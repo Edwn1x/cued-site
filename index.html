@@ -254,9 +254,24 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
 .rv-s{opacity:0;transform:scale(.92);transition:opacity .8s ease,transform .8s ease}
 .rv-s.vis{opacity:1;transform:scale(1)}
 
+/* HAMBURGER */
+.hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;background:none;border:none;cursor:pointer;padding:4px;z-index:200}
+.hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:transform .3s ease,opacity .3s ease,width .3s ease}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0;width:0}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mobile-menu{position:fixed;inset:0;background:rgba(5,5,6,.97);z-index:150;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transform:translateY(-100%);transition:transform .4s cubic-bezier(.16,1,.3,1);pointer-events:none}
+.mobile-menu.open{transform:translateY(0);pointer-events:all}
+.mobile-menu a{font-size:clamp(28px,7vw,40px);font-weight:600;letter-spacing:-1px;color:var(--text);text-decoration:none;padding:12px 0;transition:color .2s}
+.mobile-menu a:hover{color:var(--accent)}
+.mobile-menu .mm-cta{margin-top:24px;background:var(--accent);color:#fff!important;font-size:16px!important;font-weight:600;padding:14px 36px;border-radius:980px;letter-spacing:0}
+.mobile-menu .mm-cta:hover{background:#6B5CE6}
+.mm-close{position:absolute;top:18px;right:24px;background:none;border:none;color:var(--text3);font-size:28px;cursor:pointer;line-height:1;transition:color .2s}
+.mm-close:hover{color:var(--text)}
+
 /* RESPONSIVE */
 @media(max-width:768px){
-.nv-r a:not(.nv-btn){display:none}.sg{grid-template-columns:1fr}.ft-g{grid-template-columns:1fr;gap:40px}.ps{grid-template-columns:1fr}.ps-img{height:40vh}.phone{width:250px}footer{flex-direction:column;gap:12px;text-align:center}
+.nv-r{display:none}.hamburger{display:flex}.sg{grid-template-columns:1fr}.ft-g{grid-template-columns:1fr;gap:40px}.ps{grid-template-columns:1fr}.ps-img{height:40vh}.phone{width:250px}footer{flex-direction:column;gap:12px;text-align:center}
 .demo{flex-direction:column;text-align:center;padding:80px 24px}.demo-text{max-width:100%}.demo-d{margin:0 auto}
 .acc2-grid{grid-template-columns:repeat(2,1fr)}.fc-grid{grid-template-columns:1fr}
 .ws-grid{grid-template-columns:1fr;gap:40px}.ws-img{order:-1}
@@ -273,7 +288,18 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
     <a href="#pricing">Pricing</a>
     <div class="nv-btn-wrap" id="navBtn"><a href="signup.html" class="nv-btn">Get started</a></div>
   </div>
+  <button class="hamburger" id="hamburger" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mm-close" id="mmClose">&#x2715;</button>
+  <a href="index.html">Home</a>
+  <a href="how-it-works.html">How it works</a>
+  <a href="discover.html">Discover</a>
+  <a href="#pricing">Pricing</a>
+  <a href="signup.html" class="mm-cta">Get started</a>
+</div>
 
 <!-- HERO -->
 <section class="hero">
@@ -609,6 +635,15 @@ function crossfade(){
 }
 heroVidEl.addEventListener('ended',crossfade);
 setInterval(crossfade,7000);
+// Hamburger menu
+const hamburger=document.getElementById('hamburger');
+const mobileMenu=document.getElementById('mobileMenu');
+const mmClose=document.getElementById('mmClose');
+function openMenu(){mobileMenu.classList.add('open');hamburger.classList.add('open');document.body.style.overflow='hidden';}
+function closeMenu(){mobileMenu.classList.remove('open');hamburger.classList.remove('open');document.body.style.overflow='';}
+hamburger.addEventListener('click',openMenu);
+mmClose.addEventListener('click',closeMenu);
+mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));
 </script>
 </body>
 </html>
