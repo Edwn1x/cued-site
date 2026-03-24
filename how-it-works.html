@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How it Works — Cued</title>
+<meta name="description" content="See how Cued delivers personalized coaching via text. Daily rhythm, wearable integration, and AI memory — no app required.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050506;--bg2:#0A0A0C;--bg3:#111114;--surface:#19191D;--border:#1F1F24;--border2:#2A2A30;--text:#F5F5F7;--text2:#A1A1A6;--text3:#6E6E73;--accent:#7C6EFF;--accent2:#A599FF;--as:rgba(124,110,255,0.08);--ag:rgba(124,110,255,0.12);--green:#30D158;--f:'DM Sans',-apple-system,sans-serif;--m:'JetBrains Mono',monospace;--light:#F7F6F2;--light2:#EDEAE3;--light-text:#1A1A1E;--light-text2:#4A4A52;--light-text3:#8A8A92}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{font-family:var(--f);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(24px,5vw,64px);background:transparent;border-bottom:none}
+.nv-logo{font-size:18px;font-weight:600;letter-spacing:-.5px;color:var(--text);text-decoration:none;margin-left:24px;transition:color .3s}
+.nv-logo.light{color:var(--accent)}
+.nv-r{display:flex;gap:28px;align-items:center}
+.nv-r a{color:var(--text3);font-size:13px;text-decoration:none;transition:color .2s}
+.nv-r a:hover{color:var(--text)}
+.nv-btn{background:var(--accent);color:#fff!important;font-size:12px;font-weight:600;padding:7px 16px;border-radius:980px;text-decoration:none;transition:all .2s}
+.nv-btn:hover{background:#6B5CE6}
+footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);display:flex;justify-content:space-between;align-items:center}
+.ftl{font-size:12px;color:var(--text3)}
+.ftr{display:flex;gap:20px}
+.ftr a{font-size:12px;color:var(--text3);text-decoration:none;transition:color .2s}
+.ftr a:hover{color:var(--text2)}
+.rv{opacity:0;transform:translateY(28px);transition:opacity .8s ease,transform .8s ease}
+.rv.vis{opacity:1;transform:translateY(0)}
+.rv-d1{transition-delay:.1s}.rv-d2{transition-delay:.2s}.rv-d3{transition-delay:.3s}.rv-d4{transition-delay:.4s}
+.rv-l{opacity:0;transform:translateX(-40px);transition:opacity .8s ease,transform .8s ease}
+.rv-r{opacity:0;transform:translateX(40px);transition:opacity .8s ease,transform .8s ease}
+.rv-l.vis,.rv-r.vis{opacity:1;transform:translateX(0)}
+.rv-s{opacity:0;transform:scale(.92);transition:opacity .8s ease,transform .8s ease}
+.rv-s.vis{opacity:1;transform:scale(1)}
+.rv-pop{opacity:0;transform:translateY(60px);transition:opacity 1s ease,transform 1s cubic-bezier(.16,1,.3,1)}
+.rv-pop.vis{opacity:1;transform:translateY(0)}
+
+/* PAGE HERO */
+.page-hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;text-align:center}
+.page-hero-img{position:absolute;inset:0;z-index:0}
+.page-hero-img img{width:100%;height:100%;object-fit:cover;filter:brightness(.38) contrast(1.1) saturate(.75)}
+.page-hero-ov{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(5,5,6,.5) 0%,rgba(5,5,6,.2) 40%,rgba(5,5,6,.6) 75%,var(--bg) 100%)}
+.page-hero-c{position:relative;z-index:2;padding:0 24px;max-width:720px;margin:0 auto}
+.page-hero-label{font-size:11px;font-family:var(--m);font-weight:500;color:var(--accent);letter-spacing:4px;text-transform:uppercase;margin-bottom:24px;opacity:0;animation:hIn .8s ease .2s forwards}
+.page-hero h1{font-size:clamp(40px,6vw,80px);font-weight:700;letter-spacing:-3px;line-height:1.02;margin-bottom:20px;opacity:0;animation:hIn .8s ease .4s forwards}
+.page-hero-sub{font-size:clamp(16px,1.8vw,20px);color:var(--text2);font-weight:300;line-height:1.55;max-width:520px;margin:0 auto 40px;opacity:0;animation:hIn .8s ease .6s forwards}
+@keyframes hIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* TIMELINE */
+.timeline{padding:120px 24px;border-top:1px solid var(--border)}
+.tl-hd{text-align:center;margin-bottom:80px}
+.tl-l{font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:3px;margin-bottom:16px}
+.tl-t{font-size:clamp(28px,4vw,48px);font-weight:700;letter-spacing:-1.5px;margin-bottom:8px}
+.tl-d{font-size:17px;color:var(--text2);font-weight:300}
+.tl-body{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;max-width:1100px;margin:0 auto}
+.tl-steps{display:flex;flex-direction:column;gap:0}
+.tl-step{padding:24px 24px 24px 28px;border-left:2px solid var(--border2);cursor:pointer;transition:border-color .25s,background .25s;border-radius:0 12px 12px 0;position:relative}
+.tl-step:hover{background:rgba(255,255,255,.02)}
+.tl-step.active{border-left-color:var(--accent);background:rgba(124,110,255,.04)}
+.tl-step-time{font-size:11px;font-family:var(--m);color:var(--text3);letter-spacing:1.5px;margin-bottom:6px;transition:color .25s}
+.tl-step.active .tl-step-time{color:var(--accent)}
+.tl-step h3{font-size:17px;font-weight:600;margin-bottom:4px;letter-spacing:-.2px;color:var(--text2);transition:color .25s}
+.tl-step.active h3{color:var(--text)}
+.tl-step p{font-size:14px;color:var(--text3);line-height:1.6;max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .4s ease}
+.tl-step.active p{max-height:80px;opacity:1}
+/* phone mockup */
+.tl-phone-wrap{position:sticky;top:calc(50vh - 300px)}
+.tl-phone{width:300px;margin:0 auto;background:#1A1A1E;border-radius:50px;border:1px solid #3A3A40;padding:0;box-shadow:0 0 0 1px #0A0A0C,inset 0 0 0 1px rgba(255,255,255,.06),0 40px 80px rgba(0,0,0,.8),0 0 60px rgba(124,110,255,.05);overflow:hidden;position:relative}
+/* side buttons */
+.tl-phone::before{content:'';position:absolute;left:-3px;top:100px;width:3px;height:36px;background:#2A2A30;border-radius:2px 0 0 2px;box-shadow:0 44px 0 #2A2A30,0 80px 0 #2A2A30}
+.tl-phone::after{content:'';position:absolute;right:-3px;top:130px;width:3px;height:60px;background:#2A2A30;border-radius:0 2px 2px 0}
+/* status bar */
+.tl-status{display:flex;justify-content:space-between;align-items:center;padding:14px 24px 0;height:44px}
+.tl-status-time{font-size:13px;font-weight:600;color:var(--text);letter-spacing:-.3px}
+.tl-status-icons{display:flex;align-items:center;gap:5px}
+.tl-status-icons svg{width:16px;height:12px;fill:var(--text)}
+/* dynamic island */
+.tl-island{width:100px;height:30px;background:#000;border-radius:20px;margin:4px auto 0}
+/* chat header */
+.tl-phone-screen{background:#050506;display:flex;flex-direction:column;height:580px}
+.tl-phone-header{display:flex;align-items:center;gap:10px;padding:12px 16px 10px;border-bottom:1px solid rgba(255,255,255,.06)}
+.tl-phone-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.tl-phone-info{flex:1}
+.tl-phone-name{font-size:13px;font-weight:600;color:var(--text)}
+.tl-phone-status{font-size:10px;color:var(--green);display:flex;align-items:center;gap:4px}
+.tl-phone-status::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block}
+/* messages */
+.tl-msgs{flex:1;padding:12px 14px;overflow:hidden;display:flex;flex-direction:column;gap:0}
+.tl-msg{max-width:78%;padding:9px 13px;font-size:12.5px;line-height:1.5;margin-bottom:2px;word-break:break-word}
+.tl-msg.coach{background:#2C2C2E;color:var(--text);border-radius:18px 18px 18px 4px;margin-right:auto}
+.tl-msg.user{background:var(--accent);color:#fff;border-radius:18px 18px 4px 18px;margin-left:auto}
+.tl-msg-time{font-size:9px;color:var(--text3);margin-bottom:8px;padding:0 4px}
+.tl-msg-time.r{text-align:right}
+/* input bar */
+.tl-input-bar{padding:8px 12px 16px;display:flex;align-items:center;gap:8px;border-top:1px solid rgba(255,255,255,.06)}
+.tl-input{flex:1;background:#2C2C2E;border-radius:20px;padding:8px 14px;font-size:12px;color:var(--text3);display:flex;align-items:center}
+.tl-input-send{width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tl-input-send svg{width:12px;height:12px;fill:#fff}
+/* home bar */
+.tl-home-bar{height:28px;display:flex;align-items:center;justify-content:center;background:#050506}
+.tl-home-bar::before{content:'';width:100px;height:4px;background:rgba(255,255,255,.2);border-radius:2px}
+/* message panel transition */
+.tl-panel{display:none}
+.tl-panel.active{display:flex;flex-direction:column;animation:msgIn .35s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* MEMORY SECTION — light bg, no box styling */
+.memory{padding:120px 24px;background:var(--light)}
+.memory-i{max-width:1000px;margin:0 auto}
+.mem-l{font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:3px;margin-bottom:16px;text-align:center}
+.mem-t{font-size:clamp(28px,4vw,44px);font-weight:700;letter-spacing:-1.5px;text-align:center;margin-bottom:72px;color:var(--light-text)}
+.mem-grid{display:grid;grid-template-columns:repeat(3,1fr)}
+.mem-cell{padding:48px 36px;text-align:center;border-top:1px solid var(--light2)}
+.mem-cell:not(:last-child){border-right:1px solid var(--light2)}
+.mem-num{font-size:64px;font-weight:700;font-family:var(--m);background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-3px;line-height:1;margin-bottom:12px}
+.mem-title{font-size:17px;font-weight:600;color:var(--light-text);margin-bottom:8px;letter-spacing:-.3px}
+.mem-desc{font-size:14px;color:var(--light-text2);line-height:1.6;font-weight:300}
+
+/* WEARABLE */
+.wearable-section{padding:120px 24px;border-top:1px solid var(--border);background:var(--bg)}
+.ws-inner{max-width:1100px;margin:0 auto}
+.ws-title{font-size:clamp(36px,5.5vw,64px);font-weight:700;letter-spacing:-2.5px;line-height:1.05;margin-bottom:72px}
+.ws-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.ws-features{display:flex;flex-direction:column;gap:0}
+.ws-feat{padding:24px 0 24px 24px;border-left:2px solid var(--border2);transition:border-color .3s}
+.ws-feat.active{border-left-color:var(--accent)}
+.ws-feat:hover{border-left-color:var(--accent)}
+.ws-feat h3{font-size:18px;font-weight:600;margin-bottom:6px;letter-spacing:-.2px}
+.ws-feat p{font-size:14px;color:var(--text3);line-height:1.6}
+.ws-feat.active h3{color:var(--text)}
+.ws-feat:not(.active) h3{color:var(--text2)}
+.ws-img{position:relative;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,#111114 0%,#19191D 100%)}
+.ws-img img{width:100%;height:480px;object-fit:cover;display:block;filter:brightness(.85) contrast(1.05);border-radius:20px}
+
+/* FEATURES GRID */
+.feat{padding:120px 24px;border-top:1px solid var(--border)}
+.feat-i{max-width:1000px;margin:0 auto}
+.ft-l{font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:3px;margin-bottom:16px;text-align:center}
+.ft-t{font-size:clamp(28px,4vw,44px);font-weight:700;letter-spacing:-1.5px;text-align:center;margin-bottom:80px}
+.ft-g{display:grid;grid-template-columns:repeat(2,1fr);gap:56px 72px}
+.ft-item{position:relative}
+.ft-item::before{content:'';position:absolute;top:0;left:-24px;width:3px;height:100%;background:linear-gradient(to bottom,var(--accent),transparent);border-radius:3px;opacity:0;transition:opacity .4s}
+.ft-item:hover::before{opacity:1}
+.ft-tag{display:inline-block;font-size:10px;font-family:var(--m);color:var(--accent);letter-spacing:1.5px;margin-bottom:10px}
+.ft-item h3{font-size:20px;font-weight:600;margin-bottom:8px;letter-spacing:-.3px}
+.ft-item p{font-size:15px;color:var(--text3);line-height:1.6}
+
+/* FINAL CTA */
+.cta{padding:160px 24px;text-align:center;position:relative;overflow:hidden}
+.cta::before{content:'';position:absolute;width:800px;height:800px;top:50%;left:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(124,110,255,.06),transparent 60%);pointer-events:none}
+.cta .in{position:relative;z-index:1}
+.cta h2{font-size:clamp(36px,5.5vw,64px);font-weight:700;letter-spacing:-2.5px;line-height:1.05;margin-bottom:20px}
+.cta p{font-size:18px;color:var(--text2);font-weight:300;max-width:440px;margin:0 auto 44px;line-height:1.5}
+.bp{display:inline-flex;align-items:center;gap:8px;padding:15px 32px;background:var(--accent);color:#fff;font-size:16px;font-weight:600;border-radius:980px;text-decoration:none;border:none;cursor:pointer;font-family:var(--f);transition:all .3s}
+.bp:hover{background:#6B5CE6;transform:translateY(-2px);box-shadow:0 12px 40px rgba(124,110,255,.25)}
+
+/* SCALE REVEAL */
+body{transition:background-color 1.1s cubic-bezier(.16,1,.3,1)}
+.scale-reveal{transform:scale(0.92);border-radius:32px;overflow:hidden;transition:transform 1.1s cubic-bezier(.16,1,.3,1),border-radius 1.1s cubic-bezier(.16,1,.3,1);will-change:transform;position:relative;z-index:1}
+.scale-reveal.expanded{transform:scale(1);border-radius:0}
+
+/* UNDER THE HOOD */
+.hood{padding:120px 24px;background:linear-gradient(180deg,#0D0B1A 0%,#0A0819 100%);position:relative}
+.hood::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(124,110,255,.07),transparent)}
+.hood-i{max-width:1000px;margin:0 auto;position:relative;z-index:1}
+.hood-l{font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:3px;margin-bottom:8px;text-align:center}
+.hood-footnote{text-align:center;font-size:11px;font-family:var(--m);color:var(--text3);letter-spacing:1px;margin-bottom:20px}
+.hood-t{font-size:clamp(28px,4vw,48px);font-weight:700;letter-spacing:-2px;text-align:center;margin-bottom:12px}
+.hood-d{font-size:17px;color:var(--text2);text-align:center;font-weight:300;max-width:560px;margin:0 auto 72px;line-height:1.65}
+/* flip grid — stats-style layout */
+.hood-grid{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid rgba(124,110,255,.15);margin-bottom:48px}
+.hood-flip{border-right:1px solid rgba(124,110,255,.15);height:280px;perspective:1000px;cursor:pointer}
+.hood-flip:last-child{border-right:none}
+.hood-flip-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.16,1,.3,1)}
+.hood-flip:hover .hood-flip-inner{transform:rotateY(180deg)}
+.hood-face,.hood-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 28px;text-align:center}
+.hood-face{background:transparent}
+.hood-face-tag{font-size:10px;font-family:var(--m);color:var(--accent);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:16px}
+.hood-face-name{font-size:clamp(20px,2.5vw,28px);font-weight:700;letter-spacing:-1px;color:var(--text);line-height:1.1}
+.hood-back{background:var(--accent);transform:rotateY(180deg)}
+.hood-back-tag{font-size:10px;font-family:var(--m);color:rgba(255,255,255,.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.hood-back h3{font-size:16px;font-weight:700;color:#fff;margin-bottom:10px;letter-spacing:-.2px;line-height:1.2}
+.hood-back p{font-size:13px;color:rgba(255,255,255,.82);line-height:1.6}
+.hood-badge{display:flex;justify-content:center;margin-bottom:24px}
+.hood-badge span{display:inline-flex;align-items:center;gap:10px;background:rgba(124,110,255,.1);border:1px solid rgba(124,110,255,.25);border-radius:980px;padding:10px 24px;font-size:14px;font-weight:500;color:var(--accent2)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+.hood-grid{grid-template-columns:repeat(2,1fr)}.hood-flip{border-right:none;border-bottom:1px solid rgba(124,110,255,.15)}.hood-flip:nth-child(odd){border-right:1px solid rgba(124,110,255,.15)}.hood-flip:nth-last-child(-n+2){border-bottom:none}
+.nv-r a:not(.nv-btn){display:none}
+.mem-grid{grid-template-columns:1fr}
+.mem-cell{border-right:none!important;border-top:1px solid var(--light2)}
+.ft-g{grid-template-columns:1fr;gap:40px}
+.ws-grid{grid-template-columns:1fr;gap:40px}
+.ws-img{order:-1}
+footer{flex-direction:column;gap:12px;text-align:center}
+.tl-body{grid-template-columns:1fr}
+.tl-phone-wrap{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nv-logo">cued</a>
+  <div class="nv-r">
+    <a href="how-it-works.html">How it works</a>
+    <a href="discover.html">Discover</a>
+    <a href="index.html#pricing">Pricing</a>
+    <a href="signup.html" class="nv-btn">Get started</a>
+  </div>
+</nav>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="page-hero-img">
+    <video autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;filter:brightness(.38) contrast(1.1) saturate(.75)" src="videos/how_it.mp4"></video>
+  </div>
+  <div class="page-hero-ov"></div>
+  <div class="page-hero-c">
+    <div class="page-hero-label">How it Works</div>
+    <h1>Your coach texts you.<br>You just show up.</h1>
+    <p class="page-hero-sub">No app. No dashboard. Just a daily rhythm that turns goals into habits.</p>
+  </div>
+</section>
+
+<div class="scale-reveal" data-bg="#050506">
+<!-- THE DAILY RHYTHM -->
+<section class="timeline" id="rhythm">
+  <div class="tl-hd">
+    <div class="tl-l rv">The daily rhythm</div>
+    <h2 class="tl-t rv rv-d1">A day with Cued.</h2>
+    <p class="tl-d rv rv-d2">Six touchpoints. Each one takes seconds. Together, they compound into results.</p>
+  </div>
+  <div class="tl-body rv">
+    <!-- STEPS -->
+    <div class="tl-steps">
+      <div class="tl-step active" data-step="0">
+        <div class="tl-step-time">6:30 AM</div>
+        <h3>Morning briefing</h3>
+        <p>Sleep assessment, energy check, today's training preview. Your coach tells you what to expect.</p>
+      </div>
+      <div class="tl-step" data-step="1">
+        <div class="tl-step-time">7:00 AM</div>
+        <h3>Breakfast</h3>
+        <p>A meal calibrated to today's workout. Reply M to swap any ingredient.</p>
+      </div>
+      <div class="tl-step" data-step="2">
+        <div class="tl-step-time">PRE-GYM</div>
+        <h3>Your workout</h3>
+        <p>Exact exercises, sets, reps, and target weights. Built on your history and today's readiness.</p>
+      </div>
+      <div class="tl-step" data-step="3">
+        <div class="tl-step-time">POST-GYM</div>
+        <h3>Log by texting</h3>
+        <p>Text back what you hit in plain English. Your coach logs it and adjusts next week.</p>
+      </div>
+      <div class="tl-step" data-step="4">
+        <div class="tl-step-time">12:30 PM</div>
+        <h3>Lunch &amp; dinner</h3>
+        <p>Meals that hit your macros. Running daily totals so you always know where you stand.</p>
+      </div>
+      <div class="tl-step" data-step="5">
+        <div class="tl-step-time">9:00 PM</div>
+        <h3>Evening wrap</h3>
+        <p>Rate your day 1–5. Preview tomorrow. Your coach files everything and adapts.</p>
+      </div>
+    </div>
+
+    <!-- PHONE -->
+    <div class="tl-phone-wrap">
+      <div class="tl-phone">
+        <div class="tl-status">
+          <span class="tl-status-time">9:41</span>
+          <div class="tl-status-icons">
+            <!-- signal -->
+            <svg viewBox="0 0 17 12"><rect x="0" y="6" width="3" height="6" rx="1"/><rect x="4.5" y="4" width="3" height="8" rx="1"/><rect x="9" y="2" width="3" height="10" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+            <!-- wifi -->
+            <svg viewBox="0 0 16 12" width="15"><path d="M8 9.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm0-3.5a5.5 5.5 0 014.24 2l-1.5 1.5A3.5 3.5 0 008 8a3.5 3.5 0 00-2.74 1.5L3.76 8A5.5 5.5 0 018 6zm0-3.5a9 9 0 016.9 3.2l-1.5 1.5A7 7 0 008 5a7 7 0 00-5.4 2.2L1.1 5.7A9 9 0 018 2.5z"/></svg>
+            <!-- battery -->
+            <svg viewBox="0 0 25 12" width="24"><rect x="0" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1" fill="none" style="color:rgba(255,255,255,.4)"/><rect x="22" y="4" width="2" height="4" rx="1" fill="rgba(255,255,255,.4)"/><rect x="1.5" y="2.5" width="16" height="7" rx="1.5" fill="currentColor"/></svg>
+          </div>
+        </div>
+        <div class="tl-island"></div>
+        <div class="tl-phone-screen">
+          <div class="tl-phone-header">
+            <div class="tl-phone-avatar">C</div>
+            <div class="tl-phone-info">
+              <div class="tl-phone-name">Cued</div>
+              <div class="tl-phone-status">Active now</div>
+            </div>
+          </div>
+          <div class="tl-msgs">
+
+            <div class="tl-panel active" id="panel-0">
+              <div class="tl-msg coach">Gm. 6h40m sleep — not ideal but workable. HRV is flat. Today's push day, bench starts at 185 which is 5 up from last week. Don't skip breakfast.</div>
+              <div class="tl-msg-time">6:30 AM</div>
+              <div class="tl-msg user">lets get it</div>
+              <div class="tl-msg-time r">6:31 AM</div>
+              <div class="tl-msg coach">That's the plan. Breakfast: 3 eggs scrambled, toast, banana. ~470 cal, 34g protein. Or grab eggs + oatmeal from the dining hall.</div>
+              <div class="tl-msg-time">6:31 AM</div>
+            </div>
+
+            <div class="tl-panel" id="panel-1">
+              <div class="tl-msg coach">Breakfast reminder — you need food before this afternoon. Eggs + toast if you're cooking. Dining hall: omelet station + fruit + yogurt. ~500 cal, 38g protein.</div>
+              <div class="tl-msg-time">7:00 AM</div>
+              <div class="tl-msg user">had a protein bar and coffee lol</div>
+              <div class="tl-msg-time r">7:12 AM</div>
+              <div class="tl-msg coach">That's like 250 cal and 20g protein. You're going to feel it by set 3 on bench. Eat something real before noon or tonight is going to be rough.</div>
+              <div class="tl-msg-time">7:12 AM</div>
+            </div>
+
+            <div class="tl-panel" id="panel-2">
+              <div class="tl-msg user">W</div>
+              <div class="tl-msg-time r">3:50 PM</div>
+              <div class="tl-msg coach">Push Day (50 min)<br>1. Bench Press — 4×6 @ 185<br>2. OHP — 3×8 @ 105<br>3. Incline DB — 3×10 @ 55s<br>4. Cable Fly — 3×12<br>5. Lateral Raises — 3×15<br>6. Tricep Pushdown — 3×12<br><br>185 is 5 up from last week. If set 4 gets ugly, drop to 175. No ego reps.</div>
+              <div class="tl-msg-time">3:50 PM</div>
+            </div>
+
+            <div class="tl-panel" id="panel-3">
+              <div class="tl-msg coach">Session should be done. How'd it go?</div>
+              <div class="tl-msg-time">5:30 PM</div>
+              <div class="tl-msg user">bench 185 got 6 6 6 5 on last set. ohp good. incline felt heavy lowkey</div>
+              <div class="tl-msg-time r">5:44 PM</div>
+              <div class="tl-msg coach">Logged. Bench 185 — 6/6/6/5. Close enough, we run it back next week. If you get 4×6 clean, we move to 190. Incline felt heavy probably bc you ate a protein bar for breakfast. Noted.</div>
+              <div class="tl-msg-time">5:44 PM</div>
+            </div>
+
+            <div class="tl-panel" id="panel-4">
+              <div class="tl-msg coach">Lunch: chicken burrito bowl — rice, beans, chicken, salsa, skip the queso. ~640 cal, 42g protein. Running total: ~1,100 cal, 82g protein. Reply M for something else.</div>
+              <div class="tl-msg-time">12:30 PM</div>
+              <div class="tl-msg user">M</div>
+              <div class="tl-msg-time r">12:33 PM</div>
+              <div class="tl-msg coach">Option A: Turkey wrap + Greek yogurt. ~520 cal, 40g protein. Option B: Dining hall stir fry — chicken, broccoli, rice. ~600 cal, 38g protein.</div>
+              <div class="tl-msg-time">12:33 PM</div>
+            </div>
+
+            <div class="tl-panel" id="panel-5">
+              <div class="tl-msg coach">Day's done. Rate it 1–5. Tomorrow's pull — deadlifts at 225. Get more than 6 hours tonight.</div>
+              <div class="tl-msg-time">9:00 PM</div>
+              <div class="tl-msg user">4</div>
+              <div class="tl-msg-time r">9:04 PM</div>
+              <div class="tl-msg coach">Solid. That bench is close to going up — one more clean session and we bump it. Sleep well.</div>
+              <div class="tl-msg-time">9:04 PM</div>
+            </div>
+
+          </div>
+          <div class="tl-input-bar">
+            <div class="tl-input">Message</div>
+            <div class="tl-input-send"><svg viewBox="0 0 12 12"><path d="M1 6h10M6 1l5 5-5 5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+          </div>
+        </div>
+        <div class="tl-home-bar"></div>
+      </div>
+    </div>
+  </div>
+</section>
+</div><!-- /scale-reveal -->
+
+<!-- WHAT YOUR COACH REMEMBERS -->
+<div class="scale-reveal" data-bg="#F7F6F2">
+<section class="memory">
+  <div class="memory-i">
+    <div class="mem-l rv">Memory</div>
+    <h2 class="mem-t rv rv-d1">What your coach remembers.</h2>
+    <div class="mem-grid">
+      <div class="mem-cell rv rv-d1">
+        <div class="mem-num">∞</div>
+        <div class="mem-title">Everything</div>
+        <p class="mem-desc">Every workout, every meal, every check-in, every time you said your shoulder felt tight.</p>
+      </div>
+      <div class="mem-cell rv rv-d2">
+        <div class="mem-num">52</div>
+        <div class="mem-title">Every week</div>
+        <p class="mem-desc">Progressive overload applied automatically. Your weights go up as you get stronger.</p>
+      </div>
+      <div class="mem-cell rv rv-d3">
+        <div class="mem-num">1</div>
+        <div class="mem-title">Every goal</div>
+        <p class="mem-desc">Fat loss, muscle gain, marathon prep. Your plan is always pointed at what you're actually chasing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+</div><!-- /scale-reveal -->
+
+<div class="scale-reveal" data-bg="#0D0B1A">
+<!-- UNDER THE HOOD -->
+<section class="hood">
+  <div class="hood-i">
+    <div class="hood-l rv">Under the hood</div>
+    <p class="hood-footnote rv">Powered by multi-agent orchestration</p>
+    <h2 class="hood-t rv rv-d1">Your coach never stops thinking.</h2>
+    <p class="hood-d rv rv-d2">While you sleep, Cued reviews your week — analyzing what worked, what didn't, and what to change next. Four dedicated AI systems handle training, nutrition, recovery, and coaching. You only ever talk to one coach.</p>
+    <div class="hood-grid rv">
+      <div class="hood-flip">
+        <div class="hood-flip-inner">
+          <div class="hood-face">
+            <div class="hood-face-tag">Agent 01</div>
+            <div class="hood-face-name">Readiness<br>Agent</div>
+          </div>
+          <div class="hood-back">
+            <div class="hood-back-tag">Recovery</div>
+            <h3>Knows how you feel before you do.</h3>
+            <p>Processes wearable data overnight — sleep quality, HRV, strain — and adjusts your entire day before your alarm goes off.</p>
+          </div>
+        </div>
+      </div>
+      <div class="hood-flip">
+        <div class="hood-flip-inner">
+          <div class="hood-face">
+            <div class="hood-face-tag">Agent 02</div>
+            <div class="hood-face-name">Training<br>Agent</div>
+          </div>
+          <div class="hood-back">
+            <div class="hood-back-tag">Programming</div>
+            <h3>Programs like a real coach.</h3>
+            <p>Designs your session with true progressive overload — exact exercises, weights, and volume built on everything you've ever lifted.</p>
+          </div>
+        </div>
+      </div>
+      <div class="hood-flip">
+        <div class="hood-flip-inner">
+          <div class="hood-face">
+            <div class="hood-face-tag">Agent 03</div>
+            <div class="hood-face-name">Nutrition<br>Agent</div>
+          </div>
+          <div class="hood-back">
+            <div class="hood-back-tag">Nutrition</div>
+            <h3>Food that follows your training.</h3>
+            <p>Plans meals that match what you did today. Heavy session? Carbs go up. Rest day? Calories come down. Automatically.</p>
+          </div>
+        </div>
+      </div>
+      <div class="hood-flip">
+        <div class="hood-flip-inner">
+          <div class="hood-face">
+            <div class="hood-face-tag">Agent 04</div>
+            <div class="hood-face-name">Conversation<br>Agent</div>
+          </div>
+          <div class="hood-back">
+            <div class="hood-back-tag">Delivery</div>
+            <h3>Synthesizes it all into one text.</h3>
+            <p>Takes output from three complex systems and writes it as a natural coaching message. You just reply.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</div><!-- /scale-reveal -->
+
+<div class="scale-reveal" data-bg="#0A0A0C">
+<!-- WORKS WITH YOUR WEARABLES -->
+<section class="wearable-section">
+  <div class="ws-inner">
+    <h2 class="ws-title rv">Built to work with what's on your wrist.</h2>
+    <div class="ws-grid">
+      <div class="ws-features rv-l">
+        <div class="ws-feat active">
+          <h3>Zero extra steps</h3>
+          <p>Connect once. Your coach pulls sleep, HRV, strain, and recovery data automatically.</p>
+        </div>
+        <div class="ws-feat">
+          <h3>Readiness-adjusted plans</h3>
+          <p>Slept 5 hours? Volume drops. HRV spiking? Your coach pushes harder.</p>
+        </div>
+        <div class="ws-feat">
+          <h3>Works with everything</h3>
+          <p>Apple Watch. Oura Ring. Garmin. Whoop. Fitbit. Samsung. No wearable? No problem.</p>
+        </div>
+      </div>
+      <div class="ws-img rv-r">
+        <img src="images/wearable.jpg" alt="Wearable fitness device">
+      </div>
+    </div>
+  </div>
+</section>
+</div><!-- /scale-reveal -->
+
+<div class="scale-reveal" data-bg="#0A0A0C">
+<!-- CAPABILITIES -->
+<section class="feat" style="border-top:none">
+  <div class="feat-i">
+    <div class="ft-l rv">Capabilities</div>
+    <h2 class="ft-t rv rv-d1">Everything a coach does. None of the app fatigue.</h2>
+    <div class="ft-g">
+      <div class="ft-item rv rv-d1">
+        <span class="ft-tag">TRAINING</span>
+        <h3>Personalized programming</h3>
+        <p>Specific exercises, sets, reps, and weights adjusted based on recovery, performance, and your goals.</p>
+      </div>
+      <div class="ft-item rv rv-d2">
+        <span class="ft-tag">NUTRITION</span>
+        <h3>Meal plans that adapt</h3>
+        <p>Higher carbs on heavy days. More protein on recovery. Calibrated for dining halls, home cooking, or eating out.</p>
+      </div>
+      <div class="ft-item rv rv-d3">
+        <span class="ft-tag">RECOVERY</span>
+        <h3>Wearable-aware coaching</h3>
+        <p>Connect Apple Watch, Oura, or Garmin. Bad sleep? Volume drops automatically.</p>
+      </div>
+      <div class="ft-item rv rv-d4">
+        <span class="ft-tag">INTELLIGENCE</span>
+        <h3>Memory &amp; adaptation</h3>
+        <p>Your coach remembers every session, every meal, every check-in. Learns your patterns and adjusts week over week.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /scale-reveal -->
+
+<!-- FINAL CTA -->
+<div class="scale-reveal" data-bg="#050506">
+<section class="cta">
+  <div class="in">
+    <h2 class="rv">Ready to meet your coach?</h2>
+    <p class="rv rv-d1">Takes 3 minutes to set up. Your first text arrives tomorrow.</p>
+    <a href="signup.html" class="bp rv rv-d2">Get cued — $1.50/mo →</a>
+  </div>
+</section>
+</div><!-- /scale-reveal -->
+
+<footer>
+  <span class="ftl">© 2026 Cued</span>
+  <div class="ftr">
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+  </div>
+</footer>
+
+<script>
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('vis');
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.rv, .rv-l, .rv-r, .rv-s, .rv-pop').forEach(el => obs.observe(el));
+
+// Timeline interactivity
+const steps = document.querySelectorAll('.tl-step');
+steps.forEach(step => {
+  step.addEventListener('mouseenter', () => {
+    const i = step.dataset.step;
+    steps.forEach(s => s.classList.remove('active'));
+    step.classList.add('active');
+    document.querySelectorAll('.tl-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + i).classList.add('active');
+  });
+});
+
+// Nav logo color — purple over light sections
+const logo=document.querySelector('.nv-logo');
+const lightSections=document.querySelectorAll('.memory');
+function checkLogo(){
+  const any=Array.from(lightSections).some(s=>{const r=s.getBoundingClientRect();return r.top<=56&&r.bottom>=0;});
+  logo.classList.toggle('light',any);
+}
+window.addEventListener('scroll',checkLogo,{passive:true});
+
+// Scale-reveal
+const srObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    e.target.classList.toggle('expanded',e.isIntersecting);
+    if(e.isIntersecting){const bg=e.target.dataset.bg;if(bg)document.body.style.backgroundColor=bg;}
+  });
+},{threshold:0.08});
+document.querySelectorAll('.scale-reveal').forEach(b=>srObs.observe(b));
+</script>
+</body>
+</html>

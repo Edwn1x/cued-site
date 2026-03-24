@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cued — AI coaching, right in your texts</title>
+<meta name="description" content="Personalized workouts, daily meal plans, and recovery coaching — delivered via SMS. No app to open. $1.50/month.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050506;--bg2:#0A0A0C;--bg3:#111114;--surface:#19191D;--border:#1F1F24;--border2:#2A2A30;--text:#F5F5F7;--text2:#A1A1A6;--text3:#6E6E73;--accent:#7C6EFF;--accent2:#A599FF;--as:rgba(124,110,255,0.08);--ag:rgba(124,110,255,0.12);--green:#30D158;--f:'DM Sans',-apple-system,sans-serif;--m:'JetBrains Mono',monospace;
+--light:#F7F6F2;--light2:#EDEAE3;--light-text:#1A1A1E;--light-text2:#4A4A52;--light-text3:#8A8A92}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{font-family:var(--f);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(24px,5vw,64px);background:transparent;border-bottom:none}
+.nv-logo{font-size:18px;font-weight:600;letter-spacing:-.5px;color:var(--text);opacity:0;transform:translateY(-6px);transition:opacity .4s,transform .4s,color .4s;pointer-events:none;margin-left:24px}
+.nv-logo.show{opacity:1;transform:translateY(0);pointer-events:auto}
+.nv-logo.light{color:var(--accent)}
+.nv-r{display:flex;gap:28px;align-items:center;transition:gap .5s cubic-bezier(.16,1,.3,1)}
+.nv-r a{color:var(--text3);font-size:13px;text-decoration:none;transition:color .2s}
+.nv-r a:hover{color:var(--text)}
+.nv-btn-wrap{max-width:0;overflow:hidden;transition:max-width .55s cubic-bezier(.16,1,.3,1),opacity .4s ease;opacity:0}
+.nv-btn-wrap.show{max-width:140px;opacity:1}
+.nv-btn{background:var(--accent);color:#fff!important;font-size:12px;font-weight:600;padding:7px 16px;border-radius:980px;text-decoration:none;white-space:nowrap;display:inline-block;transition:background .2s}
+.nv-btn:hover{background:#6B5CE6}
+
+/* HERO */
+.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden}
+.hero-vid{position:absolute;inset:0;z-index:0}
+.hero-vid video{width:100%;height:100%;object-fit:cover;filter:brightness(.45) contrast(1.1) saturate(.8);transition:opacity .8s ease}
+.hero-ov{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(5,5,6,.6) 0%,rgba(5,5,6,.3) 40%,rgba(5,5,6,.6) 70%,var(--bg) 100%)}
+.hero-flare{position:absolute;z-index:1;width:500px;height:500px;top:20%;right:-10%;background:radial-gradient(circle,rgba(124,110,255,.1),transparent 70%);pointer-events:none;animation:flareF 8s ease-in-out infinite}
+@keyframes flareF{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,20px)}}
+.hero-c{position:relative;z-index:2;padding:0 24px}
+.hero-logo{font-size:clamp(72px,14vw,140px);font-weight:200;letter-spacing:-4px;line-height:1;margin-bottom:8px;opacity:0;animation:hIn 1s ease .2s forwards}
+.hero-tag{font-size:clamp(13px,1.6vw,16px);font-weight:400;letter-spacing:8px;text-transform:uppercase;color:var(--text2);margin-bottom:48px;opacity:0;animation:hIn 1s ease .5s forwards}
+.hero-sub{font-size:clamp(16px,1.8vw,20px);color:var(--text2);line-height:1.55;max-width:480px;margin:0 auto 44px;font-weight:300;opacity:0;animation:hIn 1s ease .7s forwards}
+.hero-acts{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;opacity:0;animation:hIn 1s ease .9s forwards}
+.bp{display:inline-flex;align-items:center;gap:8px;padding:15px 32px;background:var(--accent);color:#fff;font-size:16px;font-weight:600;border-radius:980px;text-decoration:none;border:none;cursor:pointer;font-family:var(--f);transition:all .3s}
+.bp:hover{background:#6B5CE6;transform:translateY(-2px);box-shadow:0 12px 40px rgba(124,110,255,.25)}
+.bs{display:inline-flex;align-items:center;gap:8px;padding:15px 32px;background:rgba(255,255,255,.06);color:var(--text2);font-size:16px;font-weight:500;border-radius:980px;text-decoration:none;border:1px solid rgba(255,255,255,.1);cursor:pointer;font-family:var(--f);transition:all .3s}
+.bs:hover{border-color:rgba(255,255,255,.2);color:var(--text);background:rgba(255,255,255,.08)}
+@keyframes hIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+/* MARQUEE */
+.marquee{overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:16px 0;background:var(--bg2)}
+.marquee-track{display:flex;gap:48px;animation:marq 25s linear infinite;width:max-content}
+.marquee-item{font-size:13px;font-family:var(--m);color:var(--text3);white-space:nowrap;display:flex;align-items:center;gap:10px}
+.marquee-item::before{content:'';width:5px;height:5px;background:var(--accent);border-radius:50%}
+@keyframes marq{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* TAGLINE */
+.tagline{padding:100px 24px;text-align:center;background:var(--light)}
+.tagline p{font-size:clamp(20px,2.8vw,30px);font-weight:300;color:var(--light-text2);max-width:680px;margin:0 auto;line-height:1.55;letter-spacing:-.5px}
+.tagline strong{color:var(--light-text);font-weight:600}
+
+/* PHOTO BAND */
+.pb{width:100%;height:60vh;min-height:400px;position:relative;overflow:hidden;background:linear-gradient(135deg,#0A0A10 0%,#12101E 50%,#0A0A10 100%)}
+.pb img{width:100%;height:100%;object-fit:cover;filter:brightness(.65) contrast(1.05) saturate(1.1);transition:transform 8s ease}
+.pb:hover img{transform:scale(1.05)}
+.pb-ov{position:absolute;inset:0;background:linear-gradient(to bottom,var(--bg) 0%,transparent 20%,transparent 80%,var(--bg) 100%)}
+.pb-txt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;text-align:center;padding:24px}
+.pb-txt h2{font-size:clamp(28px,5vw,56px);font-weight:700;letter-spacing:-2px;margin-bottom:8px;line-height:1.05}
+.pb-txt p{font-size:17px;color:var(--text2);font-weight:300}
+
+/* PHONE — side by side */
+.demo{padding:120px 24px;display:flex;align-items:center;justify-content:center;gap:clamp(40px,6vw,100px);max-width:1100px;margin:0 auto}
+.demo-text{flex:1;max-width:480px}
+.demo-l{font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:3px;margin-bottom:16px}
+.demo-t{font-size:clamp(28px,3.5vw,44px);font-weight:700;letter-spacing:-1.5px;margin-bottom:12px;line-height:1.1}
+.demo-d{font-size:17px;color:var(--text2);max-width:400px;font-weight:300;line-height:1.55}
+.demo-phone{flex-shrink:0}
+.phone{width:280px;background:#111114;border-radius:40px;border:2px solid #2A2A30;padding:12px;box-shadow:0 0 0 4px #0A0A0C,0 60px 100px rgba(0,0,0,.7),0 0 80px rgba(124,110,255,.04)}
+/* pop-up animation */
+.rv-pop{opacity:0;transform:translateY(60px);transition:opacity 1s ease,transform 1s cubic-bezier(.16,1,.3,1)}
+.rv-pop.vis{opacity:1;transform:translateY(0)}
+.phone-n{width:80px;height:20px;background:#050506;border-radius:0 0 12px 12px;margin:-12px auto 8px}
+.phone-s{background:#050506;border-radius:28px;padding:14px 10px;min-height:420px}
+.ph{text-align:center;padding-bottom:12px;margin-bottom:14px;border-bottom:1px solid var(--border)}
+.ph-n{font-size:14px;font-weight:600}.ph-s{font-size:10px;color:var(--text3);margin-top:2px}
+.bb{max-width:84%;padding:9px 13px;border-radius:18px;font-size:12px;line-height:1.5;margin-bottom:6px}
+.bb.c{background:#19191D;color:var(--text);border-bottom-left-radius:4px;margin-right:auto}
+.bb.u{background:var(--accent);color:#fff;border-bottom-right-radius:4px;margin-left:auto}
+.bt{font-size:9px;color:var(--text3);margin-bottom:10px}.bt.r{text-align:right}
+
+/* STATS SECTION */
+.acc{background:var(--bg);padding:120px 24px}
+.acc-i{max-width:1000px;margin:0 auto}
+.acc-l{font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:3px;margin-bottom:16px;text-align:center}
+.acc-t{font-size:clamp(32px,4.5vw,52px);font-weight:700;letter-spacing:-2px;text-align:center;margin-bottom:12px}
+.acc-t em{font-style:italic;font-weight:400;color:var(--text2)}
+.acc-d{font-size:17px;color:var(--text2);text-align:center;font-weight:300;max-width:500px;margin:0 auto 72px}
+.sg{display:grid;grid-template-columns:repeat(3,1fr)}
+.sc{padding:48px 36px;text-align:center;border-top:1px solid var(--border)}
+.sc:not(:last-child){border-right:1px solid var(--border)}
+.sn{font-size:64px;font-weight:700;font-family:var(--m);color:var(--text);margin-bottom:12px;letter-spacing:-3px;line-height:1}
+.st{font-size:14px;color:var(--text3);line-height:1.6}
+
+/* FLOW */
+.flow{padding:120px 24px;border-top:1px solid var(--border)}
+.flow-i{max-width:660px;margin:0 auto}
+.fl-l{font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:3px;margin-bottom:16px;text-align:center}
+.fl-t{font-size:clamp(28px,4vw,44px);font-weight:700;letter-spacing:-1.5px;text-align:center;margin-bottom:8px}
+.fl-d{font-size:17px;color:var(--text2);text-align:center;font-weight:300;margin-bottom:64px}
+.fi{display:flex;gap:24px;padding:26px 0;border-bottom:1px solid var(--border);transition:all .4s}
+.fi:first-of-type{border-top:1px solid var(--border)}
+.fi:hover{padding-left:8px}
+.fi-t{font-family:var(--m);font-size:12px;color:var(--accent);min-width:80px;padding-top:3px;flex-shrink:0}
+.fi-b h3{font-size:16px;font-weight:600;margin-bottom:4px;letter-spacing:-.2px}
+.fi-b p{font-size:14px;color:var(--text3);line-height:1.5}
+
+/* PHOTO SPLIT */
+.ps{display:grid;grid-template-columns:1fr 1fr;min-height:50vh}
+.ps-img{position:relative;overflow:hidden;background:linear-gradient(135deg,#111114 0%,#19191D 100%)}
+.ps-img img{width:100%;height:100%;object-fit:cover;filter:brightness(.7) contrast(1.05) saturate(1.1);transition:transform 6s ease}
+.ps-img:hover img{transform:scale(1.05)}
+.ps-c{display:flex;flex-direction:column;justify-content:center;padding:64px clamp(32px,5vw,80px);background:var(--bg2)}
+.ps-c h2{font-size:clamp(24px,3vw,36px);font-weight:700;letter-spacing:-1px;margin-bottom:16px;line-height:1.15}
+.ps-c p{font-size:15px;color:var(--text2);line-height:1.6;font-weight:300;margin-bottom:24px}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{font-size:12px;font-family:var(--m);color:var(--accent);background:var(--as);padding:5px 14px;border-radius:980px;border:1px solid rgba(124,110,255,.15)}
+
+/* WHOOP-STYLE WEARABLE */
+.wearable-section{padding:120px 24px;border-top:1px solid var(--border);background:var(--bg)}
+.ws-inner{max-width:1100px;margin:0 auto}
+.ws-title{font-size:clamp(36px,5.5vw,64px);font-weight:700;letter-spacing:-2.5px;line-height:1.05;margin-bottom:72px}
+.ws-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.ws-features{display:flex;flex-direction:column;gap:0}
+.ws-feat{padding:24px 0 24px 24px;border-left:2px solid var(--border2);transition:border-color .3s}
+.ws-feat.active{border-left-color:var(--accent)}
+.ws-feat:hover{border-left-color:var(--accent)}
+.ws-feat h3{font-size:18px;font-weight:600;margin-bottom:6px;letter-spacing:-.2px}
+.ws-feat p{font-size:14px;color:var(--text3);line-height:1.6}
+.ws-feat.active h3{color:var(--text)}
+.ws-feat:not(.active) h3{color:var(--text2)}
+.ws-img{position:relative;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,#111114 0%,#19191D 100%)}
+.ws-img img{width:100%;height:480px;object-fit:cover;display:block;filter:brightness(.85) contrast(1.05);border-radius:20px}
+
+/* FEATURES */
+.feat{padding:120px 24px;border-top:1px solid var(--border)}
+.feat-i{max-width:1000px;margin:0 auto}
+.ft-l{font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:3px;margin-bottom:16px;text-align:center}
+.ft-t{font-size:clamp(28px,4vw,44px);font-weight:700;letter-spacing:-1.5px;text-align:center;margin-bottom:80px}
+.ft-g{display:grid;grid-template-columns:repeat(2,1fr);gap:56px 72px}
+.ft-item{position:relative}
+.ft-item::before{content:'';position:absolute;top:0;left:-24px;width:3px;height:100%;background:linear-gradient(to bottom,var(--accent),transparent);border-radius:3px;opacity:0;transition:opacity .4s}
+.ft-item:hover::before{opacity:1}
+.ft-tag{display:inline-block;font-size:10px;font-family:var(--m);color:var(--accent);letter-spacing:1.5px;margin-bottom:10px}
+.ft-item h3{font-size:20px;font-weight:600;margin-bottom:8px;letter-spacing:-.3px}
+.ft-item p{font-size:15px;color:var(--text3);line-height:1.6}
+
+/* PRICING */
+.pricing{padding:140px 24px;background:var(--bg);position:relative}
+.pr-i{max-width:1100px;margin:0 auto;position:relative;z-index:1}
+.pr-l{font-size:11px;font-family:var(--m);font-weight:500;color:var(--accent);text-transform:uppercase;letter-spacing:3px;margin-bottom:56px}
+.pr-split{display:grid;grid-template-columns:1fr 1px 1fr;gap:0;align-items:center;border-top:1px solid var(--border)}
+.pr-price-col{padding:64px 80px 64px 0;display:flex;flex-direction:column;gap:8px}
+.pr-t{font-size:clamp(64px,10vw,120px);font-weight:700;letter-spacing:-5px;line-height:.9}
+.pr-t em{display:block;font-style:italic;font-weight:200;color:var(--text2);font-size:clamp(32px,5vw,56px);letter-spacing:-2px}
+.pr-was{font-size:13px;color:var(--text3);font-family:var(--m);text-decoration:line-through;margin-top:16px}
+.pr-divider-v{width:1px;background:var(--border);align-self:stretch}
+.pr-detail-col{padding:64px 0 64px 80px;display:flex;flex-direction:column;justify-content:center;gap:32px}
+.pr-sub{font-size:17px;color:var(--text2);font-weight:300;line-height:1.65;max-width:380px}
+.pr-items{display:flex;flex-direction:column;gap:12px}
+.pr-item{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--text3)}
+.pr-item::before{content:'';width:4px;height:4px;background:var(--accent);border-radius:50%;flex-shrink:0}
+.pr-actions{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.pr-cta{display:inline-flex;align-items:center;gap:8px;padding:15px 32px;background:var(--accent);color:#fff;font-size:15px;font-weight:600;border-radius:980px;text-decoration:none;transition:all .3s}
+.pr-cta:hover{background:#6B5CE6;transform:translateY(-2px);box-shadow:0 12px 40px rgba(124,110,255,.25)}
+.pr-note{font-size:12px;color:var(--text3);line-height:1.6}
+
+/* CTA */
+.cta{padding:160px 24px;text-align:center;position:relative;overflow:hidden}
+.cta::before{content:'';position:absolute;width:800px;height:800px;top:50%;left:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(124,110,255,.06),transparent 60%);pointer-events:none}
+.cta .in{position:relative;z-index:1}
+.cta h2{font-size:clamp(36px,5.5vw,64px);font-weight:700;letter-spacing:-2.5px;line-height:1.05;margin-bottom:20px}
+.cta h2 .g{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cta p{font-size:18px;color:var(--text2);font-weight:300;max-width:440px;margin:0 auto 44px;line-height:1.5}
+
+/* SCALE REVEAL TRANSITION */
+body{transition:background-color 1.1s cubic-bezier(.16,1,.3,1)}
+.scale-reveal{transform:scale(0.92);border-radius:32px;overflow:hidden;transition:transform 1.1s cubic-bezier(.16,1,.3,1),border-radius 1.1s cubic-bezier(.16,1,.3,1);will-change:transform;position:relative;z-index:1}
+.scale-reveal.expanded{transform:scale(1);border-radius:0}
+
+/* STAT BANNER */
+.stat-banner{background:var(--light2);padding:18px 24px;text-align:center}
+.stat-banner p{font-size:15px;font-weight:500;color:var(--light-text2);letter-spacing:-.2px}
+.stat-banner strong{color:var(--light-text)}
+.stat-banner strong{font-weight:700}
+
+/* LIFESTYLE CAROUSEL */
+.lifestyle{padding:100px 0 100px;background:var(--light);overflow:hidden}
+.lifestyle-hd{padding:0 clamp(24px,5vw,80px);margin-bottom:48px}
+.lifestyle-hd h2{font-size:clamp(28px,4vw,44px);font-weight:700;letter-spacing:-1.5px;margin-bottom:8px;color:var(--light-text)}
+.lifestyle-hd p{font-size:17px;color:var(--light-text2);font-weight:300}
+.lifestyle-track{display:flex;gap:16px;padding:0 clamp(24px,5vw,80px);overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.lifestyle-track::-webkit-scrollbar{display:none}
+
+/* ACCURACY STATS */
+.accuracy{padding:120px 24px;background:var(--light)}
+.acc2-i{max-width:960px;margin:0 auto}
+.acc2-l{font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:3px;margin-bottom:16px;text-align:center}
+.acc2-t{font-size:clamp(28px,4vw,44px);font-weight:700;letter-spacing:-1.5px;text-align:center;margin-bottom:8px;color:var(--light-text)}
+.acc2-d{font-size:17px;color:var(--light-text2);text-align:center;font-weight:300;max-width:480px;margin:0 auto 72px}
+.acc2-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--light2);border-radius:20px;overflow:hidden;border:1px solid var(--light2)}
+.acc2-cell{background:var(--light);padding:40px 24px;text-align:center}
+.acc2-pct{font-size:52px;font-weight:700;font-family:var(--m);background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-2px;line-height:1}
+.acc2-metric{font-size:14px;font-weight:600;margin:10px 0 4px;color:var(--light-text)}
+.acc2-bench{font-size:11px;color:var(--light-text3);line-height:1.4}
+
+
+/* LIFESTYLE CARD FLIP */
+.lc{flex-shrink:0;width:300px;height:380px;border-radius:20px;overflow:visible;position:relative;scroll-snap-align:start;perspective:1000px;cursor:pointer}
+.lc-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.16,1,.3,1);border-radius:20px}
+.lc:hover .lc-inner{transform:rotateY(180deg)}
+.lc-front,.lc-back{position:absolute;inset:0;border-radius:20px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
+.lc-front img{width:100%;height:100%;object-fit:cover;filter:brightness(.75) contrast(1.05);display:block;transition:transform 6s ease}
+.lc:hover .lc-front img{transform:scale(1.04)}
+.lc-label{position:absolute;bottom:20px;left:20px;font-size:22px;font-weight:700;letter-spacing:-.5px;color:#fff}
+.lc-back{background:var(--accent);transform:rotateY(180deg);display:flex;flex-direction:column;justify-content:center;padding:28px 24px}
+.lc-back-tag{font-size:10px;font-family:var(--m);color:rgba(255,255,255,.6);letter-spacing:2px;margin-bottom:12px;text-transform:uppercase}
+.lc-back h3{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.3px;margin-bottom:12px;line-height:1.2}
+.lc-back p{font-size:13px;color:rgba(255,255,255,.8);line-height:1.6}
+
+/* FEATURE CARDS */
+.feat-cards{padding:120px 24px;border-top:1px solid var(--border)}
+.fc-i{max-width:1100px;margin:0 auto}
+.fc-l{font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:3px;margin-bottom:16px;text-align:center}
+.fc-t{font-size:clamp(28px,4vw,44px);font-weight:700;letter-spacing:-1.5px;text-align:center;margin-bottom:56px}
+.fc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.fc-card{border-radius:20px;overflow:hidden;position:relative;background:var(--surface);border:1px solid var(--border);transition:border-color .3s}
+.fc-card:hover{border-color:var(--border2)}
+.fc-card img{width:100%;height:200px;object-fit:cover;filter:brightness(.75) contrast(1.05);display:block;transition:transform 6s ease}
+.fc-card:hover img{transform:scale(1.04)}
+.fc-body{padding:20px}
+.fc-cat{font-size:10px;font-family:var(--m);color:var(--accent);letter-spacing:2px;margin-bottom:8px}
+.fc-card h3{font-size:17px;font-weight:600;letter-spacing:-.3px;line-height:1.3}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);display:flex;justify-content:space-between;align-items:center}
+.ftl{font-size:12px;color:var(--text3)}
+.ftr{display:flex;gap:20px}
+.ftr a{font-size:12px;color:var(--text3);text-decoration:none;transition:color .2s}
+.ftr a:hover{color:var(--text2)}
+
+/* REVEALS */
+.rv{opacity:0;transform:translateY(28px);transition:opacity .8s ease,transform .8s ease}
+.rv.vis{opacity:1;transform:translateY(0)}
+.rv-d1{transition-delay:.1s}.rv-d2{transition-delay:.2s}.rv-d3{transition-delay:.3s}.rv-d4{transition-delay:.4s}
+.rv-l{opacity:0;transform:translateX(-40px);transition:opacity .8s ease,transform .8s ease}
+.rv-r{opacity:0;transform:translateX(40px);transition:opacity .8s ease,transform .8s ease}
+.rv-l.vis,.rv-r.vis{opacity:1;transform:translateX(0)}
+.rv-s{opacity:0;transform:scale(.92);transition:opacity .8s ease,transform .8s ease}
+.rv-s.vis{opacity:1;transform:scale(1)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+.nv-r a:not(.nv-btn){display:none}.sg{grid-template-columns:1fr}.ft-g{grid-template-columns:1fr;gap:40px}.ps{grid-template-columns:1fr}.ps-img{height:40vh}.phone{width:250px}footer{flex-direction:column;gap:12px;text-align:center}
+.demo{flex-direction:column;text-align:center;padding:80px 24px}.demo-text{max-width:100%}.demo-d{margin:0 auto}
+.acc2-grid{grid-template-columns:repeat(2,1fr)}.fc-grid{grid-template-columns:1fr}
+.ws-grid{grid-template-columns:1fr;gap:40px}.ws-img{order:-1}
+.pr-split{grid-template-columns:1fr;border-top:1px solid var(--border)}.pr-divider-v{display:none}.pr-price-col{padding:48px 0 32px}.pr-detail-col{padding:32px 0 48px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nv-logo" id="navLogo">cued</div>
+  <div class="nv-r">
+    <a href="how-it-works.html">How it works</a>
+    <a href="discover.html">Discover</a>
+    <a href="#pricing">Pricing</a>
+    <div class="nv-btn-wrap" id="navBtn"><a href="signup.html" class="nv-btn">Get started</a></div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-vid">
+    <video id="heroVid" autoplay muted playsinline poster="images/pexels-victorfreitas-949126.jpg"></video>
+  </div>
+  <div class="hero-ov"></div>
+  <div class="hero-flare"></div>
+  <div class="hero-c">
+    <div class="hero-logo" id="heroLogo">cued</div>
+    <div class="hero-tag">One app · One coach · One cue</div>
+    <p class="hero-sub">Multi-agent AI coaching for training, nutrition, and recovery — delivered daily via text. No app to open. Just results.</p>
+    <div class="hero-acts">
+      <a href="signup.html" class="bp">Get started</a>
+    </div>
+  </div>
+</section>
+
+<div class="scale-reveal" data-bg="#050506">
+<!-- STATS — The problem -->
+<section class="acc">
+  <div class="acc-i">
+    <p class="acc-l rv">The problem</p>
+    <h2 class="acc-t rv">Fitness apps <em>are broken.</em></h2>
+    <p class="acc-d rv">They track everything and change nothing. We built something different.</p>
+    <div class="sg rv-s">
+      <div class="sc"><div class="sn">3%</div><div class="st">of fitness app users are still<br>active after 30 days</div></div>
+      <div class="sc"><div class="sn">98%</div><div class="st">of text messages are opened<br>and read within minutes</div></div>
+      <div class="sc"><div class="sn">5x</div><div class="st">higher retention when training<br>+ nutrition + recovery are unified</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- THE SOLUTION -->
+<section class="acc">
+  <div class="acc-i">
+    <p class="acc-l rv">The solution</p>
+    <h2 class="acc-t rv">A coach in your texts. <em>Every day.</em></h2>
+    <p class="acc-d rv">No app. No dashboard. Just a daily rhythm of texts that turns goals into results.</p>
+  </div>
+</section>
+</div><!-- /scale-reveal -->
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span class="marquee-item">Personalized workouts</span>
+    <span class="marquee-item">Daily meal plans</span>
+    <span class="marquee-item">SMS coaching</span>
+    <span class="marquee-item">Progressive overload</span>
+    <span class="marquee-item">Wearable integration</span>
+    <span class="marquee-item">Recovery tracking</span>
+    <span class="marquee-item">Macro-aware nutrition</span>
+    <span class="marquee-item">No app required</span>
+    <span class="marquee-item">$1.50/month</span>
+    <span class="marquee-item">Personalized workouts</span>
+    <span class="marquee-item">Daily meal plans</span>
+    <span class="marquee-item">SMS coaching</span>
+    <span class="marquee-item">Progressive overload</span>
+    <span class="marquee-item">Wearable integration</span>
+    <span class="marquee-item">Recovery tracking</span>
+    <span class="marquee-item">Macro-aware nutrition</span>
+    <span class="marquee-item">No app required</span>
+    <span class="marquee-item">$1.50/month</span>
+  </div>
+</div>
+
+<div class="scale-reveal" id="lightBlock" data-bg="#F7F6F2">
+
+<!-- STAT BANNER -->
+<div class="stat-banner">
+  <p><strong>94% of Cued members</strong> are still active after 30 days — vs. 3% for fitness apps.</p>
+</div>
+
+<!-- TAGLINE -->
+<section class="tagline">
+  <p class="rv">98% of texts get opened. 3% of fitness apps survive past day 30. <strong>We chose texts.</strong></p>
+</section>
+
+<!-- LIFESTYLE CAROUSEL -->
+<section class="lifestyle">
+  <div class="lifestyle-hd rv">
+    <h2>Built for how you actually live.</h2>
+    <p>Not just gym days. Every day.</p>
+  </div>
+  <div class="lifestyle-track">
+    <div class="lc rv">
+      <div class="lc-inner">
+        <div class="lc-front">
+          <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&q=80" alt="Restored">
+          <div class="lc-label">Restored</div>
+        </div>
+        <div class="lc-back">
+          <div class="lc-back-tag">Recovery</div>
+          <h3>Know when to rest — and when to push.</h3>
+          <p>Cued reads your sleep and HRV data to decide if today calls for a hard session or a deload. No guessing, no burnout.</p>
+        </div>
+      </div>
+    </div>
+    <div class="lc rv rv-d1">
+      <div class="lc-inner">
+        <div class="lc-front">
+          <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80" alt="Focused">
+          <div class="lc-label">Focused</div>
+        </div>
+        <div class="lc-back">
+          <div class="lc-back-tag">Training</div>
+          <h3>Your workout, ready before you even ask.</h3>
+          <p>Every morning you get your exact session — exercises, weights, sets — built on your history and what your body can handle that day.</p>
+        </div>
+      </div>
+    </div>
+    <div class="lc rv rv-d2">
+      <div class="lc-inner">
+        <div class="lc-front">
+          <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&q=80" alt="Fueled">
+          <div class="lc-label">Fueled</div>
+        </div>
+        <div class="lc-back">
+          <div class="lc-back-tag">Nutrition</div>
+          <h3>Eat for what you actually did today.</h3>
+          <p>Heavy leg day? More carbs. Rest day? Lighter meals. Your food plan shifts with your training automatically — no app, no logging.</p>
+        </div>
+      </div>
+    </div>
+    <div class="lc rv rv-d3">
+      <div class="lc-inner">
+        <div class="lc-front">
+          <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80" alt="Pushed">
+          <div class="lc-label">Pushed</div>
+        </div>
+        <div class="lc-back">
+          <div class="lc-back-tag">Progression</div>
+          <h3>A coach that remembers every rep.</h3>
+          <p>Cued tracks every set you've ever done and applies progressive overload automatically. You just show up — your coach handles the math.</p>
+        </div>
+      </div>
+    </div>
+    <div class="lc rv rv-d4">
+      <div class="lc-inner">
+        <div class="lc-front">
+          <img src="https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=600&q=80" alt="Moving">
+          <div class="lc-label">Moving</div>
+        </div>
+        <div class="lc-back">
+          <div class="lc-back-tag">Consistency</div>
+          <h3>The only fitness habit that actually sticks.</h3>
+          <p>No app to open. No dashboard to check. Your coach texts you. You text back. That's it — and that's exactly why it works.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /lightBlock -->
+
+<div class="scale-reveal" data-bg="#0A0A0C">
+<!-- PHOTO — boxing -->
+<div class="pb rv-s">
+  <img src="https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=1600&q=80" alt="Boxing training" loading="lazy">
+  <div class="pb-ov"></div>
+  <div class="pb-txt">
+    <h2>Train like you have<br>a coach in your corner.</h2>
+    <p>Because now you do.</p>
+  </div>
+</div>
+
+<!-- PHONE DEMO — side by side -->
+<section class="demo">
+  <div class="demo-phone rv-pop">
+    <div class="phone">
+      <div class="phone-n"></div>
+      <div class="phone-s">
+        <div class="ph"><div class="ph-n">Cued</div><div class="ph-s">AI Coach</div></div>
+        <div class="bb c">Gm Alex. 7h 10m sleep, HRV trending up. Today's a pull day — I bumped your deadlift to 225. Reply W when you're ready.</div>
+        <div class="bt">6:45 AM</div>
+        <div class="bb u" style="max-width:40px;text-align:center">W</div>
+        <div class="bt r">6:52 AM</div>
+        <div class="bb c">Pull Day (55 min)<br>1. Deadlift — 4x5 @ 225<br>2. BB Row — 3x8 @ 155<br>3. Pull-ups — 3x6 +25lb<br>4. Face Pulls — 3x15<br>5. Hammer Curls — 3x12</div>
+        <div class="bt">6:52 AM</div>
+        <div class="bb c">Breakfast: 3-egg omelet w/ spinach & feta, toast, berries. ~480 cal, 38g protein.</div>
+        <div class="bt">7:30 AM</div>
+      </div>
+    </div>
+  </div>
+  <div class="demo-text">
+    <p class="demo-l rv">The experience</p>
+    <h2 class="demo-t rv">It looks like texting<br>your coach.</h2>
+    <p class="demo-d rv rv-d1">Because that's exactly what it is. Your coach texts you first. You reply when you're ready. No app to open, no dashboard to check — just your messages.</p>
+  </div>
+</section>
+</div><!-- /scale-reveal -->
+
+<div class="scale-reveal" data-bg="#0D0B1A">
+<!-- PRICING — $1.50 -->
+<section class="pricing" id="pricing">
+  <div class="pr-i">
+    <p class="pr-l rv">Pricing</p>
+    <div class="pr-split rv">
+      <div class="pr-price-col">
+        <h2 class="pr-t">$1.50<em>a month.</em></h2>
+      </div>
+      <div class="pr-divider-v"></div>
+      <div class="pr-detail-col">
+        <p class="pr-sub">Personal trainers charge $200–500/month. Your AI coach costs less than a cup of coffee — and texts you every single day.</p>
+        <div class="pr-items">
+          <div class="pr-item">Daily SMS coaching — morning to evening</div>
+          <div class="pr-item">Personalized workouts with exact weights</div>
+          <div class="pr-item">Meal plans calibrated to your training</div>
+          <div class="pr-item">Wearable sync — Apple Watch, Oura, Garmin</div>
+          <div class="pr-item">Progressive overload &amp; weekly adaptation</div>
+          <div class="pr-item">Unlimited coaching conversations</div>
+        </div>
+        <div class="pr-actions">
+          <a href="signup.html" class="pr-cta">Get cued →</a>
+          <p class="pr-note">Cancel anytime. No contracts.<br>Price goes up soon.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</div><!-- /scale-reveal -->
+
+<!-- FINAL CTA -->
+<div class="scale-reveal" data-bg="#050506">
+<section class="cta" id="start">
+  <div class="in">
+    <h2 class="rv">Your first coaching text<br>arrives <span class="g">tomorrow.</span></h2>
+    <p class="rv rv-d1">No app to download. No dashboard to learn. Just your phone number, your goals, and $1.50.</p>
+    <a href="signup.html" class="bp rv rv-d2">Get cued →</a>
+  </div>
+</section>
+</div><!-- /scale-reveal -->
+
+<footer>
+  <div class="ftl">&copy; 2026 Cued</div>
+  <div class="ftr">
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+  </div>
+</footer>
+
+<script>
+// Scroll reveals
+const io=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis')})},{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.rv,.rv-l,.rv-r,.rv-s,.rv-pop').forEach(el=>io.observe(el));
+
+// Nav logo appears when hero logo scrolls out
+const heroLogo=document.getElementById('heroLogo');
+const navLogo=document.getElementById('navLogo');
+const navBtn=document.getElementById('navBtn');
+const logoObs=new IntersectionObserver(e=>{e.forEach(x=>{
+  const past=!x.isIntersecting;
+  navLogo.classList.toggle('show',past);
+  navBtn.classList.toggle('show',past);
+})},{threshold:0});
+logoObs.observe(heroLogo);
+
+// Nav logo turns purple over light sections
+const lightSections=document.querySelectorAll('.tagline,.lifestyle,.accuracy,.stat-banner');
+const lightObs=new IntersectionObserver(e=>{
+  const anyLight=Array.from(e).some(x=>x.isIntersecting);
+  // check all light sections
+  const anyVisible=Array.from(lightSections).some(s=>{
+    const r=s.getBoundingClientRect();
+    return r.top<=56&&r.bottom>=0;
+  });
+  navLogo.classList.toggle('light',anyVisible);
+},{threshold:0,rootMargin:'-0px 0px 0px 0px'});
+lightSections.forEach(s=>lightObs.observe(s));
+window.addEventListener('scroll',()=>{
+  const anyVisible=Array.from(lightSections).some(s=>{
+    const r=s.getBoundingClientRect();
+    return r.top<=56&&r.bottom>=0;
+  });
+  navLogo.classList.toggle('light',anyVisible);
+},{passive:true});
+
+// Scale-reveal: all blocks zoom in on scroll, body bg tracks active section
+const scaleBlocks=document.querySelectorAll('.scale-reveal');
+const srObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    e.target.classList.toggle('expanded',e.isIntersecting);
+    if(e.isIntersecting){
+      const bg=e.target.dataset.bg;
+      if(bg) document.body.style.backgroundColor=bg;
+    }
+  });
+},{threshold:0.08});
+scaleBlocks.forEach(b=>srObs.observe(b));
+
+// Hero video montage — two elements crossfade
+const videos=[
+  'videos/dark_float.mp4',
+  'videos/5752175-uhd_3840_2160_25fps.mp4',
+  'videos/5837657-uhd_3840_2160_24fps.mp4',
+  'videos/6390166-uhd_3840_2160_25fps.mp4',
+];
+const heroVidEl=document.getElementById('heroVid');
+const heroVidWrap=heroVidEl.parentElement;
+
+// Create second video element for crossfade
+const vid2=document.createElement('video');
+vid2.muted=true;vid2.playsInline=true;vid2.setAttribute('playsinline','');
+vid2.style.cssText=heroVidEl.style.cssText;
+vid2.style.position='absolute';vid2.style.inset='0';vid2.style.opacity='0';
+heroVidEl.style.position='absolute';heroVidEl.style.inset='0';
+heroVidWrap.appendChild(vid2);
+
+let cur=0,active=heroVidEl,inactive=vid2;
+heroVidEl.src=videos[0];
+heroVidEl.play().catch(()=>{});
+
+// preload next
+inactive.src=videos[1];
+
+function crossfade(){
+  cur=(cur+1)%videos.length;
+  inactive.src=videos[cur];
+  inactive.style.transition='none';inactive.style.opacity='0';
+  inactive.play().catch(()=>{});
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      inactive.style.transition='opacity 1.2s ease';
+      inactive.style.opacity='1';
+      active.style.transition='opacity 1.2s ease';
+      active.style.opacity='0';
+      [active,inactive]=[inactive,active];
+      // preload next
+      setTimeout(()=>{ inactive.src=videos[(cur+1)%videos.length]; },2000);
+    });
+  });
+}
+heroVidEl.addEventListener('ended',crossfade);
+setInterval(crossfade,7000);
+</script>
+</body>
+</html>

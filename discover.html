@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Discover Cued</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root{--bg:#050506;--bg2:#0A0A0C;--bg3:#111114;--surface:#19191D;--border:#1F1F24;--border2:#2A2A30;--text:#F5F5F7;--text2:#A1A1A6;--text3:#6E6E73;--accent:#7C6EFF;--accent2:#A599FF;--as:rgba(124,110,255,0.08);--ag:rgba(124,110,255,0.12);--green:#30D158;--f:'DM Sans',-apple-system,sans-serif;--m:'JetBrains Mono',monospace;--light:#F7F6F2;--light2:#EDEAE3;--light-text:#1A1A1E;--light-text2:#4A4A52;--light-text3:#8A8A92}
+    *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{font-family:var(--f);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(24px,5vw,64px);background:transparent;border-bottom:none}
+    .nv-logo{font-size:18px;font-weight:600;letter-spacing:-.5px;color:var(--text);text-decoration:none;margin-left:24px;transition:color .3s}
+    .nv-logo.light{color:var(--accent)}
+    .nv-r{display:flex;gap:28px;align-items:center}
+    .nv-r a{color:var(--text3);font-size:13px;text-decoration:none;transition:color .2s}
+    .nv-r a:hover{color:var(--text)}
+    .nv-btn{background:var(--accent);color:#fff!important;font-size:12px;font-weight:600;padding:7px 16px;border-radius:980px;text-decoration:none;transition:all .2s}
+    .nv-btn:hover{background:#6B5CE6}
+    footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);display:flex;justify-content:space-between;align-items:center}
+    .ftl{font-size:12px;color:var(--text3)}
+    .ftr{display:flex;gap:20px}
+    .ftr a{font-size:12px;color:var(--text3);text-decoration:none;transition:color .2s}
+    .ftr a:hover{color:var(--text2)}
+    .rv{opacity:0;transform:translateY(28px);transition:opacity .8s ease,transform .8s ease}
+    .rv.vis{opacity:1;transform:translateY(0)}
+    .rv-d1{transition-delay:.1s}.rv-d2{transition-delay:.2s}.rv-d3{transition-delay:.3s}.rv-d4{transition-delay:.4s}
+    .rv-l{opacity:0;transform:translateX(-40px);transition:opacity .8s ease,transform .8s ease}
+    .rv-r{opacity:0;transform:translateX(40px);transition:opacity .8s ease,transform .8s ease}
+    .rv-l.vis,.rv-r.vis{opacity:1;transform:translateX(0)}
+    .rv-s{opacity:0;transform:scale(.92);transition:opacity .8s ease,transform .8s ease}
+    .rv-s.vis{opacity:1;transform:scale(1)}
+
+    /* ── Hero ── */
+    .hero{position:relative;height:60vh;min-height:480px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden}
+    .hero-img{position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=1600&q=80') center/cover no-repeat;filter:brightness(.4)}
+    .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(5,5,6,.6) 0%,rgba(5,5,6,0) 35%,rgba(5,5,6,0) 65%,rgba(5,5,6,.7) 100%)}
+    .hero-content{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:18px;padding:0 24px}
+    .hero-label{font-family:var(--m);font-size:11px;font-weight:500;letter-spacing:.18em;color:var(--accent2);text-transform:uppercase}
+    .hero-content h1{font-size:clamp(36px,6vw,72px);font-weight:700;letter-spacing:-1.5px;line-height:1.08;color:var(--text)}
+    .hero-content p{font-size:clamp(15px,2vw,20px);color:var(--text2);font-weight:400;letter-spacing:-.2px}
+
+    /* ── Carousel section ── */
+    .carousel-section{background:var(--light);padding:96px 0 80px;overflow:hidden}
+    .carousel-header{text-align:center;padding:0 clamp(24px,5vw,64px);margin-bottom:56px}
+    .carousel-header h2{font-size:clamp(28px,4vw,46px);font-weight:700;letter-spacing:-1px;color:var(--light-text);margin-bottom:12px}
+    .carousel-header p{font-size:15px;color:var(--light-text2)}
+    .carousel-track{display:flex;gap:20px;padding:0 clamp(24px,5vw,64px) 20px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    .carousel-track::-webkit-scrollbar{display:none}
+
+    /* ── Flip card ── */
+    .flip-card{flex:0 0 300px;height:380px;scroll-snap-align:start;perspective:1200px;cursor:pointer}
+    .flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.4,0,.2,1)}
+    .flip-card:hover .flip-inner{transform:rotateY(180deg)}
+    .flip-front,.flip-back{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
+    .flip-front{background:#000}
+    .flip-front img{width:100%;height:100%;object-fit:cover;display:block;opacity:.88}
+    .flip-front-label{position:absolute;bottom:20px;left:20px;font-size:13px;font-weight:600;color:#fff;letter-spacing:.02em;text-shadow:0 1px 8px rgba(0,0,0,.6)}
+    .flip-back{background:var(--accent);transform:rotateY(180deg);display:flex;flex-direction:column;justify-content:center;padding:32px 28px;gap:16px}
+    .flip-tag{font-family:var(--m);font-size:10px;font-weight:500;letter-spacing:.16em;color:rgba(255,255,255,.6);text-transform:uppercase}
+    .flip-back h3{font-size:20px;font-weight:700;color:#fff;line-height:1.25;letter-spacing:-.3px}
+    .flip-back p{font-size:14px;color:rgba(255,255,255,.82);line-height:1.6}
+
+    /* ── Photo band ── */
+    .photo-band{position:relative;height:55vh;min-height:360px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden}
+    .photo-band-img{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat}
+    .photo-band-overlay{position:absolute;inset:0;background:rgba(5,5,6,.45)}
+    .photo-band-content{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:14px;padding:0 clamp(24px,5vw,64px)}
+    .photo-band-content h2{font-size:clamp(26px,4.5vw,52px);font-weight:700;letter-spacing:-1px;color:var(--text);line-height:1.1}
+    .photo-band-content p{font-size:clamp(14px,1.6vw,18px);color:var(--text2);max-width:480px}
+
+    /* ── Stats section ── */
+    .stats-section{background:var(--light);padding:96px clamp(24px,5vw,64px)}
+    .stats-header{text-align:center;margin-bottom:60px}
+    .stats-label{font-family:var(--m);font-size:11px;font-weight:500;letter-spacing:.18em;color:var(--accent);text-transform:uppercase;margin-bottom:14px}
+    .stats-header h2{font-size:clamp(28px,4vw,46px);font-weight:700;letter-spacing:-1px;color:var(--light-text);margin-bottom:12px}
+    .stats-header p{font-size:15px;color:var(--light-text2);max-width:520px;margin:0 auto}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px;background:var(--light2);border-radius:20px;overflow:hidden}
+    .stat-cell{background:var(--light);padding:40px 32px;display:flex;flex-direction:column;gap:8px}
+    .stat-num{font-size:clamp(36px,5vw,56px);font-weight:700;letter-spacing:-2px;color:var(--light-text)}
+    .stat-title{font-size:15px;font-weight:600;color:var(--light-text);letter-spacing:-.2px}
+    .stat-sub{font-size:13px;color:var(--light-text3);line-height:1.5}
+
+    /* ── Photo split ── */
+    .split-section{background:var(--bg);padding:96px clamp(24px,5vw,64px)}
+    .split-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;max-width:1200px;margin:0 auto}
+    .split-img{border-radius:20px;overflow:hidden;aspect-ratio:4/5}
+    .split-img img{width:100%;height:100%;object-fit:cover;display:block}
+    .split-text{display:flex;flex-direction:column;gap:20px}
+    .split-text h2{font-size:clamp(26px,3.5vw,44px);font-weight:700;letter-spacing:-1px;color:var(--text);line-height:1.15}
+    .split-text p{font-size:15px;color:var(--text2);line-height:1.7}
+    .pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+    .pill{font-size:12px;font-weight:500;color:var(--accent2);background:var(--as);border:1px solid rgba(124,110,255,.2);border-radius:980px;padding:5px 14px;letter-spacing:.02em}
+
+    /* ── CTA section ── */
+    .cta-section{background:var(--bg);padding:120px clamp(24px,5vw,64px);text-align:center;display:flex;flex-direction:column;align-items:center;gap:20px}
+    .cta-section h2{font-size:clamp(30px,4.5vw,54px);font-weight:700;letter-spacing:-1.2px;color:var(--text)}
+    .cta-section p{font-size:16px;color:var(--text2);max-width:400px}
+    .cta-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+    .btn-secondary{font-size:14px;font-weight:600;color:var(--text);background:transparent;border:1px solid var(--border2);padding:13px 28px;border-radius:980px;text-decoration:none;transition:all .2s;letter-spacing:-.1px}
+    .btn-secondary:hover{border-color:var(--text3);color:var(--text)}
+    .btn-primary{font-size:14px;font-weight:600;color:#fff;background:var(--accent);padding:13px 28px;border-radius:980px;text-decoration:none;transition:all .2s;letter-spacing:-.1px}
+    .btn-primary:hover{background:#6B5CE6}
+
+    /* SCALE REVEAL */
+    body{transition:background-color 1.1s cubic-bezier(.16,1,.3,1)}
+    .scale-reveal{transform:scale(0.92);border-radius:32px;overflow:hidden;transition:transform 1.1s cubic-bezier(.16,1,.3,1),border-radius 1.1s cubic-bezier(.16,1,.3,1);will-change:transform;position:relative;z-index:1}
+    .scale-reveal.expanded{transform:scale(1);border-radius:0}
+
+    @media(max-width:768px){
+      .split-grid{grid-template-columns:1fr;gap:36px}
+      .split-img{aspect-ratio:16/9}
+      .nv-logo{margin-left:0}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <a href="index.html" class="nv-logo">cued</a>
+    <div class="nv-r">
+      <a href="how-it-works.html">How it works</a>
+      <a href="discover.html">Discover</a>
+      <a href="index.html#pricing">Pricing</a>
+      <a href="signup.html" class="nv-btn">Get started</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-img"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content rv">
+      <span class="hero-label">Discover Cued</span>
+      <h1>Built for how you<br>actually live.</h1>
+      <p>Not just gym days. Every day.</p>
+    </div>
+  </section>
+
+  <div class="scale-reveal" data-bg="#F7F6F2">
+  <!-- Lifestyle carousel -->
+  <section class="carousel-section">
+    <div class="carousel-header rv">
+      <h2>One coach. Every part of your day.</h2>
+      <p>Hover each card to see how Cued helps.</p>
+    </div>
+    <div class="carousel-track rv rv-d1">
+
+      <!-- Card 1: Recovery -->
+      <div class="flip-card">
+        <div class="flip-inner">
+          <div class="flip-front">
+            <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&q=80" alt="Restored" loading="lazy" />
+            <span class="flip-front-label">Restored</span>
+          </div>
+          <div class="flip-back">
+            <span class="flip-tag">Recovery</span>
+            <h3>Know when to rest — and when to push.</h3>
+            <p>Cued reads your sleep and HRV data to decide if today calls for a hard session or a deload. No guessing, no burnout.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Training -->
+      <div class="flip-card">
+        <div class="flip-inner">
+          <div class="flip-front">
+            <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80" alt="Focused" loading="lazy" />
+            <span class="flip-front-label">Focused</span>
+          </div>
+          <div class="flip-back">
+            <span class="flip-tag">Training</span>
+            <h3>Your workout, ready before you even ask.</h3>
+            <p>Every morning you get your exact session — exercises, weights, sets — built on your history and what your body can handle that day.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Nutrition -->
+      <div class="flip-card">
+        <div class="flip-inner">
+          <div class="flip-front">
+            <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&q=80" alt="Fueled" loading="lazy" />
+            <span class="flip-front-label">Fueled</span>
+          </div>
+          <div class="flip-back">
+            <span class="flip-tag">Nutrition</span>
+            <h3>Eat for what you actually did today.</h3>
+            <p>Heavy leg day? More carbs. Rest day? Lighter meals. Your food plan shifts with your training automatically — no app, no logging.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4: Progression -->
+      <div class="flip-card">
+        <div class="flip-inner">
+          <div class="flip-front">
+            <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80" alt="Pushed" loading="lazy" />
+            <span class="flip-front-label">Pushed</span>
+          </div>
+          <div class="flip-back">
+            <span class="flip-tag">Progression</span>
+            <h3>A coach that remembers every rep.</h3>
+            <p>Cued tracks every set you've ever done and applies progressive overload automatically. You just show up — your coach handles the math.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5: Consistency -->
+      <div class="flip-card">
+        <div class="flip-inner">
+          <div class="flip-front">
+            <img src="https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=600&q=80" alt="Moving" loading="lazy" />
+            <span class="flip-front-label">Moving</span>
+          </div>
+          <div class="flip-back">
+            <span class="flip-tag">Consistency</span>
+            <h3>The only fitness habit that actually sticks.</h3>
+            <p>No app to open. No dashboard to check. Your coach texts you. You text back. That's it — and that's exactly why it works.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+  </div><!-- /scale-reveal -->
+
+  <div class="scale-reveal" data-bg="#0A0A0C">
+  <!-- Photo band 1 -->
+  <section class="photo-band">
+    <div class="photo-band-img" style="background-image:url('https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=1600&q=80');filter:brightness(.65)"></div>
+    <div class="photo-band-overlay"></div>
+    <div class="photo-band-content rv">
+      <h2>Training that gets smarter.</h2>
+      <p>Real programming with progressive overload.</p>
+    </div>
+  </section>
+  </div><!-- /scale-reveal -->
+
+  <div class="scale-reveal" data-bg="#EDEAE3">
+  <!-- Stats section -->
+  <section class="stats-section">
+    <div class="stats-header rv">
+      <p class="stats-label">The Science</p>
+      <h2>Coaching backed by data.</h2>
+      <p>Every recommendation is built on real research — not bro science.</p>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-cell rv rv-d1">
+        <span class="stat-num">98%</span>
+        <span class="stat-title">SMS open rate</span>
+        <span class="stat-sub">vs. 21% for email</span>
+      </div>
+      <div class="stat-cell rv rv-d2">
+        <span class="stat-num">3x</span>
+        <span class="stat-title">Better adherence</span>
+        <span class="stat-sub">vs. self-guided programs</span>
+      </div>
+      <div class="stat-cell rv rv-d3">
+        <span class="stat-num">94%</span>
+        <span class="stat-title">30-day retention</span>
+        <span class="stat-sub">vs. 3% for fitness apps</span>
+      </div>
+      <div class="stat-cell rv rv-d4">
+        <span class="stat-num">5x</span>
+        <span class="stat-title">Faster results</span>
+        <span class="stat-sub">when training + nutrition unified</span>
+      </div>
+    </div>
+  </section>
+  </div><!-- /scale-reveal -->
+
+  <div class="scale-reveal" data-bg="#111114">
+  <!-- Photo split -->
+  <section class="split-section">
+    <div class="split-grid">
+      <div class="split-img rv-l">
+        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1200&q=80" alt="Healthy meal" loading="lazy" />
+      </div>
+      <div class="split-text rv-r">
+        <h2>Nutrition without the calorie counting.</h2>
+        <p>Daily meals planned around your training, your goals, and what you'll actually eat. No food scale required.</p>
+        <div class="pills">
+          <span class="pill">Training-matched</span>
+          <span class="pill">Macro-aware</span>
+          <span class="pill">Swap-friendly</span>
+        </div>
+      </div>
+    </div>
+  </section>
+  </div><!-- /scale-reveal -->
+
+  <div class="scale-reveal" data-bg="#0A0A0C">
+  <!-- Photo band 2 -->
+  <section class="photo-band">
+    <div class="photo-band-img" style="background-image:url('https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=1600&q=80');filter:brightness(.65)"></div>
+    <div class="photo-band-overlay"></div>
+    <div class="photo-band-content rv">
+      <h2>Every goal. Every body. One coach.</h2>
+      <p>Fat loss. Muscle gain. Marathon prep. General wellness.</p>
+    </div>
+  </section>
+  </div><!-- /scale-reveal -->
+
+  <div class="scale-reveal" data-bg="#050506">
+  <!-- CTA -->
+  <section class="cta-section">
+    <h2 class="rv">See it in action.</h2>
+    <p class="rv rv-d1">Read how it works, or just get started.</p>
+    <div class="cta-btns rv rv-d2">
+      <a href="how-it-works.html" class="btn-secondary">How it works →</a>
+      <a href="signup.html" class="btn-primary">Get cued — $1.50/mo →</a>
+    </div>
+  </section>
+  </div><!-- /scale-reveal -->
+
+  <!-- Footer -->
+  <footer>
+    <span class="ftl">© 2026 Cued</span>
+    <div class="ftr">
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
+    </div>
+  </footer>
+
+  <script>
+    (function(){
+      var els = document.querySelectorAll('.rv,.rv-l,.rv-r,.rv-s');
+      if(!els.length) return;
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if(e.isIntersecting){
+            e.target.classList.add('vis');
+            io.unobserve(e.target);
+          }
+        });
+      },{threshold:0.12});
+      els.forEach(function(el){ io.observe(el); });
+    })();
+
+    // Nav logo color — purple over light sections
+    var logo=document.querySelector('.nv-logo');
+    var lightSections=document.querySelectorAll('.carousel-section,.stats-section');
+    function checkLogo(){
+      var any=Array.from(lightSections).some(function(s){var r=s.getBoundingClientRect();return r.top<=56&&r.bottom>=0;});
+      logo.classList.toggle('light',any);
+    }
+    window.addEventListener('scroll',checkLogo,{passive:true});
+
+    // Scale-reveal
+    var srObs=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        e.target.classList.toggle('expanded',e.isIntersecting);
+        if(e.isIntersecting){var bg=e.target.dataset.bg;if(bg)document.body.style.backgroundColor=bg;}
+      });
+    },{threshold:0.08});
+    document.querySelectorAll('.scale-reveal').forEach(function(b){srObs.observe(b);});
+  </script>
+
+</body>
+</html>
