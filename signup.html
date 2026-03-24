@@ -126,7 +126,10 @@ html,body{overflow:auto}
   <a href="signup.html" class="mm-cta">Get started</a>
 </div>
 
-<div class="bg-vid"><video autoplay muted loop playsinline src="https://videos.pexels.com/video-files/8733062/8733062-hd_1920_1080_30fps.mp4"></video></div>
+<div class="bg-vid" id="bgVidWrap" style="position:fixed;inset:0;z-index:0;pointer-events:none">
+  <video id="bgVid1" autoplay muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.5);opacity:1;transition:opacity 1.2s ease" src="https://videos.pexels.com/video-files/8733062/8733062-hd_1920_1080_30fps.mp4"></video>
+  <video id="bgVid2" muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.5);opacity:0;transition:opacity 1.2s ease" src="https://videos.pexels.com/video-files/7122113/7122113-hd_1920_1080_30fps.mp4"></video>
+</div>
 
 <div class="progress-wrap">
   <div class="progress">
@@ -394,6 +397,34 @@ async function submit() {
 
 // Enter key advances step
 document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') next(); });
+
+// Background video crossfade rotation
+(function(){
+  const bgVideos=[
+    'https://videos.pexels.com/video-files/8733062/8733062-hd_1920_1080_30fps.mp4',
+    'https://videos.pexels.com/video-files/7122113/7122113-hd_1920_1080_30fps.mp4',
+    'https://videos.pexels.com/video-files/854088/854088-hd_1920_1080_25fps.mp4',
+    'https://videos.pexels.com/video-files/9694807/9694807-hd_1920_1080_25fps.mp4',
+    'https://videos.pexels.com/video-files/9935090/9935090-hd_1920_1080_30fps.mp4',
+  ];
+  const v1=document.getElementById('bgVid1'),v2=document.getElementById('bgVid2');
+  let idx=0,activeV=v1,inactiveV=v2;
+  function tryPlay(el){el.play().catch(()=>{});}
+  tryPlay(v1);
+  function bgCrossfade(){
+    idx=(idx+1)%bgVideos.length;
+    inactiveV.src=bgVideos[idx];
+    inactiveV.style.transition='none';inactiveV.style.opacity='0';
+    tryPlay(inactiveV);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      inactiveV.style.transition='opacity 1.2s ease';inactiveV.style.opacity='1';
+      activeV.style.transition='opacity 1.2s ease';activeV.style.opacity='0';
+      [activeV,inactiveV]=[inactiveV,activeV];
+    }));
+  }
+  v1.addEventListener('ended',bgCrossfade);
+  setInterval(bgCrossfade,8000);
+})();
 // Hamburger menu
 const hamburger=document.getElementById('hamburger');
 const mobileMenu=document.getElementById('mobileMenu');
