@@ -335,7 +335,7 @@ function showStep(n, dir) {
 
   document.getElementById('step-counter').textContent = cur + ' / ' + total;
   document.getElementById('btn-back').disabled = cur === 1;
-  document.getElementById('btn-next').textContent = cur === total ? 'Start coaching me — $1.50/mo' : 'Continue →';
+  document.getElementById('btn-next').textContent = cur === total ? 'Start coaching me — free beta →' : 'Continue →';
 
   for (let i = 1; i <= total; i++) {
     document.getElementById('p' + i).style.width = i < cur ? '100%' : i === cur ? '40%' : '0%';
@@ -382,7 +382,7 @@ async function submit() {
     } else {
       el.className = 'result-err';
       el.textContent = data.message || 'Something went wrong. Try again.';
-      btn.textContent = 'Start coaching me — $1.50/mo';
+      btn.textContent = 'Start coaching me — free beta →';
       btn.disabled = false;
     }
   } catch {
@@ -390,7 +390,7 @@ async function submit() {
     el.style.display = 'block';
     el.className = 'result-err';
     el.textContent = 'Connection error. Check your internet and try again.';
-    btn.textContent = 'Start coaching me — $1.50/mo';
+    btn.textContent = 'Start coaching me — free beta →';
     btn.disabled = false;
   }
 }
