@@ -237,17 +237,12 @@ async function activateSMS() {
 
   try {
     const fd = new FormData();
-    // Re-post stored profile data with sms_consent
-    const p = profile;
-    for (const [k, v] of Object.entries(p)) {
-      if (!k.startsWith('_') && k !== 'sms_opted_in') fd.append(k, v);
-    }
-    fd.set('sms_consent', 'on');
+    fd.append('phone', profile._raw_phone || profile.phone || '');
 
-    const res = await fetch('https://web-production-90171c.up.railway.app/signup', { method: 'POST', body: fd });
+    const res = await fetch('https://web-production-90171c.up.railway.app/activate-sms', { method: 'POST', body: fd });
     const data = await res.json();
 
-    if (data.status === 'ok' || data.status === 'exists') {
+    if (data.status === 'ok') {
       // Update local profile
       profile.sms_opted_in = true;
       localStorage.setItem('cued_profile', JSON.stringify(profile));
