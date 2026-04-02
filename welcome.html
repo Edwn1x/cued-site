@@ -116,7 +116,7 @@ h1{font-size:clamp(28px,5vw,48px);font-weight:700;letter-spacing:-1.5px;line-hei
   </div>
 
   <div class="tag">Profile created</div>
-  <h1>You're all set.</h1>
+  <h1 id="welcome-heading">You're all set.</h1>
   <p class="sub">Your Cued coach has your profile and will reach out shortly to introduce themselves and make sure everything is dialed in for you.</p>
 
   <div class="info-card">
@@ -169,6 +169,12 @@ h1{font-size:clamp(28px,5vw,48px);font-weight:700;letter-spacing:-1.5px;line-hei
 </div>
 
 <script>
+// Personalize with name from URL
+const urlName = new URLSearchParams(window.location.search).get('name');
+if (urlName) {
+  document.getElementById('welcome-heading').textContent = 'You\'re all set, ' + urlName + '.';
+}
+
 // Show SMS opt-in banner if user didn't consent
 const profile = JSON.parse(localStorage.getItem('cued_profile') || '{}');
 if (profile.sms_opted_in === false) {
