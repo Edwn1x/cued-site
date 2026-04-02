@@ -152,9 +152,10 @@ html,body{overflow:auto}
       </div>
       <label>Phone number</label>
       <input name="phone" placeholder="(209) 555-1234" type="tel" id="f-phone">
-      <div style="margin-top:14px;padding:12px 14px;background:rgba(124,110,255,.04);border:1px solid var(--border2);border-radius:10px">
+      <div id="sms-consent-wrap" style="margin-top:14px;padding:12px 14px;background:rgba(124,110,255,.04);border:1px solid var(--border2);border-radius:10px;transition:border-color .2s,background .2s">
         <label style="display:flex;align-items:flex-start;gap:10px;margin:0;cursor:pointer;font-weight:400;font-size:12px;line-height:1.55;color:var(--text3)">
-          <input type="checkbox" name="sms_consent" value="yes" id="sms-consent" style="width:16px;height:16px;margin-top:1px;accent-color:var(--accent);flex-shrink:0">
+          <input type="checkbox" name="sms_consent" value="yes" id="sms-consent" style="position:absolute;opacity:0;width:0;height:0">
+          <span id="sms-checkbox-ui" style="flex-shrink:0;margin-top:1px;width:16px;height:16px;border:2px solid var(--border2);border-radius:4px;background:var(--surface);display:flex;align-items:center;justify-content:center;transition:all .15s"></span>
           <span>I agree to receive recurring SMS messages from Cued including workout plans, meal suggestions, and coaching check-ins. Message frequency: 5-8 msgs/day. Msg &amp; data rates may apply. Reply STOP to cancel anytime. Reply HELP for assistance. View our <a href="terms.html" style="color:var(--accent)">Terms</a> &amp; <a href="privacy.html" style="color:var(--accent)">Privacy Policy</a>.</span>
         </label>
       </div>
@@ -397,6 +398,29 @@ async function submit() {
     btn.disabled = false;
   }
 }
+
+// SMS consent custom checkbox
+(function(){
+  const cb = document.getElementById('sms-consent');
+  const ui = document.getElementById('sms-checkbox-ui');
+  const wrap = document.getElementById('sms-consent-wrap');
+  function update(){
+    if(cb.checked){
+      ui.style.background='#7C6EFF';
+      ui.style.borderColor='#7C6EFF';
+      ui.innerHTML='<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      wrap.style.borderColor='rgba(124,110,255,.5)';
+      wrap.style.background='rgba(124,110,255,.08)';
+    } else {
+      ui.style.background='var(--surface)';
+      ui.style.borderColor='var(--border2)';
+      ui.innerHTML='';
+      wrap.style.borderColor='var(--border2)';
+      wrap.style.background='rgba(124,110,255,.04)';
+    }
+  }
+  cb.addEventListener('change', update);
+})();
 
 // Enter key advances step
 document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') next(); });
