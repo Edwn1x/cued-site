@@ -235,9 +235,20 @@ async function activateSMS() {
   btn.textContent = 'Activating...';
   btn.disabled = true;
 
+  const phone = profile._raw_phone || profile.phone || '';
+  console.log('[activateSMS] profile from localStorage:', profile);
+  console.log('[activateSMS] phone being sent:', phone);
+
+  if (!phone) {
+    btn.textContent = 'Activate SMS coaching →';
+    btn.disabled = false;
+    alert('Could not find your phone number. Please go back and sign up again.');
+    return;
+  }
+
   try {
     const fd = new FormData();
-    fd.append('phone', profile._raw_phone || profile.phone || '');
+    fd.append('phone', phone);
 
     const res = await fetch('https://web-production-90171c.up.railway.app/activate-sms', { method: 'POST', body: fd });
     const data = await res.json();
