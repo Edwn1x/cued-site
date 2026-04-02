@@ -68,12 +68,6 @@ h1{font-size:clamp(28px,5vw,48px);font-weight:700;letter-spacing:-1.5px;line-hei
 .btn-secondary{display:block;width:100%;background:transparent;color:var(--text2);font-size:14px;font-weight:500;padding:14px 24px;border-radius:980px;text-decoration:none;text-align:center;border:1px solid var(--border2);transition:all .2s}
 .btn-secondary:hover{border-color:var(--text3);color:var(--text)}
 
-/* SMS OPT-IN BANNER */
-.sms-banner{display:none;width:100%;max-width:440px;margin:0 auto 24px;background:rgba(124,110,255,.06);border:1px solid rgba(124,110,255,.2);border-radius:14px;padding:16px 18px;text-align:left;opacity:0;animation:fadeUp .6s ease .75s forwards}
-.sms-banner.visible{display:block}
-.sms-banner-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
-.sms-banner-body{font-size:12px;color:var(--text3);line-height:1.55;margin-bottom:12px}
-.sms-banner a{color:var(--accent);text-decoration:none;font-weight:500;font-size:13px}
 
 /* SMS NOTICE */
 .sms-notice{margin-top:32px;font-size:12px;color:var(--text3);max-width:380px;line-height:1.5;opacity:0;animation:fadeUp .6s ease 1s forwards}
@@ -107,7 +101,8 @@ h1{font-size:clamp(28px,5vw,48px);font-weight:700;letter-spacing:-1.5px;line-hei
 
 <div class="bg-glow"></div>
 
-<div class="page">
+<!-- FULL STATE: SMS consented -->
+<div class="page" id="state-full">
 
   <div class="check-ring">
     <svg viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -150,12 +145,6 @@ h1{font-size:clamp(28px,5vw,48px);font-weight:700;letter-spacing:-1.5px;line-hei
     </div>
   </div>
 
-  <div class="sms-banner" id="sms-banner">
-    <div class="sms-banner-title">Enable SMS coaching to unlock all features</div>
-    <div class="sms-banner-body">Your profile is created, but you haven't opted in to SMS messages yet. Cued works through text — without it, your coach can't reach you with workouts, meals, or check-ins.</div>
-    <a href="signup.html">Go back and enable SMS →</a>
-  </div>
-
   <div class="actions">
     <a href="profile.html" class="btn-primary">View my profile →</a>
     <a href="index.html" class="btn-secondary">Back to home</a>
@@ -168,17 +157,117 @@ h1{font-size:clamp(28px,5vw,48px);font-weight:700;letter-spacing:-1.5px;line-hei
 
 </div>
 
+<!-- PARTIAL STATE: no SMS consent -->
+<div class="page" id="state-partial" style="display:none">
+
+  <div class="check-ring" style="background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.2)">
+    <svg viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M15 10v6M15 19v1" stroke="#FBBF24" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <div class="tag" style="color:#FBBF24">Almost there</div>
+  <h1 id="partial-heading">One last step.</h1>
+  <p class="sub">Your profile has been saved, but your coaching hasn't started yet. Cued is an SMS-first platform — without your consent, your coach has no way to reach you.</p>
+
+  <div class="info-card" style="border-color:rgba(251,191,36,.15);background:rgba(251,191,36,.03)">
+    <div class="info-card-title" style="color:#FBBF24">What's on hold until you opt in</div>
+    <div class="info-row">
+      <div class="info-icon" style="background:rgba(251,191,36,.08)">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" stroke="#FBBF24" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"/></svg>
+      </div>
+      <div class="info-text">
+        <strong>Coach intro message</strong>
+        <span>Your coach can't text you until you give the green light.</span>
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="info-icon" style="background:rgba(251,191,36,.08)">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" stroke="#FBBF24" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
+      </div>
+      <div class="info-text">
+        <strong>Daily workouts & meal plans</strong>
+        <span>Scheduled SMS coaching won't start until you're opted in.</span>
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="info-icon" style="background:rgba(251,191,36,.08)">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" stroke="#FBBF24" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
+      </div>
+      <div class="info-text">
+        <strong>Progress tracking & check-ins</strong>
+        <span>Your coach tracks how you're feeling and adjusts your plan over time via text.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-primary" id="activate-btn" onclick="activateSMS()">Activate SMS coaching →</button>
+    <a href="profile.html" class="btn-secondary">View my profile</a>
+  </div>
+
+  <p class="sms-notice">
+    By activating, you agree to receive recurring SMS messages from Cued. Msg &amp; data rates may apply. Reply STOP anytime. View our <a href="privacy.html">Privacy Policy</a>.
+  </p>
+
+</div>
+
 <script>
-// Personalize with name from URL
-const urlName = new URLSearchParams(window.location.search).get('name');
-if (urlName) {
-  document.getElementById('welcome-heading').textContent = 'You\'re all set, ' + urlName + '.';
+const params = new URLSearchParams(window.location.search);
+const smsSkipped = params.get('sms') === 'skip';
+const urlName = params.get('name') || '';
+const profile = JSON.parse(localStorage.getItem('cued_profile') || '{}');
+
+if (smsSkipped) {
+  document.getElementById('state-full').style.display = 'none';
+  document.getElementById('state-partial').style.display = 'flex';
+  if (urlName) {
+    document.getElementById('partial-heading').textContent = 'One last step, ' + urlName + '.';
+  }
+} else {
+  if (urlName) {
+    document.getElementById('welcome-heading').textContent = 'You\'re all set, ' + urlName + '.';
+  }
 }
 
-// Show SMS opt-in banner if user didn't consent
-const profile = JSON.parse(localStorage.getItem('cued_profile') || '{}');
-if (profile.sms_opted_in === false) {
-  document.getElementById('sms-banner').classList.add('visible');
+async function activateSMS() {
+  const btn = document.getElementById('activate-btn');
+  btn.textContent = 'Activating...';
+  btn.disabled = true;
+
+  try {
+    const fd = new FormData();
+    // Re-post stored profile data with sms_consent
+    const p = profile;
+    for (const [k, v] of Object.entries(p)) {
+      if (!k.startsWith('_') && k !== 'sms_opted_in') fd.append(k, v);
+    }
+    fd.set('sms_consent', 'on');
+
+    const res = await fetch('https://web-production-90171c.up.railway.app/signup', { method: 'POST', body: fd });
+    const data = await res.json();
+
+    if (data.status === 'ok' || data.status === 'exists') {
+      // Update local profile
+      profile.sms_opted_in = true;
+      localStorage.setItem('cued_profile', JSON.stringify(profile));
+      // Swap to the full success state
+      document.getElementById('state-partial').style.display = 'none';
+      document.getElementById('state-full').style.display = 'flex';
+      if (urlName) {
+        document.getElementById('welcome-heading').textContent = 'You\'re all set, ' + urlName + '.';
+      }
+      window.scrollTo(0, 0);
+    } else {
+      btn.textContent = 'Activate SMS coaching →';
+      btn.disabled = false;
+      alert('Something went wrong. Please try again.');
+    }
+  } catch {
+    btn.textContent = 'Activate SMS coaching →';
+    btn.disabled = false;
+    alert('Connection error. Check your internet and try again.');
+  }
 }
 
 const hamburger = document.getElementById('hamburger');

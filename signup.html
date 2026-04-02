@@ -406,7 +406,7 @@ function consentAndSubmit() {
 
 function skipAndSubmit() {
   closeConsentModal();
-  submit();
+  submit(true);
 }
 
 function closeConsentModal() {
@@ -422,14 +422,23 @@ function toggleOther() {
   document.getElementById('other-goal-wrap').style.display = document.getElementById('other-check').checked ? 'block' : 'none';
 }
 
-async function submit() {
+async function submit(smsSkipped = false) {
   const btn = document.getElementById('btn-next');
-  btn.textContent = 'Setting up your coach...';
+  btn.textContent = 'Setting up your profile...';
   btn.disabled = true;
 
   const form = document.createElement('form');
-  document.querySelectorAll('input,select,textarea').forEach(el => form.appendChild(el.cloneNode(true)));
+  document.querySelectorAll('input,select,textarea').forEach(el => {
+    const clone = el.cloneNode(true);
+    if (el.type === 'checkbox') clone.checked = el.checked;
+    form.appendChild(clone);
+  });
   const fd = new FormData(form);
+  // Always explicitly set sms_consent based on live state
+  fd.delete('sms_consent');
+  if (!smsSkipped && document.getElementById('sms-consent').checked) {
+    fd.append('sms_consent', 'on');
+  }
   const goals = fd.getAll('goals').join(',');
   fd.delete('goals'); fd.append('goal', goals);
   const days = fd.getAll('workout_days').join(',');
@@ -444,9 +453,12 @@ async function submit() {
       // Save profile to localStorage for profile page
       const profileData = {};
       for (const [k, v] of fd.entries()) { profileData[k] = v; }
-      profileData.sms_opted_in = document.getElementById('sms-consent').checked;
+      profileData.sms_opted_in = !smsSkipped;
+      // Save raw form data so welcome page can re-submit with consent later
+      profileData._raw_phone = document.querySelector('input[name="phone"]').value;
       localStorage.setItem('cued_profile', JSON.stringify(profileData));
-      window.location.href = 'welcome.html?name=' + encodeURIComponent(data.name || '');
+      const dest = smsSkipped ? 'welcome.html?sms=skip' : 'welcome.html';
+      window.location.href = dest + (dest.includes('?') ? '&' : '?') + 'name=' + encodeURIComponent(data.name || '');
     } else {
       el.className = 'result-err';
       el.textContent = data.message || 'Something went wrong. Try again.';
