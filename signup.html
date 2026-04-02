@@ -76,9 +76,6 @@ select option{background:var(--surface);color:var(--text)}
 .result-ok{background:rgba(48,209,88,.08);color:var(--green);border:1px solid rgba(48,209,88,.15)}
 .result-err{background:rgba(248,113,113,.08);color:#F87171;border:1px solid rgba(248,113,113,.15)}
 
-/* FOOTER */
-.form-note{position:fixed;bottom:72px;left:0;right:0;text-align:center;font-size:11px;color:var(--text3);z-index:101}
-.form-note a{color:var(--accent);text-decoration:none}
 
 .hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;background:none;border:none;cursor:pointer;padding:4px;z-index:200}
 .hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:transform .3s ease,opacity .3s ease,width .3s ease}
@@ -155,6 +152,12 @@ html,body{overflow:auto}
       </div>
       <label>Phone number</label>
       <input name="phone" placeholder="(209) 555-1234" type="tel" id="f-phone">
+      <div style="margin-top:14px;padding:12px 14px;background:rgba(124,110,255,.04);border:1px solid var(--border2);border-radius:10px">
+        <label style="display:flex;align-items:flex-start;gap:10px;margin:0;cursor:pointer;font-weight:400;font-size:12px;line-height:1.55;color:var(--text3)">
+          <input type="checkbox" name="sms_consent" value="yes" id="sms-consent" style="width:16px;height:16px;margin-top:1px;accent-color:var(--accent);flex-shrink:0">
+          <span>I agree to receive recurring SMS messages from Cued including workout plans, meal suggestions, and coaching check-ins. Message frequency: 5-8 msgs/day. Msg &amp; data rates may apply. Reply STOP to cancel anytime. Reply HELP for assistance. View our <a href="terms.html" style="color:var(--accent)">Terms</a> &amp; <a href="privacy.html" style="color:var(--accent)">Privacy Policy</a>.</span>
+        </label>
+      </div>
       <label>Gender</label>
       <select name="gender" id="f-gender">
         <option value="male">Male</option>
@@ -305,8 +308,6 @@ html,body{overflow:auto}
 
 </div>
 
-<p class="form-note">By signing up, you consent to receive recurring SMS messages from Cued including workout plans, meal suggestions, and coaching check-ins. Message frequency: 5–8 msgs/day. Msg &amp; data rates may apply. Reply STOP to cancel anytime. View our <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>.</p>
-
 <div class="nav-btns">
   <button class="btn-back" id="btn-back" onclick="prev()" disabled>← Back</button>
   <span class="step-counter" id="step-counter">1 / 5</span>
@@ -375,10 +376,12 @@ async function submit() {
     el.style.display = 'block';
     if (data.status === 'ok') {
       el.className = 'result-ok';
-      el.innerHTML = "You're in. Your first coaching text arrives tomorrow morning. 💪";
+      const smsOptIn = document.getElementById('sms-consent').checked;
+      el.innerHTML = smsOptIn
+        ? "You're in. Your first coaching text arrives tomorrow morning. 💪"
+        : "Profile created! Check the SMS consent box on this page if you'd like to start receiving coaching texts.";
       document.querySelector('.steps').style.display = 'none';
       document.querySelector('.nav-btns').style.display = 'none';
-      document.querySelector('.form-note').style.display = 'none';
     } else {
       el.className = 'result-err';
       el.textContent = data.message || 'Something went wrong. Try again.';
