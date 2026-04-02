@@ -90,6 +90,22 @@ select option{background:var(--surface);color:var(--text)}
 .mobile-menu .mm-cta:hover{background:#6B5CE6}
 .mm-close{position:absolute;top:18px;right:24px;background:none;border:none;color:var(--text3);font-size:28px;cursor:pointer;line-height:1;transition:color .2s}
 .mm-close:hover{color:var(--text)}
+/* SMS CONSENT MODAL */
+.consent-modal-bg{position:fixed;inset:0;z-index:300;background:rgba(5,5,6,.85);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.consent-modal-bg.open{opacity:1;pointer-events:all}
+.consent-modal{width:100%;max-width:480px;background:#111114;border:1px solid var(--border2);border-radius:24px 24px 0 0;padding:28px 24px 40px;transform:translateY(40px);transition:transform .4s cubic-bezier(.16,1,.3,1)}
+.consent-modal-bg.open .consent-modal{transform:translateY(0)}
+.consent-modal-icon{width:48px;height:48px;border-radius:50%;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.consent-modal-icon svg{width:22px;height:22px;stroke:#F87171}
+.consent-modal h3{font-size:18px;font-weight:700;letter-spacing:-.4px;text-align:center;margin-bottom:8px}
+.consent-modal p{font-size:14px;color:var(--text3);text-align:center;line-height:1.6;margin-bottom:24px}
+.consent-modal p strong{color:var(--text2)}
+.consent-modal-btns{display:flex;flex-direction:column;gap:10px}
+.btn-consent-yes{background:var(--accent);color:#fff;font-size:15px;font-weight:600;padding:14px;border-radius:980px;border:none;cursor:pointer;font-family:var(--f);transition:all .2s;width:100%}
+.btn-consent-yes:hover{background:#6B5CE6;transform:translateY(-1px)}
+.btn-consent-skip{background:transparent;color:var(--text3);font-size:13px;font-weight:500;padding:12px;border-radius:980px;border:1px solid var(--border2);cursor:pointer;font-family:var(--f);transition:all .2s;width:100%}
+.btn-consent-skip:hover{border-color:var(--text3);color:var(--text2)}
+
 @media(max-width:768px){.nv-r{display:none}.hamburger{display:flex}}
 @media(max-width:600px){
 html,body{overflow:auto}
@@ -309,6 +325,21 @@ html,body{overflow:auto}
 
 </div>
 
+<!-- SMS CONSENT MODAL -->
+<div class="consent-modal-bg" id="consent-modal-bg" onclick="if(event.target===this)closeConsentModal()">
+  <div class="consent-modal">
+    <div class="consent-modal-icon">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/></svg>
+    </div>
+    <h3>SMS consent required</h3>
+    <p>Cued is an <strong>SMS-first coaching platform</strong> — your workouts, meal plans, and daily check-ins are all delivered by text. Without opting in, your coach has no way to reach you and most features won't work.</p>
+    <div class="consent-modal-btns">
+      <button class="btn-consent-yes" onclick="consentAndSubmit()">I consent to SMS — let's go →</button>
+      <button class="btn-consent-skip" onclick="skipAndSubmit()">Submit without SMS (limited experience)</button>
+    </div>
+  </div>
+</div>
+
 <div class="nav-btns">
   <button class="btn-back" id="btn-back" onclick="prev()" disabled>← Back</button>
   <span class="step-counter" id="step-counter">1 / 5</span>
@@ -345,8 +376,42 @@ function showStep(n, dir) {
 }
 
 function next() {
-  if (cur === total) { submit(); return; }
+  if (cur === total) {
+    if (!document.getElementById('sms-consent').checked) {
+      document.getElementById('consent-modal-bg').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    } else {
+      submit();
+    }
+    return;
+  }
   if (cur < total) showStep(cur + 1, 1);
+}
+
+function consentAndSubmit() {
+  // Check the box on their behalf and close modal
+  const cb = document.getElementById('sms-consent');
+  cb.checked = true;
+  // Trigger the visual update
+  const ui = document.getElementById('sms-checkbox-ui');
+  const wrap = document.getElementById('sms-consent-wrap');
+  ui.style.background = '#7C6EFF';
+  ui.style.borderColor = '#7C6EFF';
+  ui.innerHTML = '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  wrap.style.borderColor = 'rgba(124,110,255,.5)';
+  wrap.style.background = 'rgba(124,110,255,.08)';
+  closeConsentModal();
+  submit();
+}
+
+function skipAndSubmit() {
+  closeConsentModal();
+  submit();
+}
+
+function closeConsentModal() {
+  document.getElementById('consent-modal-bg').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 function prev() {
