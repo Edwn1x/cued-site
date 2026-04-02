@@ -430,7 +430,9 @@ async function submit(smsSkipped = false) {
   const form = document.createElement('form');
   document.querySelectorAll('input,select,textarea').forEach(el => {
     const clone = el.cloneNode(true);
-    if (el.type === 'checkbox') clone.checked = el.checked;
+    if (el.type === 'checkbox' || el.type === 'radio') clone.checked = el.checked;
+    if (el.tagName === 'SELECT') clone.value = el.value;
+    if (el.tagName === 'TEXTAREA') clone.value = el.value;
     form.appendChild(clone);
   });
   const fd = new FormData(form);
