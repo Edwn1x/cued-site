@@ -68,6 +68,13 @@ h1{font-size:clamp(28px,5vw,48px);font-weight:700;letter-spacing:-1.5px;line-hei
 .btn-secondary{display:block;width:100%;background:transparent;color:var(--text2);font-size:14px;font-weight:500;padding:14px 24px;border-radius:980px;text-decoration:none;text-align:center;border:1px solid var(--border2);transition:all .2s}
 .btn-secondary:hover{border-color:var(--text3);color:var(--text)}
 
+/* SMS OPT-IN BANNER */
+.sms-banner{display:none;width:100%;max-width:440px;margin:0 auto 24px;background:rgba(124,110,255,.06);border:1px solid rgba(124,110,255,.2);border-radius:14px;padding:16px 18px;text-align:left;opacity:0;animation:fadeUp .6s ease .75s forwards}
+.sms-banner.visible{display:block}
+.sms-banner-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+.sms-banner-body{font-size:12px;color:var(--text3);line-height:1.55;margin-bottom:12px}
+.sms-banner a{color:var(--accent);text-decoration:none;font-weight:500;font-size:13px}
+
 /* SMS NOTICE */
 .sms-notice{margin-top:32px;font-size:12px;color:var(--text3);max-width:380px;line-height:1.5;opacity:0;animation:fadeUp .6s ease 1s forwards}
 .sms-notice a{color:var(--accent);text-decoration:none}
@@ -143,6 +150,12 @@ h1{font-size:clamp(28px,5vw,48px);font-weight:700;letter-spacing:-1.5px;line-hei
     </div>
   </div>
 
+  <div class="sms-banner" id="sms-banner">
+    <div class="sms-banner-title">Enable SMS coaching to unlock all features</div>
+    <div class="sms-banner-body">Your profile is created, but you haven't opted in to SMS messages yet. Cued works through text — without it, your coach can't reach you with workouts, meals, or check-ins.</div>
+    <a href="signup.html">Go back and enable SMS →</a>
+  </div>
+
   <div class="actions">
     <a href="profile.html" class="btn-primary">View my profile →</a>
     <a href="index.html" class="btn-secondary">Back to home</a>
@@ -156,6 +169,12 @@ h1{font-size:clamp(28px,5vw,48px);font-weight:700;letter-spacing:-1.5px;line-hei
 </div>
 
 <script>
+// Show SMS opt-in banner if user didn't consent
+const profile = JSON.parse(localStorage.getItem('cued_profile') || '{}');
+if (profile.sms_opted_in === false) {
+  document.getElementById('sms-banner').classList.add('visible');
+}
+
 const hamburger = document.getElementById('hamburger');
 const mobileMenu = document.getElementById('mobileMenu');
 const mmClose = document.getElementById('mmClose');
