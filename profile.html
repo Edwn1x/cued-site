@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile — Cued</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050506;--bg2:#0A0A0C;--surface:#19191D;--border:#1F1F24;--border2:#2A2A30;--text:#F5F5F7;--text2:#A1A1A6;--text3:#6E6E73;--accent:#7C6EFF;--accent2:#A599FF;--green:#30D158;--f:'DM Sans',-apple-system,sans-serif;--m:'JetBrains Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{font-family:var(--f);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(24px,5vw,64px);background:rgba(5,5,6,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.nv-logo{font-size:18px;font-weight:600;letter-spacing:-.5px;color:var(--text);text-decoration:none;margin-left:24px}
+.nv-r{display:flex;gap:28px;align-items:center}
+.nv-r a{color:var(--text3);font-size:13px;text-decoration:none;transition:color .2s}
+.nv-r a:hover{color:var(--text)}
+
+/* HAMBURGER */
+.hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;background:none;border:none;cursor:pointer;padding:4px;z-index:200}
+.hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:transform .3s ease,opacity .3s ease,width .3s ease}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0;width:0}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mobile-menu{position:fixed;inset:0;background:rgba(5,5,6,.97);z-index:150;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transform:translateY(-100%);transition:transform .4s cubic-bezier(.16,1,.3,1);pointer-events:none}
+.mobile-menu.open{transform:translateY(0);pointer-events:all}
+.mobile-menu a{font-size:clamp(28px,7vw,40px);font-weight:600;letter-spacing:-1px;color:var(--text);text-decoration:none;padding:12px 0;transition:color .2s}
+.mobile-menu a:hover{color:var(--accent)}
+.mm-close{position:absolute;top:18px;right:24px;background:none;border:none;color:var(--text3);font-size:28px;cursor:pointer;line-height:1;transition:color .2s}
+.mm-close:hover{color:var(--text)}
+@media(max-width:768px){.nv-r{display:none}.hamburger{display:flex}}
+
+/* PAGE */
+.page{max-width:600px;margin:0 auto;padding:80px 24px 80px}
+
+/* PROFILE HEADER */
+.profile-header{display:flex;align-items:center;gap:18px;margin-bottom:40px;padding-top:16px}
+.avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;flex-shrink:0;letter-spacing:-.5px}
+.profile-meta h1{font-size:22px;font-weight:700;letter-spacing:-.5px;margin-bottom:2px}
+.profile-meta span{font-size:13px;color:var(--text3)}
+.profile-meta .badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-family:var(--m);color:var(--green);background:rgba(48,209,88,.08);border:1px solid rgba(48,209,88,.15);padding:3px 9px;border-radius:980px;margin-top:5px}
+.profile-meta .badge::before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%}
+
+/* SECTIONS */
+.section{margin-bottom:28px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.section-title{font-size:11px;font-family:var(--m);color:var(--text3);text-transform:uppercase;letter-spacing:2.5px}
+.edit-btn{font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:var(--f);font-weight:500;padding:4px 0;transition:opacity .2s}
+.edit-btn:hover{opacity:.7}
+
+.card{background:var(--surface);border:1px solid var(--border2);border-radius:16px;overflow:hidden}
+.field-row{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);gap:12px}
+.field-row:last-child{border-bottom:none}
+.field-label{font-size:12px;color:var(--text3);margin-bottom:2px}
+.field-value{font-size:14px;color:var(--text);font-weight:500}
+.field-value.empty{color:var(--text3);font-weight:400;font-style:italic}
+.field-edit{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;border-radius:6px;transition:color .2s;flex-shrink:0}
+.field-edit:hover{color:var(--text)}
+.field-edit svg{width:15px;height:15px;stroke:currentColor}
+
+/* TAG PILLS */
+.pills{display:flex;flex-wrap:wrap;gap:6px;padding:14px 18px}
+.pill{font-size:12px;padding:5px 12px;border-radius:980px;background:rgba(124,110,255,.08);border:1px solid rgba(124,110,255,.2);color:var(--accent2)}
+
+/* EDIT MODAL */
+.modal-bg{position:fixed;inset:0;z-index:200;background:rgba(5,5,6,.85);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-bg.open{opacity:1;pointer-events:all}
+.modal{width:100%;max-width:560px;background:var(--bg2);border:1px solid var(--border2);border-radius:20px 20px 0 0;padding:28px 24px 40px;transform:translateY(40px);transition:transform .4s cubic-bezier(.16,1,.3,1)}
+.modal-bg.open .modal{transform:translateY(0)}
+.modal-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.modal-title{font-size:16px;font-weight:600;letter-spacing:-.3px}
+.modal-close{background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;line-height:1;transition:color .2s}
+.modal-close:hover{color:var(--text)}
+.modal label{display:block;font-size:12px;color:var(--text2);margin-bottom:5px;margin-top:16px;font-weight:500}
+.modal label:first-of-type{margin-top:0}
+.modal input,.modal select,.modal textarea{width:100%;padding:12px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:14px;font-family:var(--f);-webkit-appearance:none;transition:border-color .2s}
+.modal input:focus,.modal select:focus,.modal textarea:focus{outline:none;border-color:var(--accent)}
+.modal input::placeholder,.modal textarea::placeholder{color:var(--text3)}
+.modal select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236E6E73'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.modal select option{background:var(--surface)}
+.modal-row{display:flex;gap:10px}.modal-row>div{flex:1}
+.modal-save{width:100%;margin-top:20px;background:var(--accent);color:#fff;font-size:15px;font-weight:600;padding:14px;border-radius:980px;border:none;cursor:pointer;font-family:var(--f);transition:all .2s}
+.modal-save:hover{background:#6B5CE6}
+
+/* SAVE TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface);border:1px solid var(--border2);border-radius:980px;padding:12px 24px;font-size:14px;font-weight:500;color:var(--text);z-index:300;transition:transform .4s cubic-bezier(.16,1,.3,1),opacity .4s;opacity:0;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* DANGER ZONE */
+.danger-link{font-size:13px;color:var(--text3);text-align:center;margin-top:32px;display:block;text-decoration:none;transition:color .2s}
+.danger-link:hover{color:#F87171}
+
+@media(max-width:480px){
+  .profile-header{flex-direction:column;align-items:flex-start;gap:12px}
+  .modal{border-radius:20px 20px 0 0;padding:24px 20px 36px}
+}
+</style>
+<link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nv-logo">cued</a>
+  <div class="nv-r">
+    <a href="how-it-works.html">How it works</a>
+    <a href="discover.html">Discover</a>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mm-close" id="mmClose">&#x2715;</button>
+  <a href="index.html">Home</a>
+  <a href="how-it-works.html">How it works</a>
+  <a href="discover.html">Discover</a>
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="profile-header">
+    <div class="avatar" id="avatar-initials">?</div>
+    <div class="profile-meta">
+      <h1 id="display-name">Loading...</h1>
+      <span id="display-phone"></span>
+      <div class="badge">Active</div>
+    </div>
+  </div>
+
+  <!-- BASICS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">About you</span>
+      <button class="edit-btn" onclick="openModal('basics')">Edit</button>
+    </div>
+    <div class="card">
+      <div class="field-row">
+        <div><div class="field-label">Name</div><div class="field-value" id="v-name">—</div></div>
+      </div>
+      <div class="field-row">
+        <div><div class="field-label">Age</div><div class="field-value" id="v-age">—</div></div>
+      </div>
+      <div class="field-row">
+        <div><div class="field-label">Gender</div><div class="field-value" id="v-gender">—</div></div>
+      </div>
+      <div class="field-row">
+        <div><div class="field-label">Occupation</div><div class="field-value" id="v-occupation">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BODY STATS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Body stats</span>
+      <button class="edit-btn" onclick="openModal('body')">Edit</button>
+    </div>
+    <div class="card">
+      <div class="field-row">
+        <div><div class="field-label">Height</div><div class="field-value" id="v-height">—</div></div>
+      </div>
+      <div class="field-row">
+        <div><div class="field-label">Weight</div><div class="field-value" id="v-weight">—</div></div>
+      </div>
+      <div class="field-row">
+        <div><div class="field-label">Body fat %</div><div class="field-value" id="v-bodyfat">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GOALS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Goals</span>
+      <button class="edit-btn" onclick="openModal('goals')">Edit</button>
+    </div>
+    <div class="card">
+      <div id="v-goals-wrap" class="pills"></div>
+      <div class="field-row">
+        <div><div class="field-label">Biggest obstacle</div><div class="field-value" id="v-obstacle">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRAINING -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Training</span>
+      <button class="edit-btn" onclick="openModal('training')">Edit</button>
+    </div>
+    <div class="card">
+      <div class="field-row">
+        <div><div class="field-label">Experience</div><div class="field-value" id="v-experience">—</div></div>
+      </div>
+      <div class="field-row">
+        <div><div class="field-label">Equipment</div><div class="field-value" id="v-equipment">—</div></div>
+      </div>
+      <div class="field-row">
+        <div><div class="field-label">Training days</div><div class="field-value" id="v-days">—</div></div>
+      </div>
+      <div class="field-row">
+        <div><div class="field-label">Workout time</div><div class="field-value" id="v-workout-time">—</div></div>
+      </div>
+      <div class="field-row">
+        <div><div class="field-label">Injuries / limitations</div><div class="field-value" id="v-injuries">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NUTRITION -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Food & schedule</span>
+      <button class="edit-btn" onclick="openModal('nutrition')">Edit</button>
+    </div>
+    <div class="card">
+      <div class="field-row">
+        <div><div class="field-label">Diet</div><div class="field-value" id="v-diet">—</div></div>
+      </div>
+      <div class="field-row">
+        <div><div class="field-label">Eating situation</div><div class="field-value" id="v-cooking">—</div></div>
+      </div>
+      <div class="field-row">
+        <div><div class="field-label">Restrictions / allergies</div><div class="field-value" id="v-restrictions">—</div></div>
+      </div>
+      <div class="field-row">
+        <div><div class="field-label">Sleep</div><div class="field-value" id="v-sleep">—</div></div>
+      </div>
+      <div class="field-row">
+        <div><div class="field-label">Wearable</div><div class="field-value" id="v-wearable">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <a href="index.html" class="danger-link">← Back to home</a>
+
+</div>
+
+<!-- EDIT MODALS -->
+<div class="modal-bg" id="modal-bg" onclick="handleModalBgClick(event)">
+  <div class="modal" id="modal-inner">
+    <div class="modal-top">
+      <span class="modal-title" id="modal-title">Edit</span>
+      <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+    </div>
+    <div id="modal-body"></div>
+    <button class="modal-save" onclick="saveModal()">Save changes</button>
+  </div>
+</div>
+
+<div class="toast" id="toast">Changes saved</div>
+
+<script>
+// ── Local profile store ──────────────────────────────────────────────────────
+const KEY = 'cued_profile';
+let profile = JSON.parse(localStorage.getItem(KEY) || '{}');
+
+function save() {
+  localStorage.setItem(KEY, JSON.stringify(profile));
+}
+
+// ── Label maps ───────────────────────────────────────────────────────────────
+const goalLabels = {fat_loss:'Lose fat',muscle_building:'Build muscle',general_fitness:'General fitness',endurance:'Endurance',strength:'Get stronger',flexibility:'Flexibility'};
+const obstacleLabels = {consistency:'Staying consistent',nutrition:'Nutrition / diet',knowledge:'Not knowing what to do',time:'Not enough time',motivation:'Motivation / accountability',injuries:'Injuries holding me back',plateaus:'Hit a plateau'};
+const experienceLabels = {none:'Beginner',beginner:'Under 6 months',intermediate:'6 mo – 2 yrs',advanced:'2+ years'};
+const equipmentLabels = {full_gym:'Full gym',limited_gym:'Limited gym',home_gym:'Home gym',minimal:'Bands / bar',bodyweight:'Bodyweight'};
+const dietLabels = {omnivore:'Omnivore',vegetarian:'Vegetarian',vegan:'Vegan',pescatarian:'Pescatarian',keto:'Keto',halal:'Halal',kosher:'Kosher'};
+const cookingLabels = {cook_myself:'I cook',dining_hall:'Dining hall',mostly_eat_out:'Eat out',mix:'Mix'};
+const genderLabels = {male:'Male',female:'Female',non_binary:'Non-binary',prefer_not_to_say:'Prefer not to say'};
+const dayLabels = {mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sat',sun:'Sun'};
+const wearableLabels = {none:'None',apple_watch:'Apple Watch',oura:'Oura Ring',garmin:'Garmin',whoop:'Whoop',fitbit:'Fitbit',samsung:'Samsung'};
+
+function fmt12(t) {
+  if (!t) return '—';
+  const [h, m] = t.split(':').map(Number);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  return ((h % 12) || 12) + ':' + String(m).padStart(2,'0') + ' ' + ampm;
+}
+
+// ── Render ───────────────────────────────────────────────────────────────────
+function render() {
+  const p = profile;
+  const name = p.name || '';
+  document.getElementById('display-name').textContent = name || 'Your Profile';
+  document.getElementById('display-phone').textContent = p.phone || '';
+  document.getElementById('avatar-initials').textContent = name ? name.charAt(0).toUpperCase() : '?';
+
+  set('v-name', p.name);
+  set('v-age', p.age ? p.age + ' yrs' : null);
+  set('v-gender', genderLabels[p.gender]);
+  set('v-occupation', p.occupation);
+
+  const hft = p.height_ft, hin = p.height_in;
+  set('v-height', hft ? hft + '\'' + (hin || '0') + '"' : null);
+  set('v-weight', p.weight_lbs ? p.weight_lbs + ' lbs' : null);
+  set('v-bodyfat', p.body_fat_pct ? p.body_fat_pct + '%' : null);
+
+  // Goals pills
+  const goalsWrap = document.getElementById('v-goals-wrap');
+  const goals = p.goal ? p.goal.split(',').filter(Boolean) : [];
+  if (goals.length) {
+    goalsWrap.innerHTML = goals.map(g => `<span class="pill">${goalLabels[g] || g}</span>`).join('');
+  } else {
+    goalsWrap.innerHTML = '<span style="padding:14px 18px;font-size:14px;color:var(--text3);display:block">No goals set</span>';
+  }
+  set('v-obstacle', obstacleLabels[p.biggest_obstacle]);
+
+  set('v-experience', experienceLabels[p.experience]);
+  set('v-equipment', equipmentLabels[p.equipment]);
+  const days = p.workout_days ? p.workout_days.split(',').filter(Boolean).map(d => dayLabels[d] || d).join(', ') : null;
+  set('v-days', days);
+  set('v-workout-time', fmt12(p.workout_time));
+  set('v-injuries', p.injuries);
+
+  set('v-diet', dietLabels[p.diet]);
+  set('v-cooking', cookingLabels[p.cooking_situation]);
+  set('v-restrictions', p.restrictions);
+  const sleepStr = p.wake_time && p.sleep_time ? fmt12(p.wake_time) + ' – ' + fmt12(p.sleep_time) + (p.sleep_quality ? ' (' + p.sleep_quality + ')' : '') : null;
+  set('v-sleep', sleepStr);
+  set('v-wearable', wearableLabels[p.wearable]);
+}
+
+function set(id, val) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (val) { el.textContent = val; el.classList.remove('empty'); }
+  else { el.textContent = 'Not set'; el.classList.add('empty'); }
+}
+
+// ── Modal ────────────────────────────────────────────────────────────────────
+let currentSection = null;
+
+const modals = {
+  basics: {
+    title: 'Edit basics',
+    html: () => `
+      <div style="display:flex;gap:10px">
+        <div style="flex:1"><label>First name</label><input id="e-name" value="${esc(profile.name)}" placeholder="Alex"></div>
+        <div style="flex:1"><label>Age</label><input id="e-age" type="number" value="${esc(profile.age)}" placeholder="24"></div>
+      </div>
+      <label>Phone number</label><input id="e-phone" type="tel" value="${esc(profile.phone)}" placeholder="(510) 555-1234">
+      <label>Gender</label>
+      <select id="e-gender">
+        ${opts({male:'Male',female:'Female',non_binary:'Non-binary',prefer_not_to_say:'Prefer not to say'}, profile.gender)}
+      </select>
+      <label>Occupation</label><input id="e-occupation" value="${esc(profile.occupation)}" placeholder="e.g. CS student, barista">`,
+    save: () => {
+      profile.name = val('e-name');
+      profile.age = val('e-age');
+      profile.phone = val('e-phone');
+      profile.gender = val('e-gender');
+      profile.occupation = val('e-occupation');
+    }
+  },
+  body: {
+    title: 'Edit body stats',
+    html: () => `
+      <label>Height</label>
+      <div style="display:flex;gap:10px">
+        <div style="flex:1"><input id="e-hft" type="number" value="${esc(profile.height_ft)}" placeholder="5" style="text-align:center"><div style="font-size:11px;color:var(--text3);text-align:center;margin-top:4px">feet</div></div>
+        <div style="flex:1"><input id="e-hin" type="number" value="${esc(profile.height_in)}" placeholder="10" style="text-align:center"><div style="font-size:11px;color:var(--text3);text-align:center;margin-top:4px">inches</div></div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <div style="flex:1"><label>Weight (lbs)</label><input id="e-weight" type="number" value="${esc(profile.weight_lbs)}" placeholder="170"></div>
+        <div style="flex:1"><label>Body fat % <span style="color:var(--text3)">(optional)</span></label><input id="e-bf" type="number" step="0.1" value="${esc(profile.body_fat_pct)}" placeholder="18"></div>
+      </div>
+      <label>Occupation</label><input id="e-occ2" value="${esc(profile.occupation)}" placeholder="e.g. CS student, barista">`,
+    save: () => {
+      profile.height_ft = val('e-hft');
+      profile.height_in = val('e-hin');
+      profile.weight_lbs = val('e-weight');
+      profile.body_fat_pct = val('e-bf');
+      profile.occupation = val('e-occ2');
+    }
+  },
+  goals: {
+    title: 'Edit goals',
+    html: () => {
+      const active = profile.goal ? profile.goal.split(',') : [];
+      const checks = Object.entries(goalLabels).map(([k,l]) =>
+        `<label style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;cursor:pointer;font-size:14px;color:var(--text2);margin-top:8px">
+          <input type="checkbox" name="egoal" value="${k}" ${active.includes(k)?'checked':''} style="width:15px;height:15px;accent-color:var(--accent)"> ${l}</label>`
+      ).join('');
+      return `<div>${checks}</div>
+        <label>Biggest obstacle</label>
+        <select id="e-obstacle">${opts(obstacleLabels, profile.biggest_obstacle, true)}</select>`;
+    },
+    save: () => {
+      const checked = [...document.querySelectorAll('input[name="egoal"]:checked')].map(el => el.value);
+      profile.goal = checked.join(',');
+      profile.biggest_obstacle = val('e-obstacle');
+    }
+  },
+  training: {
+    title: 'Edit training',
+    html: () => {
+      const activeDays = profile.workout_days ? profile.workout_days.split(',') : [];
+      const dayChecks = Object.entries(dayLabels).map(([k,l]) =>
+        `<label style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;background:var(--surface);border:1px solid ${activeDays.includes(k)?'var(--accent)':'var(--border2)'};border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;color:${activeDays.includes(k)?'var(--text)':'var(--text3)'};margin:3px" id="dl-${k}">
+          <input type="checkbox" name="eday" value="${k}" ${activeDays.includes(k)?'checked':''} style="display:none"> ${l}</label>`
+      ).join('');
+      return `
+        <div style="display:flex;gap:10px">
+          <div style="flex:1"><label>Experience</label><select id="e-exp">${opts(experienceLabels, profile.experience)}</select></div>
+          <div style="flex:1"><label>Equipment</label><select id="e-equip">${opts(equipmentLabels, profile.equipment)}</select></div>
+        </div>
+        <label>Training days</label>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px">${dayChecks}</div>
+        <label>Usual workout time</label><input id="e-wtime" type="time" value="${esc(profile.workout_time)||'16:00'}">
+        <label>Injuries / limitations <span style="color:var(--text3)">(optional)</span></label>
+        <input id="e-injuries" value="${esc(profile.injuries)}" placeholder="e.g. bad left knee">`;
+    },
+    save: () => {
+      const checked = [...document.querySelectorAll('input[name="eday"]:checked')].map(el => el.value);
+      profile.workout_days = checked.join(',');
+      profile.experience = val('e-exp');
+      profile.equipment = val('e-equip');
+      profile.workout_time = val('e-wtime');
+      profile.injuries = val('e-injuries');
+    }
+  },
+  nutrition: {
+    title: 'Edit food & schedule',
+    html: () => `
+      <div style="display:flex;gap:10px">
+        <div style="flex:1"><label>Diet</label><select id="e-diet">${opts(dietLabels, profile.diet)}</select></div>
+        <div style="flex:1"><label>Eating situation</label><select id="e-cooking">${opts(cookingLabels, profile.cooking_situation)}</select></div>
+      </div>
+      <label>Allergies / restrictions <span style="color:var(--text3)">(optional)</span></label>
+      <input id="e-restrict" value="${esc(profile.restrictions)}" placeholder="e.g. lactose intolerant">
+      <div style="display:flex;gap:10px">
+        <div style="flex:1"><label>Wake time</label><input id="e-wake" type="time" value="${esc(profile.wake_time)||'07:00'}"></div>
+        <div style="flex:1"><label>Bedtime</label><input id="e-sleep" type="time" value="${esc(profile.sleep_time)||'23:00'}"></div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <div style="flex:1"><label>Sleep quality</label><select id="e-sq">${opts({great:'Great',okay:'Okay',poor:'Poor',terrible:'Terrible'}, profile.sleep_quality)}</select></div>
+        <div style="flex:1"><label>Wearable</label><select id="e-wear">${opts(wearableLabels, profile.wearable)}</select></div>
+      </div>`,
+    save: () => {
+      profile.diet = val('e-diet');
+      profile.cooking_situation = val('e-cooking');
+      profile.restrictions = val('e-restrict');
+      profile.wake_time = val('e-wake');
+      profile.sleep_time = val('e-sleep');
+      profile.sleep_quality = val('e-sq');
+      profile.wearable = val('e-wear');
+    }
+  }
+};
+
+function opts(map, current, addEmpty) {
+  let html = addEmpty ? '<option value="">Select one</option>' : '';
+  for (const [k, l] of Object.entries(map)) {
+    html += `<option value="${k}" ${current===k?'selected':''}>${l}</option>`;
+  }
+  return html;
+}
+
+function esc(v) { return v ? String(v).replace(/"/g,'&quot;') : ''; }
+function val(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+function openModal(section) {
+  currentSection = section;
+  const m = modals[section];
+  document.getElementById('modal-title').textContent = m.title;
+  document.getElementById('modal-body').innerHTML = m.html();
+  document.getElementById('modal-bg').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal-bg').classList.remove('open');
+  document.body.style.overflow = '';
+  currentSection = null;
+}
+
+function handleModalBgClick(e) {
+  if (e.target === document.getElementById('modal-bg')) closeModal();
+}
+
+function saveModal() {
+  if (!currentSection) return;
+  modals[currentSection].save();
+  save();
+  render();
+  closeModal();
+  showToast('Changes saved');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+render();
+
+// Hamburger
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+const mmClose = document.getElementById('mmClose');
+hamburger.addEventListener('click', () => { mobileMenu.classList.add('open'); hamburger.classList.add('open'); });
+mmClose.addEventListener('click', () => { mobileMenu.classList.remove('open'); hamburger.classList.remove('open'); });
+mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { mobileMenu.classList.remove('open'); hamburger.classList.remove('open'); }));
+</script>
+</body>
+</html>
