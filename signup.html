@@ -436,7 +436,9 @@ async function submit(smsSkipped = false) {
   const fd = new FormData(form);
   // Always explicitly set sms_consent based on live state
   fd.delete('sms_consent');
-  if (!smsSkipped && document.getElementById('sms-consent').checked) {
+  if (smsSkipped) {
+    fd.append('sms_consent', 'skip');
+  } else if (document.getElementById('sms-consent').checked) {
     fd.append('sms_consent', 'on');
   }
   const goals = fd.getAll('goals').join(',');
