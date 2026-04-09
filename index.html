@@ -92,13 +92,31 @@ nav{border-bottom:none!important;background:transparent!important;backdrop-filte
 .pb-txt h2{font-size:clamp(28px,5vw,56px);font-weight:700;letter-spacing:-2px;margin-bottom:8px;line-height:1.05;color:#fff}
 .pb-txt p{font-size:17px;color:rgba(255,255,255,.8);font-weight:300}
 
-/* PHONE — side by side */
-.demo{padding:120px 24px;display:flex;align-items:center;justify-content:center;gap:clamp(40px,6vw,100px);max-width:1100px;margin:0 auto;background:#fff}
-.demo-text{flex:1;max-width:480px}
-.demo-l{font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:3px;margin-bottom:16px}
-.demo-t{font-size:clamp(28px,3.5vw,44px);font-weight:700;letter-spacing:-1.5px;margin-bottom:12px;line-height:1.1;color:var(--text)}
-.demo-d{font-size:17px;color:var(--text2);max-width:400px;font-weight:300;line-height:1.55}
-.demo-phone{flex-shrink:0}
+/* PHONE DEMO */
+.demo{padding:clamp(80px,10vw,140px) clamp(24px,6vw,100px);display:flex;align-items:flex-start;justify-content:center;gap:clamp(48px,6vw,100px);max-width:1300px;margin:0 auto;background:#fff}
+.demo-phone{flex-shrink:0;position:sticky;top:100px}
+.demo-right{flex:1;display:flex;flex-direction:column;gap:48px}
+.demo-steps-hd{margin-bottom:32px}
+.demo-steps-hd h2{font-size:clamp(28px,3.5vw,44px);font-weight:700;letter-spacing:-1.5px;color:var(--text);line-height:1.1;margin-bottom:10px}
+.demo-steps-hd p{font-size:16px;color:var(--text2);font-weight:300}
+.demo-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.demo-step{background:var(--bg3);border-radius:20px;padding:28px 24px;display:flex;flex-direction:column;gap:16px}
+.demo-step-icon{width:48px;height:48px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.demo-step-num{font-size:11px;font-family:var(--m);color:var(--text3);letter-spacing:1px}
+.demo-step h3{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.2px;margin-bottom:4px}
+.demo-step p{font-size:13px;color:var(--text2);font-weight:300;line-height:1.55}
+.demo-bento{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.db-card{border-radius:20px;padding:28px;position:relative;overflow:hidden}
+.db-card.purple{background:#7C6EFF;color:#fff}
+.db-card.dark{background:#1A1A1E;color:#fff}
+.db-card.light{background:#F5F5F7;color:var(--text)}
+.db-card.white{background:#fff;border:1px solid var(--border);color:var(--text)}
+.db-icon{font-size:28px;position:absolute;top:24px;right:24px}
+.db-card h3{font-size:clamp(16px,1.8vw,20px);font-weight:700;letter-spacing:-.3px;margin-bottom:8px;line-height:1.2}
+.db-card p{font-size:13px;line-height:1.6;font-weight:300;opacity:.8}
+.db-card.purple h3,.db-card.dark h3{color:#fff}
+.db-card.purple p,.db-card.dark p{color:rgba(255,255,255,.75)}
+@media(max-width:900px){.demo{flex-direction:column}.demo-phone{position:static;margin:0 auto}.demo-steps{grid-template-columns:1fr}.demo-bento{grid-template-columns:1fr}}
 .phone{width:280px;background:#1A1A1E;border-radius:40px;border:2px solid #2A2A30;padding:12px;box-shadow:0 0 0 4px #F0EEF9,0 40px 80px rgba(124,110,255,.15),0 8px 32px rgba(0,0,0,.12)}
 /* pop-up animation */
 .rv-pop{opacity:0;transform:translateY(60px);transition:opacity 1s ease,transform 1s cubic-bezier(.16,1,.3,1)}
@@ -300,7 +318,7 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
 /* RESPONSIVE */
 @media(max-width:768px){
 .nv-r{display:none}.hamburger{display:flex}.sg{grid-template-columns:1fr}.ft-g{grid-template-columns:1fr;gap:40px}.ps{grid-template-columns:1fr}.ps-img{height:40vh}.phone{width:250px}footer{flex-direction:column;gap:12px;text-align:center}
-.demo{flex-direction:column;text-align:center;padding:80px 24px}.demo-text{max-width:100%}.demo-d{margin:0 auto}
+.demo{flex-direction:column;padding:80px 24px}
 .acc2-grid{grid-template-columns:repeat(2,1fr)}.fc-grid{grid-template-columns:1fr}
 .ws-grid{grid-template-columns:1fr;gap:40px}.ws-img{order:-1}
 .pr-split{grid-template-columns:1fr;border-top:1px solid var(--border)}.pr-divider-v{display:none}.pr-price-col{padding:48px 0 32px}.pr-detail-col{padding:32px 0 48px}}
@@ -448,7 +466,7 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
   </div>
 </div>
 
-<!-- PHONE DEMO — side by side -->
+<!-- PHONE DEMO -->
 <section class="demo">
   <div class="demo-phone rv-pop">
     <div class="phone">
@@ -461,15 +479,66 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
         <div class="bt r">6:52 AM</div>
         <div class="bb c">Pull Day (55 min)<br>1. Deadlift — 4x5 @ 225<br>2. BB Row — 3x8 @ 155<br>3. Pull-ups — 3x6 +25lb<br>4. Face Pulls — 3x15<br>5. Hammer Curls — 3x12</div>
         <div class="bt">6:52 AM</div>
-        <div class="bb c">Breakfast: 3-egg omelet w/ spinach & feta, toast, berries. ~480 cal, 38g protein.</div>
+        <div class="bb c">Breakfast: 3-egg omelet w/ spinach &amp; feta, toast, berries. ~480 cal, 38g protein.</div>
         <div class="bt">7:30 AM</div>
       </div>
     </div>
   </div>
-  <div class="demo-text">
-    <p class="demo-l rv">The experience</p>
-    <h2 class="demo-t rv">It looks like texting<br>your coach.</h2>
-    <p class="demo-d rv rv-d1">Because that's exactly what it is. Your coach texts you first. You reply when you're ready. No app to open, no dashboard to check — just your messages.</p>
+  <div class="demo-right rv">
+    <div>
+      <div class="demo-steps-hd">
+        <h2>Three texts to your first workout.</h2>
+        <p>Sign up in under a minute. Your first coaching text arrives tomorrow morning.</p>
+      </div>
+      <div class="demo-steps">
+        <div class="demo-step">
+          <div class="demo-step-icon">📱</div>
+          <div>
+            <div class="demo-step-num">01</div>
+            <h3>Tell us your goals</h3>
+            <p>Quick text-style conversation. Experience, equipment, what you're working toward. Done in 60 seconds.</p>
+          </div>
+        </div>
+        <div class="demo-step">
+          <div class="demo-step-icon">💬</div>
+          <div>
+            <div class="demo-step-num">02</div>
+            <h3>Get your first text</h3>
+            <p>Tomorrow morning, your Cued coach texts you. Workout, meal ideas, and a check-in — in your Messages app.</p>
+          </div>
+        </div>
+        <div class="demo-step">
+          <div class="demo-step-icon">💪</div>
+          <div>
+            <div class="demo-step-num">03</div>
+            <h3>Just reply</h3>
+            <p>Log workouts by texting back. Ask questions anytime. Your coach adapts every day based on your progress.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="demo-bento">
+      <div class="db-card purple">
+        <div class="db-icon">✦</div>
+        <h3>No app to download. Ever.</h3>
+        <p>Cued lives in your text messages. The app you already check 96 times a day.</p>
+      </div>
+      <div class="db-card white">
+        <div class="db-icon">🧠</div>
+        <h3>Learns how you train.</h3>
+        <p>Every reply teaches your coach more. Preferred exercises, schedule changes, energy levels — all factored in.</p>
+      </div>
+      <div class="db-card dark">
+        <div class="db-icon">⚡</div>
+        <h3>Responds in seconds.</h3>
+        <p>Mid-workout question? Ask. Need a meal swap? Done. Faster than any app notification.</p>
+      </div>
+      <div class="db-card light">
+        <div class="db-icon">🔒</div>
+        <h3>Private by design.</h3>
+        <p>Your data stays yours. No social feeds, no leaderboards, no sharing.</p>
+      </div>
+    </div>
   </div>
 </section>
 </div><!-- /scale-reveal -->
