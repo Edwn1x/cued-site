@@ -218,13 +218,24 @@ body{transition:background-color 1.1s cubic-bezier(.16,1,.3,1)}
 .stat-banner strong{color:var(--light-text)}
 .stat-banner strong{font-weight:700}
 
-/* LIFESTYLE CAROUSEL */
-.lifestyle{padding:100px 0 100px;background:var(--light);overflow:hidden}
-.lifestyle-hd{padding:0 clamp(24px,5vw,80px);margin-bottom:48px}
-.lifestyle-hd h2{font-size:clamp(28px,4vw,44px);font-weight:700;letter-spacing:-1.5px;margin-bottom:8px;color:var(--light-text)}
-.lifestyle-hd p{font-size:17px;color:var(--light-text2);font-weight:300}
-.lifestyle-track{display:flex;gap:16px;padding:0 clamp(24px,5vw,80px);overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.lifestyle-track::-webkit-scrollbar{display:none}
+/* HIGHLIGHTS TABS */
+.highlights{padding:clamp(80px,10vw,140px) clamp(24px,6vw,100px);background:#fff}
+.highlights-i{max-width:1100px;margin:0 auto}
+.highlights-hd{text-align:center;margin-bottom:56px}
+.highlights-hd h2{font-size:clamp(36px,5vw,60px);font-weight:700;letter-spacing:-2.5px;color:var(--text);line-height:1.05}
+.hl-tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:64px}
+.hl-tab{padding:10px 22px;border-radius:980px;font-size:14px;font-weight:500;color:var(--text3);background:none;border:1px solid var(--border);cursor:pointer;transition:all .2s;font-family:var(--f)}
+.hl-tab:hover{color:var(--text);border-color:var(--border2)}
+.hl-tab.active{background:var(--text);color:#fff;border-color:var(--text)}
+.hl-panels{}
+.hl-panel{display:none;align-items:center;gap:clamp(40px,6vw,96px)}
+.hl-panel.active{display:flex}
+.hl-icon{flex-shrink:0;width:340px;height:340px;border-radius:28px;display:flex;align-items:center;justify-content:center;font-size:96px}
+.hl-body{flex:1}
+.hl-badge{display:inline-block;font-size:11px;font-weight:600;color:var(--text);background:var(--border);padding:4px 12px;border-radius:980px;letter-spacing:.5px;margin-bottom:20px}
+.hl-body h3{font-size:clamp(26px,3.5vw,42px);font-weight:700;letter-spacing:-1.5px;color:var(--text);margin-bottom:16px;line-height:1.1}
+.hl-body p{font-size:17px;color:var(--text2);font-weight:300;line-height:1.65;max-width:460px}
+@media(max-width:768px){.hl-panel.active{flex-direction:column}.hl-icon{width:100%;height:240px;border-radius:20px}.hl-tabs{gap:6px}.hl-tab{font-size:13px;padding:8px 16px}}
 
 /* ACCURACY STATS */
 .accuracy{padding:120px 24px;background:var(--light)}
@@ -239,18 +250,6 @@ body{transition:background-color 1.1s cubic-bezier(.16,1,.3,1)}
 .acc2-bench{font-size:11px;color:var(--light-text3);line-height:1.4}
 
 
-/* LIFESTYLE CARD FLIP */
-.lc{flex-shrink:0;width:300px;height:380px;border-radius:20px;overflow:visible;position:relative;scroll-snap-align:start;perspective:1000px;cursor:pointer}
-.lc-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.16,1,.3,1);border-radius:20px}
-.lc:hover .lc-inner{transform:rotateY(180deg)}
-.lc-front,.lc-back{position:absolute;inset:0;border-radius:20px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
-.lc-front img{width:100%;height:100%;object-fit:cover;filter:brightness(.75) contrast(1.05);display:block;transition:transform 6s ease}
-.lc:hover .lc-front img{transform:scale(1.04)}
-.lc-label{position:absolute;bottom:20px;left:20px;font-size:22px;font-weight:700;letter-spacing:-.5px;color:#fff}
-.lc-back{background:var(--accent);transform:rotateY(180deg);display:flex;flex-direction:column;justify-content:center;padding:28px 24px}
-.lc-back-tag{font-size:10px;font-family:var(--m);color:rgba(255,255,255,.6);letter-spacing:2px;margin-bottom:12px;text-transform:uppercase}
-.lc-back h3{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.3px;margin-bottom:12px;line-height:1.2}
-.lc-back p{font-size:13px;color:rgba(255,255,255,.8);line-height:1.6}
 
 /* FEATURE CARDS */
 .feat-cards{padding:120px 24px;border-top:1px solid var(--border);background:#fff}
@@ -378,75 +377,58 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
   <p class="rv">98% of texts get opened. 3% of fitness apps survive past day 30. <strong>We chose texts.</strong></p>
 </section>
 
-<!-- LIFESTYLE CAROUSEL -->
-<section class="lifestyle">
-  <div class="lifestyle-hd rv">
-    <h2>Built for how you actually live.</h2>
-    <p>Not just gym days. Every day.</p>
-  </div>
-  <div class="lifestyle-track">
-    <div class="lc rv">
-      <div class="lc-inner">
-        <div class="lc-front">
-          <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&q=80" alt="Restored">
-          <div class="lc-label">Restored</div>
-        </div>
-        <div class="lc-back">
-          <div class="lc-back-tag">Recovery</div>
-          <h3>Know when to rest — and when to push.</h3>
-          <p>Cued reads your sleep and HRV data to decide if today calls for a hard session or a deload. No guessing, no burnout.</p>
-        </div>
-      </div>
+<!-- HIGHLIGHTS TABS -->
+<section class="highlights">
+  <div class="highlights-i">
+    <div class="highlights-hd rv">
+      <h2>Get the highlights.</h2>
     </div>
-    <div class="lc rv rv-d1">
-      <div class="lc-inner">
-        <div class="lc-front">
-          <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80" alt="Focused">
-          <div class="lc-label">Focused</div>
-        </div>
-        <div class="lc-back">
-          <div class="lc-back-tag">Training</div>
+    <div class="hl-tabs rv">
+      <button class="hl-tab active" data-tab="training">Training</button>
+      <button class="hl-tab" data-tab="nutrition">Nutrition</button>
+      <button class="hl-tab" data-tab="recovery">Recovery</button>
+      <button class="hl-tab" data-tab="accountability">Accountability</button>
+      <button class="hl-tab" data-tab="adaptability">Adaptability</button>
+    </div>
+    <div class="hl-panels rv">
+      <div class="hl-panel active" data-panel="training">
+        <div class="hl-icon" style="background:#EEF0FF">🏋️</div>
+        <div class="hl-body">
+          <span class="hl-badge">Built for you</span>
           <h3>Your workout, ready before you even ask.</h3>
-          <p>Every morning you get your exact session — exercises, weights, sets — built on your history and what your body can handle that day.</p>
+          <p>Every morning you get your exact session — exercises, sets, weights — built on your history and what your body can handle that day. No guesswork, no planning.</p>
         </div>
       </div>
-    </div>
-    <div class="lc rv rv-d2">
-      <div class="lc-inner">
-        <div class="lc-front">
-          <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&q=80" alt="Fueled">
-          <div class="lc-label">Fueled</div>
-        </div>
-        <div class="lc-back">
-          <div class="lc-back-tag">Nutrition</div>
+      <div class="hl-panel" data-panel="nutrition">
+        <div class="hl-icon" style="background:#FFF3E0">🥗</div>
+        <div class="hl-body">
+          <span class="hl-badge">Calibrated daily</span>
           <h3>Eat for what you actually did today.</h3>
-          <p>Heavy leg day? More carbs. Rest day? Lighter meals. Your food plan shifts with your training automatically — no app, no logging.</p>
+          <p>Heavy leg day? More carbs. Rest day? Lighter meals. Your food plan shifts with your training automatically — no app, no calorie logging, no guessing.</p>
         </div>
       </div>
-    </div>
-    <div class="lc rv rv-d3">
-      <div class="lc-inner">
-        <div class="lc-front">
-          <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80" alt="Pushed">
-          <div class="lc-label">Pushed</div>
-        </div>
-        <div class="lc-back">
-          <div class="lc-back-tag">Progression</div>
-          <h3>A coach that remembers every rep.</h3>
-          <p>Cued tracks every set you've ever done and applies progressive overload automatically. You just show up — your coach handles the math.</p>
+      <div class="hl-panel" data-panel="recovery">
+        <div class="hl-icon" style="background:#E8F5E9">😴</div>
+        <div class="hl-body">
+          <span class="hl-badge">Always watching</span>
+          <h3>Know when to rest — and when to push.</h3>
+          <p>Cued reads your sleep and HRV data to decide if today calls for a hard session or a deload. No burnout, no wasted easy days when you had more in the tank.</p>
         </div>
       </div>
-    </div>
-    <div class="lc rv rv-d4">
-      <div class="lc-inner">
-        <div class="lc-front">
-          <img src="https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=600&q=80" alt="Moving">
-          <div class="lc-label">Moving</div>
+      <div class="hl-panel" data-panel="accountability">
+        <div class="hl-icon" style="background:#E8F5E9">💬</div>
+        <div class="hl-body">
+          <span class="hl-badge">Always there</span>
+          <h3>The nudge you need. Not the spam you don't.</h3>
+          <p>Your coach knows when to push and when to back off. Miss a few days? A gentle check-in, not a guilt trip. Crushing it? Your coach notices that too.</p>
         </div>
-        <div class="lc-back">
-          <div class="lc-back-tag">Consistency</div>
-          <h3>The only fitness habit that actually sticks.</h3>
-          <p>No app to open. No dashboard to check. Your coach texts you. You text back. That's it — and that's exactly why it works.</p>
+      </div>
+      <div class="hl-panel" data-panel="adaptability">
+        <div class="hl-icon" style="background:#F3E8FF">⚡</div>
+        <div class="hl-body">
+          <span class="hl-badge">Always evolving</span>
+          <h3>A coach that learns you over time.</h3>
+          <p>Only 40 minutes today? Traveling? Skipped a session? Cued adjusts on the fly — your plan always fits your life, not the other way around.</p>
         </div>
       </div>
     </div>
@@ -584,6 +566,17 @@ const srObs=new IntersectionObserver(entries=>{
   });
 },{threshold:0.08});
 scaleBlocks.forEach(b=>srObs.observe(b));
+
+// Highlights tab switching
+document.querySelectorAll('.hl-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    const t=tab.dataset.tab;
+    document.querySelectorAll('.hl-tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.hl-panel').forEach(x=>x.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelector('.hl-panel[data-panel="'+t+'"]').classList.add('active');
+  });
+});
 
 // Hero conversation animation
 (function(){
