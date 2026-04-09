@@ -20,14 +20,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;ali
 .nv-r{display:flex;gap:28px;align-items:center;transition:gap .5s cubic-bezier(.16,1,.3,1)}
 .nv-r a{color:var(--text3);font-size:13px;text-decoration:none;transition:color .2s}
 .nv-r a:hover{color:var(--text)}
-nav{border-bottom:1px solid var(--border)!important;background:rgba(255,255,255,.92)!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+nav{border-bottom:none!important;background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .nv-btn-wrap{max-width:0;overflow:hidden;transition:max-width .55s cubic-bezier(.16,1,.3,1),opacity .4s ease;opacity:0}
 .nv-btn-wrap.show{max-width:140px;opacity:1}
 .nv-btn{background:var(--accent);color:#fff!important;font-size:12px;font-weight:600;padding:7px 16px;border-radius:980px;text-decoration:none;white-space:nowrap;display:inline-block;transition:background .2s}
 .nv-btn:hover{background:#6B5CE6}
 
 /* HERO */
-.hero{position:relative;min-height:100vh;display:flex;align-items:center;overflow:hidden;background:#fff;padding:100px clamp(24px,6vw,100px) 80px}
+.hero{position:relative;min-height:88vh;display:flex;align-items:center;overflow:hidden;background:#fff;padding:100px clamp(24px,6vw,100px) 80px}
 .hero-vid{display:none}.hero-ov{display:none}.hero-flare{display:none}
 @keyframes flareF{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,20px)}}
 .hero-inner{max-width:1200px;width:100%;margin:0 auto;display:flex;align-items:center;gap:clamp(48px,6vw,100px)}
@@ -43,8 +43,9 @@ nav{border-bottom:1px solid var(--border)!important;background:rgba(255,255,255,
 @keyframes hIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 
 /* HERO CONVERSATION */
-.hero-conv{flex:1;max-width:400px;opacity:0;animation:hIn .8s .3s ease forwards}
-.hero-conv-label{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:20px;padding-left:4px}
+.hero-conv{flex:1;max-width:400px;opacity:0;animation:hIn .8s .3s ease forwards;display:flex;flex-direction:column;align-items:center}
+.hero-conv-label{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:2px;margin-bottom:20px;text-align:center}
+.hc-msgs{width:100%}
 .hc-msgs{display:flex;flex-direction:column;gap:6px}
 .hc-msg{display:flex;opacity:0;transform:translateY(10px)}
 .hc-msg.show{opacity:1;transform:translateY(0);transition:opacity .4s ease,transform .4s cubic-bezier(.16,1,.3,1)}
@@ -340,24 +341,22 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
 <section class="hero">
   <div class="hero-inner">
     <div class="hero-c">
-      <p class="hero-eyebrow">AI fitness coaching via SMS</p>
       <h1 class="hero-tag" id="heroLogo">Your Cue<br>to Move.</h1>
       <p class="hero-sub">Text your goals once. Every morning you get a personalized workout, meal plan, and recovery read — built around your body and what you did yesterday. No app. Just your phone.</p>
       <div class="hero-acts">
-        <a href="signup.html" class="bp">Start messaging →</a>
+        <a href="signup.html" class="bp">Start messaging</a>
       </div>
     </div>
     <div class="hero-conv" id="heroConv">
       <div class="hero-conv-label">Your morning, with Cued</div>
       <div class="hc-msgs" id="hcMsgs">
-        <div class="hc-time show">6:45 AM</div>
-        <div class="hc-msg coach"><div class="hc-bubble">Gm Alex. 7h sleep, HRV trending up — good recovery. Today's a pull day. I bumped your deadlift to 225. Reply <strong>W</strong> when you're ready.</div></div>
-        <div class="hc-msg user"><div class="hc-bubble">W</div></div>
-        <div class="hc-msg coach"><div class="hc-bubble">Pull Day (55 min)<br>1. Deadlift — 4×5 @ 225<br>2. BB Row — 3×8 @ 155<br>3. Pull-ups — 3×6 +25lb<br>4. Hammer Curls — 3×12</div></div>
-        <div class="hc-time">7:30 AM</div>
-        <div class="hc-msg coach"><div class="hc-bubble">Breakfast: 3-egg omelet w/ spinach &amp; feta, toast, berries. ~480 cal, 38g protein.</div></div>
-        <div class="hc-msg user"><div class="hc-bubble">done 💪 felt strong today</div></div>
-        <div class="hc-msg coach"><div class="hc-bubble">Logged. That's a 5lb PR on deadlift. Nice work — I'll program 230 next week.</div></div>
+        <div class="hc-time show">6:47 AM</div>
+        <div class="hc-msg coach"><div class="hc-bubble">Hey, good morning Alex! 7h 12m sleep, resting HR dropped to 58 — recovery is solid. You ready for legs today?</div></div>
+        <div class="hc-msg user"><div class="hc-bubble">yeah but i only have 40 min today</div></div>
+        <div class="hc-msg coach"><div class="hc-bubble">Alr bet, no worries. Here's your 40-min leg day:<br>4×6 Barbell Squat (165lb)<br>3×10 Romanian Deadlift (135lb)<br>3×12 Walking Lunges<br>Superset: Leg Curls + Calf Raises 3×15</div></div>
+        <div class="hc-msg user"><div class="hc-bubble">last set of squats felt heavy last time, should i deload?</div></div>
+        <div class="hc-msg coach"><div class="hc-bubble">Think about it — your squat has gone up 20lb in 6 weeks, some fatigue is expected. Let's keep 165 but drop to 4×5. If it still feels heavy, we deload next week.</div></div>
+        <div class="hc-msg coach"><div class="hc-bubble">Post-workout: Greek yogurt bowl with granola and banana. ~420 cal, 38g protein. Or want a different option? Lmk what's in your fridge.</div></div>
       </div>
     </div>
   </div>
@@ -543,7 +542,7 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
           <div class="pr-item">Unlimited coaching conversations</div>
         </div>
         <div class="pr-actions">
-          <a href="signup.html" class="pr-cta">Get cued →</a>
+          <a href="signup.html" class="pr-cta">Get cued</a>
           <p class="pr-note">No credit card. No commitment.<br>Beta spots are limited.</p>
         </div>
       </div>
@@ -558,7 +557,7 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
   <div class="in">
     <h2 class="rv">Your first coaching text<br>arrives <span class="g">tomorrow.</span></h2>
     <p class="rv rv-d1">No app to download. No dashboard to learn. Just your phone number, your goals, and it's free during beta.</p>
-    <a href="signup.html" class="bp rv rv-d2">Get cued →</a>
+    <a href="signup.html" class="bp rv rv-d2">Get cued</a>
   </div>
 </section>
 </div><!-- /scale-reveal -->
