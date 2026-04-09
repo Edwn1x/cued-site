@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#FFFFFF;--bg2:#F7F6F2;--bg3:#EDEAE3;--surface:#F0EEF9;--border:#E5E3EE;--border2:#D8D5EE;--text:#1A1A1E;--text2:#4A4A52;--text3:#8A8A92;--accent:#7C6EFF;--accent2:#5B4ECC;--as:rgba(124,110,255,0.08);--ag:rgba(124,110,255,0.12);--green:#1A9E47;--f:'DM Sans',-apple-system,sans-serif;--m:'JetBrains Mono',monospace;
---light:#F7F6F2;--light2:#EDEAE3;--light-text:#1A1A1E;--light-text2:#4A4A52;--light-text3:#8A8A92}
+:root{--bg:#FFFFFF;--bg2:#FFFFFF;--bg3:#F5F5F7;--surface:#FFFFFF;--border:#E5E3EE;--border2:#D8D5EE;--text:#1A1A1E;--text2:#4A4A52;--text3:#8A8A92;--accent:#7C6EFF;--accent2:#5B4ECC;--as:rgba(124,110,255,0.08);--ag:rgba(124,110,255,0.12);--green:#1A9E47;--f:'DM Sans',-apple-system,sans-serif;--m:'JetBrains Mono',monospace;
+--light:#FFFFFF;--light2:#F5F5F7;--light-text:#1A1A1E;--light-text2:#4A4A52;--light-text3:#8A8A92}
 *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{font-family:var(--f);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 
 /* NAV */
@@ -43,7 +43,7 @@ nav{border-bottom:none!important;background:transparent!important;backdrop-filte
 @keyframes hIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 
 /* HERO CONVERSATION */
-.hero-conv{flex:1;max-width:400px;opacity:0;animation:hIn .8s .3s ease forwards;display:flex;flex-direction:column;align-items:center}
+.hero-conv{flex:1;max-width:420px;min-width:320px;opacity:0;animation:hIn .8s .3s ease forwards;display:flex;flex-direction:column;align-items:center;margin-left:auto}
 .hero-conv-label{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:2px;margin-bottom:20px;text-align:center}
 .hc-msgs{width:100%}
 .hc-msgs{display:flex;flex-direction:column;gap:6px}
@@ -77,12 +77,6 @@ nav{border-bottom:none!important;background:transparent!important;backdrop-filte
 
 @media(max-width:768px){.hero{flex-direction:column;padding:100px 24px 64px}.hero-inner{flex-direction:column;gap:48px}.hero-c{max-width:100%}.hero-conv{max-width:100%;width:100%}.problem-grid{grid-template-columns:1fr}.problem-cell{border-right:none!important;border-top:1px solid rgba(255,255,255,.2)}}
 
-/* MARQUEE */
-.marquee{overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:16px 0;background:var(--bg2)}
-.marquee-track{display:flex;gap:48px;animation:marq 25s linear infinite;width:max-content}
-.marquee-item{font-size:13px;font-family:var(--m);color:var(--text3);white-space:nowrap;display:flex;align-items:center;gap:10px}
-.marquee-item::before{content:'';width:5px;height:5px;background:var(--accent);border-radius:50%;opacity:.6}
-@keyframes marq{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
 /* TAGLINE */
 .tagline{padding:100px 24px;text-align:center;background:var(--light)}
@@ -341,7 +335,7 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
 <section class="hero">
   <div class="hero-inner">
     <div class="hero-c">
-      <h1 class="hero-tag" id="heroLogo">Your Cue<br>to Move.</h1>
+      <h1 class="hero-tag" id="heroLogo">Your <span style="color:var(--accent)">cue</span><br>to move.</h1>
       <p class="hero-sub">Text your goals once. Every morning you get a personalized workout, meal plan, and recovery read — built around your body and what you did yesterday. No app. Just your phone.</p>
       <div class="hero-acts">
         <a href="signup.html" class="bp">Start messaging</a>
@@ -375,31 +369,8 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
   </div>
 </section>
 
-<!-- MARQUEE -->
-<div class="marquee">
-  <div class="marquee-track">
-    <span class="marquee-item">Personalized workouts</span>
-    <span class="marquee-item">Daily meal plans</span>
-    <span class="marquee-item">SMS coaching</span>
-    <span class="marquee-item">Progressive overload</span>
-    <span class="marquee-item">Wearable integration</span>
-    <span class="marquee-item">Recovery tracking</span>
-    <span class="marquee-item">Macro-aware nutrition</span>
-    <span class="marquee-item">No app required</span>
-    <span class="marquee-item">Free beta access</span>
-    <span class="marquee-item">Personalized workouts</span>
-    <span class="marquee-item">Daily meal plans</span>
-    <span class="marquee-item">SMS coaching</span>
-    <span class="marquee-item">Progressive overload</span>
-    <span class="marquee-item">Wearable integration</span>
-    <span class="marquee-item">Recovery tracking</span>
-    <span class="marquee-item">Macro-aware nutrition</span>
-    <span class="marquee-item">No app required</span>
-    <span class="marquee-item">Free beta access</span>
-  </div>
-</div>
 
-<div class="scale-reveal" id="lightBlock" data-bg="#F7F6F2">
+<div class="scale-reveal" id="lightBlock" data-bg="#FFFFFF">
 
 
 <!-- TAGLINE -->
