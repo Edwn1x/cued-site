@@ -49,7 +49,10 @@ nav.nav-light .nv-btn{background:#fff;color:var(--accent)!important}
 /* HERO CONVERSATION */
 .hero-conv{flex:1.2;max-width:540px;min-width:380px;opacity:0;animation:hIn .8s .3s ease forwards;display:flex;flex-direction:column;align-items:center;margin-left:auto}
 .hero-conv-label{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:2px;margin-bottom:20px;text-align:center}
-.hc-msgs{width:100%;display:flex;flex-direction:column;gap:8px}
+.hc-msgs{width:100%;display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto;padding-right:6px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.hc-msgs::-webkit-scrollbar{width:4px}
+.hc-msgs::-webkit-scrollbar-track{background:transparent}
+.hc-msgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 .hc-msg{display:flex;opacity:0;transform:translateY(10px)}
 .hc-msg.show{opacity:1;transform:translateY(0);transition:opacity .4s ease,transform .4s cubic-bezier(.16,1,.3,1)}
 .hc-msg.coach{justify-content:flex-start}
@@ -654,11 +657,12 @@ document.querySelectorAll('.hl-tab').forEach(tab=>{
 // Hero conversation animation
 (function(){
   const msgs=document.querySelectorAll('#hcMsgs .hc-msg, #hcMsgs .hc-time');
+  const container=document.getElementById('hcMsgs');
+  function scrollToBottom(){container.scrollTop=container.scrollHeight;}
   let i=0;
   function showNext(){
     if(i>=msgs.length)return;
     const el=msgs[i];
-    // Show typing indicator before coach messages
     if(el.classList.contains('coach')){
       const wrap=el.parentElement;
       const typing=document.createElement('div');
@@ -666,19 +670,21 @@ document.querySelectorAll('.hl-tab').forEach(tab=>{
       typing.innerHTML='<div class="hc-typing"><div class="hc-dot"></div><div class="hc-dot"></div><div class="hc-dot"></div></div>';
       wrap.insertBefore(typing,el);
       typing.style.opacity='1';
+      scrollToBottom();
       setTimeout(()=>{
         wrap.removeChild(typing);
         el.classList.add('show');
         i++;
+        scrollToBottom();
         setTimeout(showNext,el.querySelector('.hc-bubble').textContent.length>60?1800:900);
       },900);
     } else {
       el.classList.add('show');
       i++;
+      scrollToBottom();
       setTimeout(showNext,500);
     }
   }
-  // Start after a short delay
   setTimeout(showNext,1200);
 })();
 
