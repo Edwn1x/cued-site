@@ -35,21 +35,18 @@ nav.nav-light .nv-btn{background:#fff;color:var(--accent)!important}
 .hero-vid{display:none}.hero-ov{display:none}.hero-flare{display:none}
 @keyframes flareF{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,20px)}}
 
-/* Phase 1: centered layout — inner is a flex row but text block is centered */
-.hero-inner{max-width:1300px;width:100%;margin:0 auto;display:flex;align-items:center;gap:clamp(40px,5vw,80px)}
+/* Phase 1: centered layout */
+.hero-inner{max-width:1300px;width:100%;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:0;transition:gap .7s cubic-bezier(.4,0,.2,1),justify-content .7s}
+.hero-inner.revealed{justify-content:flex-start;gap:clamp(40px,5vw,80px)}
 
-/* Text block: starts centered (full width, larger scale), transitions to left */
+/* Text block: starts centered, transitions to left */
 .hero-c{
-  flex:1;max-width:100%;width:100%;
+  flex:0 0 auto;width:min(600px,90%);
   display:flex;flex-direction:column;align-items:center;text-align:center;
-  transform-origin:center center;
-  transition:max-width .7s cubic-bezier(.4,0,.2,1),
-             align-items .7s cubic-bezier(.4,0,.2,1),
-             text-align .7s cubic-bezier(.4,0,.2,1);
+  transition:width .7s cubic-bezier(.4,0,.2,1),align-items .7s,text-align .7s;
 }
-/* Revealed state: text moves left, shrinks to fit half */
 .hero-inner.revealed .hero-c{
-  max-width:520px;
+  width:min(520px,50%);
   align-items:flex-start;
   text-align:left;
 }
@@ -72,12 +69,15 @@ nav.nav-light .nv-btn{background:#fff;color:var(--accent)!important}
 
 /* HERO CONVERSATION */
 .hero-conv{
-  flex:1.2;max-width:540px;min-width:340px;
-  display:flex;flex-direction:column;align-items:center;margin-left:auto;
+  flex:0 0 0;width:0;min-width:0;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;
   opacity:0;pointer-events:none;
-  transition:opacity .8s ease;
+  transition:opacity .8s ease, flex-basis .7s cubic-bezier(.4,0,.2,1), width .7s cubic-bezier(.4,0,.2,1);
 }
-.hero-inner.revealed .hero-conv{opacity:1;pointer-events:auto}
+.hero-inner.revealed .hero-conv{
+  flex:1 1 auto;width:min(540px,50%);min-width:300px;
+  opacity:1;pointer-events:auto;overflow:visible;
+}
 .hc-msgs{width:100%;display:flex;flex-direction:column;gap:8px;max-height:360px;overflow-y:auto;scrollbar-width:none}
 .hc-msgs::-webkit-scrollbar{display:none}
 .hc-msg{display:flex;opacity:0;transform:translateY(10px)}
@@ -97,10 +97,10 @@ nav.nav-light .nv-btn{background:#fff;color:var(--accent)!important}
 
 /* MOBILE: skip animation, stack vertically */
 @media(max-width:768px){
-  .hero-inner{flex-direction:column;gap:48px}
-  .hero-c,.hero-inner.revealed .hero-c{max-width:100%;align-items:center;text-align:center}
+  .hero-inner,.hero-inner.revealed{flex-direction:column;gap:48px;justify-content:flex-start}
+  .hero-c,.hero-inner.revealed .hero-c{width:100%;align-items:center;text-align:center}
   .hero-tag,.hero-inner.revealed .hero-tag{font-size:clamp(36px,9vw,52px)}
-  .hero-conv,.hero-inner.revealed .hero-conv{max-width:100%;width:100%;min-width:0;opacity:1;pointer-events:auto;margin-left:0}
+  .hero-conv,.hero-inner.revealed .hero-conv{flex:none;width:100%;min-width:0;opacity:1;pointer-events:auto;overflow:visible}
 }
 
 /* PROBLEM SECTION */
