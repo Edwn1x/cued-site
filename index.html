@@ -67,7 +67,8 @@ nav.nav-light .nv-btn{background:#fff;color:var(--accent)!important}
 @keyframes htB{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-3px)}}
 
 /* PROBLEM SECTION */
-.problem{padding:clamp(100px,12vw,160px) 24px;background:var(--accent);color:#fff;position:relative;overflow:hidden;border-radius:32px 32px 0 0;margin-top:-32px}
+.problem-wrap{padding:0 clamp(16px,4vw,64px);background:#fff}
+.problem{padding:clamp(100px,12vw,160px) 24px;background:var(--accent);color:#fff;position:relative;overflow:hidden;border-radius:32px 32px 0 0;will-change:border-radius,transform}
 .problem::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:800px;height:800px;background:radial-gradient(circle,rgba(255,255,255,.1) 0%,transparent 60%);pointer-events:none}
 .problem-i{max-width:1000px;margin:0 auto;position:relative;z-index:1}
 .problem-t{font-size:clamp(36px,5vw,60px);font-weight:700;letter-spacing:-2.5px;text-align:center;margin-bottom:14px;color:#fff}
@@ -378,7 +379,8 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
 </section>
 
 <!-- PROBLEM SECTION -->
-<section class="problem">
+<div class="problem-wrap" id="problemWrap">
+<section class="problem" id="problemSection">
   <div class="problem-i">
     <h2 class="problem-t rv">Fitness apps <em>are broken.</em></h2>
     <p class="problem-d rv">They track everything and change nothing. We built something different.</p>
@@ -389,7 +391,7 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
     </div>
   </div>
 </section>
-
+</div>
 
 <!-- THREE TEXTS SECTION -->
 <section class="three-texts" data-nav="dark">
@@ -689,6 +691,27 @@ document.querySelectorAll('.hl-tab').forEach(tab=>{
     }
   }
   setTimeout(showNext,1200);
+})();
+
+// Problem section scroll reveal: small card → full width
+(function(){
+  const wrap=document.getElementById('problemWrap');
+  const section=document.getElementById('problemSection');
+  if(!wrap||!section)return;
+  function update(){
+    const rect=wrap.getBoundingClientRect();
+    const wh=window.innerHeight;
+    // progress: 0 = section top just entering bottom of screen, 1 = section top at top of screen
+    const progress=Math.min(1,Math.max(0,(wh-rect.top)/(wh*0.7)));
+    const radius=Math.round(32*(1-progress));
+    const maxPad=Math.min(64,Math.max(16,window.innerWidth*0.04));
+    const currentPad=Math.round(maxPad*(1-progress));
+    wrap.style.paddingLeft=currentPad+'px';
+    wrap.style.paddingRight=currentPad+'px';
+    section.style.borderRadius=radius+'px '+radius+'px 0 0';
+  }
+  window.addEventListener('scroll',update,{passive:true});
+  update();
 })();
 
 // Hamburger menu
