@@ -357,23 +357,14 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
 <section class="hero">
   <div class="hero-inner">
     <div class="hero-c">
-      <h1 class="hero-tag" id="heroLogo">Your <span style="color:var(--accent)">cue</span><br>to move.</h1>
-      <p class="hero-sub">Text your goals once. Every morning you get a personalized workout, meal plan, and recovery read — built around your body and what you did yesterday. No app. Just your phone.</p>
+      <h1 class="hero-tag" id="heroLogo">The AI fitness coach that <span style="color:var(--accent)">texts you first.</span></h1>
+      <p class="hero-sub">Personalized workouts, nutrition, and accountability — delivered entirely over SMS. No app required.</p>
       <div class="hero-acts">
-        <a href="signup.html" class="bp">Start messaging</a>
+        <a href="signup.html" class="bp">Get your first text</a>
       </div>
     </div>
     <div class="hero-conv" id="heroConv">
-      <div class="hero-conv-label">Your morning, with Cued</div>
-      <div class="hc-msgs" id="hcMsgs">
-        <div class="hc-time show">6:47 AM</div>
-        <div class="hc-msg coach"><div class="hc-bubble">Hey, good morning Alex! 7h 12m sleep, resting HR dropped to 58 — recovery is solid. You ready for legs today?</div></div>
-        <div class="hc-msg user"><div class="hc-bubble">yeah but i only have 40 min today</div></div>
-        <div class="hc-msg coach"><div class="hc-bubble">Alr bet, no worries. Here's your 40-min leg day:<br>4×6 Barbell Squat (165lb)<br>3×10 Romanian Deadlift (135lb)<br>3×12 Walking Lunges<br>Superset: Leg Curls + Calf Raises 3×15</div></div>
-        <div class="hc-msg user"><div class="hc-bubble">last set of squats felt heavy last time, should i deload?</div></div>
-        <div class="hc-msg coach"><div class="hc-bubble">Think about it — your squat has gone up 20lb in 6 weeks, some fatigue is expected. Let's keep 165 but drop to 4×5. If it still feels heavy, we deload next week.</div></div>
-        <div class="hc-msg coach"><div class="hc-bubble">Post-workout: Greek yogurt bowl with granola and banana. ~420 cal, 38g protein. Or want a different option? Lmk what's in your fridge.</div></div>
-      </div>
+      <div class="hc-msgs" id="hcMsgs"></div>
     </div>
   </div>
 </section>
@@ -654,43 +645,65 @@ document.querySelectorAll('.hl-tab').forEach(tab=>{
   });
 });
 
-// Hero conversation animation
+// Hero conversation animation — messages appended dynamically so container starts empty
 (function(){
-  const msgs=document.querySelectorAll('#hcMsgs .hc-msg, #hcMsgs .hc-time');
   const container=document.getElementById('hcMsgs');
-  container.scrollTop=0;
-  function scrollToBottom(){
-    // Only scroll if content overflows the container
+  if(!container)return;
+  const script=[
+    {type:'time', text:'6:47 AM'},
+    {type:'coach', text:'Hey, good morning Alex! 7h 12m sleep, resting HR dropped to 58 — recovery is solid. You ready for legs today?'},
+    {type:'user', text:'yeah but i only have 40 min today'},
+    {type:'coach', text:'Alr bet, no worries. Here\'s your 40-min leg day:\n4×6 Barbell Squat (165lb)\n3×10 Romanian Deadlift (135lb)\n3×12 Walking Lunges\nSuperset: Leg Curls + Calf Raises 3×15'},
+    {type:'user', text:'last set of squats felt heavy last time, should i deload?'},
+    {type:'coach', text:'Think about it — your squat has gone up 20lb in 6 weeks, some fatigue is expected. Let\'s keep 165 but drop to 4×5. If it still feels heavy, we deload next week.'},
+    {type:'coach', text:'Post-workout: Greek yogurt bowl with granola and banana. ~420 cal, 38g protein. Or want a different option? Lmk what\'s in your fridge.'}
+  ];
+  function scrollDown(){
     if(container.scrollHeight>container.clientHeight)
       container.scrollTop=container.scrollHeight;
   }
+  function appendMsg(item){
+    const el=document.createElement('div');
+    if(item.type==='time'){
+      el.className='hc-time';
+      el.textContent=item.text;
+      container.appendChild(el);
+      requestAnimationFrame(()=>el.classList.add('show'));
+    } else {
+      el.className='hc-msg '+item.type;
+      const bubble=document.createElement('div');
+      bubble.className='hc-bubble';
+      bubble.innerHTML=item.text.replace(/\n/g,'<br>');
+      el.appendChild(bubble);
+      container.appendChild(el);
+      requestAnimationFrame(()=>el.classList.add('show'));
+      scrollDown();
+    }
+  }
   let i=0;
   function showNext(){
-    if(i>=msgs.length)return;
-    const el=msgs[i];
-    if(el.classList.contains('coach')){
-      const wrap=el.parentElement;
+    if(i>=script.length)return;
+    const item=script[i];
+    if(item.type==='coach'){
       const typing=document.createElement('div');
       typing.className='hc-msg coach';
       typing.innerHTML='<div class="hc-typing"><div class="hc-dot"></div><div class="hc-dot"></div><div class="hc-dot"></div></div>';
-      wrap.insertBefore(typing,el);
-      typing.style.opacity='1';
-      scrollToBottom();
+      container.appendChild(typing);
+      scrollDown();
       setTimeout(()=>{
-        wrap.removeChild(typing);
-        el.classList.add('show');
+        container.removeChild(typing);
+        appendMsg(item);
         i++;
-        scrollToBottom();
-        setTimeout(showNext,el.querySelector('.hc-bubble').textContent.length>60?1800:900);
+        const delay=item.text.length>80?1800:1000;
+        setTimeout(showNext,delay);
       },900);
     } else {
-      el.classList.add('show');
+      appendMsg(item);
       i++;
-      scrollToBottom();
-      setTimeout(showNext,500);
+      setTimeout(showNext,item.type==='time'?600:700);
     }
   }
-  setTimeout(showNext,1200);
+  setTimeout(showNext,1000);
 })();
 
 // Problem section scroll reveal: small card → full width
