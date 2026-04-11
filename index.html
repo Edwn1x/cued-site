@@ -273,15 +273,17 @@ body{transition:background-color 1.1s cubic-bezier(.16,1,.3,1)}
 .hl-tab{padding:10px 22px;border-radius:980px;font-size:14px;font-weight:500;color:var(--text3);background:none;border:1px solid var(--border);cursor:pointer;transition:all .2s;font-family:var(--f)}
 .hl-tab:hover{color:var(--text);border-color:var(--border2)}
 .hl-tab.active{background:var(--text);color:#fff;border-color:var(--text)}
-/* Carousel wrapper with prev/next arrows */
-.hl-carousel{position:relative}
-.hl-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:10;width:44px;height:44px;border-radius:50%;background:#fff;border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;font-size:18px;color:var(--text2);line-height:1}
+/* Carousel wrapper */
+.hl-carousel{position:relative;padding:0 48px}
+.hl-arrow{position:absolute;top:50%;transform:translateY(-60%);z-index:10;width:44px;height:44px;border-radius:50%;background:#fff;border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;font-size:18px;color:var(--text2);line-height:1;flex-shrink:0}
 .hl-arrow:hover{border-color:var(--border2);color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,.12)}
-.hl-arrow.prev{left:-56px}
-.hl-arrow.next{right:-56px}
-.hl-panels{}
-.hl-panel{display:none;align-items:center;gap:clamp(40px,6vw,96px)}
-.hl-panel.active{display:flex}
+.hl-arrow.prev{left:0}
+.hl-arrow.next{right:0}
+/* Sliding track — all panels in a row, clip to show peek of neighbors */
+.hl-panels{overflow:hidden}
+.hl-track{display:flex;transition:transform .6s cubic-bezier(.4,0,.2,1);will-change:transform}
+.hl-panel{flex:0 0 100%;display:flex;align-items:center;gap:clamp(40px,6vw,96px);opacity:.4;transform:scale(.97);transition:opacity .6s ease,transform .6s ease;pointer-events:none}
+.hl-panel.active{opacity:1;transform:scale(1);pointer-events:auto}
 /* Image-based icon */
 .hl-icon{flex-shrink:0;width:340px;height:340px;border-radius:28px;display:flex;align-items:center;justify-content:center;font-size:96px;overflow:hidden}
 .hl-icon img{width:100%;height:100%;object-fit:cover;border-radius:28px}
@@ -291,10 +293,10 @@ body{transition:background-color 1.1s cubic-bezier(.16,1,.3,1)}
 .hl-body p{font-size:17px;color:var(--text2);font-weight:300;line-height:1.65;max-width:460px}
 /* Progress dots */
 .hl-dots{display:flex;gap:8px;justify-content:center;margin-top:40px}
-.hl-dot{width:6px;height:6px;border-radius:50%;background:var(--border2);transition:all .3s;cursor:pointer}
+.hl-dot{width:6px;height:6px;border-radius:50%;background:var(--border2);transition:all .3s;cursor:pointer;border:none}
 .hl-dot.active{width:20px;border-radius:3px;background:var(--text)}
-@media(max-width:900px){.hl-arrow{display:none}}
-@media(max-width:768px){.hl-panel.active{flex-direction:column}.hl-icon{width:100%;height:240px;border-radius:20px}.hl-tabs{gap:6px}.hl-tab{font-size:13px;padding:8px 16px}}
+@media(max-width:900px){.hl-arrow{display:none}.hl-carousel{padding:0}}
+@media(max-width:768px){.hl-panel{flex-direction:column}.hl-icon{width:100%;height:240px;border-radius:20px}.hl-tabs{gap:6px}.hl-tab{font-size:13px;padding:8px 16px}}
 
 /* ACCURACY STATS */
 .accuracy{padding:120px 24px;background:var(--light)}
@@ -549,6 +551,7 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
       <button class="hl-arrow prev" id="hlPrev">&#8592;</button>
       <button class="hl-arrow next" id="hlNext">&#8594;</button>
       <div class="hl-panels">
+      <div class="hl-track" id="hlTrack">
         <div class="hl-panel active" data-panel="training">
           <div class="hl-icon">
             <img src="images/barbell.jpg" alt="Training">
@@ -597,7 +600,8 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
             <p>Only 40 minutes today? Traveling? Skipped a session? Cued adjusts on the fly — your plan always fits your life, not the other way around.</p>
           </div>
         </div>
-      </div>
+      </div><!-- /hl-track -->
+      </div><!-- /hl-panels -->
       <div class="hl-dots" id="hlDots"></div>
     </div>
   </div>
@@ -697,19 +701,19 @@ const srObs=new IntersectionObserver(entries=>{
 },{threshold:0.08});
 scaleBlocks.forEach(b=>srObs.observe(b));
 
-// Highlights tab switching
-// Highlights carousel — tabs, prev/next arrows, auto-advance, dots
+// Highlights carousel — sliding track with peek, arrows, dots, auto-advance
 (function(){
   const tabs=Array.from(document.querySelectorAll('.hl-tab'));
   const panels=Array.from(document.querySelectorAll('.hl-panel'));
+  const track=document.getElementById('hlTrack');
   const dotsEl=document.getElementById('hlDots');
   const prevBtn=document.getElementById('hlPrev');
   const nextBtn=document.getElementById('hlNext');
-  if(!tabs.length||!panels.length)return;
+  if(!tabs.length||!panels.length||!track)return;
 
   let current=0;
   let timer=null;
-  const INTERVAL=4000;
+  const INTERVAL=4500;
 
   // Build dots
   panels.forEach((_,i)=>{
@@ -728,6 +732,7 @@ scaleBlocks.forEach(b=>srObs.observe(b));
     panels[current].classList.add('active');
     tabs[current].classList.add('active');
     dots[current].classList.add('active');
+    track.style.transform='translateX(-'+current+'00%)';
     if(userInitiated) resetTimer();
   }
 
@@ -794,6 +799,7 @@ scaleBlocks.forEach(b=>srObs.observe(b));
       typing.className='hc-msg coach';
       typing.innerHTML='<div class="hc-typing"><div class="hc-dot"></div><div class="hc-dot"></div><div class="hc-dot"></div></div>';
       container.appendChild(typing);
+      requestAnimationFrame(()=>typing.classList.add('show'));
       scrollDown();
       setTimeout(()=>{
         container.removeChild(typing);
