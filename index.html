@@ -269,18 +269,31 @@ body{transition:background-color 1.1s cubic-bezier(.16,1,.3,1)}
 .highlights-i{max-width:1100px;margin:0 auto}
 .highlights-hd{text-align:center;margin-bottom:56px}
 .highlights-hd h2{font-size:clamp(36px,5vw,60px);font-weight:700;letter-spacing:-2.5px;color:var(--text);line-height:1.05}
-.hl-tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:64px}
+.hl-tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:48px}
 .hl-tab{padding:10px 22px;border-radius:980px;font-size:14px;font-weight:500;color:var(--text3);background:none;border:1px solid var(--border);cursor:pointer;transition:all .2s;font-family:var(--f)}
 .hl-tab:hover{color:var(--text);border-color:var(--border2)}
 .hl-tab.active{background:var(--text);color:#fff;border-color:var(--text)}
+/* Carousel wrapper with prev/next arrows */
+.hl-carousel{position:relative}
+.hl-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:10;width:44px;height:44px;border-radius:50%;background:#fff;border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;font-size:18px;color:var(--text2);line-height:1}
+.hl-arrow:hover{border-color:var(--border2);color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,.12)}
+.hl-arrow.prev{left:-56px}
+.hl-arrow.next{right:-56px}
 .hl-panels{}
 .hl-panel{display:none;align-items:center;gap:clamp(40px,6vw,96px)}
 .hl-panel.active{display:flex}
-.hl-icon{flex-shrink:0;width:340px;height:340px;border-radius:28px;display:flex;align-items:center;justify-content:center;font-size:96px}
+/* Image-based icon */
+.hl-icon{flex-shrink:0;width:340px;height:340px;border-radius:28px;display:flex;align-items:center;justify-content:center;font-size:96px;overflow:hidden}
+.hl-icon img{width:100%;height:100%;object-fit:cover;border-radius:28px}
 .hl-body{flex:1}
 .hl-badge{display:inline-block;font-size:11px;font-weight:600;color:var(--text);background:var(--border);padding:4px 12px;border-radius:980px;letter-spacing:.5px;margin-bottom:20px}
 .hl-body h3{font-size:clamp(26px,3.5vw,42px);font-weight:700;letter-spacing:-1.5px;color:var(--text);margin-bottom:16px;line-height:1.1}
 .hl-body p{font-size:17px;color:var(--text2);font-weight:300;line-height:1.65;max-width:460px}
+/* Progress dots */
+.hl-dots{display:flex;gap:8px;justify-content:center;margin-top:40px}
+.hl-dot{width:6px;height:6px;border-radius:50%;background:var(--border2);transition:all .3s;cursor:pointer}
+.hl-dot.active{width:20px;border-radius:3px;background:var(--text)}
+@media(max-width:900px){.hl-arrow{display:none}}
 @media(max-width:768px){.hl-panel.active{flex-direction:column}.hl-icon{width:100%;height:240px;border-radius:20px}.hl-tabs{gap:6px}.hl-tab{font-size:13px;padding:8px 16px}}
 
 /* ACCURACY STATS */
@@ -532,47 +545,60 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
       <button class="hl-tab" data-tab="accountability">Accountability</button>
       <button class="hl-tab" data-tab="adaptability">Adaptability</button>
     </div>
-    <div class="hl-panels rv">
-      <div class="hl-panel active" data-panel="training">
-        <div class="hl-icon" style="background:#EEF0FF">🏋️</div>
-        <div class="hl-body">
-          <span class="hl-badge">Built for you</span>
-          <h3>Your workout, ready before you even ask.</h3>
-          <p>Every morning you get your exact session — exercises, sets, weights — built on your history and what your body can handle that day. No guesswork, no planning.</p>
+    <div class="hl-carousel rv">
+      <button class="hl-arrow prev" id="hlPrev">&#8592;</button>
+      <button class="hl-arrow next" id="hlNext">&#8594;</button>
+      <div class="hl-panels">
+        <div class="hl-panel active" data-panel="training">
+          <div class="hl-icon">
+            <img src="images/barbell.jpg" alt="Training">
+          </div>
+          <div class="hl-body">
+            <span class="hl-badge">Built for you</span>
+            <h3>Your workout, ready before you even ask.</h3>
+            <p>Every morning you get your exact session — exercises, sets, weights — built on your history and what your body can handle that day. No guesswork, no planning.</p>
+          </div>
+        </div>
+        <div class="hl-panel" data-panel="nutrition">
+          <div class="hl-icon">
+            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=700&q=80" alt="Nutrition">
+          </div>
+          <div class="hl-body">
+            <span class="hl-badge">Calibrated daily</span>
+            <h3>Eat for what you actually did today.</h3>
+            <p>Heavy leg day? More carbs. Rest day? Lighter meals. Your food plan shifts with your training automatically — no app, no calorie logging, no guessing.</p>
+          </div>
+        </div>
+        <div class="hl-panel" data-panel="recovery">
+          <div class="hl-icon">
+            <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=700&q=80" alt="Recovery">
+          </div>
+          <div class="hl-body">
+            <span class="hl-badge">Always watching</span>
+            <h3>Know when to rest — and when to push.</h3>
+            <p>Cued reads your sleep and HRV data to decide if today calls for a hard session or a deload. No burnout, no wasted easy days when you had more in the tank.</p>
+          </div>
+        </div>
+        <div class="hl-panel" data-panel="accountability">
+          <div class="hl-icon" style="background:#E8F5E9;font-size:96px">💬</div>
+          <div class="hl-body">
+            <span class="hl-badge">Always there</span>
+            <h3>The nudge you need. Not the spam you don't.</h3>
+            <p>Your coach knows when to push and when to back off. Miss a few days? A gentle check-in, not a guilt trip. Crushing it? Your coach notices that too.</p>
+          </div>
+        </div>
+        <div class="hl-panel" data-panel="adaptability">
+          <div class="hl-icon">
+            <img src="images/wearable.jpg" alt="Adaptability">
+          </div>
+          <div class="hl-body">
+            <span class="hl-badge">Always evolving</span>
+            <h3>A coach that learns you over time.</h3>
+            <p>Only 40 minutes today? Traveling? Skipped a session? Cued adjusts on the fly — your plan always fits your life, not the other way around.</p>
+          </div>
         </div>
       </div>
-      <div class="hl-panel" data-panel="nutrition">
-        <div class="hl-icon" style="background:#FFF3E0">🥗</div>
-        <div class="hl-body">
-          <span class="hl-badge">Calibrated daily</span>
-          <h3>Eat for what you actually did today.</h3>
-          <p>Heavy leg day? More carbs. Rest day? Lighter meals. Your food plan shifts with your training automatically — no app, no calorie logging, no guessing.</p>
-        </div>
-      </div>
-      <div class="hl-panel" data-panel="recovery">
-        <div class="hl-icon" style="background:#E8F5E9">😴</div>
-        <div class="hl-body">
-          <span class="hl-badge">Always watching</span>
-          <h3>Know when to rest — and when to push.</h3>
-          <p>Cued reads your sleep and HRV data to decide if today calls for a hard session or a deload. No burnout, no wasted easy days when you had more in the tank.</p>
-        </div>
-      </div>
-      <div class="hl-panel" data-panel="accountability">
-        <div class="hl-icon" style="background:#E8F5E9">💬</div>
-        <div class="hl-body">
-          <span class="hl-badge">Always there</span>
-          <h3>The nudge you need. Not the spam you don't.</h3>
-          <p>Your coach knows when to push and when to back off. Miss a few days? A gentle check-in, not a guilt trip. Crushing it? Your coach notices that too.</p>
-        </div>
-      </div>
-      <div class="hl-panel" data-panel="adaptability">
-        <div class="hl-icon" style="background:#F3E8FF">⚡</div>
-        <div class="hl-body">
-          <span class="hl-badge">Always evolving</span>
-          <h3>A coach that learns you over time.</h3>
-          <p>Only 40 minutes today? Traveling? Skipped a session? Cued adjusts on the fly — your plan always fits your life, not the other way around.</p>
-        </div>
-      </div>
+      <div class="hl-dots" id="hlDots"></div>
     </div>
   </div>
 </section>
@@ -672,15 +698,50 @@ const srObs=new IntersectionObserver(entries=>{
 scaleBlocks.forEach(b=>srObs.observe(b));
 
 // Highlights tab switching
-document.querySelectorAll('.hl-tab').forEach(tab=>{
-  tab.addEventListener('click',()=>{
-    const t=tab.dataset.tab;
-    document.querySelectorAll('.hl-tab').forEach(x=>x.classList.remove('active'));
-    document.querySelectorAll('.hl-panel').forEach(x=>x.classList.remove('active'));
-    tab.classList.add('active');
-    document.querySelector('.hl-panel[data-panel="'+t+'"]').classList.add('active');
+// Highlights carousel — tabs, prev/next arrows, auto-advance, dots
+(function(){
+  const tabs=Array.from(document.querySelectorAll('.hl-tab'));
+  const panels=Array.from(document.querySelectorAll('.hl-panel'));
+  const dotsEl=document.getElementById('hlDots');
+  const prevBtn=document.getElementById('hlPrev');
+  const nextBtn=document.getElementById('hlNext');
+  if(!tabs.length||!panels.length)return;
+
+  let current=0;
+  let timer=null;
+  const INTERVAL=4000;
+
+  // Build dots
+  panels.forEach((_,i)=>{
+    const d=document.createElement('button');
+    d.className='hl-dot'+(i===0?' active':'');
+    d.addEventListener('click',()=>goTo(i,true));
+    dotsEl.appendChild(d);
   });
-});
+  const dots=Array.from(dotsEl.querySelectorAll('.hl-dot'));
+
+  function goTo(idx,userInitiated){
+    panels[current].classList.remove('active');
+    tabs[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current=(idx+panels.length)%panels.length;
+    panels[current].classList.add('active');
+    tabs[current].classList.add('active');
+    dots[current].classList.add('active');
+    if(userInitiated) resetTimer();
+  }
+
+  function resetTimer(){
+    clearInterval(timer);
+    timer=setInterval(()=>goTo(current+1,false),INTERVAL);
+  }
+
+  tabs.forEach((tab,i)=>tab.addEventListener('click',()=>goTo(i,true)));
+  prevBtn.addEventListener('click',()=>goTo(current-1,true));
+  nextBtn.addEventListener('click',()=>goTo(current+1,true));
+
+  resetTimer();
+})();
 
 // Hero reveal + conversation orchestrator
 (function(){
