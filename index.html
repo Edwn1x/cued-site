@@ -366,6 +366,60 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
 .acc2-grid{grid-template-columns:repeat(2,1fr)}.fc-grid{grid-template-columns:1fr}
 .ws-grid{grid-template-columns:1fr;gap:40px}.ws-img{order:-1}
 .pr-split{grid-template-columns:1fr;border-top:1px solid var(--border)}.pr-divider-v{display:none}.pr-price-col{padding:48px 0 32px}.pr-detail-col{padding:32px 0 48px}}
+
+/* ── CHAT SIGNUP OVERLAY ─────────────────────────── */
+.co-bg{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .35s ease;display:flex;align-items:flex-end;justify-content:center}
+.co-bg.open{opacity:1;pointer-events:all}
+.co-sheet{width:100%;max-width:520px;background:#fff;border-radius:28px 28px 0 0;display:flex;flex-direction:column;max-height:90vh;transform:translateY(100%);transition:transform .45s cubic-bezier(.16,1,.3,1)}
+.co-bg.open .co-sheet{transform:translateY(0)}
+.co-handle{width:36px;height:4px;border-radius:2px;background:#E5E3EE;margin:14px auto 0;flex-shrink:0}
+.co-head{display:flex;align-items:center;justify-content:space-between;padding:12px 20px 0;flex-shrink:0}
+.co-head-info{display:flex;align-items:center;gap:10px}
+.co-avatar{width:36px;height:36px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.co-head-name{font-size:14px;font-weight:600;color:var(--text);line-height:1.2}
+.co-head-sub{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px}
+.co-head-sub::before{content:'';width:6px;height:6px;border-radius:50%;background:#30D158;display:inline-block}
+.co-close{width:28px;height:28px;border-radius:50%;background:#F5F5F7;border:none;cursor:pointer;font-size:14px;color:var(--text2);display:flex;align-items:center;justify-content:center;transition:background .2s}
+.co-close:hover{background:#E5E3EE}
+.co-msgs{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:10px;scrollbar-width:none}
+.co-msgs::-webkit-scrollbar{display:none}
+.co-msg{max-width:80%;padding:11px 15px;font-size:15px;line-height:1.5;border-radius:18px;opacity:0;transform:translateY(8px);transition:opacity .3s ease,transform .3s ease}
+.co-msg.show{opacity:1;transform:translateY(0)}
+.co-msg.coach{background:#F7F6F2;color:var(--text);border-bottom-left-radius:4px;align-self:flex-start;border:1px solid var(--border)}
+.co-msg.user{background:var(--accent);color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
+.co-typing{align-self:flex-start;display:inline-flex;gap:5px;padding:12px 16px;background:#F7F6F2;border:1px solid var(--border);border-radius:18px;border-bottom-left-radius:4px}
+.co-typing .co-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);animation:htB 1.2s ease-in-out infinite}
+.co-typing .co-dot:nth-child(2){animation-delay:.15s}
+.co-typing .co-dot:nth-child(3){animation-delay:.3s}
+/* Input area */
+.co-input-area{flex-shrink:0;padding:12px 16px 20px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:10px}
+.co-input-row{display:flex;gap:8px;align-items:flex-end}
+.co-input{flex:1;padding:11px 16px;border:1.5px solid var(--border);border-radius:24px;font-size:15px;font-family:var(--f);color:var(--text);background:#fff;outline:none;resize:none;transition:border-color .2s;max-height:120px}
+.co-input:focus{border-color:var(--accent)}
+.co-input::placeholder{color:var(--text3)}
+.co-send{width:40px;height:40px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s;color:#fff}
+.co-send:hover{background:#6B5CE6}
+.co-send:disabled{background:#E5E3EE;cursor:default}
+.co-send svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* Options chips */
+.co-chips{display:flex;flex-wrap:wrap;gap:8px}
+.co-chip{padding:8px 16px;border-radius:980px;border:1.5px solid var(--border);background:#fff;font-size:14px;font-family:var(--f);color:var(--text2);cursor:pointer;transition:all .15s}
+.co-chip:hover,.co-chip.sel{border-color:var(--accent);background:rgba(124,110,255,.07);color:var(--accent)}
+.co-chip.multi.sel{background:rgba(124,110,255,.1)}
+.co-confirm{width:100%;padding:12px;border-radius:980px;background:var(--accent);color:#fff;border:none;font-size:15px;font-weight:600;font-family:var(--f);cursor:pointer;transition:background .2s}
+.co-confirm:hover{background:#6B5CE6}
+/* Consent */
+.co-consent-wrap{background:#F7F6F2;border-radius:14px;padding:14px;border:1.5px solid var(--border)}
+.co-consent-label{display:flex;align-items:flex-start;gap:10px;cursor:pointer}
+.co-consent-box{flex-shrink:0;margin-top:2px;width:18px;height:18px;border-radius:4px;border:2px solid var(--border2);background:#fff;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.co-consent-box.checked{background:var(--accent);border-color:var(--accent)}
+.co-consent-text{font-size:12px;color:var(--text3);line-height:1.55}
+.co-consent-text a{color:var(--accent)}
+/* Success */
+.co-success{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 28px;text-align:center;gap:12px}
+.co-success-icon{font-size:48px;margin-bottom:8px}
+.co-success h3{font-size:22px;font-weight:700;letter-spacing:-.5px;color:var(--text)}
+.co-success p{font-size:15px;color:var(--text2);font-weight:300;line-height:1.6;max-width:300px}
 </style>
 <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
 </head>
@@ -377,7 +431,7 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
     <a href="how-it-works.html">How it works</a>
     <a href="discover.html">Discover</a>
     <a href="#pricing">Pricing</a>
-    <div class="nv-btn-wrap" id="navBtn"><a href="signup.html" class="nv-btn">Get started</a></div>
+    <div class="nv-btn-wrap" id="navBtn"><a href="#" class="nv-btn" onclick="openChatSignup();return false">Get started</a></div>
   </div>
   <button class="hamburger" id="hamburger" aria-label="Open menu">
     <span></span><span></span><span></span>
@@ -389,7 +443,26 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
   <a href="how-it-works.html">How it works</a>
   <a href="discover.html">Discover</a>
   <a href="#pricing">Pricing</a>
-  <a href="signup.html" class="mm-cta">Get started</a>
+  <a href="#" class="mm-cta" onclick="openChatSignup();closeMenu();return false">Get started</a>
+</div>
+
+<!-- CHAT SIGNUP OVERLAY -->
+<div class="co-bg" id="coOverlay">
+  <div class="co-sheet" id="coSheet">
+    <div class="co-handle"></div>
+    <div class="co-head">
+      <div class="co-head-info">
+        <div class="co-avatar">🏋️</div>
+        <div>
+          <div class="co-head-name">Cued Coach</div>
+          <div class="co-head-sub">Active now</div>
+        </div>
+      </div>
+      <button class="co-close" id="coClose">✕</button>
+    </div>
+    <div class="co-msgs" id="coMsgs"></div>
+    <div class="co-input-area" id="coInputArea"></div>
+  </div>
 </div>
 
 <!-- HERO -->
@@ -399,7 +472,7 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
       <h1 class="hero-tag" id="heroLogo">The AI fitness coach that <span style="color:var(--accent)">texts you first.</span></h1>
       <p class="hero-sub">Personalized workouts, nutrition, and accountability — delivered entirely over SMS. No app required.</p>
       <div class="hero-acts">
-        <a href="signup.html" class="bp">Get Cued</a>
+        <a href="#" class="bp" onclick="openChatSignup();return false">Get Cued</a>
         <a href="how-it-works.html" class="bs">Learn more</a>
       </div>
     </div>
@@ -609,7 +682,7 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
           <div class="pr-item">Unlimited coaching conversations</div>
         </div>
         <div class="pr-actions">
-          <a href="signup.html" class="pr-cta">Get cued</a>
+          <a href="#" class="pr-cta" onclick="openChatSignup();return false">Get cued</a>
           <p class="pr-note">No credit card. No commitment.<br>Beta spots are limited.</p>
         </div>
       </div>
@@ -624,7 +697,7 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
   <div class="in">
     <h2 class="rv">Your first coaching text<br>arrives <span class="g">tomorrow.</span></h2>
     <p class="rv rv-d1">No app to download. No dashboard to learn. Just your phone number, your goals, and it's free during beta.</p>
-    <a href="signup.html" class="bp rv rv-d2">Get cued</a>
+    <a href="#" class="bp rv rv-d2" onclick="openChatSignup();return false">Get cued</a>
   </div>
 </section>
 </div><!-- /scale-reveal -->
@@ -855,6 +928,270 @@ function closeMenu(){mobileMenu.classList.remove('open');hamburger.classList.rem
 hamburger.addEventListener('click',openMenu);
 mmClose.addEventListener('click',closeMenu);
 mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));
+
+// ── CHAT SIGNUP OVERLAY ─────────────────────────────
+(function(){
+  const BACKEND='https://web-production-90171c.up.railway.app/signup';
+  const overlay=document.getElementById('coOverlay');
+  const msgs=document.getElementById('coMsgs');
+  const inputArea=document.getElementById('coInputArea');
+  document.getElementById('coClose').addEventListener('click',closeOverlay);
+  overlay.addEventListener('click',e=>{if(e.target===overlay)closeOverlay();});
+
+  // Collected data
+  let sdata={};
+  let consentChecked=false;
+
+  // ── Helpers ──
+  function scrollBottom(){msgs.scrollTop=msgs.scrollHeight;}
+
+  function addMsg(text,who,delay=0){
+    return new Promise(resolve=>{
+      setTimeout(()=>{
+        const m=document.createElement('div');
+        m.className='co-msg '+who;
+        m.innerHTML=text;
+        msgs.appendChild(m);
+        requestAnimationFrame(()=>m.classList.add('show'));
+        scrollBottom();
+        resolve();
+      },delay);
+    });
+  }
+
+  function showTyping(){
+    const t=document.createElement('div');
+    t.className='co-typing';
+    t.innerHTML='<div class="co-dot"></div><div class="co-dot"></div><div class="co-dot"></div>';
+    msgs.appendChild(t);
+    scrollBottom();
+    return t;
+  }
+
+  function coachSay(text,typingMs=700){
+    return new Promise(resolve=>{
+      const t=showTyping();
+      setTimeout(()=>{
+        msgs.removeChild(t);
+        addMsg(text,'coach').then(resolve);
+      },typingMs);
+    });
+  }
+
+  function clearInput(){inputArea.innerHTML='';}
+
+  function textInput(placeholder,type='text'){
+    return new Promise(resolve=>{
+      clearInput();
+      const row=document.createElement('div');
+      row.className='co-input-row';
+      const inp=document.createElement('input');
+      inp.className='co-input';
+      inp.placeholder=placeholder;
+      inp.type=type;
+      inp.setAttribute('inputmode', type==='tel'?'tel':type==='number'?'numeric':'text');
+      const btn=document.createElement('button');
+      btn.className='co-send';
+      btn.innerHTML='<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+      function submit(){
+        const val=inp.value.trim();
+        if(!val)return;
+        addMsg(val,'user');
+        clearInput();
+        resolve(val);
+      }
+      btn.addEventListener('click',submit);
+      inp.addEventListener('keydown',e=>{if(e.key==='Enter')submit();});
+      row.appendChild(inp);
+      row.appendChild(btn);
+      inputArea.appendChild(row);
+      inp.focus();
+    });
+  }
+
+  function chips(options,multi=false){
+    return new Promise(resolve=>{
+      clearInput();
+      const wrap=document.createElement('div');
+      wrap.className='co-chips';
+      const selected=new Set();
+      options.forEach(opt=>{
+        const c=document.createElement('button');
+        c.className='co-chip'+(multi?' multi':'');
+        c.textContent=opt.label;
+        c.addEventListener('click',()=>{
+          if(!multi){
+            addMsg(opt.label,'user');
+            clearInput();
+            resolve([opt.value]);
+          } else {
+            c.classList.toggle('sel');
+            selected.has(opt.value)?selected.delete(opt.value):selected.add(opt.value);
+          }
+        });
+        wrap.appendChild(c);
+      });
+      inputArea.appendChild(wrap);
+      if(multi){
+        const btn=document.createElement('button');
+        btn.className='co-confirm';
+        btn.textContent='Confirm →';
+        btn.addEventListener('click',()=>{
+          if(!selected.size)return;
+          const labels=options.filter(o=>selected.has(o.value)).map(o=>o.label).join(', ');
+          addMsg(labels,'user');
+          clearInput();
+          resolve([...selected]);
+        });
+        inputArea.appendChild(btn);
+      }
+    });
+  }
+
+  function consentStep(){
+    return new Promise(resolve=>{
+      clearInput();
+      const wrap=document.createElement('div');
+      wrap.className='co-consent-wrap';
+      const lbl=document.createElement('label');
+      lbl.className='co-consent-label';
+      const box=document.createElement('div');
+      box.className='co-consent-box';
+      const txt=document.createElement('span');
+      txt.className='co-consent-text';
+      txt.innerHTML='I agree to receive recurring automated SMS messages from Cued including workout plans, meal suggestions, and coaching check-ins. Message frequency: 5–8 msgs/day. Msg &amp; data rates may apply. Reply STOP to cancel. Reply HELP for help. <a href="terms.html" target="_blank">Terms</a> &amp; <a href="privacy.html" target="_blank">Privacy</a>.';
+      lbl.appendChild(box);
+      lbl.appendChild(txt);
+      lbl.addEventListener('click',()=>{
+        consentChecked=!consentChecked;
+        box.classList.toggle('checked',consentChecked);
+        box.innerHTML=consentChecked?'<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>':'';
+      });
+      wrap.appendChild(lbl);
+      const btn=document.createElement('button');
+      btn.className='co-confirm';
+      btn.style.marginTop='10px';
+      btn.textContent='Start coaching me →';
+      btn.addEventListener('click',()=>{
+        if(!consentChecked){
+          box.style.borderColor='#F87171';
+          setTimeout(()=>box.style.borderColor='',1200);
+          return;
+        }
+        clearInput();
+        resolve(true);
+      });
+      inputArea.appendChild(wrap);
+      inputArea.appendChild(btn);
+    });
+  }
+
+  async function runChat(){
+    // Reset
+    msgs.innerHTML='';
+    clearInput();
+    sdata={};
+    consentChecked=false;
+
+    await coachSay("Hey! I'm your Cued coach. Let's get you set up — takes about 60 seconds. What's your first name?",900);
+    sdata.name=await textInput('Your first name');
+
+    await coachSay(`Nice to meet you, ${sdata.name}! How old are you?`,600);
+    sdata.age=await textInput('Your age','number');
+
+    await coachSay("What are you training for? Pick everything that applies.",700);
+    const goals=await chips([
+      {label:'Lose fat',value:'fat_loss'},
+      {label:'Build muscle',value:'muscle_building'},
+      {label:'Get stronger',value:'strength'},
+      {label:'General fitness',value:'general_fitness'},
+      {label:'Endurance',value:'endurance'},
+    ],true);
+    sdata.goal=goals;
+
+    await coachSay("How long have you been training seriously?",600);
+    const [exp]=await chips([
+      {label:'Just starting out',value:'none'},
+      {label:'Under 6 months',value:'beginner'},
+      {label:'6 months – 2 years',value:'intermediate'},
+      {label:'2+ years',value:'advanced'},
+    ]);
+    sdata.experience=exp;
+
+    await coachSay("What equipment do you have access to?",600);
+    const [equip]=await chips([
+      {label:'Full gym',value:'full_gym'},
+      {label:'Limited gym',value:'limited_gym'},
+      {label:'Home gym',value:'home_gym'},
+      {label:'Bands / bar',value:'minimal'},
+      {label:'Bodyweight only',value:'bodyweight'},
+    ]);
+    sdata.equipment=equip;
+
+    await coachSay("How many days a week can you train?",600);
+    const [days]=await chips([
+      {label:'2 days',value:'2'},{label:'3 days',value:'3'},
+      {label:'4 days',value:'4'},{label:'5 days',value:'5'},
+      {label:'6 days',value:'6'},
+    ]);
+    sdata.workout_days=days;
+
+    await coachSay("Last thing — what's your phone number? That's where I'll text you.",700);
+    sdata.phone=await textInput('(510) 555-1234','tel');
+
+    await coachSay("Almost there! One quick consent before I can text you:",600);
+    await consentStep();
+    sdata.sms_consent=true;
+
+    // Submit
+    clearInput();
+    await coachSay(`Perfect, ${sdata.name}! Setting up your profile...`,500);
+
+    try {
+      const res=await fetch(BACKEND,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(sdata)
+      });
+      const data=await res.json();
+      if(data.status==='ok'||data.status==='exists'){
+        msgs.innerHTML='';
+        const s=document.createElement('div');
+        s.className='co-success';
+        s.innerHTML=`<div class="co-success-icon">🎉</div><h3>You're in, ${sdata.name}!</h3><p>Your first coaching text arrives tomorrow morning. Keep an eye on your messages — your coach is getting your plan ready.</p>`;
+        msgs.appendChild(s);
+        inputArea.innerHTML='';
+      } else {
+        await coachSay("Hmm, something went wrong. Try again?",400);
+        showRetry();
+      }
+    } catch {
+      await coachSay("Connection error — check your internet and try again.",400);
+      showRetry();
+    }
+  }
+
+  function showRetry(){
+    clearInput();
+    const btn=document.createElement('button');
+    btn.className='co-confirm';
+    btn.textContent='Try again';
+    btn.addEventListener('click',runChat);
+    inputArea.appendChild(btn);
+  }
+
+  window.openChatSignup=function(){
+    overlay.classList.add('open');
+    document.body.style.overflow='hidden';
+    // Only run the chat if msgs is empty (don't restart if already in progress)
+    if(!msgs.children.length) runChat();
+  };
+
+  function closeOverlay(){
+    overlay.classList.remove('open');
+    document.body.style.overflow='';
+  }
+})();
 </script>
 </body>
 </html>
