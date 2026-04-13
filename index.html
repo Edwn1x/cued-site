@@ -53,6 +53,9 @@ nav.nav-light .nv-btn{background:rgba(255,255,255,.15)!important;color:#fff!impo
   font-weight:700;letter-spacing:-2.5px;line-height:1.05;color:var(--text);margin-bottom:24px;
   opacity:0;animation:hIn .8s ease .3s forwards;
 }
+.hero-rotating{color:var(--accent);position:relative;white-space:nowrap}
+.hero-cursor{display:inline-block;width:3px;height:.85em;background:var(--accent);margin-left:2px;vertical-align:middle;border-radius:1px;animation:cursorBlink .7s step-end infinite}
+@keyframes cursorBlink{0%,100%{opacity:1}50%{opacity:0}}
 .hero-sub{font-size:clamp(16px,1.4vw,18px);color:var(--text2);line-height:1.65;max-width:480px;font-weight:300;margin-bottom:40px;opacity:0;animation:hIn .8s ease .5s forwards}
 .hero-acts{display:flex;gap:14px;flex-wrap:wrap;opacity:0;animation:hIn .8s ease .65s forwards}
 .bp{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:var(--accent);color:#fff;font-size:15px;font-weight:600;border-radius:980px;text-decoration:none;border:none;cursor:pointer;font-family:var(--f);transition:all .3s}
@@ -469,7 +472,7 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
 <section class="hero">
   <div class="hero-inner" id="heroInner">
     <div class="hero-c">
-      <h1 class="hero-tag" id="heroLogo">The AI fitness coach that <span style="color:var(--accent)">texts you first.</span></h1>
+      <h1 class="hero-tag" id="heroLogo">The AI coach that<br><span class="hero-rotating" id="heroRotating"></span><span class="hero-cursor" id="heroCursor"></span></h1>
       <p class="hero-sub">Personalized workouts, nutrition, and accountability — delivered entirely over SMS. No app required.</p>
       <div class="hero-acts">
         <a href="#" class="bp" onclick="openChatSignup();return false">Get Cued</a>
@@ -928,6 +931,64 @@ function closeMenu(){mobileMenu.classList.remove('open');hamburger.classList.rem
 hamburger.addEventListener('click',openMenu);
 mmClose.addEventListener('click',closeMenu);
 mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));
+
+// ── TYPEWRITER ROTATING HEADLINE ────────────────────
+(function(){
+  const el=document.getElementById('heroRotating');
+  const cursor=document.getElementById('heroCursor');
+  if(!el)return;
+
+  const phrases=[
+    'texts you first.',
+    'needs no app.',
+    'knows your body.',
+    'shows up every day.',
+  ];
+
+  const TYPE_SPEED=52;    // ms per character typed
+  const DELETE_SPEED=28;  // ms per character deleted
+  const HOLD_MS=2800;     // how long phrase stays visible
+  const PAUSE_MS=180;     // pause between delete and next type
+
+  let phraseIdx=0;
+  let charIdx=0;
+  let deleting=false;
+  let started=false;
+
+  function tick(){
+    const phrase=phrases[phraseIdx];
+
+    if(!deleting){
+      // Typing in
+      charIdx++;
+      el.textContent=phrase.slice(0,charIdx);
+      if(charIdx===phrase.length){
+        // Done typing — hold, then delete
+        deleting=true;
+        setTimeout(tick, HOLD_MS);
+        return;
+      }
+      setTimeout(tick, TYPE_SPEED);
+    } else {
+      // Deleting
+      charIdx--;
+      el.textContent=phrase.slice(0,charIdx);
+      if(charIdx===0){
+        deleting=false;
+        phraseIdx=(phraseIdx+1)%phrases.length;
+        setTimeout(tick, PAUSE_MS);
+        return;
+      }
+      setTimeout(tick, DELETE_SPEED);
+    }
+  }
+
+  // Start after the hero fade-in animation clears (~1.2s)
+  setTimeout(()=>{
+    started=true;
+    tick();
+  },1300);
+})();
 
 // ── CHAT SIGNUP OVERLAY ─────────────────────────────
 (function(){
