@@ -941,14 +941,12 @@ mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu
   const phrases=[
     'texts you first.',
     'needs no app.',
-    'knows your body.',
-    'shows up every day.',
   ];
 
-  const TYPE_SPEED=52;    // ms per character typed
-  const DELETE_SPEED=28;  // ms per character deleted
-  const HOLD_MS=2800;     // how long phrase stays visible
-  const PAUSE_MS=180;     // pause between delete and next type
+  const TYPE_SPEED=80;    // ms per character typed
+  const DELETE_SPEED=40;  // ms per character deleted
+  const HOLD_MS=3000;     // how long phrase stays visible
+  const PAUSE_MS=220;     // pause between delete and next type
 
   let phraseIdx=0;
   let charIdx=0;
