@@ -128,11 +128,15 @@ nav.nav-light .nv-btn{background:rgba(255,255,255,.15)!important;color:#fff!impo
 .three-texts-hd p{font-size:17px;color:var(--text2);font-weight:300}
 /* Horizontal 3-col steps */
 .demo-steps-h{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-.demo-step-h{background:var(--bg3);border-radius:24px;padding:40px 36px;display:flex;flex-direction:column;gap:16px}
-.demo-step-h .demo-step-icon{width:56px;height:56px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.07)}
-.demo-step-h .demo-step-num{font-size:11px;font-family:var(--m);color:var(--text3);letter-spacing:1px;margin-bottom:2px}
-.demo-step-h h3{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.3px;margin-bottom:4px}
-.demo-step-h p{font-size:15px;color:var(--text2);font-weight:300;line-height:1.65}
+.demo-step-h{border-radius:24px;padding:40px 36px;display:flex;flex-direction:column;gap:16px;transition:transform .25s,box-shadow .25s}
+.demo-step-h:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(124,110,255,.3)}
+.demo-step-h:nth-child(1){background:#A99BFF}
+.demo-step-h:nth-child(2){background:#7C6EFF}
+.demo-step-h:nth-child(3){background:#5A4ECC}
+.demo-step-h .demo-step-icon{width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.demo-step-h .demo-step-num{font-size:11px;font-family:var(--m);color:rgba(255,255,255,.6);letter-spacing:1px;margin-bottom:2px}
+.demo-step-h h3{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.3px;margin-bottom:4px}
+.demo-step-h p{font-size:15px;color:rgba(255,255,255,.8);font-weight:300;line-height:1.65}
 @media(max-width:768px){.demo-steps-h{grid-template-columns:1fr}}
 .demo-bento-full{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
 .db-card{border-radius:24px;padding:40px 36px;position:relative;overflow:hidden;min-height:260px;display:flex;flex-direction:column;justify-content:flex-end;background:#7C6EFF;transition:background .25s,transform .25s,box-shadow .25s;cursor:default}
