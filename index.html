@@ -104,15 +104,13 @@ nav.nav-light .nv-btn{background:rgba(255,255,255,.15)!important;color:#fff!impo
 .sf-hd{text-align:center;margin-bottom:clamp(48px,6vw,80px)}
 .sf-hd h2{font-size:clamp(36px,5vw,64px);font-weight:700;letter-spacing:-2.5px;color:#fff;line-height:1.05;margin-bottom:12px}
 .sf-hd p{font-size:17px;color:rgba(255,255,255,.6);font-weight:300}
-.sf-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.sf-card{border-radius:20px;overflow:hidden;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column}
-.sf-card-img{width:100%;height:200px;object-fit:cover;display:block;filter:brightness(.7) saturate(1.05)}
-.sf-card-body{padding:32px 28px 36px;flex:1;display:flex;flex-direction:column;gap:16px}
-.sf-pain{font-size:clamp(18px,1.6vw,22px);font-weight:600;color:#fff;line-height:1.35;letter-spacing:-.4px}
-.sf-divider{width:32px;height:1px;background:rgba(255,255,255,.2)}
-.sf-solution{font-size:15px;color:rgba(255,255,255,.5);line-height:1.7;font-weight:300}
-.sf-solution strong{color:rgba(255,255,255,.85);font-weight:500}
-@media(max-width:900px){.sf-cards{grid-template-columns:1fr}}
+.sf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:rgba(255,255,255,.08);border-radius:20px;overflow:hidden}
+.sf-cell{background:rgba(255,255,255,.06);padding:44px 36px;display:flex;flex-direction:column;gap:10px;transition:background .2s}
+.sf-cell:hover{background:rgba(255,255,255,.1)}
+.sf-stat{font-size:clamp(44px,6vw,72px);font-weight:800;color:#fff;letter-spacing:-3px;line-height:1;font-family:var(--m)}
+.sf-title{font-size:16px;font-weight:600;color:#fff;letter-spacing:-.2px}
+.sf-sub{font-size:14px;color:rgba(255,255,255,.5);line-height:1.55;font-weight:300}
+@media(max-width:768px){.sf-grid{grid-template-columns:1fr}}
 
 /* PHOTO BAND */
 .pb{width:100%;height:60vh;min-height:400px;position:relative;overflow:hidden;background:var(--bg3)}
@@ -491,33 +489,24 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
 <section class="sf" id="sfSection" data-nav="light">
   <div class="sf-i">
     <div class="sf-hd rv">
-      <h2>Sound familiar?</h2>
+      <h2>Fitness apps <em>are broken.</em></h2>
       <p>You're not the problem. The tools are.</p>
     </div>
-    <div class="sf-cards">
-      <div class="sf-card rv">
-        <img class="sf-card-img" src="images/barbell.jpg" alt="App graveyard">
-        <div class="sf-card-body">
-          <p class="sf-pain">"You have a folder of fitness apps you haven't opened in months."</p>
-          <div class="sf-divider"></div>
-          <p class="sf-solution">Cued lives in your texts. Nothing to open, nothing to forget. <strong>Your coach reaches out to you, every morning.</strong></p>
-        </div>
+    <div class="sf-grid">
+      <div class="sf-cell rv">
+        <span class="sf-stat">6 apps</span>
+        <span class="sf-title">downloaded this year.</span>
+        <span class="sf-sub">You don't use any of them.</span>
       </div>
-      <div class="sf-card rv rv-d1">
-        <img class="sf-card-img" src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80" alt="Calorie tracking">
-        <div class="sf-card-body">
-          <p class="sf-pain">"You tracked calories for 11 days. Then life happened."</p>
-          <div class="sf-divider"></div>
-          <p class="sf-solution">Cued handles your nutrition without logging a single meal. <strong>Just tell it what you ate, in plain English, over text.</strong></p>
-        </div>
+      <div class="sf-cell rv rv-d1">
+        <span class="sf-stat">11 days</span>
+        <span class="sf-title">the average calorie tracking streak</span>
+        <span class="sf-sub">before people quit.</span>
       </div>
-      <div class="sf-card rv rv-d2">
-        <img class="sf-card-img" src="images/wearable.jpg" alt="Wearable data without direction">
-        <div class="sf-card-body">
-          <p class="sf-pain">"Your watch tracks everything. You still don't know what to do at the gym."</p>
-          <div class="sf-divider"></div>
-          <p class="sf-solution">Cued reads your wearable data and turns it into an actual plan. <strong>Today's workout, adjusted to how you recovered.</strong></p>
-        </div>
+      <div class="sf-cell rv rv-d2">
+        <span class="sf-stat">$400+</span>
+        <span class="sf-title">spent on a watch that counts your steps.</span>
+        <span class="sf-sub">You still wing it at the gym.</span>
       </div>
     </div>
   </div>
