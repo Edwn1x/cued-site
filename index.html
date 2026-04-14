@@ -518,8 +518,8 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
 
 <!-- HEADER -->
 <div class="three-texts-hd rv">
-  <h2>Three texts to your first workout.</h2>
-  <p>Sign up in under a minute. Your first coaching text arrives tomorrow morning.</p>
+  <h2>No app to download. No account to create. Just your phone number and your goals.</h2>
+  <p>Sign up in under a minute. Your first coaching text arrives instantly.</p>
 </div>
 
 <!-- STEPS — horizontal 3 columns -->
@@ -528,13 +528,13 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
     <div class="demo-step-icon">📱</div>
     <div class="demo-step-num">01</div>
     <h3>Tell us your goals</h3>
-    <p>Quick text-style conversation. Experience, equipment, what you're working toward. Done in 60 seconds.</p>
+    <p>A quick text-style conversation. Experience, equipment, what you're working toward — and you're in.</p>
   </div>
   <div class="demo-step-h">
     <div class="demo-step-icon">💬</div>
     <div class="demo-step-num">02</div>
     <h3>Get your first text</h3>
-    <p>Tomorrow morning, your Cued coach texts you. Workout, meal ideas, and a check-in — in your Messages app.</p>
+    <p>Your Cued coach texts you within minutes. Workout, meal ideas, and a check-in — right in your Messages app.</p>
   </div>
   <div class="demo-step-h">
     <div class="demo-step-icon">💪</div>
@@ -542,6 +542,10 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
     <h3>Just reply</h3>
     <p>Log workouts by texting back. Ask questions anytime. Your coach adapts every day based on your progress.</p>
   </div>
+</div>
+
+<div style="text-align:center;margin-top:56px">
+  <a href="#" class="bp rv" onclick="openChatSignup();return false">Get Cued — it's free</a>
 </div>
 
 </section>
@@ -683,17 +687,6 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
         </div>
       </div>
     </div>
-  </div>
-</section>
-</div><!-- /scale-reveal -->
-
-<!-- FINAL CTA -->
-<div class="scale-reveal" data-bg="#F0EEF9">
-<section class="cta" id="start">
-  <div class="in">
-    <h2 class="rv">Your first coaching text<br>arrives <span class="g">tomorrow.</span></h2>
-    <p class="rv rv-d1">No app to download. No dashboard to learn. Just your phone number, your goals, and it's free during beta.</p>
-    <a href="#" class="bp rv rv-d2" onclick="openChatSignup();return false">Get cued</a>
   </div>
 </section>
 </div><!-- /scale-reveal -->
@@ -1210,7 +1203,7 @@ mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu
         msgs.innerHTML='';
         const s=document.createElement('div');
         s.className='co-success';
-        s.innerHTML=`<div class="co-success-icon">🎉</div><h3>You're in, ${sdata.name}!</h3><p>Your first coaching text arrives tomorrow morning. Keep an eye on your messages — your coach is getting your plan ready.</p>`;
+        s.innerHTML=`<div class="co-success-icon">🎉</div><h3>You're in, ${sdata.name}!</h3><p>Your first coaching text is on its way. Keep an eye on your messages — your coach is getting your plan ready.</p>`;
         msgs.appendChild(s);
         inputArea.innerHTML='';
       } else {
