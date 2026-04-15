@@ -447,6 +447,7 @@ async function submit(smsSkipped = false) {
   fd.delete('goals'); fd.append('goal', goals);
   const days = fd.getAll('workout_days').join(',');
   fd.delete('workout_days'); fd.append('workout_days', days);
+  fd.append('timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
 
   try {
     const res = await fetch('https://web-production-90171c.up.railway.app/signup', { method: 'POST', body: fd });

@@ -1197,6 +1197,7 @@ mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu
     clearInput();
     await coachSay(`Perfect, ${sdata.name}! Setting up your profile...`,500);
 
+    sdata.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     try {
       const res=await fetch(BACKEND,{
         method:'POST',
