@@ -1155,9 +1155,20 @@ mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu
       {label:'Build muscle',value:'muscle_building'},
       {label:'Get stronger',value:'strength'},
       {label:'General fitness',value:'general_fitness'},
-      {label:'Endurance',value:'endurance'},
+      {label:'Running / Endurance',value:'endurance'},
     ],true);
-    sdata.goal=goals;
+    sdata.goal=goals.join(',');
+
+    await coachSay("What's been your biggest obstacle so far?",600);
+    const [obstacle]=await chips([
+      {label:'Staying consistent',value:'consistency'},
+      {label:'Nutrition / what to eat',value:'nutrition'},
+      {label:'Not knowing what to do',value:'knowledge'},
+      {label:'Not enough time',value:'time'},
+      {label:'Motivation / accountability',value:'motivation'},
+      {label:'Injuries',value:'injuries'},
+    ]);
+    sdata.biggest_obstacle=obstacle;
 
     await coachSay("How long have you been training seriously?",600);
     const [exp]=await chips([
@@ -1173,18 +1184,9 @@ mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu
       {label:'Full gym',value:'full_gym'},
       {label:'Limited gym',value:'limited_gym'},
       {label:'Home gym',value:'home_gym'},
-      {label:'Bands / bar',value:'minimal'},
       {label:'Bodyweight only',value:'bodyweight'},
     ]);
     sdata.equipment=equip;
-
-    await coachSay("How many days a week can you train?",600);
-    const [days]=await chips([
-      {label:'2 days',value:'2'},{label:'3 days',value:'3'},
-      {label:'4 days',value:'4'},{label:'5 days',value:'5'},
-      {label:'6 days',value:'6'},
-    ]);
-    sdata.workout_days=days;
 
     await coachSay("Last thing — what's your phone number? That's where I'll text you.",700);
     sdata.phone=await textInput('(510) 555-1234','tel');
