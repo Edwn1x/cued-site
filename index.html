@@ -1149,6 +1149,15 @@ mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu
     await coachSay(`Nice to meet you, ${sdata.name}! How old are you?`,600);
     sdata.age=await textInput('Your age','number');
 
+    await coachSay("What's your gender?",600);
+    const [gender]=await chips([
+      {label:'Male',value:'male'},
+      {label:'Female',value:'female'},
+      {label:'Non-binary',value:'non_binary'},
+      {label:'Prefer not to say',value:'prefer_not_to_say'},
+    ]);
+    sdata.gender=gender;
+
     await coachSay("What are you training for? Pick everything that applies.",700);
     const goals=await chips([
       {label:'Lose fat',value:'fat_loss'},
