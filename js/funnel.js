@@ -49,7 +49,7 @@
     items.forEach(function (item) {
       // shift each item down so it sits in the bottom half
       var naturalCY = item.offsetTop + item.offsetHeight / 2;
-      var targetCY  = sH * 0.62 + (naturalCY / sH - 0.5) * sH * 0.55;
+      var targetCY  = sH * 0.75 + (naturalCY / sH - 0.5) * sH * 0.40;
       item._shiftY  = targetCY - naturalCY;
       // convergence target = center of viewport
       var cx = sW * 0.5;
