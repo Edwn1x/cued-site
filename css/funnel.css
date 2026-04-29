@@ -5,6 +5,7 @@
 /* ── Section container ─────────────────────────────────────── */
 #funnel-section {
   position: relative;
+  overflow: hidden;
 }
 
 .funnel-scroll-spacer {
@@ -225,20 +226,24 @@
 #chaos-girlfriend { top: 48%; left: 70%; transform: rotate(-4deg); }
 #chaos-break     { top: 60%; left: 12%;  transform: rotate(6deg);  }
 
-/* ── Mobile positions (<768px) ─────────────────────────────── */
+/* ── Mobile positions (<768px) — kept inside safe zone ─────── */
 @media (max-width: 767px) {
-  #chaos-doordash  { top: 5%;  left: 2%;  transform: rotate(-3deg) scale(0.7); }
-  #chaos-boba      { top: 12%; left: 55%; transform: rotate(2deg) scale(0.7);  }
-  #chaos-darty     { top: 3%;  left: 28%; transform: rotate(-2deg) scale(0.7); }
-  #chaos-onedrink  { top: 22%; left: 65%; transform: rotate(4deg) scale(0.7);  }
-  #chaos-bench     { top: 10%; left: 10%; transform: rotate(-5deg) scale(0.7); }
-  #chaos-shredded  { top: 28%; left: 48%; transform: rotate(3deg) scale(0.7);  }
-  #chaos-mfp       { top: 38%; left: 4%;  transform: rotate(-2deg) scale(0.7); }
-  #chaos-streak    { top: 36%; left: 42%; transform: rotate(2deg) scale(0.7);  }
-  #chaos-midterms  { top: 48%; left: 20%; transform: rotate(-4deg) scale(0.7); }
-  #chaos-confused  { top: 18%; left: 35%; transform: rotate(2deg) scale(0.7);  }
-  #chaos-girlfriend { top: 42%; left: 58%; transform: rotate(-3deg) scale(0.7); }
-  #chaos-break     { top: 55%; left: 8%;  transform: rotate(5deg) scale(0.7);  }
+  /* Notifications are 280px wide at scale 0.7 = 196px — left max safe: calc(100% - 196px) */
+  #chaos-doordash  { top: 4%;  left: 2%;   transform: rotate(-3deg) scale(0.7); transform-origin: top left; }
+  #chaos-mfp       { top: 38%; left: 2%;   transform: rotate(-2deg) scale(0.7); transform-origin: top left; }
+  /* iMessage bubbles 220px at 0.7 = 154px */
+  #chaos-boba      { top: 10%; left: 48%;  transform: rotate(2deg) scale(0.7);  transform-origin: top left; }
+  #chaos-darty     { top: 3%;  left: 24%;  transform: rotate(-2deg) scale(0.7); transform-origin: top left; }
+  #chaos-onedrink  { top: 22%; left: 52%;  transform: rotate(4deg) scale(0.7);  transform-origin: top left; }
+  /* TikTok/IG cards 200px at 0.7 = 140px */
+  #chaos-bench     { top: 9%;  left: 8%;   transform: rotate(-5deg) scale(0.7); transform-origin: top left; }
+  #chaos-shredded  { top: 28%; left: 44%;  transform: rotate(3deg) scale(0.7);  transform-origin: top left; }
+  /* Thoughts max 240px at 0.7 = 168px */
+  #chaos-streak    { top: 34%; left: 38%;  transform: rotate(2deg) scale(0.7);  transform-origin: top left; }
+  #chaos-midterms  { top: 47%; left: 16%;  transform: rotate(-4deg) scale(0.7); transform-origin: top left; }
+  #chaos-confused  { top: 17%; left: 30%;  transform: rotate(2deg) scale(0.7);  transform-origin: top left; }
+  #chaos-girlfriend { top: 42%; left: 44%; transform: rotate(-3deg) scale(0.7); transform-origin: top left; }
+  #chaos-break     { top: 55%; left: 6%;   transform: rotate(5deg) scale(0.7);  transform-origin: top left; }
 }
 
 /* ── Logo convergence point ────────────────────────────────── */
