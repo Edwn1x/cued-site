@@ -1,12 +1,20 @@
 /* ============================================================
-   funnel.js
-   Sequence:
-     0–20%  : "Fitness is broken." fades in, big, centered
-     20–30% : headline fades out, chaos fades in
-     30–75% : chaos converges toward center
-     75–85% : chaos fades out, "cued" fades in big
-     85–90% : summary card fades in
-     90–100%: coaching bubbles stagger in
+   funnel.js — Full narrative sequence
+
+   0–15%  : "Fitness is broken." fades in centered
+   15–22% : "Fitness is broken." slides up + fades out
+   22–32% : chaos fades in (items in bottom half)
+             "This is your phone right now." fades in above chaos
+   32–48% : chaos holds, "This is your phone..." holds
+   48–55% : chaos + "This is your phone..." slide up + fade out
+             "You're getting coached by everyone except a coach." fades in
+   55–65% : that headline holds
+   65–72% : it slides up + fades out
+             "And none of it knows you." fades in
+   72–80% : that holds
+   80–85% : it slides up + fades out
+             "— cued —" + "changes that." fade in
+   85–100%: hold
    ============================================================ */
 
 (function () {
@@ -18,9 +26,10 @@
 
   var isMobile = window.innerWidth < 768;
 
-  gsap.set('.funnel-headline', { opacity: 0 });
+  // Hide all animated elements on init
+  gsap.set('#fh-broken, #fh-phone, #fh-coached, #fh-none', { opacity: 0, y: 0 });
+  gsap.set('#fh-cued, #fh-changes', { opacity: 0 });
   gsap.set('.chaos-item', { opacity: 0 });
-  gsap.set('.funnel-cued', { opacity: 0 });
 
   function clamp01(v) { return Math.max(0, Math.min(1, v)); }
   function prog(p, a, b) { return clamp01((p - a) / (b - a)); }
@@ -33,11 +42,18 @@
 
     var sW = sticky.offsetWidth;
     var sH = sticky.offsetHeight;
-    var cx = sW * 0.5;
-    var cy = sH * 0.5;
 
+    // Chaos items sit in the bottom 40% of the viewport initially
+    // Their natural CSS positions are in the top half, so we pre-offset them down
     var items = gsap.utils.toArray('.chaos-item');
     items.forEach(function (item) {
+      // shift each item down so it sits in the bottom half
+      var naturalCY = item.offsetTop + item.offsetHeight / 2;
+      var targetCY  = sH * 0.62 + (naturalCY / sH - 0.5) * sH * 0.55;
+      item._shiftY  = targetCY - naturalCY;
+      // convergence target = center of viewport
+      var cx = sW * 0.5;
+      var cy = sH * 0.5;
       item._dx = cx - (item.offsetLeft + item.offsetWidth / 2);
       item._dy = cy - (item.offsetTop + item.offsetHeight / 2);
     });
@@ -50,33 +66,52 @@
       onUpdate: function (self) {
         var p = self.progress;
 
-        // ── Headline: fades in 0–20%, slides up + fades out 20–30%
-        var hlIn  = ease(prog(p, 0.00, 0.20));
-        var hlOut = ease(prog(p, 0.20, 0.30));
-        gsap.set('.funnel-headline', {
-          opacity: hlIn * (1 - hlOut),
-          y: lerp(0, -80, hlOut),
+        // ── Beat 1: "Fitness is broken." ─────────────────────────
+        var b1in  = ease(prog(p, 0.00, 0.15));
+        var b1out = ease(prog(p, 0.15, 0.22));
+        gsap.set('#fh-broken', {
+          opacity: b1in * (1 - b1out),
+          y: lerp(0, -80, b1out),
         });
 
-        // ── Chaos: fades in 20–30%, converges 30–75% ─────────────
-        var chaosIn = ease(prog(p, 0.20, 0.30));
-        var converge = ease(prog(p, 0.30, 0.75));
-        var chaosOut = ease(prog(p, 0.75, 0.85));
-
-        items.forEach(function (item, i) {
-          var spread = isMobile ? 7 : 14;
-          var angle = (i / items.length) * Math.PI * 2;
+        // ── Chaos: fades in 22–32%, sits in bottom half ───────────
+        var chaosIn  = ease(prog(p, 0.22, 0.32));
+        var chaosOut = ease(prog(p, 0.48, 0.56));
+        items.forEach(function (item) {
           gsap.set(item, {
             opacity: chaosIn * (1 - chaosOut),
-            x: (item._dx + Math.cos(angle) * spread) * converge,
-            y: (item._dy + Math.sin(angle) * spread) * converge,
-            rotation: lerp(0, 0, converge),
-            scale: lerp(1, isMobile ? 0.6 : 0.75, converge),
+            y: item._shiftY * (1 - chaosIn) + lerp(0, -60, chaosOut),
           });
         });
 
-        // ── "cued": fades in 75–90% ───────────────────────────────
-        gsap.set('.funnel-cued', { opacity: ease(prog(p, 0.75, 0.90)) });
+        // ── Beat 2: "This is your phone right now." ───────────────
+        var b2in  = ease(prog(p, 0.25, 0.35));
+        var b2out = ease(prog(p, 0.48, 0.56));
+        gsap.set('#fh-phone', {
+          opacity: b2in * (1 - b2out),
+          y: lerp(0, -80, b2out),
+        });
+
+        // ── Beat 3: "You're getting coached by everyone..." ───────
+        var b3in  = ease(prog(p, 0.56, 0.64));
+        var b3out = ease(prog(p, 0.65, 0.72));
+        gsap.set('#fh-coached', {
+          opacity: b3in * (1 - b3out),
+          y: lerp(0, -80, b3out),
+        });
+
+        // ── Beat 4: "And none of it knows you." ───────────────────
+        var b4in  = ease(prog(p, 0.72, 0.79));
+        var b4out = ease(prog(p, 0.80, 0.86));
+        gsap.set('#fh-none', {
+          opacity: b4in * (1 - b4out),
+          y: lerp(0, -80, b4out),
+        });
+
+        // ── Beat 5: "— cued —" + "changes that." ─────────────────
+        var b5in = ease(prog(p, 0.86, 0.94));
+        gsap.set('#fh-cued',    { opacity: b5in });
+        gsap.set('#fh-changes', { opacity: ease(prog(p, 0.89, 0.97)) });
       }
     });
   }

@@ -465,11 +465,21 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
   <div class="funnel-scroll-spacer">
     <div class="funnel-sticky">
 
-      <!-- Headline: starts hidden, fades in at scroll 0–15% -->
-      <div class="funnel-headline">Fitness is <em>broken.</em></div>
+      <!-- Beat 1: "Fitness is broken." -->
+      <div class="funnel-headline" id="fh-broken">Fitness is <em>broken.</em></div>
 
-      <!-- Cued logo: appears after chaos converges -->
-      <div class="funnel-cued">— cued —</div>
+      <!-- Beat 2: above the chaos -->
+      <div class="funnel-headline" id="fh-phone">This is your phone right now.</div>
+
+      <!-- Beat 3: after chaos -->
+      <div class="funnel-headline" id="fh-coached">You're getting coached by everyone<br>except a coach.</div>
+
+      <!-- Beat 4 -->
+      <div class="funnel-headline" id="fh-none">And none of it knows you.</div>
+
+      <!-- Beat 5: cued -->
+      <div class="funnel-cued" id="fh-cued">— cued —</div>
+      <div class="funnel-changes" id="fh-changes">changes that.</div>
 
       <!-- 12 chaos items -->
 
@@ -558,6 +568,8 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
 <div class="clean-side" id="cleanSide">
   <div class="clean-side-inner">
 
+    <h2 class="clean-side-headline rv">Now imagine one voice that knows all of it.<br><em>Imagine cued.</em></h2>
+
     <div class="clean-card rv">
       <div class="clean-card-line"><span class="card-emoji">🏋️</span><span>Push day — 45 min session sent</span></div>
       <div class="clean-card-line"><span class="card-emoji">🍳</span><span>3 meals planned — 2,180 cal, 162g protein</span></div>
@@ -589,6 +601,8 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
         <div class="bubble-msg">A protein bar and coffee isn't breakfast. You're going to feel it by set 3 on bench. Want me to send you something quick before you leave?</div>
       </div>
     </div>
+
+    <h2 class="clean-side-headline clean-side-headline--bottom rv">This is what coaching actually looks like.</h2>
 
   </div>
 </div>

@@ -13,7 +13,7 @@
 }
 
 .funnel-scroll-spacer {
-  height: 350vh;
+  height: 550vh;
   position: relative;
 }
 
@@ -25,33 +25,72 @@
   /* background comes from .sf parent */
 }
 
+/* All beat headlines share this base */
 .funnel-headline {
   position: absolute;
-  top: 50%;
   left: 50%;
   transform: translateX(-50%) translateY(-50%);
-  font-size: clamp(56px, 10vw, 120px);
-  font-weight: 700;
-  letter-spacing: -4px;
-  line-height: 1.0;
-  color: #fff;
   text-align: center;
-  white-space: nowrap;
   z-index: 5;
   font-family: 'DM Sans', sans-serif;
   pointer-events: none;
   opacity: 0;
+  width: 90%;
 }
 
 .funnel-headline em {
   font-style: italic;
 }
 
+/* Beat 1 — "Fitness is broken." — huge, dead center */
+#fh-broken {
+  top: 50%;
+  font-size: clamp(56px, 10vw, 120px);
+  font-weight: 700;
+  letter-spacing: -4px;
+  line-height: 1.0;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* Beat 2 — "This is your phone right now." — upper third, above chaos */
+#fh-phone {
+  top: 22%;
+  font-size: clamp(28px, 4vw, 52px);
+  font-weight: 700;
+  letter-spacing: -2px;
+  color: #fff;
+}
+
+/* Beat 3 — "You're getting coached by everyone except a coach." — center */
+#fh-coached {
+  top: 50%;
+  font-size: clamp(28px, 4vw, 52px);
+  font-weight: 700;
+  letter-spacing: -2px;
+  color: #fff;
+  line-height: 1.15;
+}
+
+/* Beat 4 — "And none of it knows you." — center */
+#fh-none {
+  top: 50%;
+  font-size: clamp(32px, 5vw, 64px);
+  font-weight: 700;
+  letter-spacing: -2.5px;
+  color: #fff;
+}
+
+@media (max-width: 767px) {
+  #fh-broken { white-space: normal; font-size: clamp(42px, 12vw, 72px); letter-spacing: -2px; }
+  #fh-phone, #fh-coached, #fh-none { font-size: clamp(24px, 7vw, 40px); letter-spacing: -1px; }
+}
+
 .funnel-cued {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translateX(-50%) translateY(-50%);
+  transform: translateX(-50%) translateY(-60%);
   font-size: clamp(48px, 8vw, 96px);
   font-weight: 700;
   letter-spacing: -3px;
@@ -60,6 +99,22 @@
   z-index: 10;
   pointer-events: none;
   opacity: 0;
+}
+
+.funnel-changes {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(20%);
+  font-size: clamp(20px, 3vw, 32px);
+  font-weight: 400;
+  letter-spacing: -.5px;
+  color: rgba(255,255,255,0.7);
+  font-family: 'DM Sans', sans-serif;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0;
+  font-style: italic;
 }
 
 @media (max-width: 767px) {
@@ -313,6 +368,29 @@
   flex-direction: column;
   align-items: center;
   gap: 48px;
+}
+
+/* ── Clean side headlines ──────────────────────────────────── */
+.clean-side-headline {
+  font-size: clamp(32px, 4.5vw, 56px);
+  font-weight: 700;
+  letter-spacing: -2px;
+  line-height: 1.1;
+  color: #1a1a1a;
+  text-align: center;
+  max-width: 700px;
+}
+
+.clean-side-headline em {
+  font-style: italic;
+  color: #7C6EFF;
+}
+
+.clean-side-headline--bottom {
+  font-size: clamp(24px, 3vw, 40px);
+  color: #555;
+  font-weight: 500;
+  letter-spacing: -1px;
 }
 
 /* ── Summary card ──────────────────────────────────────────── */
