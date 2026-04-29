@@ -50,10 +50,13 @@
       onUpdate: function (self) {
         var p = self.progress;
 
-        // ── Headline: fades in 0–20%, holds, fades out 20–30% ───
+        // ── Headline: fades in 0–20%, slides up + fades out 20–30%
         var hlIn  = ease(prog(p, 0.00, 0.20));
         var hlOut = ease(prog(p, 0.20, 0.30));
-        gsap.set('.funnel-headline', { opacity: hlIn * (1 - hlOut) });
+        gsap.set('.funnel-headline', {
+          opacity: hlIn * (1 - hlOut),
+          y: lerp(0, -80, hlOut),
+        });
 
         // ── Chaos: fades in 20–30%, converges 30–75% ─────────────
         var chaosIn = ease(prog(p, 0.20, 0.30));
