@@ -686,38 +686,50 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
 <div class="clean-side" id="cleanSide">
   <div class="clean-side-inner">
 
-    <h2 class="clean-side-headline rv">Now imagine one voice that knows all of it.<br><em>Imagine cued.</em></h2>
+    <h2 class="clean-side-headline rv">Now imagine one voice that knows all of it.</h2>
 
-    <div class="clean-card rv">
-      <div class="clean-card-line"><span class="card-emoji">🏋️</span><span>Push day — 45 min session sent</span></div>
-      <div class="clean-card-line"><span class="card-emoji">🍳</span><span>3 meals planned — 2,180 cal, 162g protein</span></div>
-      <div class="clean-card-line"><span class="card-emoji">😴</span><span>Sleep: 6h40m — volume adjusted down</span></div>
-      <div class="clean-card-line"><span class="card-emoji">📸</span><span>1 food photo logged</span></div>
-      <div class="clean-card-line"><span class="card-emoji">💬</span><span>12 coaching messages today</span></div>
-      <div class="clean-card-line"><span class="card-emoji">⚡</span><span>Bench up 5lb this week</span></div>
+    <!-- Main conversation thread: Manny morning check-in -->
+    <div class="conversation-thread rv" id="thread-main">
+      <div class="thread-label">Manny, 22 — eats out most days</div>
+      <div class="bubble-incoming">Morning. Push day today — 45 min session. I already sent it. Bench is up 5lb this week.</div>
+      <div class="bubble-outgoing">lets go. what about food today</div>
+      <div class="bubble-incoming">3 meals planned — 2,180 cal, 162g protein. You slept 6h40 so I pulled volume down a bit.</div>
+      <div class="bubble-outgoing">wait you can see my sleep?</div>
+      <div class="bubble-incoming">Apple Watch. You averaged 6h20 this week. We'll talk about that.</div>
     </div>
 
-    <div class="clean-bubbles-grid">
-      <div class="clean-bubble rv" id="bubble-manny">
-        <div class="bubble-label">To Manny <span class="bubble-desc">22, eats out most days</span></div>
-        <div class="bubble-msg">You ordered DoorDash 3 times this week. Tonight you're not. If you want something to eat, lmk, I'll put something quick tg from the groceries you got earlier.</div>
-      </div>
-      <div class="clean-bubble rv rv-d1" id="bubble-jess">
-        <div class="bubble-label">To Jess <span class="bubble-desc">20, goes out on weekends</span></div>
-        <div class="bubble-msg">If I see an Artichoke's pic at 2am I'm giving you legs at 9am. Eat something real before you go out. Text me if you want a quick option.</div>
-      </div>
-      <div class="clean-bubble rv rv-d1" id="bubble-james">
-        <div class="bubble-label">To James <span class="bubble-desc">21, keeps putting it off</span></div>
-        <div class="bubble-msg">You said you'd get back to it after midterms. That was three weeks ago. I've got a 20-min session ready when you are. Just say the word.</div>
-      </div>
-      <div class="clean-bubble rv rv-d2" id="bubble-molly">
-        <div class="bubble-label">To Molly <span class="bubble-desc">19, just getting started</span></div>
-        <div class="bubble-msg">12 minutes on the elliptical isn't a full workout Molly. Say 'send it' and I'll give you a real one you can do in your room tonight.</div>
-      </div>
-      <div class="clean-bubble rv rv-d2" id="bubble-alex">
-        <div class="bubble-label">To Alex <span class="bubble-desc">23, skips breakfast</span></div>
-        <div class="bubble-msg">A protein bar and coffee isn't breakfast. You're going to feel it by set 3 on bench. Want me to send you something quick before you leave?</div>
-      </div>
+    <p class="threads-divider rv">Every user gets coaching that fits their life.</p>
+
+    <!-- Jess -->
+    <div class="conversation-thread rv" id="thread-jess">
+      <div class="thread-label">Jess, 20 — goes out every weekend</div>
+      <div class="bubble-incoming">If I see an Artichoke's pic at 2am I'm giving you legs at 9am. Eat something real before you go out.</div>
+      <div class="bubble-outgoing">lmao fine what should i eat</div>
+      <div class="bubble-incoming">Protein bowl from Chipotle. Double chicken. You're welcome.</div>
+    </div>
+
+    <!-- James -->
+    <div class="conversation-thread rv" id="thread-james">
+      <div class="thread-label">James, 21 — keeps putting it off</div>
+      <div class="bubble-incoming">You said you'd get back to it after midterms. That was three weeks ago.</div>
+      <div class="bubble-outgoing">i know i know</div>
+      <div class="bubble-incoming">20-min session. Bodyweight. Your dorm room. Say the word.</div>
+    </div>
+
+    <!-- Molly -->
+    <div class="conversation-thread rv" id="thread-molly">
+      <div class="thread-label">Molly, 19 — just getting started</div>
+      <div class="bubble-incoming">12 minutes on the elliptical isn't a full workout Molly.</div>
+      <div class="bubble-outgoing">ok then what do i do</div>
+      <div class="bubble-incoming">I just sent you a 25-min full body circuit. No equipment. You can do it tonight.</div>
+    </div>
+
+    <!-- Alex -->
+    <div class="conversation-thread rv" id="thread-alex">
+      <div class="thread-label">Alex, 23 — lifts but eats like shit</div>
+      <div class="bubble-incoming">A protein bar and coffee isn't breakfast. You're going to feel it by set 3 on bench.</div>
+      <div class="bubble-outgoing">what should i eat then</div>
+      <div class="bubble-incoming">3 eggs, toast, banana. Takes 6 minutes. You have time.</div>
     </div>
 
     <h2 class="clean-side-headline clean-side-headline--bottom rv">This is what coaching actually looks like.</h2>
