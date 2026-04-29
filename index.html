@@ -36,16 +36,8 @@ nav.nav-light .nv-btn{background:rgba(255,255,255,.15)!important;color:#fff!impo
 @keyframes flareF{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,20px)}}
 
 /* Hero layout: two columns, text left, conv right */
-.hero-inner{max-width:1300px;width:100%;margin:0 auto;display:grid;grid-template-columns:1fr 0fr;align-items:center;gap:0;transition:grid-template-columns .75s cubic-bezier(.4,0,.2,1),gap .75s cubic-bezier(.4,0,.2,1)}
-.hero-inner.revealed{grid-template-columns:1fr 1fr;gap:clamp(40px,5vw,80px)}
-
-/* Text block: starts translated to center (50% of its own width = visual center of page) */
-.hero-c{
-  display:flex;flex-direction:column;align-items:flex-start;text-align:left;
-  transform:translateX(calc(50vw - 50% - clamp(24px,6vw,100px)));
-  transition:transform .75s cubic-bezier(.4,0,.2,1);
-}
-.hero-inner.revealed .hero-c{transform:translateX(0)}
+.hero-inner{max-width:800px;width:100%;margin:0 auto;display:flex;flex-direction:column;align-items:center;text-align:center}
+.hero-c{display:flex;flex-direction:column;align-items:center;text-align:center}
 
 .hero-eyebrow{font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:3px;margin-bottom:20px;opacity:0;animation:hIn 1s ease .1s forwards}
 .hero-tag{
@@ -53,9 +45,6 @@ nav.nav-light .nv-btn{background:rgba(255,255,255,.15)!important;color:#fff!impo
   font-weight:700;letter-spacing:-2.5px;line-height:1.05;color:var(--text);margin-bottom:24px;
   opacity:0;animation:hIn .8s ease .3s forwards;
 }
-.hero-rotating{color:var(--accent);position:relative;white-space:nowrap}
-.hero-cursor{display:inline-block;width:3px;height:.85em;background:var(--accent);margin-left:2px;vertical-align:middle;border-radius:1px;animation:cursorBlink .7s step-end infinite}
-@keyframes cursorBlink{0%,100%{opacity:1}50%{opacity:0}}
 .hero-sub{font-size:clamp(16px,1.4vw,18px);color:var(--text2);line-height:1.65;max-width:480px;font-weight:300;margin-bottom:40px;opacity:0;animation:hIn .8s ease .5s forwards}
 .hero-acts{display:flex;gap:14px;flex-wrap:wrap;opacity:0;animation:hIn .8s ease .65s forwards}
 .bp{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:var(--accent);color:#fff;font-size:15px;font-weight:600;border-radius:980px;text-decoration:none;border:none;cursor:pointer;font-family:var(--f);transition:all .3s}
@@ -64,36 +53,9 @@ nav.nav-light .nv-btn{background:rgba(255,255,255,.15)!important;color:#fff!impo
 .bs:hover{border-color:rgba(124,110,255,.35);color:var(--text);background:rgba(124,110,255,.12)}
 @keyframes hIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
-/* HERO CONVERSATION */
-.hero-conv{
-  display:flex;flex-direction:column;align-items:center;
-  opacity:0;pointer-events:none;overflow:hidden;
-  transition:opacity .8s ease .1s;
-}
-.hero-inner.revealed .hero-conv{opacity:1;pointer-events:auto;overflow:visible}
-.hc-msgs{width:100%;display:flex;flex-direction:column;gap:8px;max-height:360px;overflow-y:auto;scrollbar-width:none}
-.hc-msgs::-webkit-scrollbar{display:none}
-.hc-msg{display:flex;opacity:0;transform:translateY(10px)}
-.hc-msg.show{opacity:1;transform:translateY(0);transition:opacity .4s ease,transform .4s cubic-bezier(.16,1,.3,1)}
-.hc-msg.coach{justify-content:flex-start}
-.hc-msg.user{justify-content:flex-end}
-.hc-bubble{max-width:78%;padding:13px 18px;font-size:15px;line-height:1.55;border-radius:20px}
-.hc-msg.coach .hc-bubble{background:#F7F6F2;color:var(--text);border-bottom-left-radius:6px;border:1px solid var(--border)}
-.hc-msg.user .hc-bubble{background:var(--accent);color:#fff;border-bottom-right-radius:6px}
-.hc-time{font-size:11px;color:var(--text3);margin:8px 0;text-align:center;opacity:0}
-.hc-time.show{opacity:1;transition:opacity .3s}
-.hc-typing{display:inline-flex;gap:5px;padding:12px 18px;background:#F7F6F2;border:1px solid var(--border);border-radius:20px;border-bottom-left-radius:6px}
-.hc-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);animation:htB 1.2s ease-in-out infinite}
-.hc-dot:nth-child(2){animation-delay:.15s}
-.hc-dot:nth-child(3){animation-delay:.3s}
-@keyframes htB{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-3px)}}
 
-/* MOBILE: static, stacked, no animation */
 @media(max-width:768px){
-  .hero-inner,.hero-inner.revealed{display:flex;flex-direction:column;gap:48px}
-  .hero-c,.hero-inner.revealed .hero-c{transform:none;align-items:center;text-align:center;width:100%}
   .hero-tag{font-size:clamp(36px,9vw,52px)}
-  .hero-conv,.hero-inner.revealed .hero-conv{opacity:1;pointer-events:auto;overflow:visible;width:100%}
 }
 
 /* SOUND FAMILIAR SECTION */
@@ -481,15 +443,12 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
 <section class="hero">
   <div class="hero-inner" id="heroInner">
     <div class="hero-c">
-      <h1 class="hero-tag" id="heroLogo">The AI fitness coach that <span class="hero-rotating" id="heroRotating"></span><span class="hero-cursor" id="heroCursor"></span></h1>
+      <h1 class="hero-tag">The AI fitness coach that texts you first.</h1>
       <p class="hero-sub">Personalized workouts, nutrition, and accountability — delivered entirely over text messages. No app required.</p>
       <div class="hero-acts">
         <a href="#" class="bp" onclick="openChatSignup();return false">Get Cued</a>
         <a href="how-it-works.html" class="bs">Learn more</a>
       </div>
-    </div>
-    <div class="hero-conv" id="heroConv">
-      <div class="hc-msgs" id="hcMsgs"></div>
     </div>
   </div>
 </section>
@@ -898,104 +857,6 @@ scaleBlocks.forEach(b=>srObs.observe(b));
   resetTimer();
 })();
 
-// Hero reveal + conversation orchestrator
-(function(){
-  const inner=document.getElementById('heroInner');
-  const container=document.getElementById('hcMsgs');
-  if(!inner||!container)return;
-
-  const isMobile=()=>window.innerWidth<=768;
-
-  const convScript=[
-    {type:'time', text:'6:47 AM'},
-    {type:'coach', text:'Hey, good morning Alex! 7h 12m sleep, resting HR dropped to 58 — recovery is solid. You ready for legs today?'},
-    {type:'user', text:'yeah but i only have 40 min today'},
-    {type:'coach', text:'Alr bet, no worries. Here\'s your 40-min leg day:\n4×6 Barbell Squat (165lb)\n3×10 Romanian Deadlift (135lb)\n3×12 Walking Lunges\nSuperset: Leg Curls + Calf Raises 3×15'},
-    {type:'user', text:'last set of squats felt heavy last time, should i deload?'},
-    {type:'coach', text:'Think about it — your squat has gone up 20lb in 6 weeks, some fatigue is expected. Let\'s keep 165 but drop to 4×5. If it still feels heavy, we deload next week.'},
-    {type:'coach', text:'Post-workout: Greek yogurt bowl with granola and banana. ~420 cal, 38g protein. Or want a different option? Lmk what\'s in your fridge.'}
-  ];
-
-  function scrollDown(){
-    if(container.scrollHeight>container.clientHeight)
-      container.scrollTop=container.scrollHeight;
-  }
-
-  function appendMsg(item){
-    const el=document.createElement('div');
-    if(item.type==='time'){
-      el.className='hc-time';
-      el.textContent=item.text;
-      container.appendChild(el);
-      requestAnimationFrame(()=>el.classList.add('show'));
-    } else {
-      el.className='hc-msg '+item.type;
-      const bubble=document.createElement('div');
-      bubble.className='hc-bubble';
-      bubble.innerHTML=item.text.replace(/\n/g,'<br>');
-      el.appendChild(bubble);
-      container.appendChild(el);
-      requestAnimationFrame(()=>el.classList.add('show'));
-      scrollDown();
-    }
-  }
-
-  let convIdx=0;
-  function runConversation(){
-    if(convIdx>=convScript.length)return;
-    const item=convScript[convIdx];
-    if(item.type==='coach'){
-      const typing=document.createElement('div');
-      typing.className='hc-msg coach';
-      typing.innerHTML='<div class="hc-typing"><div class="hc-dot"></div><div class="hc-dot"></div><div class="hc-dot"></div></div>';
-      container.appendChild(typing);
-      requestAnimationFrame(()=>typing.classList.add('show'));
-      scrollDown();
-      setTimeout(()=>{
-        container.removeChild(typing);
-        appendMsg(item);
-        convIdx++;
-        setTimeout(runConversation,item.text.length>80?1800:1000);
-      },900);
-    } else {
-      appendMsg(item);
-      convIdx++;
-      setTimeout(runConversation,item.type==='time'?600:700);
-    }
-  }
-
-  let revealed=false;
-  function reveal(){
-    if(revealed)return;
-    revealed=true;
-    // Remove scroll listener — no longer needed
-    window.removeEventListener('scroll',onScroll,{passive:true});
-    if(isMobile()){
-      // Mobile: just run conversation immediately, no layout shift
-      setTimeout(runConversation,800);
-      return;
-    }
-    // Slide text left + fade in conversation
-    inner.classList.add('revealed');
-    // Start conversation after transition completes (~700ms) + small buffer
-    setTimeout(runConversation,900);
-  }
-
-  function onScroll(){
-    // If user scrolls before timer fires, trigger immediately
-    reveal();
-  }
-
-  // On mobile: reveal immediately so conversation shows below
-  if(isMobile()){
-    reveal();
-    return;
-  }
-
-  // Desktop: wait 2s, or reveal on first scroll — whichever comes first
-  window.addEventListener('scroll',onScroll,{passive:true});
-  setTimeout(reveal,2000);
-})();
 
 // Sound familiar section scroll reveal: small card → full width
 (function(){
@@ -1027,61 +888,6 @@ hamburger.addEventListener('click',openMenu);
 mmClose.addEventListener('click',closeMenu);
 mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));
 
-// ── TYPEWRITER ROTATING HEADLINE ────────────────────
-(function(){
-  const el=document.getElementById('heroRotating');
-  const cursor=document.getElementById('heroCursor');
-  if(!el)return;
-
-  const phrases=[
-    'texts you first.',
-    'needs no app.',
-  ];
-
-  const TYPE_SPEED=80;    // ms per character typed
-  const DELETE_SPEED=40;  // ms per character deleted
-  const HOLD_MS=3000;     // how long phrase stays visible
-  const PAUSE_MS=220;     // pause between delete and next type
-
-  let phraseIdx=0;
-  let charIdx=0;
-  let deleting=false;
-  let started=false;
-
-  function tick(){
-    const phrase=phrases[phraseIdx];
-
-    if(!deleting){
-      // Typing in
-      charIdx++;
-      el.textContent=phrase.slice(0,charIdx);
-      if(charIdx===phrase.length){
-        // Done typing — hold, then delete
-        deleting=true;
-        setTimeout(tick, HOLD_MS);
-        return;
-      }
-      setTimeout(tick, TYPE_SPEED);
-    } else {
-      // Deleting
-      charIdx--;
-      el.textContent=phrase.slice(0,charIdx);
-      if(charIdx===0){
-        deleting=false;
-        phraseIdx=(phraseIdx+1)%phrases.length;
-        setTimeout(tick, PAUSE_MS);
-        return;
-      }
-      setTimeout(tick, DELETE_SPEED);
-    }
-  }
-
-  // Start after the hero fade-in animation clears (~1.2s)
-  setTimeout(()=>{
-    started=true;
-    tick();
-  },1300);
-})();
 
 // ── CHAT SIGNUP OVERLAY ─────────────────────────────
 (function(){
