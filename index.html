@@ -465,27 +465,21 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
   <div class="funnel-scroll-spacer">
     <div class="funnel-sticky">
 
-      <!-- Beat 1: "Fitness is broken." -->
-      <div class="funnel-headline" id="fh-broken">Fitness is <em>broken.</em></div>
-
-      <!-- Beat 2: above the chaos -->
-      <div class="funnel-headline" id="fh-phone">This is your phone right now.</div>
-
-      <!-- Beat 3: after chaos -->
+      <!-- Zone 1 headline — appears at 0%, before chaos -->
       <div class="funnel-headline" id="fh-coached">You're getting coached by everyone<br>except a coach.</div>
 
-      <!-- Beat 4 -->
+      <!-- Zone 2 headline — transitions in during rapid chaos phase -->
       <div class="funnel-headline" id="fh-none">And none of it knows you.</div>
 
-      <!-- Beat 5: cued + changes that -->
+      <!-- Beat 5: cued logo pause -->
       <div class="funnel-cued-wrap" id="fh-cued">
         <span class="funnel-cued-word">cued</span>
         <div class="funnel-changes">changes that.</div>
       </div>
 
-      <!-- 12 chaos items -->
+      <!-- ── HERO ITEMS (15) — real copy, fully styled ── -->
 
-      <!-- 1. DoorDash notification -->
+      <!-- H1. DoorDash — first to arrive, iOS banner drop -->
       <div class="chaos-item notification" id="chaos-doordash">
         <div class="notif-icon">🍔</div>
         <div class="notif-content">
@@ -494,40 +488,13 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
         </div>
       </div>
 
-      <!-- 2. Sophie iMessage -->
+      <!-- H2. Boba invite -->
       <div class="chaos-item imessage blue" id="chaos-boba">
         <div class="imsg-contact">Sophie</div>
         <div class="imsg-bubble">We're getting boba at Plentea, you in?</div>
       </div>
 
-      <!-- 3. Jake iMessage -->
-      <div class="chaos-item imessage green" id="chaos-darty">
-        <div class="imsg-contact">Jake</div>
-        <div class="imsg-bubble">Darty at Sig Chi at 3, bring whoever</div>
-      </div>
-
-      <!-- 4. Tyler iMessage -->
-      <div class="chaos-item imessage blue" id="chaos-onedrink">
-        <div class="imsg-contact">Tyler</div>
-        <div class="imsg-bubble">Bro just come out for one drink</div>
-      </div>
-
-      <!-- 5. TikTok card -->
-      <div class="chaos-item tiktok-card" id="chaos-bench">
-        <div class="tt-header">
-          <span class="tt-play">▶</span>
-          <span class="tt-username">@fitnessbro</span>
-        </div>
-        <div class="tt-caption">POV: you've been doing bench wrong your whole life 😳</div>
-      </div>
-
-      <!-- 6. Instagram card -->
-      <div class="chaos-item instagram-card" id="chaos-shredded">
-        <div class="ig-username">@coachmike</div>
-        <div class="ig-caption">Get shredded in 30 days — link in bio 🔥</div>
-      </div>
-
-      <!-- 7. MyFitnessPal notification -->
+      <!-- H3. Calorie guilt — MyFitnessPal -->
       <div class="chaos-item notification" id="chaos-mfp">
         <div class="notif-icon">🥗</div>
         <div class="notif-content">
@@ -536,29 +503,178 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
         </div>
       </div>
 
-      <!-- 8. Streak thought -->
-      <div class="chaos-item thought" id="chaos-streak">
-        Day 1 ✓&nbsp; Day 2 ✓&nbsp; Day 3 ✓&nbsp; Day 4...
+      <!-- H4. TikTok form check -->
+      <div class="chaos-item tiktok-card" id="chaos-bench">
+        <div class="tt-header">
+          <span class="tt-play">▶</span>
+          <span class="tt-username">@fitnessbro</span>
+        </div>
+        <div class="tt-caption">POV: you've been doing bench wrong your whole life 😳</div>
       </div>
 
-      <!-- 9. Midterms thought -->
-      <div class="chaos-item thought" id="chaos-midterms">
-        I'll start going back after midterms
-      </div>
-
-      <!-- 10. Confused thought -->
+      <!-- H5. Gym paralysis thought -->
       <div class="chaos-item thought" id="chaos-confused">
         I don't know what to do at the gym today
       </div>
 
-      <!-- 11. Girlfriend thought -->
-      <div class="chaos-item thought" id="chaos-girlfriend">
-        my girlfriend wants boba again
+      <!-- H6. Instagram shred bait -->
+      <div class="chaos-item instagram-card" id="chaos-shredded">
+        <div class="ig-username">@coachmike</div>
+        <div class="ig-caption">Get shredded in 30 days — link in bio 🔥</div>
       </div>
 
-      <!-- 12. Break thought -->
+      <!-- H7. Darty invite -->
+      <div class="chaos-item imessage green" id="chaos-darty">
+        <div class="imsg-contact">Jake</div>
+        <div class="imsg-bubble">Darty at Sig Chi at 3, bring whoever</div>
+      </div>
+
+      <!-- H8. Stat: app fatigue -->
+      <div class="chaos-item stat-callout" id="chaos-stat-apps">
+        <div class="stat-num">6</div>
+        <div class="stat-copy">apps downloaded this year. None of them stuck.</div>
+      </div>
+
+      <!-- H9. Procrastination thought -->
+      <div class="chaos-item thought" id="chaos-midterms">
+        I'll start going back after midterms
+      </div>
+
+      <!-- H10. Peer pressure -->
+      <div class="chaos-item imessage blue" id="chaos-onedrink">
+        <div class="imsg-contact">Tyler</div>
+        <div class="imsg-bubble">Bro just come out for one drink</div>
+      </div>
+
+      <!-- H11. Stat: streak death -->
+      <div class="chaos-item stat-callout" id="chaos-stat-streak">
+        <div class="stat-num">11</div>
+        <div class="stat-copy">days. That's how long most people log before quitting.</div>
+      </div>
+
+      <!-- H12. Bulk or cut thought -->
+      <div class="chaos-item thought" id="chaos-bulkcut">
+        Should I bulk or cut? Every answer online is different
+      </div>
+
+      <!-- H13. Stat: expensive nothing -->
+      <div class="chaos-item stat-callout" id="chaos-stat-watch">
+        <div class="stat-num">$400</div>
+        <div class="stat-copy">watch. Still no plan.</div>
+      </div>
+
+      <!-- H14. UberEats notification -->
+      <div class="chaos-item notification" id="chaos-ubereats">
+        <div class="notif-icon">🌮</div>
+        <div class="notif-content">
+          <span class="notif-app">Uber Eats</span>
+          <span class="notif-text">Your favorite order is one tap away 🌮</span>
+        </div>
+      </div>
+
+      <!-- H15. Travel excuse thought -->
       <div class="chaos-item thought" id="chaos-break">
         I'll find a gym when I'm home for break
+      </div>
+
+      <!-- ── FILLER ITEMS (12) — visual noise, lower opacity ── -->
+
+      <!-- F1. Group chat cluster -->
+      <div class="chaos-item imessage green filler" id="chaos-groupchat">
+        <div class="imsg-contact">Group Chat</div>
+        <div class="imsg-bubble">lol wait what 😂😂 who's coming</div>
+      </div>
+
+      <!-- F2. Snapchat -->
+      <div class="chaos-item notification filler" id="chaos-snap">
+        <div class="notif-icon">📸</div>
+        <div class="notif-content">
+          <span class="notif-app">Snapchat</span>
+          <span class="notif-text">New Snap from Marcus</span>
+        </div>
+      </div>
+
+      <!-- F3. Reddit card -->
+      <div class="chaos-item tiktok-card filler" id="chaos-reddit">
+        <div class="tt-header">
+          <span class="tt-play">↑</span>
+          <span class="tt-username">r/fitness</span>
+        </div>
+        <div class="tt-caption">Why your program isn't working</div>
+      </div>
+
+      <!-- F4. YouTube notification -->
+      <div class="chaos-item notification filler" id="chaos-youtube">
+        <div class="notif-icon">🔴</div>
+        <div class="notif-content">
+          <span class="notif-app">YouTube</span>
+          <span class="notif-text">Jeff Nippard: You're Wasting Your Sets</span>
+        </div>
+      </div>
+
+      <!-- F5. Second TikTok -->
+      <div class="chaos-item tiktok-card filler" id="chaos-tiktok2">
+        <div class="tt-header">
+          <span class="tt-play">▶</span>
+          <span class="tt-username">@gymtok</span>
+        </div>
+        <div class="tt-caption">This one trick doubled my bench in 6 weeks</div>
+      </div>
+
+      <!-- F6. Instagram DM -->
+      <div class="chaos-item notification filler" id="chaos-igdm">
+        <div class="notif-icon">💬</div>
+        <div class="notif-content">
+          <span class="notif-app">Instagram</span>
+          <span class="notif-text">fitcoach_mike sent you a message</span>
+        </div>
+      </div>
+
+      <!-- F7. Apple Watch stand -->
+      <div class="chaos-item notification filler" id="chaos-watch">
+        <div class="notif-icon">🟢</div>
+        <div class="notif-content">
+          <span class="notif-app">Activity</span>
+          <span class="notif-text">Time to stand! You've been sitting for 1 hour.</span>
+        </div>
+      </div>
+
+      <!-- F8. Venmo request -->
+      <div class="chaos-item notification filler" id="chaos-venmo">
+        <div class="notif-icon">🔵</div>
+        <div class="notif-content">
+          <span class="notif-app">Venmo</span>
+          <span class="notif-text">Sarah requested $14.00 — boba</span>
+        </div>
+      </div>
+
+      <!-- F9. Second thought — trainer spiral -->
+      <div class="chaos-item thought filler" id="chaos-trainer">
+        Maybe I should just get a trainer
+      </div>
+
+      <!-- F10. Calendar midterm alert -->
+      <div class="chaos-item notification filler" id="chaos-midterm-cal">
+        <div class="notif-icon">⚠️</div>
+        <div class="notif-content">
+          <span class="notif-app">Calendar</span>
+          <span class="notif-text">CS 61B Midterm 2 — Tomorrow 7pm</span>
+        </div>
+      </div>
+
+      <!-- F11. Sleep app nag -->
+      <div class="chaos-item notification filler" id="chaos-sleep">
+        <div class="notif-icon">😴</div>
+        <div class="notif-content">
+          <span class="notif-app">Sleep Cycle</span>
+          <span class="notif-text">You averaged 5h42m of sleep this week</span>
+        </div>
+      </div>
+
+      <!-- F12. RSF iMessage -->
+      <div class="chaos-item imessage blue filler" id="chaos-rsf">
+        <div class="imsg-contact">Kevin</div>
+        <div class="imsg-bubble">you still going to the RSF today?</div>
       </div>
 
     </div><!-- /funnel-sticky -->
