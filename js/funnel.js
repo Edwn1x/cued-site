@@ -88,10 +88,13 @@
       ease: 'power1.out',
     }, 0.6);
 
-    // 70–80%: pause — logo + halo only
-    tl.to({}, { duration: 0.1 });
+    // 70–80%: pause — logo + halo only; background transitions to white
+    tl.to('.funnel-sticky', { backgroundColor: '#ffffff', duration: 0.1, ease: 'power1.inOut' }, 0.68);
+    tl.to('.funnel-headline', { opacity: 0, duration: 0.05 }, 0.62);
+    tl.to({}, { duration: 0.02 });
 
-    // 80–85%: summary card fades in
+    // 80–85%: summary card fades in; logo shifts to dark
+    tl.to('.funnel-logo', { color: '#7C6EFF', duration: 0.05 }, 0.78);
     tl.to('.clean-card', {
       opacity: 1,
       scale: 1,
