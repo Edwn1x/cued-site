@@ -27,18 +27,20 @@
 
 .funnel-headline {
   position: absolute;
-  top: clamp(40px, 6vh, 72px);
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  font-size: clamp(32px, 5vw, 60px);
+  transform: translateX(-50%) translateY(-50%);
+  font-size: clamp(56px, 10vw, 120px);
   font-weight: 700;
-  letter-spacing: -2px;
+  letter-spacing: -4px;
+  line-height: 1.0;
   color: #fff;
+  text-align: center;
   white-space: nowrap;
   z-index: 5;
   font-family: 'DM Sans', sans-serif;
   pointer-events: none;
-  opacity: 0; /* fades in via JS */
+  opacity: 0;
 }
 
 .funnel-headline em {
@@ -47,25 +49,29 @@
 
 .funnel-cued {
   position: absolute;
-  top: 65%;
+  top: 50%;
   left: 50%;
   transform: translateX(-50%) translateY(-50%);
-  font-size: clamp(28px, 4vw, 48px);
+  font-size: clamp(48px, 8vw, 96px);
   font-weight: 700;
-  letter-spacing: 4px;
+  letter-spacing: -3px;
   color: #fff;
   font-family: 'DM Sans', sans-serif;
   z-index: 10;
   pointer-events: none;
-  opacity: 0; /* fades in via JS after chaos converges */
+  opacity: 0;
 }
 
 @media (max-width: 767px) {
   .funnel-headline {
     white-space: normal;
     text-align: center;
-    width: 90%;
-    font-size: clamp(26px, 7vw, 36px);
+    width: 88%;
+    font-size: clamp(42px, 12vw, 72px);
+    letter-spacing: -2px;
+  }
+  .funnel-cued {
+    font-size: clamp(40px, 12vw, 72px);
   }
 }
 
