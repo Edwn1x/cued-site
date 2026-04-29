@@ -426,6 +426,7 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
 .co-success h3{font-size:22px;font-weight:700;letter-spacing:-.5px;color:var(--text)}
 .co-success p{font-size:15px;color:var(--text2);font-weight:300;line-height:1.6;max-width:300px}
 </style>
+<link rel="stylesheet" href="css/funnel.css">
 <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
 <meta property="og:title" content="Cued — AI fitness coaching over text">
 <meta property="og:description" content="Personalized workouts, nutrition, and accountability — delivered entirely over text messages. No app required.">
@@ -493,34 +494,134 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
   </div>
 </section>
 
-<!-- SOUND FAMILIAR SECTION -->
-<div class="sf-wrap" id="sfWrap">
-<section class="sf" id="sfSection" data-nav="light">
-  <div class="sf-i">
-    <div class="sf-hd rv">
-      <h2>Fitness apps <em>are broken.</em></h2>
-      <p>You're not the problem. The tools are.</p>
-    </div>
-    <div class="sf-grid">
-      <div class="sf-cell rv">
-        <span class="sf-stat">6 apps</span>
-        <span class="sf-title">downloaded this year.</span>
-        <span class="sf-sub">You don't use any of them.</span>
+<!-- FUNNEL SECTION — scroll-driven chaos→clean -->
+<section id="funnel-section">
+  <div class="funnel-scroll-spacer">
+    <div class="funnel-sticky">
+
+      <!-- 12 chaos items -->
+
+      <!-- 1. DoorDash notification -->
+      <div class="chaos-item notification" id="chaos-doordash">
+        <div class="notif-icon">🍔</div>
+        <div class="notif-content">
+          <span class="notif-app">DoorDash</span>
+          <span class="notif-text">$0 delivery fee tonight only 🍔</span>
+        </div>
       </div>
-      <div class="sf-cell rv rv-d1">
-        <span class="sf-stat">11 days</span>
-        <span class="sf-title">the average calorie tracking streak</span>
-        <span class="sf-sub">before people quit.</span>
+
+      <!-- 2. Sophie iMessage -->
+      <div class="chaos-item imessage blue" id="chaos-boba">
+        <div class="imsg-contact">Sophie</div>
+        <div class="imsg-bubble">We're getting boba at Plentea, you in?</div>
       </div>
-      <div class="sf-cell rv rv-d2">
-        <span class="sf-stat">$400+</span>
-        <span class="sf-title">spent on a watch that counts your steps.</span>
-        <span class="sf-sub">You still wing it at the gym.</span>
+
+      <!-- 3. Jake iMessage -->
+      <div class="chaos-item imessage green" id="chaos-darty">
+        <div class="imsg-contact">Jake</div>
+        <div class="imsg-bubble">Darty at Sig Chi at 3, bring whoever</div>
       </div>
-    </div>
-  </div>
-</section>
-</div>
+
+      <!-- 4. Tyler iMessage -->
+      <div class="chaos-item imessage blue" id="chaos-onedrink">
+        <div class="imsg-contact">Tyler</div>
+        <div class="imsg-bubble">Bro just come out for one drink</div>
+      </div>
+
+      <!-- 5. TikTok card -->
+      <div class="chaos-item tiktok-card" id="chaos-bench">
+        <div class="tt-header">
+          <span class="tt-play">▶</span>
+          <span class="tt-username">@fitnessbro</span>
+        </div>
+        <div class="tt-caption">POV: you've been doing bench wrong your whole life 😳</div>
+      </div>
+
+      <!-- 6. Instagram card -->
+      <div class="chaos-item instagram-card" id="chaos-shredded">
+        <div class="ig-username">@coachmike</div>
+        <div class="ig-caption">Get shredded in 30 days — link in bio 🔥</div>
+      </div>
+
+      <!-- 7. MyFitnessPal notification -->
+      <div class="chaos-item notification" id="chaos-mfp">
+        <div class="notif-icon">🥗</div>
+        <div class="notif-content">
+          <span class="notif-app">MyFitnessPal</span>
+          <span class="notif-text">You haven't logged lunch — tap to add</span>
+        </div>
+      </div>
+
+      <!-- 8. Streak thought -->
+      <div class="chaos-item thought" id="chaos-streak">
+        Day 1 ✓&nbsp; Day 2 ✓&nbsp; Day 3 ✓&nbsp; Day 4...
+      </div>
+
+      <!-- 9. Midterms thought -->
+      <div class="chaos-item thought" id="chaos-midterms">
+        I'll start going back after midterms
+      </div>
+
+      <!-- 10. Confused thought -->
+      <div class="chaos-item thought" id="chaos-confused">
+        I don't know what to do at the gym today
+      </div>
+
+      <!-- 11. Girlfriend thought -->
+      <div class="chaos-item thought" id="chaos-girlfriend">
+        my girlfriend wants boba again
+      </div>
+
+      <!-- 12. Break thought -->
+      <div class="chaos-item thought" id="chaos-break">
+        I'll find a gym when I'm home for break
+      </div>
+
+      <!-- Logo halo (behind logo) -->
+      <div class="funnel-logo-halo"></div>
+
+      <!-- Logo convergence point -->
+      <div class="funnel-logo">cued</div>
+
+      <!-- Summary card -->
+      <div class="clean-card">
+        <div class="clean-card-line"><span class="card-emoji">🏋️</span><span>Push day — 45 min session sent</span></div>
+        <div class="clean-card-line"><span class="card-emoji">🍳</span><span>3 meals planned — 2,180 cal, 162g protein</span></div>
+        <div class="clean-card-line"><span class="card-emoji">😴</span><span>Sleep: 6h40m — volume adjusted down</span></div>
+        <div class="clean-card-line"><span class="card-emoji">📸</span><span>1 food photo logged</span></div>
+        <div class="clean-card-line"><span class="card-emoji">💬</span><span>12 coaching messages today</span></div>
+        <div class="clean-card-line"><span class="card-emoji">⚡</span><span>Bench up 5lb this week</span></div>
+      </div>
+
+      <!-- Coaching bubbles -->
+      <div class="clean-bubble" id="bubble-manny">
+        <div class="bubble-label">To Manny <span class="bubble-desc">22, eats out most days</span></div>
+        <div class="bubble-msg">You ordered DoorDash 3 times this week. Tonight you're not. If you want something to eat, lmk, I'll put something quick tg from the groceries you got earlier.</div>
+      </div>
+
+      <div class="clean-bubble" id="bubble-jess">
+        <div class="bubble-label">To Jess <span class="bubble-desc">20, goes out on weekends</span></div>
+        <div class="bubble-msg">If I see an Artichoke's pic at 2am I'm giving you legs at 9am. Eat something real before you go out. Text me if you want a quick option.</div>
+      </div>
+
+      <div class="clean-bubble" id="bubble-james">
+        <div class="bubble-label">To James <span class="bubble-desc">21, keeps putting it off</span></div>
+        <div class="bubble-msg">You said you'd get back to it after midterms. That was three weeks ago. I've got a 20-min session ready when you are. Just say the word.</div>
+      </div>
+
+      <div class="clean-bubble" id="bubble-molly">
+        <div class="bubble-label">To Molly <span class="bubble-desc">19, just getting started</span></div>
+        <div class="bubble-msg">12 minutes on the elliptical isn't a full workout Molly. Say 'send it' and I'll give you a real one you can do in your room tonight.</div>
+      </div>
+
+      <div class="clean-bubble" id="bubble-alex">
+        <div class="bubble-label">To Alex <span class="bubble-desc">23, skips breakfast</span></div>
+        <div class="bubble-msg">A protein bar and coffee isn't breakfast. You're going to feel it by set 3 on bench. Want me to send you something quick before you leave?</div>
+      </div>
+
+    </div><!-- /funnel-sticky -->
+  </div><!-- /funnel-scroll-spacer -->
+</section><!-- /funnel-section -->
 
 <!-- THREE TEXTS SECTION -->
 <section class="three-texts" data-nav="dark">
@@ -1255,5 +1356,8 @@ mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu
   }
 })();
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="js/funnel.js"></script>
 </body>
 </html>

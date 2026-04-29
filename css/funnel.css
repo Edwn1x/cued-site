@@ -1,0 +1,414 @@
+/* ============================================================
+   funnel.css — Scroll-driven chaos→clean funnel section
+   ============================================================ */
+
+/* ── Section container ─────────────────────────────────────── */
+#funnel-section {
+  position: relative;
+}
+
+.funnel-scroll-spacer {
+  height: 350vh;
+  position: relative;
+}
+
+.funnel-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+/* ── Chaos items — shared base ─────────────────────────────── */
+.chaos-item {
+  position: absolute;
+  will-change: transform, opacity;
+  /* No-JS fallback: hidden by default; GSAP sets opacity:1 on init */
+  opacity: 0;
+  cursor: default;
+  user-select: none;
+}
+
+/* ── Notification style (iOS lock screen) ──────────────────── */
+.notification {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 12px 14px;
+  width: 280px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.13), 0 1px 4px rgba(0, 0, 0, 0.07);
+}
+
+.notification .notif-icon {
+  font-size: 28px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.notification .notif-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.notification .notif-app {
+  font-size: 12px;
+  font-weight: 700;
+  color: #000000;
+  font-family: -apple-system, 'DM Sans', sans-serif;
+}
+
+.notification .notif-text {
+  font-size: 13px;
+  color: #444444;
+  font-family: -apple-system, 'DM Sans', sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── iMessage style ────────────────────────────────────────── */
+.imessage {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-width: 220px;
+}
+
+.imessage .imsg-contact {
+  font-size: 11px;
+  color: #8a8a8a;
+  font-family: -apple-system, 'DM Sans', sans-serif;
+  padding-left: 4px;
+}
+
+.imessage .imsg-bubble {
+  padding: 10px 14px;
+  border-radius: 18px 18px 18px 4px;
+  font-size: 13px;
+  color: #ffffff;
+  font-family: -apple-system, 'DM Sans', sans-serif;
+  line-height: 1.4;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.imessage.green .imsg-bubble {
+  background: #34C759;
+}
+
+.imessage.blue .imsg-bubble {
+  background: #007AFF;
+}
+
+/* ── TikTok card ───────────────────────────────────────────── */
+.tiktok-card {
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 14px 16px;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.tiktok-card .tt-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tiktok-card .tt-play {
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.tiktok-card .tt-username {
+  font-size: 12px;
+  font-weight: 600;
+  color: #FE2C55;
+  font-family: -apple-system, 'DM Sans', sans-serif;
+}
+
+.tiktok-card .tt-caption {
+  font-size: 13px;
+  color: #ffffff;
+  font-family: -apple-system, 'DM Sans', sans-serif;
+  line-height: 1.4;
+}
+
+/* ── Instagram card ────────────────────────────────────────── */
+.instagram-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 14px 16px;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+  /* Instagram gradient border via outline trick */
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  outline: 2px solid;
+  outline-color: #e6683c;
+}
+
+/* Better Instagram gradient border approach */
+.instagram-card::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  z-index: -1;
+}
+
+.instagram-card {
+  border: none;
+  outline: none;
+}
+
+.instagram-card .ig-username {
+  font-size: 12px;
+  font-weight: 700;
+  color: #000000;
+  font-family: -apple-system, 'DM Sans', sans-serif;
+}
+
+.instagram-card .ig-caption {
+  font-size: 13px;
+  color: #333333;
+  font-family: -apple-system, 'DM Sans', sans-serif;
+  line-height: 1.4;
+}
+
+/* ── Thought bubble ────────────────────────────────────────── */
+.thought {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 14px;
+  padding: 12px 18px;
+  font-size: 14px;
+  font-style: italic;
+  color: #555555;
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  max-width: 240px;
+  line-height: 1.45;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* ── Desktop positions ─────────────────────────────────────── */
+#chaos-doordash  { top: 8%;  left: 5%;   transform: rotate(-4deg); }
+#chaos-boba      { top: 15%; left: 72%;  transform: rotate(3deg);  }
+#chaos-darty     { top: 5%;  left: 38%;  transform: rotate(-2deg); }
+#chaos-onedrink  { top: 28%; left: 80%;  transform: rotate(5deg);  }
+#chaos-bench     { top: 12%; left: 18%;  transform: rotate(-6deg); }
+#chaos-shredded  { top: 30%; left: 60%;  transform: rotate(4deg);  }
+#chaos-mfp       { top: 45%; left: 8%;   transform: rotate(-3deg); }
+#chaos-streak    { top: 42%; left: 50%;  transform: rotate(2deg);  }
+#chaos-midterms  { top: 55%; left: 25%;  transform: rotate(-5deg); }
+#chaos-confused  { top: 20%; left: 45%;  transform: rotate(3deg);  }
+#chaos-girlfriend { top: 48%; left: 70%; transform: rotate(-4deg); }
+#chaos-break     { top: 60%; left: 12%;  transform: rotate(6deg);  }
+
+/* ── Mobile positions (<768px) ─────────────────────────────── */
+@media (max-width: 767px) {
+  #chaos-doordash  { top: 5%;  left: 2%;  transform: rotate(-3deg) scale(0.7); }
+  #chaos-boba      { top: 12%; left: 55%; transform: rotate(2deg) scale(0.7);  }
+  #chaos-darty     { top: 3%;  left: 28%; transform: rotate(-2deg) scale(0.7); }
+  #chaos-onedrink  { top: 22%; left: 65%; transform: rotate(4deg) scale(0.7);  }
+  #chaos-bench     { top: 10%; left: 10%; transform: rotate(-5deg) scale(0.7); }
+  #chaos-shredded  { top: 28%; left: 48%; transform: rotate(3deg) scale(0.7);  }
+  #chaos-mfp       { top: 38%; left: 4%;  transform: rotate(-2deg) scale(0.7); }
+  #chaos-streak    { top: 36%; left: 42%; transform: rotate(2deg) scale(0.7);  }
+  #chaos-midterms  { top: 48%; left: 20%; transform: rotate(-4deg) scale(0.7); }
+  #chaos-confused  { top: 18%; left: 35%; transform: rotate(2deg) scale(0.7);  }
+  #chaos-girlfriend { top: 42%; left: 58%; transform: rotate(-3deg) scale(0.7); }
+  #chaos-break     { top: 55%; left: 8%;  transform: rotate(5deg) scale(0.7);  }
+}
+
+/* ── Logo convergence point ────────────────────────────────── */
+.funnel-logo {
+  position: absolute;
+  top: 65%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -2px;
+  color: #7C6EFF;
+  z-index: 10;
+  font-family: 'DM Sans', sans-serif;
+  pointer-events: none;
+}
+
+.funnel-logo-halo {
+  position: absolute;
+  top: 65%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  width: 0px;
+  height: 0px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(124, 110, 255, 0.12) 0%, transparent 70%);
+  z-index: 9;
+  pointer-events: none;
+}
+
+/* ── Clean card ────────────────────────────────────────────── */
+.clean-card {
+  position: absolute;
+  top: 72%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  width: 380px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 32px 40px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  z-index: 20;
+  /* No-JS fallback: visible by default; GSAP hides then animates in */
+  opacity: 1;
+}
+
+.clean-card-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  color: #1a1a1a;
+  line-height: 2;
+}
+
+.clean-card-line .card-emoji {
+  font-size: 16px;
+  flex-shrink: 0;
+  line-height: 2;
+}
+
+@media (max-width: 767px) {
+  .clean-card {
+    width: 90vw;
+    padding: 24px 20px;
+  }
+}
+
+/* ── Coaching bubbles ──────────────────────────────────────── */
+.clean-bubble {
+  position: absolute;
+  z-index: 20;
+  /* No-JS fallback: visible by default; GSAP hides then animates in */
+  opacity: 1;
+  max-width: 300px;
+}
+
+.bubble-label {
+  font-size: 11px;
+  color: #7C6EFF;
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 6px;
+}
+
+.bubble-desc {
+  color: #999999;
+  font-style: italic;
+}
+
+.bubble-msg {
+  background: #F0F0F0;
+  border-radius: 18px 18px 18px 4px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #1a1a1a;
+  max-width: 280px;
+  line-height: 1.5;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── Desktop bubble positions ──────────────────────────────── */
+#bubble-manny {
+  top: 58%;
+  left: 8%;
+  transform: translateY(-50%);
+}
+
+#bubble-jess {
+  top: 63%;
+  left: 58%;
+  transform: translateY(-50%);
+}
+
+#bubble-james {
+  top: 83%;
+  left: 8%;
+  transform: translateY(-50%);
+}
+
+#bubble-molly {
+  top: 88%;
+  left: 58%;
+  transform: translateY(-50%);
+}
+
+#bubble-alex {
+  top: 93%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+/* ── Mobile bubble positions ────────────────────────────────── */
+@media (max-width: 767px) {
+  .clean-bubble {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    max-width: 100%;
+    margin: 0 auto 16px;
+  }
+
+  .bubble-msg {
+    max-width: 100%;
+  }
+
+  #bubble-manny,
+  #bubble-jess,
+  #bubble-james,
+  #bubble-molly,
+  #bubble-alex {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+  }
+
+  /* On mobile, stack bubbles in a scrollable container */
+  .funnel-sticky .clean-bubbles-mobile {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    max-height: 40vh;
+  }
+}
