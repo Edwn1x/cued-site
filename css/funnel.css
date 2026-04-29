@@ -22,7 +22,7 @@
   top: 0;
   height: 100vh;
   overflow: hidden;
-  background: #7C6EFF;
+  /* background comes from .sf parent */
 }
 
 .funnel-headline {
@@ -38,10 +38,26 @@
   z-index: 5;
   font-family: 'DM Sans', sans-serif;
   pointer-events: none;
+  opacity: 0; /* fades in via JS */
 }
 
 .funnel-headline em {
   font-style: italic;
+}
+
+.funnel-cued {
+  position: absolute;
+  top: 65%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0; /* fades in via JS after chaos converges */
 }
 
 @media (max-width: 767px) {
