@@ -5,7 +5,11 @@
 /* ── Section container ─────────────────────────────────────── */
 #funnel-section {
   position: relative;
-  overflow: hidden;
+}
+
+/* Clip mobile overflow on the sticky container itself, not the section */
+.funnel-sticky {
+  /* overflow:hidden already set below — do not add to #funnel-section */
 }
 
 .funnel-scroll-spacer {
