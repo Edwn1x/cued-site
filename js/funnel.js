@@ -21,7 +21,6 @@
   gsap.set('.funnel-headline', { opacity: 0 });
   gsap.set('.chaos-item', { opacity: 0 });
   gsap.set('.funnel-cued', { opacity: 0 });
-  gsap.set(['.clean-card', '.clean-bubble'], { opacity: 0, scale: 0.95 });
 
   function clamp01(v) { return Math.max(0, Math.min(1, v)); }
   function prog(p, a, b) { return clamp01((p - a) / (b - a)); }
@@ -73,23 +72,8 @@
           });
         });
 
-        // ── "cued": fades in 75–85% ───────────────────────────────
-        gsap.set('.funnel-cued', { opacity: ease(prog(p, 0.75, 0.85)) });
-
-        // ── Clean card: fades in 85–90% ───────────────────────────
-        var cardP = ease(prog(p, 0.85, 0.90));
-        gsap.set('.clean-card', { opacity: cardP, scale: lerp(0.9, 1, cardP) });
-
-        // ── Bubbles: stagger 90–100% ──────────────────────────────
-        var ids = ['#bubble-manny','#bubble-jess','#bubble-james','#bubble-molly','#bubble-alex'];
-        ids.forEach(function (id, i) {
-          var bP = ease(prog(p, 0.90 + i * 0.02, 0.92 + i * 0.02));
-          gsap.set(id, {
-            opacity: bP,
-            x: ((i % 2 === 0) ? -16 : 16) * (1 - bP),
-            scale: lerp(0.95, 1, bP),
-          });
-        });
+        // ── "cued": fades in 75–90% ───────────────────────────────
+        gsap.set('.funnel-cued', { opacity: ease(prog(p, 0.75, 0.90)) });
       }
     });
   }
