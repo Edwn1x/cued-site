@@ -28,7 +28,7 @@
 
   // Hide all animated elements on init
   gsap.set('#fh-broken, #fh-phone, #fh-coached, #fh-none', { opacity: 0, y: 0 });
-  gsap.set('#fh-cued, #fh-changes', { opacity: 0 });
+  gsap.set('#fh-cued', { opacity: 0 });
   gsap.set('.chaos-item', { opacity: 0 });
 
   function clamp01(v) { return Math.max(0, Math.min(1, v)); }
@@ -43,17 +43,11 @@
     var sW = sticky.offsetWidth;
     var sH = sticky.offsetHeight;
 
-    // Chaos items sit in the bottom 40% of the viewport initially
-    // Their natural CSS positions are in the top half, so we pre-offset them down
+    // Convergence target: center of viewport
+    var cx = sW * 0.5;
+    var cy = sH * 0.5;
     var items = gsap.utils.toArray('.chaos-item');
     items.forEach(function (item) {
-      // shift each item down so it sits in the bottom half
-      var naturalCY = item.offsetTop + item.offsetHeight / 2;
-      var targetCY  = sH * 0.75 + (naturalCY / sH - 0.5) * sH * 0.40;
-      item._shiftY  = targetCY - naturalCY;
-      // convergence target = center of viewport
-      var cx = sW * 0.5;
-      var cy = sH * 0.5;
       item._dx = cx - (item.offsetLeft + item.offsetWidth / 2);
       item._dy = cy - (item.offsetTop + item.offsetHeight / 2);
     });
@@ -80,7 +74,7 @@
         items.forEach(function (item) {
           gsap.set(item, {
             opacity: chaosIn * (1 - chaosOut),
-            y: item._shiftY * (1 - chaosIn) + lerp(0, -60, chaosOut),
+            y: lerp(0, -60, chaosOut),
           });
         });
 
@@ -110,8 +104,7 @@
 
         // ── Beat 5: "— cued —" + "changes that." ─────────────────
         var b5in = ease(prog(p, 0.86, 0.94));
-        gsap.set('#fh-cued',    { opacity: b5in });
-        gsap.set('#fh-changes', { opacity: ease(prog(p, 0.89, 0.97)) });
+        gsap.set('#fh-cued', { opacity: b5in });
       }
     });
   }

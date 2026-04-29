@@ -86,34 +86,51 @@
   #fh-phone, #fh-coached, #fh-none { font-size: clamp(24px, 7vw, 40px); letter-spacing: -1px; }
 }
 
-.funnel-cued {
+/* Cued beat — wrapper centers both word + tagline together */
+.funnel-cued-wrap {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translateX(-50%) translateY(-60%);
-  font-size: clamp(48px, 8vw, 96px);
-  font-weight: 700;
-  letter-spacing: -3px;
-  color: #fff;
-  font-family: 'DM Sans', sans-serif;
+  transform: translateX(-50%) translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
   z-index: 10;
   pointer-events: none;
   opacity: 0;
 }
 
-.funnel-changes {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translateX(-50%) translateY(20%);
-  font-size: clamp(20px, 3vw, 32px);
-  font-weight: 400;
-  letter-spacing: -.5px;
-  color: rgba(255,255,255,0.7);
+/* "cued" with thin lines either side */
+.funnel-cued-word {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: clamp(48px, 8vw, 96px);
+  font-weight: 700;
+  letter-spacing: -3px;
+  color: #fff;
   font-family: 'DM Sans', sans-serif;
-  z-index: 10;
-  pointer-events: none;
-  opacity: 0;
+  white-space: nowrap;
+}
+
+.funnel-cued-word::before,
+.funnel-cued-word::after {
+  content: '';
+  display: block;
+  width: clamp(40px, 6vw, 80px);
+  height: 2px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 2px;
+}
+
+/* "changes that." sits below */
+.funnel-changes {
+  font-size: clamp(18px, 2.5vw, 28px);
+  font-weight: 300;
+  letter-spacing: 0;
+  color: rgba(255,255,255,0.75);
+  font-family: 'DM Sans', sans-serif;
   font-style: italic;
 }
 
@@ -321,38 +338,34 @@
   border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
-/* ── Desktop positions ─────────────────────────────────────── */
-#chaos-doordash  { top: 8%;  left: 5%;   transform: rotate(-4deg); }
-#chaos-boba      { top: 15%; left: 72%;  transform: rotate(3deg);  }
-#chaos-darty     { top: 5%;  left: 38%;  transform: rotate(-2deg); }
-#chaos-onedrink  { top: 28%; left: 80%;  transform: rotate(5deg);  }
-#chaos-bench     { top: 12%; left: 18%;  transform: rotate(-6deg); }
-#chaos-shredded  { top: 30%; left: 60%;  transform: rotate(4deg);  }
-#chaos-mfp       { top: 45%; left: 8%;   transform: rotate(-3deg); }
-#chaos-streak    { top: 42%; left: 50%;  transform: rotate(2deg);  }
-#chaos-midterms  { top: 55%; left: 25%;  transform: rotate(-5deg); }
-#chaos-confused  { top: 20%; left: 45%;  transform: rotate(3deg);  }
-#chaos-girlfriend { top: 48%; left: 70%; transform: rotate(-4deg); }
-#chaos-break     { top: 60%; left: 12%;  transform: rotate(6deg);  }
+/* ── Desktop positions — all in bottom half so headline has clear space ── */
+#chaos-doordash  { top: 52%; left: 5%;   transform: rotate(-4deg); }
+#chaos-boba      { top: 55%; left: 72%;  transform: rotate(3deg);  }
+#chaos-darty     { top: 48%; left: 38%;  transform: rotate(-2deg); }
+#chaos-onedrink  { top: 62%; left: 80%;  transform: rotate(5deg);  }
+#chaos-bench     { top: 50%; left: 18%;  transform: rotate(-6deg); }
+#chaos-shredded  { top: 65%; left: 58%;  transform: rotate(4deg);  }
+#chaos-mfp       { top: 70%; left: 6%;   transform: rotate(-3deg); }
+#chaos-streak    { top: 68%; left: 46%;  transform: rotate(2deg);  }
+#chaos-midterms  { top: 78%; left: 22%;  transform: rotate(-5deg); }
+#chaos-confused  { top: 58%; left: 42%;  transform: rotate(3deg);  }
+#chaos-girlfriend { top: 74%; left: 66%; transform: rotate(-4deg); }
+#chaos-break     { top: 82%; left: 10%;  transform: rotate(6deg);  }
 
-/* ── Mobile positions (<768px) — kept inside safe zone ─────── */
+/* ── Mobile positions — all in bottom half ──────────────────── */
 @media (max-width: 767px) {
-  /* Notifications are 280px wide at scale 0.7 = 196px — left max safe: calc(100% - 196px) */
-  #chaos-doordash  { top: 4%;  left: 2%;   transform: rotate(-3deg) scale(0.7); transform-origin: top left; }
-  #chaos-mfp       { top: 38%; left: 2%;   transform: rotate(-2deg) scale(0.7); transform-origin: top left; }
-  /* iMessage bubbles 220px at 0.7 = 154px */
-  #chaos-boba      { top: 10%; left: 48%;  transform: rotate(2deg) scale(0.7);  transform-origin: top left; }
-  #chaos-darty     { top: 3%;  left: 24%;  transform: rotate(-2deg) scale(0.7); transform-origin: top left; }
-  #chaos-onedrink  { top: 22%; left: 52%;  transform: rotate(4deg) scale(0.7);  transform-origin: top left; }
-  /* TikTok/IG cards 200px at 0.7 = 140px */
-  #chaos-bench     { top: 9%;  left: 8%;   transform: rotate(-5deg) scale(0.7); transform-origin: top left; }
-  #chaos-shredded  { top: 28%; left: 44%;  transform: rotate(3deg) scale(0.7);  transform-origin: top left; }
-  /* Thoughts max 240px at 0.7 = 168px */
-  #chaos-streak    { top: 34%; left: 38%;  transform: rotate(2deg) scale(0.7);  transform-origin: top left; }
-  #chaos-midterms  { top: 47%; left: 16%;  transform: rotate(-4deg) scale(0.7); transform-origin: top left; }
-  #chaos-confused  { top: 17%; left: 30%;  transform: rotate(2deg) scale(0.7);  transform-origin: top left; }
-  #chaos-girlfriend { top: 42%; left: 44%; transform: rotate(-3deg) scale(0.7); transform-origin: top left; }
-  #chaos-break     { top: 55%; left: 6%;   transform: rotate(5deg) scale(0.7);  transform-origin: top left; }
+  #chaos-doordash  { top: 50%; left: 2%;   transform: rotate(-3deg) scale(0.7); transform-origin: top left; }
+  #chaos-mfp       { top: 68%; left: 2%;   transform: rotate(-2deg) scale(0.7); transform-origin: top left; }
+  #chaos-boba      { top: 54%; left: 46%;  transform: rotate(2deg) scale(0.7);  transform-origin: top left; }
+  #chaos-darty     { top: 46%; left: 24%;  transform: rotate(-2deg) scale(0.7); transform-origin: top left; }
+  #chaos-onedrink  { top: 62%; left: 50%;  transform: rotate(4deg) scale(0.7);  transform-origin: top left; }
+  #chaos-bench     { top: 48%; left: 6%;   transform: rotate(-5deg) scale(0.7); transform-origin: top left; }
+  #chaos-shredded  { top: 72%; left: 42%;  transform: rotate(3deg) scale(0.7);  transform-origin: top left; }
+  #chaos-streak    { top: 64%; left: 36%;  transform: rotate(2deg) scale(0.7);  transform-origin: top left; }
+  #chaos-midterms  { top: 78%; left: 14%;  transform: rotate(-4deg) scale(0.7); transform-origin: top left; }
+  #chaos-confused  { top: 56%; left: 28%;  transform: rotate(2deg) scale(0.7);  transform-origin: top left; }
+  #chaos-girlfriend { top: 74%; left: 44%; transform: rotate(-3deg) scale(0.7); transform-origin: top left; }
+  #chaos-break     { top: 84%; left: 4%;   transform: rotate(5deg) scale(0.7);  transform-origin: top left; }
 }
 
 /* ── Clean side — flows below sticky, normal document flow ──── */
