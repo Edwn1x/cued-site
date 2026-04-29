@@ -62,7 +62,7 @@
 
 /* Beat 2 — "This is your phone right now." — top of viewport, above chaos */
 #fh-phone {
-  top: 14%;
+  top: 22%;
   font-size: clamp(28px, 4vw, 52px);
   font-weight: 700;
   letter-spacing: -2px;
@@ -345,34 +345,42 @@
   border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
-/* ── Desktop positions — all in bottom half so headline has clear space ── */
-#chaos-doordash  { top: 52%; left: 5%;   transform: rotate(-4deg); }
-#chaos-boba      { top: 55%; left: 72%;  transform: rotate(3deg);  }
-#chaos-darty     { top: 48%; left: 38%;  transform: rotate(-2deg); }
-#chaos-onedrink  { top: 62%; left: 80%;  transform: rotate(5deg);  }
-#chaos-bench     { top: 50%; left: 18%;  transform: rotate(-6deg); }
-#chaos-shredded  { top: 65%; left: 58%;  transform: rotate(4deg);  }
-#chaos-mfp       { top: 70%; left: 6%;   transform: rotate(-3deg); }
-#chaos-streak    { top: 68%; left: 46%;  transform: rotate(2deg);  }
-#chaos-midterms  { top: 78%; left: 22%;  transform: rotate(-5deg); }
-#chaos-confused  { top: 58%; left: 42%;  transform: rotate(3deg);  }
-#chaos-girlfriend { top: 74%; left: 66%; transform: rotate(-4deg); }
-#chaos-break     { top: 82%; left: 10%;  transform: rotate(6deg);  }
+/* ── Desktop positions — spread across full viewport ── */
+/* Wave 1 — corners/edges, appear first */
+#chaos-doordash  { top: 38%; left: 2%;   transform: rotate(-4deg); }
+#chaos-boba      { top: 32%; left: 71%;  transform: rotate(3deg);  }
+#chaos-bench     { top: 60%; left: 1%;   transform: rotate(-6deg); }
+/* Wave 2 — mid-sides */
+#chaos-darty     { top: 55%; left: 68%;  transform: rotate(-2deg); }
+#chaos-mfp       { top: 72%; left: 4%;   transform: rotate(-3deg); }
+#chaos-onedrink  { top: 44%; left: 80%;  transform: rotate(5deg);  }
+/* Wave 3 — spread inward */
+#chaos-shredded  { top: 78%; left: 62%;  transform: rotate(4deg);  }
+#chaos-streak    { top: 50%; left: 55%;  transform: rotate(2deg);  }
+#chaos-girlfriend{ top: 82%; left: 30%;  transform: rotate(-4deg); }
+/* Wave 4 — final fill-in across center */
+#chaos-confused  { top: 40%; left: 36%;  transform: rotate(3deg);  }
+#chaos-midterms  { top: 65%; left: 22%;  transform: rotate(-5deg); }
+#chaos-break     { top: 85%; left: 48%;  transform: rotate(6deg);  }
 
-/* ── Mobile positions — all in bottom half ──────────────────── */
+/* ── Mobile positions — spread across full viewport ─────────── */
 @media (max-width: 767px) {
-  #chaos-doordash  { top: 50%; left: 2%;   transform: rotate(-3deg) scale(0.7); transform-origin: top left; }
-  #chaos-mfp       { top: 68%; left: 2%;   transform: rotate(-2deg) scale(0.7); transform-origin: top left; }
-  #chaos-boba      { top: 54%; left: 46%;  transform: rotate(2deg) scale(0.7);  transform-origin: top left; }
-  #chaos-darty     { top: 46%; left: 24%;  transform: rotate(-2deg) scale(0.7); transform-origin: top left; }
-  #chaos-onedrink  { top: 62%; left: 50%;  transform: rotate(4deg) scale(0.7);  transform-origin: top left; }
-  #chaos-bench     { top: 48%; left: 6%;   transform: rotate(-5deg) scale(0.7); transform-origin: top left; }
-  #chaos-shredded  { top: 72%; left: 42%;  transform: rotate(3deg) scale(0.7);  transform-origin: top left; }
-  #chaos-streak    { top: 64%; left: 36%;  transform: rotate(2deg) scale(0.7);  transform-origin: top left; }
-  #chaos-midterms  { top: 78%; left: 14%;  transform: rotate(-4deg) scale(0.7); transform-origin: top left; }
-  #chaos-confused  { top: 56%; left: 28%;  transform: rotate(2deg) scale(0.7);  transform-origin: top left; }
-  #chaos-girlfriend { top: 74%; left: 44%; transform: rotate(-3deg) scale(0.7); transform-origin: top left; }
-  #chaos-break     { top: 84%; left: 4%;   transform: rotate(5deg) scale(0.7);  transform-origin: top left; }
+  /* Wave 1 */
+  #chaos-doordash  { top: 36%; left: 1%;   transform: rotate(-3deg) scale(0.7); transform-origin: top left; }
+  #chaos-boba      { top: 30%; left: 48%;  transform: rotate(2deg) scale(0.7);  transform-origin: top left; }
+  #chaos-bench     { top: 58%; left: 1%;   transform: rotate(-5deg) scale(0.7); transform-origin: top left; }
+  /* Wave 2 */
+  #chaos-darty     { top: 52%; left: 46%;  transform: rotate(-2deg) scale(0.7); transform-origin: top left; }
+  #chaos-mfp       { top: 70%; left: 2%;   transform: rotate(-2deg) scale(0.7); transform-origin: top left; }
+  #chaos-onedrink  { top: 42%; left: 54%;  transform: rotate(4deg) scale(0.7);  transform-origin: top left; }
+  /* Wave 3 */
+  #chaos-shredded  { top: 76%; left: 42%;  transform: rotate(3deg) scale(0.7);  transform-origin: top left; }
+  #chaos-streak    { top: 48%; left: 26%;  transform: rotate(2deg) scale(0.7);  transform-origin: top left; }
+  #chaos-girlfriend { top: 80%; left: 22%; transform: rotate(-3deg) scale(0.7); transform-origin: top left; }
+  /* Wave 4 */
+  #chaos-confused  { top: 38%; left: 20%;  transform: rotate(2deg) scale(0.7);  transform-origin: top left; }
+  #chaos-midterms  { top: 64%; left: 14%;  transform: rotate(-4deg) scale(0.7); transform-origin: top left; }
+  #chaos-break     { top: 86%; left: 38%;  transform: rotate(5deg) scale(0.7);  transform-origin: top left; }
 }
 
 /* ── Clean side — flows below sticky, normal document flow ──── */
