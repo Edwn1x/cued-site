@@ -420,35 +420,35 @@
 #chaos-sleep       { top: 42%; left: 14%;  transform: rotate(-6deg); z-index: 2; }
 #chaos-rsf         { top: 86%; left: 68%;  transform: rotate(3deg);  z-index: 3; }
 
-/* ── Mobile positions — scaled down, same spread ────────────── */
+/* ── Mobile positions — scaled down, capped to prevent overflow ── */
 @media (max-width: 767px) {
   #chaos-doordash    { top: 33%; left: 1%;   transform: rotate(-3deg) scale(0.72); transform-origin: top left; }
-  #chaos-boba        { top: 27%; left: 46%;  transform: rotate(2deg)  scale(0.72); transform-origin: top left; }
+  #chaos-boba        { top: 27%; left: 38%;  transform: rotate(2deg)  scale(0.72); transform-origin: top left; }
   #chaos-mfp         { top: 66%; left: 1%;   transform: rotate(-2deg) scale(0.72); transform-origin: top left; }
-  #chaos-bench       { top: 36%; left: 50%;  transform: rotate(-5deg) scale(0.72); transform-origin: top left; }
-  #chaos-confused    { top: 54%; left: 44%;  transform: rotate(3deg)  scale(0.72); transform-origin: top left; }
-  #chaos-shredded    { top: 72%; left: 42%;  transform: rotate(4deg)  scale(0.72); transform-origin: top left; }
+  #chaos-bench       { top: 36%; left: 40%;  transform: rotate(-5deg) scale(0.72); transform-origin: top left; }
+  #chaos-confused    { top: 54%; left: 36%;  transform: rotate(3deg)  scale(0.72); transform-origin: top left; }
+  #chaos-shredded    { top: 72%; left: 34%;  transform: rotate(4deg)  scale(0.72); transform-origin: top left; }
   #chaos-darty       { top: 42%; left: 2%;   transform: rotate(-4deg) scale(0.72); transform-origin: top left; }
-  #chaos-stat-apps   { top: 60%; left: 50%;  transform: rotate(2deg)  scale(0.72); transform-origin: top left; }
+  #chaos-stat-apps   { top: 60%; left: 40%;  transform: rotate(2deg)  scale(0.72); transform-origin: top left; }
   #chaos-midterms    { top: 78%; left: 8%;   transform: rotate(-3deg) scale(0.72); transform-origin: top left; }
-  #chaos-onedrink    { top: 30%; left: 28%;  transform: rotate(5deg)  scale(0.72); transform-origin: top left; }
+  #chaos-onedrink    { top: 30%; left: 24%;  transform: rotate(5deg)  scale(0.72); transform-origin: top left; }
   #chaos-stat-streak { top: 50%; left: 10%;  transform: rotate(-6deg) scale(0.72); transform-origin: top left; }
   #chaos-bulkcut     { top: 68%; left: 24%;  transform: rotate(3deg)  scale(0.72); transform-origin: top left; }
-  #chaos-stat-watch  { top: 82%; left: 44%;  transform: rotate(-4deg) scale(0.72); transform-origin: top left; }
-  #chaos-ubereats    { top: 44%; left: 36%;  transform: rotate(-2deg) scale(0.72); transform-origin: top left; }
+  #chaos-stat-watch  { top: 82%; left: 36%;  transform: rotate(-4deg) scale(0.72); transform-origin: top left; }
+  #chaos-ubereats    { top: 44%; left: 30%;  transform: rotate(-2deg) scale(0.72); transform-origin: top left; }
   #chaos-break       { top: 86%; left: 18%;  transform: rotate(6deg)  scale(0.72); transform-origin: top left; }
   #chaos-groupchat   { top: 38%; left: 16%;  transform: rotate(-7deg) scale(0.65); transform-origin: top left; }
   #chaos-snap        { top: 56%; left: 3%;   transform: rotate(5deg)  scale(0.65); transform-origin: top left; }
   #chaos-reddit      { top: 28%; left: 14%;  transform: rotate(-3deg) scale(0.65); transform-origin: top left; }
-  #chaos-youtube     { top: 74%; left: 48%;  transform: rotate(4deg)  scale(0.65); transform-origin: top left; }
-  #chaos-tiktok2     { top: 46%; left: 52%;  transform: rotate(-8deg) scale(0.65); transform-origin: top left; }
-  #chaos-igdm        { top: 62%; left: 54%;  transform: rotate(3deg)  scale(0.65); transform-origin: top left; }
-  #chaos-watch       { top: 34%; left: 40%;  transform: rotate(-5deg) scale(0.65); transform-origin: top left; }
-  #chaos-venmo       { top: 80%; left: 32%;  transform: rotate(7deg)  scale(0.65); transform-origin: top left; }
+  #chaos-youtube     { top: 74%; left: 38%;  transform: rotate(4deg)  scale(0.65); transform-origin: top left; }
+  #chaos-tiktok2     { top: 46%; left: 42%;  transform: rotate(-8deg) scale(0.65); transform-origin: top left; }
+  #chaos-igdm        { top: 62%; left: 40%;  transform: rotate(3deg)  scale(0.65); transform-origin: top left; }
+  #chaos-watch       { top: 34%; left: 32%;  transform: rotate(-5deg) scale(0.65); transform-origin: top left; }
+  #chaos-venmo       { top: 80%; left: 30%;  transform: rotate(7deg)  scale(0.65); transform-origin: top left; }
   #chaos-trainer     { top: 52%; left: 22%;  transform: rotate(-4deg) scale(0.65); transform-origin: top left; }
   #chaos-midterm-cal { top: 70%; left: 10%;  transform: rotate(5deg)  scale(0.65); transform-origin: top left; }
   #chaos-sleep       { top: 40%; left: 6%;   transform: rotate(-6deg) scale(0.65); transform-origin: top left; }
-  #chaos-rsf         { top: 84%; left: 56%;  transform: rotate(3deg)  scale(0.65); transform-origin: top left; }
+  #chaos-rsf         { top: 84%; left: 42%;  transform: rotate(3deg)  scale(0.65); transform-origin: top left; }
 }
 
 /* ── Clean side — flows below sticky, normal document flow ──── */
