@@ -14,7 +14,8 @@
 
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(24px,5vw,64px);background:transparent;border-bottom:none}
-.nv-logo{font-size:18px;font-weight:600;letter-spacing:-.5px;color:var(--text);opacity:1;transform:translateY(0);transition:opacity .4s,transform .4s,color .4s;pointer-events:auto;margin-left:24px}
+.nv-logo{font-size:18px;font-weight:600;letter-spacing:-.5px;color:var(--text);opacity:1;transform:translateY(0);transition:opacity .4s,transform .4s,color .4s;pointer-events:auto;margin-left:24px;display:flex;align-items:center;gap:8px}
+.nv-logo-icon{width:26px;height:26px;flex-shrink:0}
 .nv-logo.show{opacity:1;transform:translateY(0);pointer-events:auto}
 .nv-logo.light{color:var(--accent)}
 .nv-r{display:flex;gap:28px;align-items:center;transition:gap .5s cubic-bezier(.16,1,.3,1)}
@@ -410,7 +411,13 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
 <body>
 
 <nav>
-  <div class="nv-logo" id="navLogo">cued</div>
+  <div class="nv-logo" id="navLogo">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" class="nv-logo-icon" aria-hidden="true">
+      <rect width="32" height="32" rx="4" fill="currentColor" fill-opacity="0.08"/>
+      <path d="M21 9.5L12.5 9.5C10 9.5 8 11.5 8 14v4c0 2.5 2 4.5 4.5 4.5H21" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter"/>
+    </svg>
+    cued
+  </div>
   <div class="nv-r">
     <a href="#how-it-works">How it works</a>
     <a href="#highlights">Highlights</a>
