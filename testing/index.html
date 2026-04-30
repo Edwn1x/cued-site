@@ -70,9 +70,9 @@ nav {
   inset: 0;
   width: 100%; height: 100%;
   object-fit: cover;
-  /* Dark + desaturated so phone and text pop */
   filter: brightness(0.28) contrast(1.1) saturate(0.6);
   z-index: 0;
+  transition: opacity 1.5s ease;
 }
 
 /* Gradient overlays on top of video */
@@ -556,8 +556,11 @@ nav {
 
 <section class="hero">
 
-  <video class="hero-video" autoplay muted loop playsinline>
+  <video class="hero-video" id="hv1" autoplay muted playsinline>
     <source src="https://videos.pexels.com/video-files/4859758/4859758-hd_1920_1080_25fps.mp4" type="video/mp4">
+  </video>
+  <video class="hero-video" id="hv2" muted playsinline style="opacity:0">
+    <source src="https://videos.pexels.com/video-files/3125907/3125907-hd_1920_1080_25fps.mp4" type="video/mp4">
   </video>
 
   <div class="hero-left">
@@ -659,5 +662,29 @@ nav {
   </div>
 </section>
 
+<script>
+(function () {
+  var v1 = document.getElementById('hv1');
+  var v2 = document.getElementById('hv2');
+  var active = v1;
+  var next = v2;
+
+  // Preload second video
+  v2.load();
+
+  function crossfade() {
+    next.currentTime = 0;
+    next.play();
+    next.style.opacity = '1';
+    active.style.opacity = '0';
+    var tmp = active;
+    active = next;
+    next = tmp;
+  }
+
+  v1.addEventListener('ended', crossfade);
+  v2.addEventListener('ended', crossfade);
+}());
+</script>
 </body>
 </html>
