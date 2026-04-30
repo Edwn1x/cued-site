@@ -30,7 +30,6 @@ nav {
   align-items: center;
   justify-content: space-between;
 }
-
 .nv-logo {
   font-size: 17px;
   font-weight: 600;
@@ -42,7 +41,6 @@ nav {
   text-decoration: none;
 }
 .nv-logo svg { width: 24px; height: 24px; }
-
 .nv-signup {
   background: #fff;
   color: #080809;
@@ -55,36 +53,32 @@ nav {
 }
 .nv-signup:hover { opacity: .85; }
 
-/* ── Hero — full viewport ── */
+/* ── Hero ── */
 .hero {
   min-height: 100vh;
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: center;
-  gap: 0;
   padding: 0 clamp(32px, 7vw, 100px);
   position: relative;
   overflow: hidden;
 }
-
-/* Subtle dark vignette radial */
 .hero::before {
   content: '';
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 60% 80% at 20% 50%, rgba(124,58,255,0.06) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 60% at 80% 50%, rgba(0,0,0,0.4) 0%, transparent 80%);
+    radial-gradient(ellipse 55% 70% at 15% 50%, rgba(124,58,255,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 85% 50%, rgba(0,0,0,0.5) 0%, transparent 80%);
   pointer-events: none;
 }
 
-/* ── Left: headline + CTA ── */
+/* ── Left ── */
 .hero-left {
   position: relative;
   z-index: 2;
   padding-right: clamp(32px, 4vw, 80px);
 }
-
 .hero-headline {
   font-family: 'Playfair Display', Georgia, serif;
   font-size: clamp(44px, 6vw, 82px);
@@ -94,12 +88,10 @@ nav {
   color: #fff;
   margin-bottom: 40px;
 }
-
 .hero-headline em {
   font-style: italic;
-  color: rgba(255,255,255,0.75);
+  color: rgba(255,255,255,0.7);
 }
-
 .hero-cta {
   display: inline-flex;
   align-items: center;
@@ -114,241 +106,423 @@ nav {
   transition: background .2s, transform .2s;
 }
 .hero-cta:hover { background: #6B2EE6; transform: translateY(-1px); }
-
 .hero-cta-icon {
-  width: 28px;
-  height: 28px;
+  width: 28px; height: 28px;
   background: rgba(255,255,255,0.2);
   border-radius: 7px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
 }
-
 .hero-sub {
   margin-top: 20px;
   font-size: 13px;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.32);
   font-weight: 300;
-  letter-spacing: .01em;
 }
 
-/* ── Right: iPhone mockup ── */
+/* ── Right ── */
 .hero-right {
   position: relative;
   z-index: 2;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 80px 0;
 }
 
-.phone-wrap {
+/* ════════════════════════════════════════════
+   HYPERREALISTIC iPHONE 15 PRO
+   ════════════════════════════════════════════ */
+.iphone {
   position: relative;
-  width: clamp(260px, 28vw, 360px);
-}
-
-/* iPhone shell */
-.phone-shell {
-  width: 100%;
+  width: clamp(240px, 26vw, 340px);
+  /* 9:19.5 ratio */
   aspect-ratio: 9 / 19.5;
-  background: #1a1a1c;
-  border-radius: clamp(36px, 5vw, 52px);
-  border: 1.5px solid rgba(255,255,255,0.12);
-  position: relative;
+  /* Slight perspective tilt */
+  transform: perspective(1200px) rotateY(-6deg) rotateX(2deg);
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 60px 80px rgba(0,0,0,0.8)) drop-shadow(0 0 40px rgba(124,58,255,0.18));
+}
+
+/* Titanium outer frame — the physical chassis */
+.iphone-frame {
+  position: absolute;
+  inset: 0;
+  border-radius: clamp(38px, 5.5vw, 54px);
+  /* Titanium brushed gradient */
+  background: linear-gradient(
+    160deg,
+    #c8c8ca 0%,
+    #a0a0a2 15%,
+    #7a7a7c 30%,
+    #5c5c5e 45%,
+    #6e6e70 55%,
+    #9a9a9c 70%,
+    #b8b8ba 82%,
+    #888 100%
+  );
+  padding: 3px; /* frame thickness */
+}
+
+/* Glass back / screen surround */
+.iphone-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: calc(clamp(38px, 5.5vw, 54px) - 3px);
+  background: #000;
   overflow: hidden;
-  box-shadow:
-    0 0 0 1px rgba(0,0,0,0.8),
-    0 40px 100px rgba(0,0,0,0.7),
-    0 0 60px rgba(124,58,255,0.12),
-    inset 0 1px 0 rgba(255,255,255,0.08);
+  position: relative;
+}
+
+/* Specular highlight — top-left sheen on frame */
+.iphone-frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.55) 0%,
+    rgba(255,255,255,0.1) 20%,
+    transparent 45%,
+    rgba(255,255,255,0.04) 75%,
+    rgba(255,255,255,0.12) 100%
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Screen glass glare overlay */
+.iphone-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    145deg,
+    rgba(255,255,255,0.06) 0%,
+    rgba(255,255,255,0.02) 30%,
+    transparent 60%
+  );
+  z-index: 50;
+  pointer-events: none;
+}
+
+/* Side buttons — power button right */
+.iphone-btn-power {
+  position: absolute;
+  right: -4px;
+  top: 28%;
+  width: 3.5px;
+  height: 14%;
+  background: linear-gradient(to right, #6a6a6c, #9a9a9c, #7a7a7c);
+  border-radius: 0 2px 2px 0;
+  z-index: 20;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+/* Volume buttons left */
+.iphone-btn-vol-up {
+  position: absolute;
+  left: -4px;
+  top: 20%;
+  width: 3.5px;
+  height: 9%;
+  background: linear-gradient(to left, #6a6a6c, #9a9a9c, #7a7a7c);
+  border-radius: 2px 0 0 2px;
+  z-index: 20;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+}
+.iphone-btn-vol-down {
+  position: absolute;
+  left: -4px;
+  top: 31%;
+  width: 3.5px;
+  height: 9%;
+  background: linear-gradient(to left, #6a6a6c, #9a9a9c, #7a7a7c);
+  border-radius: 2px 0 0 2px;
+  z-index: 20;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+/* Action button (mute toggle) — smaller, above vol up */
+.iphone-btn-action {
+  position: absolute;
+  left: -4px;
+  top: 13%;
+  width: 3.5px;
+  height: 5%;
+  background: linear-gradient(to left, #6a6a6c, #9a9a9c, #7a7a7c);
+  border-radius: 2px 0 0 2px;
+  z-index: 20;
+}
+
+/* ── Screen content ── */
+.screen {
+  position: absolute;
+  inset: 3px; /* inside frame padding */
+  border-radius: calc(clamp(38px, 5.5vw, 54px) - 3px);
+  background: #000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Status bar */
-.phone-status {
+.s-status {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 24px 0;
-  font-size: 12px;
-  font-weight: 600;
+  padding: 14px 22px 4px;
+  flex-shrink: 0;
+}
+.s-time {
+  font-size: 13px;
+  font-weight: 700;
   color: #fff;
   font-family: -apple-system, sans-serif;
+  letter-spacing: -.3px;
 }
-.phone-status-right {
+.s-icons {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 11px;
 }
-.status-bar-icon {
-  width: 16px;
-  height: 8px;
-  border: 1.5px solid #fff;
-  border-radius: 2px;
-  position: relative;
+.s-signal {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5px;
+  height: 10px;
 }
-.status-bar-icon::after {
-  content: '';
-  position: absolute;
-  left: 1.5px; top: 1.5px;
-  width: 60%;
-  height: calc(100% - 3px);
+.s-signal span {
+  width: 2.5px;
   background: #fff;
   border-radius: 1px;
 }
+.s-signal span:nth-child(1) { height: 30%; opacity: .4; }
+.s-signal span:nth-child(2) { height: 55%; opacity: .6; }
+.s-signal span:nth-child(3) { height: 80%; }
+.s-signal span:nth-child(4) { height: 100%; }
+
+.s-wifi {
+  width: 14px;
+  height: 10px;
+  position: relative;
+}
+.s-wifi::before, .s-wifi::after, .s-wifi-dot {
+  position: absolute;
+  border: 1.5px solid #fff;
+  border-radius: 50%;
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+  transform: rotate(-45deg);
+}
+.s-wifi::before {
+  content: '';
+  width: 12px; height: 12px;
+  top: -1px; left: 1px;
+  opacity: .5;
+}
+.s-wifi::after {
+  content: '';
+  width: 7px; height: 7px;
+  top: 1.5px; left: 3.5px;
+  opacity: .8;
+}
+.s-wifi-dot {
+  width: 3px; height: 3px;
+  background: #fff;
+  border: none;
+  border-radius: 50%;
+  bottom: 0; left: 5.5px;
+  transform: none;
+}
+
+.s-battery {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+.s-battery-body {
+  width: 22px; height: 11px;
+  border: 1.5px solid rgba(255,255,255,0.55);
+  border-radius: 3px;
+  padding: 1.5px;
+  position: relative;
+}
+.s-battery-fill {
+  width: 55%;
+  height: 100%;
+  background: #fff;
+  border-radius: 1.5px;
+}
+.s-battery-tip {
+  width: 2px; height: 5px;
+  background: rgba(255,255,255,0.55);
+  border-radius: 0 1px 1px 0;
+}
 
 /* Dynamic island */
-.phone-island {
-  width: 32%;
-  height: 28px;
+.s-island {
+  width: 33%;
+  height: 30px;
   background: #000;
   border-radius: 20px;
-  margin: 6px auto 0;
+  margin: 4px auto 0;
+  flex-shrink: 0;
+  position: relative;
+  /* subtle inner edge */
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.06), inset 0 1px 3px rgba(0,0,0,0.8);
 }
 
-/* iMessage conversation header */
-.imsg-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 12px 0 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-
-.imsg-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: #7C3AFF;
+/* iMessage nav bar */
+.s-imsg-nav {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 6px;
-  font-family: -apple-system, sans-serif;
+  flex-direction: column;
+  padding: 10px 0 8px;
+  border-bottom: 0.5px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
 }
-
-.imsg-name {
-  font-size: 13px;
+.s-imsg-back {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  color: #007AFF;
+  font-family: -apple-system, sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.s-imsg-nav-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.s-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7C3AFF, #A78BFA);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; font-weight: 700; color: #fff;
+  font-family: -apple-system, sans-serif;
+  flex-shrink: 0;
+}
+.s-contact-name {
+  font-size: 12px;
   font-weight: 600;
   color: #fff;
   font-family: -apple-system, sans-serif;
-  display: flex;
-  align-items: center;
-  gap: 3px;
+  display: flex; align-items: center; gap: 2px;
 }
-.imsg-name::after {
+.s-contact-name::after {
   content: '›';
-  color: rgba(255,255,255,0.4);
-  font-size: 14px;
+  color: rgba(255,255,255,0.35);
+  font-size: 13px;
 }
 
-/* Conversation area */
-.imsg-body {
-  padding: 12px 14px;
+/* Messages */
+.s-msgs {
+  flex: 1;
+  overflow: hidden;
+  padding: 10px 12px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  flex: 1;
+  gap: 6px;
 }
-
-.imsg-timestamp {
+.s-ts {
   text-align: center;
-  font-size: 10px;
-  color: rgba(255,255,255,0.35);
+  font-size: 9.5px;
+  color: rgba(255,255,255,0.3);
   font-family: -apple-system, sans-serif;
   margin: 2px 0;
 }
+.s-row { display: flex; }
+.s-row.them { justify-content: flex-start; }
+.s-row.me   { justify-content: flex-end; }
 
-.imsg-row {
-  display: flex;
-}
-.imsg-row.them { justify-content: flex-start; }
-.imsg-row.me   { justify-content: flex-end; }
-
-.imsg-bubble {
-  padding: 9px 13px;
-  border-radius: 18px;
-  font-size: clamp(11px, 1.5vw, 13px);
+.s-bubble {
+  padding: 7px 11px;
+  border-radius: 16px;
+  font-size: clamp(9px, 1.3vw, 12px);
   line-height: 1.45;
   font-family: -apple-system, sans-serif;
-  max-width: 78%;
+  max-width: 80%;
 }
-.imsg-bubble.them {
+.s-bubble.them {
   background: #2c2c2e;
   color: #fff;
-  border-bottom-left-radius: 5px;
+  border-bottom-left-radius: 4px;
 }
-.imsg-bubble.me {
+.s-bubble.me {
   background: #007AFF;
   color: #fff;
-  border-bottom-right-radius: 5px;
+  border-bottom-right-radius: 4px;
 }
-.imsg-bubble.me.done {
-  background: #34C759;
-}
+.s-bubble.me.done { background: #34C759; }
 
-/* iMessage input bar */
-.imsg-input {
+/* Input bar */
+.s-input {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 14px 16px;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  gap: 7px;
+  padding: 8px 12px 18px;
+  border-top: 0.5px solid rgba(255,255,255,0.07);
+  flex-shrink: 0;
 }
-.imsg-input-field {
+.s-input-field {
   flex: 1;
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 20px;
-  padding: 8px 14px;
-  font-size: 12px;
-  color: rgba(255,255,255,0.3);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  border-radius: 18px;
+  padding: 7px 12px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.25);
   font-family: -apple-system, sans-serif;
 }
-.imsg-input-send {
-  width: 28px;
-  height: 28px;
-  background: rgba(255,255,255,0.1);
+.s-input-send {
+  width: 26px; height: 26px;
+  background: #007AFF;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+  font-size: 11px;
   flex-shrink: 0;
 }
 
-/* Soft glow under phone */
-.phone-glow {
+/* Ambient glow beneath phone */
+.iphone-glow {
   position: absolute;
-  bottom: -40px;
+  bottom: -20px;
   left: 50%;
   transform: translateX(-50%);
-  width: 70%;
-  height: 80px;
-  background: radial-gradient(ellipse at center, rgba(124,58,255,0.3) 0%, transparent 70%);
-  filter: blur(20px);
+  width: 80%;
+  height: 100px;
+  background: radial-gradient(ellipse at center, rgba(124,58,255,0.25) 0%, transparent 70%);
+  filter: blur(24px);
   pointer-events: none;
+  z-index: -1;
 }
 
 /* ── Mobile ── */
 @media (max-width: 768px) {
   .hero {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
     text-align: center;
     padding: 100px 28px 60px;
     gap: 56px;
   }
   .hero-left { padding-right: 0; }
   .hero-cta { margin: 0 auto; }
-  .hero-sub { text-align: center; }
-  .phone-wrap { width: min(300px, 80vw); }
   .hero-right { order: -1; }
+  .iphone {
+    width: min(260px, 70vw);
+    transform: perspective(1000px) rotateY(0deg) rotateX(2deg);
+  }
 }
 </style>
 </head>
@@ -367,7 +541,6 @@ nav {
 
 <section class="hero">
 
-  <!-- LEFT -->
   <div class="hero-left">
     <h1 class="hero-headline">
       Your coach lives<br>
@@ -380,76 +553,91 @@ nav {
     <p class="hero-sub">Personal coaching for everyone. No app. No gym. Just texts.</p>
   </div>
 
-  <!-- RIGHT: iPhone mockup -->
   <div class="hero-right">
-    <div class="phone-wrap">
-      <div class="phone-shell">
 
-        <!-- Status bar -->
-        <div class="phone-status">
-          <span>6:42</span>
-          <div class="phone-status-right">
-            <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
-              <rect x="0" y="3" width="2.5" height="7" rx=".5" fill="white" opacity=".4"/>
-              <rect x="3.5" y="2" width="2.5" height="8" rx=".5" fill="white" opacity=".6"/>
-              <rect x="7" y="0.5" width="2.5" height="9.5" rx=".5" fill="white"/>
-            </svg>
-            <svg width="14" height="10" viewBox="0 0 14 10" fill="white">
-              <path d="M7 2C9.2 2 11.2 2.9 12.6 4.4L14 3C12.2 1.1 9.7 0 7 0C4.3 0 1.8 1.1 0 3L1.4 4.4C2.8 2.9 4.8 2 7 2Z" opacity=".4"/>
-              <path d="M7 5C8.4 5 9.6 5.6 10.5 6.5L12 5C10.7 3.8 8.9 3 7 3C5.1 3 3.3 3.8 2 5L3.5 6.5C4.4 5.6 5.6 5 7 5Z" opacity=".7"/>
-              <circle cx="7" cy="9" r="1.5"/>
-            </svg>
-            <div class="status-bar-icon"></div>
-          </div>
-        </div>
+    <!-- HYPERREALISTIC iPHONE -->
+    <div class="iphone">
 
-        <!-- Dynamic island -->
-        <div class="phone-island"></div>
+      <!-- Physical buttons -->
+      <div class="iphone-btn-action"></div>
+      <div class="iphone-btn-vol-up"></div>
+      <div class="iphone-btn-vol-down"></div>
+      <div class="iphone-btn-power"></div>
 
-        <!-- iMessage header -->
-        <div class="imsg-header">
-          <div class="imsg-avatar">C</div>
-          <div class="imsg-name">Cued</div>
-        </div>
+      <!-- Titanium frame + glass inner -->
+      <div class="iphone-frame">
+        <div class="iphone-inner">
 
-        <!-- Conversation -->
-        <div class="imsg-body">
-          <div class="imsg-timestamp">iMessage · Today 6:42 AM</div>
+          <!-- Screen -->
+          <div class="screen">
+            <div class="iphone-glare"></div>
 
-          <div class="imsg-row them">
-            <div class="imsg-bubble them">Morning. Today is a 30 min easy run + 10 min core. Ready when you are 🏃</div>
-          </div>
+            <!-- Status bar -->
+            <div class="s-status">
+              <span class="s-time">6:42</span>
+              <div class="s-icons">
+                <div class="s-signal">
+                  <span></span><span></span><span></span><span></span>
+                </div>
+                <div class="s-wifi">
+                  <div class="s-wifi-dot"></div>
+                </div>
+                <div class="s-battery">
+                  <div class="s-battery-body">
+                    <div class="s-battery-fill"></div>
+                  </div>
+                  <div class="s-battery-tip"></div>
+                </div>
+              </div>
+            </div>
 
-          <div class="imsg-row me">
-            <div class="imsg-bubble me">let's go</div>
-          </div>
+            <!-- Dynamic island -->
+            <div class="s-island"></div>
 
-          <div class="imsg-row them">
-            <div class="imsg-bubble them">Text "done" when you finish. I'll log it.</div>
-          </div>
+            <!-- iMessage contact header -->
+            <div class="s-imsg-nav">
+              <div class="s-imsg-nav-wrap">
+                <div class="s-avatar">C</div>
+                <div class="s-contact-name">Cued</div>
+              </div>
+            </div>
 
-          <div class="imsg-timestamp">Today 7:25 AM</div>
+            <!-- Conversation -->
+            <div class="s-msgs">
+              <div class="s-ts">iMessage · Today 6:42 AM</div>
 
-          <div class="imsg-row me">
-            <div class="imsg-bubble me done">done</div>
-          </div>
+              <div class="s-row them">
+                <div class="s-bubble them">Morning. Today is a 30 min easy run + 10 min core. Ready when you are 🏃</div>
+              </div>
+              <div class="s-row me">
+                <div class="s-bubble me">let's go</div>
+              </div>
+              <div class="s-row them">
+                <div class="s-bubble them">Text "done" when you finish. I'll log it.</div>
+              </div>
+              <div class="s-ts">Today 7:25 AM</div>
+              <div class="s-row me">
+                <div class="s-bubble me done">done</div>
+              </div>
+              <div class="s-row them">
+                <div class="s-bubble them">Nice work. 4 sessions this week — ahead of last week's 3 🔥</div>
+              </div>
+            </div>
 
-          <div class="imsg-row them">
-            <div class="imsg-bubble them">Nice work. 4 sessions this week — ahead of last week's 3 🔥</div>
-          </div>
-        </div>
+            <!-- Input bar -->
+            <div class="s-input">
+              <div class="s-input-field">iMessage</div>
+              <div class="s-input-send">↑</div>
+            </div>
 
-        <!-- Input bar -->
-        <div class="imsg-input">
-          <div class="imsg-input-field">iMessage</div>
-          <div class="imsg-input-send">⬆</div>
-        </div>
+          </div><!-- /screen -->
+        </div><!-- /iphone-inner -->
+      </div><!-- /iphone-frame -->
 
-      </div>
-      <div class="phone-glow"></div>
-    </div>
+      <div class="iphone-glow"></div>
+    </div><!-- /iphone -->
+
   </div>
-
 </section>
 
 </body>
