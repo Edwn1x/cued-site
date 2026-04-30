@@ -124,7 +124,7 @@
   font-size: clamp(48px, 8vw, 96px);
   font-weight: 700;
   letter-spacing: -3px;
-  color: #6D28D9;
+  color: #7970E0;
   font-family: 'DM Sans', sans-serif;
   white-space: nowrap;
 }
@@ -535,7 +535,7 @@
 .cb-label {
   font-size: 10px;
   font-family: 'JetBrains Mono', monospace;
-  color: #6D28D9;
+  color: #7970E0;
   letter-spacing: 0.04em;
 }
 
