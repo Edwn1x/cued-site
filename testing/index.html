@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Testing — Cued</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="../images/favicon.svg">
+<style>
+:root {
+  --bg: #050506;
+  --bg2: #0A0A0C;
+  --surface: #19191D;
+  --border: #1F1F24;
+  --text: #F5F5F7;
+  --text2: #A1A1A6;
+  --text3: #6E6E73;
+  --accent: #7C3AFF;
+  --accent2: #6B2EE6;
+  --f: 'DM Sans', -apple-system, sans-serif;
+  --m: 'JetBrains Mono', monospace;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--f); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; min-height: 100vh; }
+
+.header {
+  padding: 32px 40px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -.5px;
+  color: var(--text);
+  text-decoration: none;
+}
+.header-logo svg { width: 26px; height: 26px; flex-shrink: 0; }
+.header-badge {
+  font-size: 10px;
+  font-family: var(--m);
+  color: var(--accent);
+  background: rgba(124,58,255,0.1);
+  border: 1px solid rgba(124,58,255,0.2);
+  border-radius: 4px;
+  padding: 3px 8px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.canvas {
+  padding: 60px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.canvas-label {
+  font-size: 11px;
+  font-family: var(--m);
+  color: var(--text3);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 40px;
+}
+
+/* ── Drop your test designs below ── */
+.placeholder {
+  border: 1px dashed var(--border);
+  border-radius: 20px;
+  padding: 80px 40px;
+  text-align: center;
+  color: var(--text3);
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.7;
+}
+.placeholder strong {
+  display: block;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 8px;
+  letter-spacing: -.5px;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="../index.html" class="header-logo">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true">
+      <rect width="32" height="32" rx="4" fill="currentColor" fill-opacity="0.08"/>
+      <path d="M21 9.5L12.5 9.5C10 9.5 8 11.5 8 14v4c0 2.5 2 4.5 4.5 4.5H21" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter"/>
+    </svg>
+    cued
+  </a>
+  <span class="header-badge">testing</span>
+</div>
+
+<div class="canvas">
+  <div class="canvas-label">Design sandbox — not linked from any public page</div>
+
+  <!-- ── Paste test designs below this line ── -->
+
+  <div class="placeholder">
+    <strong>Nothing here yet.</strong>
+    Drop new components, layouts, or experiments below this line.
+  </div>
+
+</div>
+
+</body>
+</html>
