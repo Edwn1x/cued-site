@@ -95,25 +95,26 @@
     var sticky = document.querySelector('.funnel-sticky');
     if (!sticky) return;
 
-    /* Compute convergence deltas via getBoundingClientRect so that
-       CSS transforms (scale, rotate) on mobile are accounted for.
-       We capture rects after a short defer so layout is settled. */
     var items = gsap.utils.toArray('.chaos-item');
+    var deltasReady = false;
 
+    /* Convergence target = viewport center.
+       We measure each item's offset from viewport center while the
+       sticky panel is pinned (progress > 0) so getBoundingClientRect
+       reflects the true visual position with all transforms applied. */
     function computeDeltas() {
-      var sRect = sticky.getBoundingClientRect();
-      var cx = sRect.left + sRect.width  * 0.5;
-      var cy = sRect.top  + sRect.height * 0.5;
+      var cx = window.innerWidth  * 0.5;
+      var cy = window.innerHeight * 0.5;
       items.forEach(function (el) {
         var r = el.getBoundingClientRect();
         el._cx = cx - (r.left + r.width  / 2);
         el._cy = cy - (r.top  + r.height / 2);
       });
+      deltasReady = true;
     }
 
-    /* Run once after layout, and again on resize */
-    computeDeltas();
-    window.addEventListener('resize', computeDeltas);
+    /* Recompute on resize (resets flag so next onUpdate re-measures) */
+    window.addEventListener('resize', function () { deltasReady = false; });
 
     ScrollTrigger.create({
       trigger: '.funnel-scroll-spacer',
@@ -143,6 +144,12 @@
         var convergeProg = ease(prog(p, 0.55, 0.70));
         var exitProg     = ease(prog(p, 0.65, 0.72));
 
+        /* Measure item positions once, just before convergence starts,
+           while the sticky panel is pinned and items are fully visible. */
+        if (!deltasReady && p >= 0.50) {
+          computeDeltas();
+        }
+
         for (var i = 0; i < schedule.length; i++) {
           var s = schedule[i];
           var arriveT = ease(prog(p, s.a, s.b));
@@ -155,8 +162,8 @@
           /* Convergence: drift toward viewport center */
           var el = document.querySelector(s.id);
           if (!el) continue;
-          var convX = lerp(0, el._cx, convergeProg);
-          var convY = lerp(0, el._cy, convergeProg);
+          var convX = deltasReady ? lerp(0, el._cx, convergeProg) : 0;
+          var convY = deltasReady ? lerp(0, el._cy, convergeProg) : 0;
           var convScale = lerp(1, 0.5, convergeProg);
 
           gsap.set(s.id, {
