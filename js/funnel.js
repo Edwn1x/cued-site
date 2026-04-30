@@ -95,17 +95,25 @@
     var sticky = document.querySelector('.funnel-sticky');
     if (!sticky) return;
 
-    var sW = sticky.offsetWidth;
-    var sH = sticky.offsetHeight;
-    var cx = sW * 0.5;
-    var cy = sH * 0.5;
-
-    /* Pre-compute convergence deltas for each item */
+    /* Compute convergence deltas via getBoundingClientRect so that
+       CSS transforms (scale, rotate) on mobile are accounted for.
+       We capture rects after a short defer so layout is settled. */
     var items = gsap.utils.toArray('.chaos-item');
-    items.forEach(function (el) {
-      el._cx = cx - (el.offsetLeft + el.offsetWidth  / 2);
-      el._cy = cy - (el.offsetTop  + el.offsetHeight / 2);
-    });
+
+    function computeDeltas() {
+      var sRect = sticky.getBoundingClientRect();
+      var cx = sRect.left + sRect.width  * 0.5;
+      var cy = sRect.top  + sRect.height * 0.5;
+      items.forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        el._cx = cx - (r.left + r.width  / 2);
+        el._cy = cy - (r.top  + r.height / 2);
+      });
+    }
+
+    /* Run once after layout, and again on resize */
+    computeDeltas();
+    window.addEventListener('resize', computeDeltas);
 
     ScrollTrigger.create({
       trigger: '.funnel-scroll-spacer',
