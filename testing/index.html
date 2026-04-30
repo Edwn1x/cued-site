@@ -82,8 +82,8 @@ nav {
   inset: 0;
   background:
     radial-gradient(ellipse 60% 80% at 10% 50%, rgba(124,58,255,0.10) 0%, transparent 65%),
-    linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.45) 100%),
-    linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.4) 100%);
+    linear-gradient(to right, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.3) 45%, rgba(0,0,0,0.65) 100%),
+    linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, transparent 20%, transparent 75%, rgba(0,0,0,0.6) 100%);
   z-index: 1;
   pointer-events: none;
 }
@@ -524,6 +524,43 @@ nav {
 }
 
 /* ── Mobile ── */
+/* ── Footer ── */
+footer {
+  background: #060607;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 32px clamp(24px, 5vw, 56px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ft-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -.4px;
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+}
+.ft-logo svg { width: 20px; height: 20px; opacity: .5; }
+.ft-links {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+.ft-links a {
+  font-size: 12px;
+  color: rgba(255,255,255,0.3);
+  text-decoration: none;
+  transition: color .2s;
+}
+.ft-links a:hover { color: rgba(255,255,255,0.7); }
+.ft-copy {
+  font-size: 12px;
+  color: rgba(255,255,255,0.2);
+}
+
 @media (max-width: 768px) {
   .hero {
     grid-template-columns: 1fr;
@@ -661,6 +698,22 @@ nav {
 
   </div>
 </section>
+
+<footer>
+  <a href="../index.html" class="ft-logo">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true">
+      <rect width="32" height="32" rx="4" fill="currentColor" fill-opacity="0.08"/>
+      <path d="M21 9.5L12.5 9.5C10 9.5 8 11.5 8 14v4c0 2.5 2 4.5 4.5 4.5H21" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter"/>
+    </svg>
+    cued
+  </a>
+  <div class="ft-links">
+    <a href="../privacy.html">Privacy</a>
+    <a href="../terms.html">Terms</a>
+    <a href="mailto:hello@cued.fit">Contact</a>
+  </div>
+  <span class="ft-copy">&copy; 2026 Cued</span>
+</footer>
 
 <script>
 (function () {
