@@ -6,116 +6,451 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Testing — Cued</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="../images/favicon.svg">
 <style>
-:root {
-  --bg: #050506;
-  --bg2: #0A0A0C;
-  --surface: #19191D;
-  --border: #1F1F24;
-  --text: #F5F5F7;
-  --text2: #A1A1A6;
-  --text3: #6E6E73;
-  --accent: #7C3AFF;
-  --accent2: #6B2EE6;
-  --f: 'DM Sans', -apple-system, sans-serif;
-  --m: 'JetBrains Mono', monospace;
-}
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { font-family: var(--f); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; min-height: 100vh; }
+html, body { height: 100%; }
+body {
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  background: #080809;
+  color: #F5F5F7;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
 
-.header {
-  padding: 32px 40px 24px;
-  border-bottom: 1px solid var(--border);
+/* ── Nav ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 0 clamp(24px, 5vw, 56px);
+  height: 60px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  justify-content: space-between;
 }
-.header-logo {
+
+.nv-logo {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -.4px;
+  color: #fff;
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: -.5px;
-  color: var(--text);
   text-decoration: none;
 }
-.header-logo svg { width: 26px; height: 26px; flex-shrink: 0; }
-.header-badge {
-  font-size: 10px;
-  font-family: var(--m);
-  color: var(--accent);
-  background: rgba(124,58,255,0.1);
-  border: 1px solid rgba(124,58,255,0.2);
-  border-radius: 4px;
-  padding: 3px 8px;
-  letter-spacing: .08em;
-  text-transform: uppercase;
+.nv-logo svg { width: 24px; height: 24px; }
+
+.nv-signup {
+  background: #fff;
+  color: #080809;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: 980px;
+  text-decoration: none;
+  transition: opacity .2s;
+}
+.nv-signup:hover { opacity: .85; }
+
+/* ── Hero — full viewport ── */
+.hero {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 0;
+  padding: 0 clamp(32px, 7vw, 100px);
+  position: relative;
+  overflow: hidden;
 }
 
-.canvas {
-  padding: 60px 40px;
-  max-width: 1200px;
-  margin: 0 auto;
+/* Subtle dark vignette radial */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 80% at 20% 50%, rgba(124,58,255,0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 80% 50%, rgba(0,0,0,0.4) 0%, transparent 80%);
+  pointer-events: none;
 }
 
-.canvas-label {
-  font-size: 11px;
-  font-family: var(--m);
-  color: var(--text3);
-  letter-spacing: .1em;
-  text-transform: uppercase;
+/* ── Left: headline + CTA ── */
+.hero-left {
+  position: relative;
+  z-index: 2;
+  padding-right: clamp(32px, 4vw, 80px);
+}
+
+.hero-headline {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(44px, 6vw, 82px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -1px;
+  color: #fff;
   margin-bottom: 40px;
 }
 
-/* ── Drop your test designs below ── */
-.placeholder {
-  border: 1px dashed var(--border);
-  border-radius: 20px;
-  padding: 80px 40px;
-  text-align: center;
-  color: var(--text3);
-  font-size: 15px;
-  font-weight: 300;
-  line-height: 1.7;
+.hero-headline em {
+  font-style: italic;
+  color: rgba(255,255,255,0.75);
 }
-.placeholder strong {
-  display: block;
-  font-size: 22px;
+
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: #7C3AFF;
+  color: #fff;
+  font-size: 16px;
   font-weight: 600;
-  color: var(--text2);
-  margin-bottom: 8px;
-  letter-spacing: -.5px;
+  padding: 16px 28px;
+  border-radius: 980px;
+  text-decoration: none;
+  transition: background .2s, transform .2s;
+}
+.hero-cta:hover { background: #6B2EE6; transform: translateY(-1px); }
+
+.hero-cta-icon {
+  width: 28px;
+  height: 28px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.hero-sub {
+  margin-top: 20px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.35);
+  font-weight: 300;
+  letter-spacing: .01em;
+}
+
+/* ── Right: iPhone mockup ── */
+.hero-right {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.phone-wrap {
+  position: relative;
+  width: clamp(260px, 28vw, 360px);
+}
+
+/* iPhone shell */
+.phone-shell {
+  width: 100%;
+  aspect-ratio: 9 / 19.5;
+  background: #1a1a1c;
+  border-radius: clamp(36px, 5vw, 52px);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.8),
+    0 40px 100px rgba(0,0,0,0.7),
+    0 0 60px rgba(124,58,255,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+/* Status bar */
+.phone-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  font-family: -apple-system, sans-serif;
+}
+.phone-status-right {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+}
+.status-bar-icon {
+  width: 16px;
+  height: 8px;
+  border: 1.5px solid #fff;
+  border-radius: 2px;
+  position: relative;
+}
+.status-bar-icon::after {
+  content: '';
+  position: absolute;
+  left: 1.5px; top: 1.5px;
+  width: 60%;
+  height: calc(100% - 3px);
+  background: #fff;
+  border-radius: 1px;
+}
+
+/* Dynamic island */
+.phone-island {
+  width: 32%;
+  height: 28px;
+  background: #000;
+  border-radius: 20px;
+  margin: 6px auto 0;
+}
+
+/* iMessage conversation header */
+.imsg-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.imsg-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #7C3AFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+  font-family: -apple-system, sans-serif;
+}
+
+.imsg-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  font-family: -apple-system, sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.imsg-name::after {
+  content: '›';
+  color: rgba(255,255,255,0.4);
+  font-size: 14px;
+}
+
+/* Conversation area */
+.imsg-body {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.imsg-timestamp {
+  text-align: center;
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  font-family: -apple-system, sans-serif;
+  margin: 2px 0;
+}
+
+.imsg-row {
+  display: flex;
+}
+.imsg-row.them { justify-content: flex-start; }
+.imsg-row.me   { justify-content: flex-end; }
+
+.imsg-bubble {
+  padding: 9px 13px;
+  border-radius: 18px;
+  font-size: clamp(11px, 1.5vw, 13px);
+  line-height: 1.45;
+  font-family: -apple-system, sans-serif;
+  max-width: 78%;
+}
+.imsg-bubble.them {
+  background: #2c2c2e;
+  color: #fff;
+  border-bottom-left-radius: 5px;
+}
+.imsg-bubble.me {
+  background: #007AFF;
+  color: #fff;
+  border-bottom-right-radius: 5px;
+}
+.imsg-bubble.me.done {
+  background: #34C759;
+}
+
+/* iMessage input bar */
+.imsg-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.imsg-input-field {
+  flex: 1;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.3);
+  font-family: -apple-system, sans-serif;
+}
+.imsg-input-send {
+  width: 28px;
+  height: 28px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+/* Soft glow under phone */
+.phone-glow {
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 80px;
+  background: radial-gradient(ellipse at center, rgba(124,58,255,0.3) 0%, transparent 70%);
+  filter: blur(20px);
+  pointer-events: none;
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .hero {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    text-align: center;
+    padding: 100px 28px 60px;
+    gap: 56px;
+  }
+  .hero-left { padding-right: 0; }
+  .hero-cta { margin: 0 auto; }
+  .hero-sub { text-align: center; }
+  .phone-wrap { width: min(300px, 80vw); }
+  .hero-right { order: -1; }
 }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <a href="../index.html" class="header-logo">
+<nav>
+  <a href="../index.html" class="nv-logo">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true">
       <rect width="32" height="32" rx="4" fill="currentColor" fill-opacity="0.08"/>
       <path d="M21 9.5L12.5 9.5C10 9.5 8 11.5 8 14v4c0 2.5 2 4.5 4.5 4.5H21" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter"/>
     </svg>
     cued
   </a>
-  <span class="header-badge">testing</span>
-</div>
+  <a href="../signup.html" class="nv-signup">Sign up</a>
+</nav>
 
-<div class="canvas">
-  <div class="canvas-label">Design sandbox — not linked from any public page</div>
+<section class="hero">
 
-  <!-- ── Paste test designs below this line ── -->
-
-  <div class="placeholder">
-    <strong>Nothing here yet.</strong>
-    Drop new components, layouts, or experiments below this line.
+  <!-- LEFT -->
+  <div class="hero-left">
+    <h1 class="hero-headline">
+      Your coach lives<br>
+      <em>on iMessage</em>
+    </h1>
+    <a href="../signup.html" class="hero-cta">
+      <span class="hero-cta-icon">💬</span>
+      Start Training
+    </a>
+    <p class="hero-sub">Personal coaching for everyone. No app. No gym. Just texts.</p>
   </div>
 
-</div>
+  <!-- RIGHT: iPhone mockup -->
+  <div class="hero-right">
+    <div class="phone-wrap">
+      <div class="phone-shell">
+
+        <!-- Status bar -->
+        <div class="phone-status">
+          <span>6:42</span>
+          <div class="phone-status-right">
+            <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
+              <rect x="0" y="3" width="2.5" height="7" rx=".5" fill="white" opacity=".4"/>
+              <rect x="3.5" y="2" width="2.5" height="8" rx=".5" fill="white" opacity=".6"/>
+              <rect x="7" y="0.5" width="2.5" height="9.5" rx=".5" fill="white"/>
+            </svg>
+            <svg width="14" height="10" viewBox="0 0 14 10" fill="white">
+              <path d="M7 2C9.2 2 11.2 2.9 12.6 4.4L14 3C12.2 1.1 9.7 0 7 0C4.3 0 1.8 1.1 0 3L1.4 4.4C2.8 2.9 4.8 2 7 2Z" opacity=".4"/>
+              <path d="M7 5C8.4 5 9.6 5.6 10.5 6.5L12 5C10.7 3.8 8.9 3 7 3C5.1 3 3.3 3.8 2 5L3.5 6.5C4.4 5.6 5.6 5 7 5Z" opacity=".7"/>
+              <circle cx="7" cy="9" r="1.5"/>
+            </svg>
+            <div class="status-bar-icon"></div>
+          </div>
+        </div>
+
+        <!-- Dynamic island -->
+        <div class="phone-island"></div>
+
+        <!-- iMessage header -->
+        <div class="imsg-header">
+          <div class="imsg-avatar">C</div>
+          <div class="imsg-name">Cued</div>
+        </div>
+
+        <!-- Conversation -->
+        <div class="imsg-body">
+          <div class="imsg-timestamp">iMessage · Today 6:42 AM</div>
+
+          <div class="imsg-row them">
+            <div class="imsg-bubble them">Morning. Today is a 30 min easy run + 10 min core. Ready when you are 🏃</div>
+          </div>
+
+          <div class="imsg-row me">
+            <div class="imsg-bubble me">let's go</div>
+          </div>
+
+          <div class="imsg-row them">
+            <div class="imsg-bubble them">Text "done" when you finish. I'll log it.</div>
+          </div>
+
+          <div class="imsg-timestamp">Today 7:25 AM</div>
+
+          <div class="imsg-row me">
+            <div class="imsg-bubble me done">done</div>
+          </div>
+
+          <div class="imsg-row them">
+            <div class="imsg-bubble them">Nice work. 4 sessions this week — ahead of last week's 3 🔥</div>
+          </div>
+        </div>
+
+        <!-- Input bar -->
+        <div class="imsg-input">
+          <div class="imsg-input-field">iMessage</div>
+          <div class="imsg-input-send">⬆</div>
+        </div>
+
+      </div>
+      <div class="phone-glow"></div>
+    </div>
+  </div>
+
+</section>
 
 </body>
 </html>
