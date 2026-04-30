@@ -124,7 +124,7 @@
   font-size: clamp(48px, 8vw, 96px);
   font-weight: 700;
   letter-spacing: -3px;
-  color: #34C759;
+  color: #007AFF;
   font-family: 'DM Sans', sans-serif;
   white-space: nowrap;
 }
@@ -251,7 +251,7 @@
 }
 
 .imessage.green .imsg-bubble {
-  background: #34C759;
+  background: #007AFF;
 }
 
 .imessage.blue .imsg-bubble {
@@ -535,7 +535,7 @@
 .cb-label {
   font-size: 10px;
   font-family: 'JetBrains Mono', monospace;
-  color: #34C759;
+  color: #007AFF;
   letter-spacing: 0.04em;
 }
 
@@ -550,7 +550,7 @@
 }
 
 .cb-blue  { background: #007AFF; }
-.cb-green { background: #34C759; }
+.cb-green { background: #007AFF; }
 
 /* ── Bubble positions (relative to composition center) ──────── */
 .cb-manny {
