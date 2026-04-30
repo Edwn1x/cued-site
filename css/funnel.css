@@ -443,17 +443,17 @@
 
 /* ── Clean side — flows below sticky, normal document flow ──── */
 .clean-side {
-  background: #ffffff;
-  padding: clamp(80px, 10vw, 120px) clamp(24px, 6vw, 80px);
+  background: #7C6EFF;
+  padding: clamp(80px, 10vw, 140px) clamp(24px, 6vw, 80px);
 }
 
 .clean-side-inner {
-  max-width: 420px;
+  max-width: 1100px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 70px;
+  align-items: center;
+  gap: 80px;
 }
 
 /* ── Clean side headlines ──────────────────────────────────── */
@@ -462,71 +462,130 @@
   font-weight: 700;
   letter-spacing: -1.5px;
   line-height: 1.1;
-  color: #1a1a1a;
+  color: #fff;
   text-align: center;
-}
-
-.clean-side-headline em {
-  font-style: italic;
-  color: #7C6EFF;
 }
 
 .clean-side-headline--bottom {
-  font-size: clamp(24px, 3vw, 40px);
-  color: #555;
+  font-size: clamp(22px, 2.5vw, 36px);
+  color: rgba(255,255,255,0.7);
   font-weight: 500;
-  letter-spacing: -1px;
+  letter-spacing: -0.5px;
 }
 
-/* ── Conversation thread ───────────────────────────────────── */
-.conversation-thread {
+/* ── Composition: frosted card + orbiting bubbles ───────────── */
+.clean-composition {
+  position: relative;
   width: 100%;
-  max-width: 420px;
-  margin: 0 auto;
+  min-height: 600px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ── Daily recap card — frosted glass ───────────────────────── */
+.daily-recap {
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 28px 32px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 0 40px rgba(0,0,0,0.12), 0 0 0 1px rgba(255,255,255,0.12);
+}
+
+.recap-header {
+  display: block;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.recap-item {
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  color: #fff;
+  line-height: 2.0;
+}
+
+/* ── Coaching bubbles — orbit the card ──────────────────────── */
+.coaching-bubble {
+  position: absolute;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 5px;
+  max-width: 290px;
+  z-index: 3;
 }
 
-.thread-label {
-  font-size: 11px;
-  color: #7C6EFF;
+.cb-label {
+  font-size: 10px;
   font-family: 'JetBrains Mono', monospace;
-  margin-bottom: 4px;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.04em;
 }
 
-/* Incoming — Cued, gray, left-aligned */
-.bubble-incoming {
-  align-self: flex-start;
-  background: #E9E9EB;
-  color: #1a1a1a;
-  border-radius: 18px 18px 18px 4px;
-  padding: 11px 15px;
+.cb-message {
+  border-radius: 18px;
+  padding: 12px 16px;
   font-size: 14px;
   font-family: 'DM Sans', sans-serif;
-  line-height: 1.5;
-  max-width: 85%;
-}
-
-/* Outgoing — user, blue, right-aligned */
-.bubble-outgoing {
-  align-self: flex-end;
-  background: #007AFF;
   color: #fff;
-  border-radius: 18px 18px 4px 18px;
-  padding: 11px 15px;
-  font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
   line-height: 1.5;
-  max-width: 75%;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.18);
 }
 
-/* Divider between main thread and persona threads */
-.threads-divider {
-  font-size: 13px;
-  color: #999;
-  text-align: center;
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 300;
-  letter-spacing: 0.02em;
+.cb-blue  { background: #007AFF; }
+.cb-green { background: #34C759; }
+
+/* ── Bubble positions (relative to composition center) ──────── */
+.cb-manny {
+  top: 2%;
+  left: 2%;
+  transform: rotate(-2deg);
+}
+.cb-jess {
+  top: 2%;
+  right: 2%;
+  transform: rotate(1.5deg);
+}
+.cb-james {
+  bottom: 5%;
+  left: 2%;
+  transform: rotate(-1deg);
+}
+.cb-molly {
+  bottom: 5%;
+  right: 2%;
+  transform: rotate(2deg);
+}
+.cb-alex {
+  bottom: -2%;
+  left: 50%;
+  transform: translateX(-50%) rotate(-1.5deg);
+}
+
+/* ── Mobile: collapse to vertical stack ─────────────────────── */
+@media (max-width: 768px) {
+  .clean-composition {
+    flex-direction: column;
+    min-height: auto;
+    gap: 32px;
+    align-items: stretch;
+  }
+  .coaching-bubble {
+    position: static;
+    transform: none !important;
+    max-width: 100%;
+  }
+  .cb-alex {
+    left: auto;
+    transform: none !important;
+  }
 }

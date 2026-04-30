@@ -686,53 +686,55 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
 <div class="clean-side" id="cleanSide">
   <div class="clean-side-inner">
 
-    <h2 class="clean-side-headline rv">Now imagine one voice that knows all of it.</h2>
+    <h2 class="clean-side-headline rv" id="clean-headline">Now imagine one voice that knows all of it.</h2>
 
-    <!-- Main conversation thread: Manny morning check-in -->
-    <div class="conversation-thread rv" id="thread-main">
-      <div class="thread-label">Manny, 22 — eats out most days</div>
-      <div class="bubble-incoming">Morning. Push day today — 45 min session. I already sent it. Bench is up 5lb this week.</div>
-      <div class="bubble-outgoing">lets go. what about food today</div>
-      <div class="bubble-incoming">3 meals planned — 2,180 cal, 162g protein. You slept 6h40 so I pulled volume down a bit.</div>
-      <div class="bubble-outgoing">wait you can see my sleep?</div>
-      <div class="bubble-incoming">Apple Watch. You averaged 6h20 this week. We'll talk about that.</div>
-    </div>
+    <!-- Composition: frosted card + 5 coaching bubbles orbiting it -->
+    <div class="clean-composition">
 
-    <p class="threads-divider rv">Every user gets coaching that fits their life.</p>
+      <!-- Daily recap card — center anchor -->
+      <div class="daily-recap rv" id="daily-recap">
+        <span class="recap-header">Today — April 29</span>
+        <div class="recap-item">🏋️ Push day — 45 min session sent</div>
+        <div class="recap-item">🍳 3 meals planned — 2,180 cal, 162g protein</div>
+        <div class="recap-item">😴 You slept 6h40 — volume adjusted down</div>
+        <div class="recap-item">📸 1 food photo logged</div>
+        <div class="recap-item">💬 12 coaching messages today</div>
+        <div class="recap-item">⚡ Bench up 5lb this week</div>
+      </div>
 
-    <!-- Jess -->
-    <div class="conversation-thread rv" id="thread-jess">
-      <div class="thread-label">Jess, 20 — goes out every weekend</div>
-      <div class="bubble-incoming">If I see an Artichoke's pic at 2am I'm giving you legs at 9am. Eat something real before you go out.</div>
-      <div class="bubble-outgoing">lmao fine what should i eat</div>
-      <div class="bubble-incoming">Protein bowl from Chipotle. Double chicken. You're welcome.</div>
-    </div>
+      <!-- Manny — top left -->
+      <div class="coaching-bubble cb-manny rv rv-d1" id="cb-manny">
+        <div class="cb-label">Manny, 22 — eats out most days</div>
+        <div class="cb-message cb-blue">You ordered DoorDash 3 times this week. Tonight you're not.</div>
+      </div>
 
-    <!-- James -->
-    <div class="conversation-thread rv" id="thread-james">
-      <div class="thread-label">James, 21 — keeps putting it off</div>
-      <div class="bubble-incoming">You said you'd get back to it after midterms. That was three weeks ago.</div>
-      <div class="bubble-outgoing">i know i know</div>
-      <div class="bubble-incoming">20-min session. Bodyweight. Your dorm room. Say the word.</div>
-    </div>
+      <!-- Jess — top right -->
+      <div class="coaching-bubble cb-jess rv rv-d2" id="cb-jess">
+        <div class="cb-label">Jess, 20 — goes out every weekend</div>
+        <div class="cb-message cb-green">If I see an Artichoke's pic at 2am I'm giving you legs at 9am.</div>
+      </div>
 
-    <!-- Molly -->
-    <div class="conversation-thread rv" id="thread-molly">
-      <div class="thread-label">Molly, 19 — just getting started</div>
-      <div class="bubble-incoming">12 minutes on the elliptical isn't a full workout Molly.</div>
-      <div class="bubble-outgoing">ok then what do i do</div>
-      <div class="bubble-incoming">I just sent you a 25-min full body circuit. No equipment. You can do it tonight.</div>
-    </div>
+      <!-- James — bottom left -->
+      <div class="coaching-bubble cb-james rv rv-d2" id="cb-james">
+        <div class="cb-label">James, 21 — keeps putting it off</div>
+        <div class="cb-message cb-blue">You said you'd get back to it after midterms. That was three weeks ago.</div>
+      </div>
 
-    <!-- Alex -->
-    <div class="conversation-thread rv" id="thread-alex">
-      <div class="thread-label">Alex, 23 — lifts but eats like shit</div>
-      <div class="bubble-incoming">A protein bar and coffee isn't breakfast. You're going to feel it by set 3 on bench.</div>
-      <div class="bubble-outgoing">what should i eat then</div>
-      <div class="bubble-incoming">3 eggs, toast, banana. Takes 6 minutes. You have time.</div>
-    </div>
+      <!-- Molly — bottom right -->
+      <div class="coaching-bubble cb-molly rv rv-d3" id="cb-molly">
+        <div class="cb-label">Molly, 19 — just getting started</div>
+        <div class="cb-message cb-green">12 minutes on the elliptical isn't a full workout Molly.</div>
+      </div>
 
-    <h2 class="clean-side-headline clean-side-headline--bottom rv">This is what coaching actually looks like.</h2>
+      <!-- Alex — bottom center -->
+      <div class="coaching-bubble cb-alex rv rv-d4" id="cb-alex">
+        <div class="cb-label">Alex, 23 — lifts but eats like shit</div>
+        <div class="cb-message cb-blue">A protein bar and coffee isn't breakfast. You're going to feel it by set 3.</div>
+      </div>
+
+    </div><!-- /clean-composition -->
+
+    <h2 class="clean-side-headline clean-side-headline--bottom rv" id="clean-bottom">This is what coaching actually looks like.</h2>
 
   </div>
 </div>
