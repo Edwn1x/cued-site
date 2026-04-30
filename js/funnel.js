@@ -25,6 +25,7 @@
 
   gsap.set('#fh-coached, #fh-none', { opacity: 0, y: 0 });
   gsap.set('#fh-cued', { opacity: 0 });
+  gsap.set('#funnel-invert-bg', { opacity: 0 });
   gsap.set('.chaos-item', { opacity: 0, x: 0, y: 0 });
 
   function clamp01(v) { return Math.max(0, Math.min(1, v)); }
@@ -170,8 +171,9 @@
           }
         }
 
-        /* ── Beat 5: "cued" logo — pause after convergence ──────── */
+        /* ── Beat 5: white inversion + "cued" logo ──────────────── */
         var cuedIn = ease(prog(p, 0.72, 0.80));
+        gsap.set('#funnel-invert-bg', { opacity: cuedIn });
         gsap.set('#fh-cued', { opacity: cuedIn });
       }
     });
