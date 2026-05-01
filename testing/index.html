@@ -524,6 +524,74 @@ nav {
   z-index: -1;
 }
 
+/* ── Phone entrance animation ── */
+.iphone {
+  opacity: 0;
+  animation: phoneEnter 1.1s cubic-bezier(.16,1,.3,1) 0.3s forwards;
+}
+@keyframes phoneEnter {
+  0%   { opacity: 0; transform: perspective(1200px) rotateY(-6deg) rotateX(2deg) translateY(48px) scale(0.93); }
+  100% { opacity: 1; transform: perspective(1200px) rotateY(-6deg) rotateX(2deg) translateY(0)    scale(1); }
+}
+
+/* Glow pulse after entrance */
+.iphone-glow {
+  animation: glowPulse 3s ease-in-out 1.4s infinite;
+}
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+
+/* Hero-left entrance */
+.hero-left {
+  opacity: 0;
+  animation: leftEnter 1s cubic-bezier(.16,1,.3,1) 0.15s forwards;
+}
+@keyframes leftEnter {
+  0%   { opacity: 0; transform: translateY(24px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Chat bubble pop-in */
+@keyframes bubbleIn {
+  0%   { opacity: 0; transform: scale(0.85) translateY(6px); }
+  100% { opacity: 1; transform: scale(1)    translateY(0); }
+}
+.s-row, .s-ts {
+  opacity: 0;
+}
+.s-row.show, .s-ts.show {
+  animation: bubbleIn 0.35s cubic-bezier(.16,1,.3,1) forwards;
+}
+
+/* Typing indicator */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: #2c2c2e;
+  border-radius: 16px;
+  border-bottom-left-radius: 4px;
+  width: fit-content;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.typing-indicator.show { opacity: 1; }
+.typing-indicator span {
+  width: 5px; height: 5px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 50%;
+  animation: typingDot 1.2s ease-in-out infinite;
+}
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingDot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30%            { transform: translateY(-4px); opacity: 1; }
+}
+
 /* ── Mobile ── */
 /* ── Footer ── */
 footer {
@@ -656,26 +724,9 @@ footer {
               </div>
             </div>
 
-            <!-- Conversation -->
-            <div class="s-msgs">
+            <!-- Conversation — populated by JS -->
+            <div class="s-msgs" id="chatMsgs">
               <div class="s-ts">Messages · Today 6:42 AM</div>
-
-              <div class="s-row them">
-                <div class="s-bubble them">Morning. Today is a 30 min easy run + 10 min core. Ready when you are 🏃</div>
-              </div>
-              <div class="s-row me">
-                <div class="s-bubble me">let's go</div>
-              </div>
-              <div class="s-row them">
-                <div class="s-bubble them">Text "done" when you finish. I'll log it.</div>
-              </div>
-              <div class="s-ts">Today 7:25 AM</div>
-              <div class="s-row me">
-                <div class="s-bubble me done">done</div>
-              </div>
-              <div class="s-row them">
-                <div class="s-bubble them">Nice work. 4 sessions this week — ahead of last week's 3 🔥</div>
-              </div>
             </div>
 
             <!-- Input bar -->
@@ -712,26 +763,134 @@ footer {
 
 <script>
 (function () {
+
+  /* ── Video crossfade ── */
   var v1 = document.getElementById('hv1');
   var v2 = document.getElementById('hv2');
-  var active = v1;
-  var next = v2;
-
-  // Preload second video
+  var active = v1, next = v2;
   v2.load();
-
   function crossfade() {
-    next.currentTime = 0;
-    next.play();
-    next.style.opacity = '1';
-    active.style.opacity = '0';
-    var tmp = active;
-    active = next;
-    next = tmp;
+    next.currentTime = 0; next.play();
+    next.style.opacity = '1'; active.style.opacity = '0';
+    var tmp = active; active = next; next = tmp;
   }
-
   v1.addEventListener('ended', crossfade);
   v2.addEventListener('ended', crossfade);
+
+  /* ── Chat animation ── */
+  var container = document.getElementById('chatMsgs');
+
+  // Conversation script — cycles through these on loop
+  var conversations = [
+    [
+      { type: 'ts',   text: 'Messages · Today 6:42 AM' },
+      { type: 'them', text: 'Morning. Today is a 30 min easy run + 10 min core. Ready when you are 🏃' },
+      { type: 'me',   text: "let's go" },
+      { type: 'them', text: 'Text "done" when you finish. I\'ll log it.' },
+      { type: 'ts',   text: 'Today 7:25 AM' },
+      { type: 'me',   text: 'done', cls: 'done' },
+      { type: 'them', text: 'Nice work. 4 sessions this week — ahead of last week\'s 3 🔥' },
+    ],
+    [
+      { type: 'ts',   text: 'Messages · Today 8:10 AM' },
+      { type: 'them', text: 'Today is upper body — bench, rows, OHP. 45 min. I\'ll send the full plan now 💪' },
+      { type: 'me',   text: 'what weight should i use for bench?' },
+      { type: 'them', text: 'Start at 65% of your max. If rep 8 feels easy, go heavier next set.' },
+      { type: 'me',   text: 'got it, starting now' },
+      { type: 'ts',   text: 'Today 9:05 AM' },
+      { type: 'me',   text: 'done. felt way stronger than last week', cls: 'done' },
+      { type: 'them', text: 'That\'s the adaptation kicking in. Rest tomorrow — we\'ll hit legs Thursday 🎯' },
+    ],
+    [
+      { type: 'ts',   text: 'Messages · Today 12:30 PM' },
+      { type: 'them', text: 'Lunch check-in — how\'s the eating going today?' },
+      { type: 'me',   text: 'had eggs and toast this morning, about to grab lunch' },
+      { type: 'them', text: 'Nice. Aim for protein + veggies at lunch. Dining hall tip: grilled chicken + any two sides.' },
+      { type: 'me',   text: 'easy, will do' },
+      { type: 'them', text: 'You\'re on track for the week. Keep it up 🙌' },
+    ],
+  ];
+
+  var convIndex = 0;
+  var TYPING_DELAY_THEM = 1200; // ms to show typing indicator
+  var TYPING_DELAY_SHORT = 700;
+  var MSG_PAUSE = 600;          // pause between messages
+  var END_PAUSE = 3000;         // pause at end before reset
+
+  function sleep(ms) { return new Promise(function(r){ setTimeout(r, ms); }); }
+
+  function addTimestamp(text) {
+    var el = document.createElement('div');
+    el.className = 's-ts';
+    el.textContent = text;
+    container.appendChild(el);
+    requestAnimationFrame(function(){ el.classList.add('show'); });
+    container.scrollTop = container.scrollHeight;
+    return el;
+  }
+
+  function addBubble(msg) {
+    var row = document.createElement('div');
+    row.className = 's-row ' + msg.type;
+    var bubble = document.createElement('div');
+    bubble.className = 's-bubble ' + msg.type + (msg.cls ? ' ' + msg.cls : '');
+    bubble.textContent = msg.text;
+    row.appendChild(bubble);
+    container.appendChild(row);
+    requestAnimationFrame(function(){ row.classList.add('show'); });
+    container.scrollTop = container.scrollHeight;
+    return row;
+  }
+
+  function showTyping() {
+    var row = document.createElement('div');
+    row.className = 's-row them';
+    var indicator = document.createElement('div');
+    indicator.className = 'typing-indicator';
+    indicator.innerHTML = '<span></span><span></span><span></span>';
+    row.appendChild(indicator);
+    container.appendChild(row);
+    container.scrollTop = container.scrollHeight;
+    requestAnimationFrame(function(){ indicator.classList.add('show'); });
+    return row;
+  }
+
+  async function runConversation() {
+    var msgs = conversations[convIndex % conversations.length];
+    convIndex++;
+
+    // Clear old messages except the first timestamp node
+    container.innerHTML = '';
+
+    for (var i = 0; i < msgs.length; i++) {
+      var msg = msgs[i];
+
+      if (msg.type === 'ts') {
+        await sleep(MSG_PAUSE);
+        addTimestamp(msg.text);
+        continue;
+      }
+
+      // Show typing indicator for "them" messages
+      if (msg.type === 'them') {
+        var typingRow = showTyping();
+        await sleep(msg.text.length > 60 ? TYPING_DELAY_THEM : TYPING_DELAY_SHORT);
+        typingRow.remove();
+      } else {
+        await sleep(MSG_PAUSE);
+      }
+
+      addBubble(msg);
+      await sleep(MSG_PAUSE);
+    }
+
+    await sleep(END_PAUSE);
+    runConversation();
+  }
+
+  // Start after phone entrance animation settles
+  setTimeout(runConversation, 1400);
+
 }());
 </script>
 </body>
