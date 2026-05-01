@@ -32,30 +32,26 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;ali
 .mm-close:hover{color:var(--text)}
 @media(max-width:768px){.nv-r{display:none}.hamburger{display:flex}}
 
-/* PAGE — two-col on desktop, single col on mobile */
-.page{max-width:960px;margin:0 auto;padding:80px 32px 80px}
+/* PAGE */
+.page{max-width:1100px;margin:0 auto;padding:88px 32px 80px}
 
-@media(min-width:769px){
-  .page-inner{display:grid;grid-template-columns:260px 1fr;gap:48px;align-items:start}
-  .page-sidebar{position:sticky;top:80px}
-}
+/* Top row: profile card left, about you right */
+.page-top{display:grid;grid-template-columns:280px 1fr;gap:24px;margin-bottom:24px;align-items:start}
 
-/* PROFILE HEADER */
-.profile-header{display:flex;flex-direction:column;align-items:flex-start;gap:16px;margin-bottom:32px}
-.avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#fff;flex-shrink:0;letter-spacing:-.5px}
-.profile-meta h1{font-size:20px;font-weight:700;letter-spacing:-.4px;margin-bottom:2px;color:var(--text)}
+/* Bottom row: two equal columns */
+.page-bottom{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+
+/* Profile card */
+.profile-card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:28px 24px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.profile-header{display:flex;flex-direction:column;align-items:flex-start;gap:14px}
+.avatar{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;flex-shrink:0;letter-spacing:-.5px}
+.profile-meta h1{font-size:19px;font-weight:700;letter-spacing:-.4px;margin-bottom:2px;color:var(--text)}
 .profile-meta span{font-size:13px;color:var(--text3)}
 .profile-meta .badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-family:var(--m);color:var(--green);background:rgba(48,209,88,.08);border:1px solid rgba(48,209,88,.2);padding:3px 9px;border-radius:980px;margin-top:6px}
 .profile-meta .badge::before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%}
 
-/* Sidebar nav links */
-.sidebar-nav{display:flex;flex-direction:column;gap:2px}
-.sidebar-link{font-size:14px;color:var(--text2);padding:8px 12px;border-radius:8px;cursor:pointer;transition:background .15s,color .15s;font-weight:500;background:none;border:none;text-align:left;font-family:var(--f)}
-.sidebar-link:hover{background:var(--surface);color:var(--text)}
-.sidebar-link.active{background:var(--surface);color:var(--accent);font-weight:600}
-
 /* SECTIONS */
-.section{margin-bottom:32px}
+.section{margin-bottom:0}
 .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .section-title{font-size:11px;font-family:var(--m);color:var(--text3);text-transform:uppercase;letter-spacing:2.5px}
 .edit-btn{font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:var(--f);font-weight:600;padding:4px 0;transition:opacity .2s}
@@ -101,7 +97,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;ali
 .danger-link:hover{color:#ef4444}
 
 @media(max-width:768px){
-  .profile-header{flex-direction:row;align-items:center}
+  .page-top{grid-template-columns:1fr}
+  .page-bottom{grid-template-columns:1fr}
   .modal{border-radius:20px 20px 0 0;padding:24px 20px 36px}
 }
 </style>
@@ -127,139 +124,100 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;ali
 </div>
 
 <div class="page">
-<div class="page-inner">
 
-  <!-- SIDEBAR -->
-  <div class="page-sidebar">
-    <div class="profile-header">
-      <div class="avatar" id="avatar-initials">?</div>
-      <div class="profile-meta">
-        <h1 id="display-name">Loading...</h1>
-        <span id="display-phone"></span>
-        <div class="badge">Active</div>
-      </div>
-    </div>
-    <nav class="sidebar-nav">
-      <button class="sidebar-link active" onclick="scrollTo('s-basics')">About you</button>
-      <button class="sidebar-link" onclick="scrollTo('s-body')">Body stats</button>
-      <button class="sidebar-link" onclick="scrollTo('s-goals')">Goals</button>
-      <button class="sidebar-link" onclick="scrollTo('s-training')">Training</button>
-      <button class="sidebar-link" onclick="scrollTo('s-nutrition')">Food & schedule</button>
-    </nav>
-  </div>
+  <!-- TOP ROW: profile card left, About you right -->
+  <div class="page-top">
 
-  <!-- MAIN CONTENT -->
-  <div class="page-main">
+    <!-- Profile card -->
+    <div class="profile-card">
+      <div class="profile-header">
+        <div class="avatar" id="avatar-initials">?</div>
+        <div class="profile-meta">
+          <h1 id="display-name">Your Profile</h1>
+          <span id="display-phone"></span>
+          <div class="badge">Active</div>
+        </div>
+      </div>
+    </div>
 
-  <!-- BASICS -->
-  <div class="section" id="s-basics">
-    <div class="section-header">
-      <span class="section-title">About you</span>
-      <button class="edit-btn" onclick="openModal('basics')">Edit</button>
-    </div>
-    <div class="card">
-      <div class="field-row">
-        <div><div class="field-label">Name</div><div class="field-value" id="v-name">—</div></div>
+    <!-- About you -->
+    <div class="section" id="s-basics">
+      <div class="section-header">
+        <span class="section-title">About you</span>
+        <button class="edit-btn" onclick="openModal('basics')">Edit</button>
       </div>
-      <div class="field-row">
-        <div><div class="field-label">Age</div><div class="field-value" id="v-age">—</div></div>
-      </div>
-      <div class="field-row">
-        <div><div class="field-label">Gender</div><div class="field-value" id="v-gender">—</div></div>
-      </div>
-      <div class="field-row">
-        <div><div class="field-label">Occupation</div><div class="field-value" id="v-occupation">—</div></div>
+      <div class="card">
+        <div class="field-row"><div><div class="field-label">Name</div><div class="field-value" id="v-name">—</div></div></div>
+        <div class="field-row"><div><div class="field-label">Age</div><div class="field-value" id="v-age">—</div></div></div>
+        <div class="field-row"><div><div class="field-label">Gender</div><div class="field-value" id="v-gender">—</div></div></div>
+        <div class="field-row"><div><div class="field-label">Occupation</div><div class="field-value" id="v-occupation">—</div></div></div>
       </div>
     </div>
-  </div>
 
-  <!-- BODY STATS -->
-  <div class="section" id="s-body">
-    <div class="section-header">
-      <span class="section-title">Body stats</span>
-      <button class="edit-btn" onclick="openModal('body')">Edit</button>
-    </div>
-    <div class="card">
-      <div class="field-row">
-        <div><div class="field-label">Height</div><div class="field-value" id="v-height">—</div></div>
-      </div>
-      <div class="field-row">
-        <div><div class="field-label">Weight</div><div class="field-value" id="v-weight">—</div></div>
-      </div>
-      <div class="field-row">
-        <div><div class="field-label">Body fat %</div><div class="field-value" id="v-bodyfat">—</div></div>
-      </div>
-    </div>
-  </div>
+  </div><!-- /page-top -->
 
-  <!-- GOALS -->
-  <div class="section" id="s-goals">
-    <div class="section-header">
-      <span class="section-title">Goals</span>
-      <button class="edit-btn" onclick="openModal('goals')">Edit</button>
-    </div>
-    <div class="card">
-      <div id="v-goals-wrap" class="pills"></div>
-      <div class="field-row">
-        <div><div class="field-label">Biggest obstacle</div><div class="field-value" id="v-obstacle">—</div></div>
-      </div>
-    </div>
-  </div>
+  <!-- BOTTOM ROW: left col + right col -->
+  <div class="page-bottom">
 
-  <!-- TRAINING -->
-  <div class="section" id="s-training">
-    <div class="section-header">
-      <span class="section-title">Training</span>
-      <button class="edit-btn" onclick="openModal('training')">Edit</button>
+    <!-- Bottom left: Body stats + Goals -->
+    <div>
+      <div class="section" id="s-body" style="margin-bottom:24px">
+        <div class="section-header">
+          <span class="section-title">Body stats</span>
+          <button class="edit-btn" onclick="openModal('body')">Edit</button>
+        </div>
+        <div class="card">
+          <div class="field-row"><div><div class="field-label">Height</div><div class="field-value" id="v-height">—</div></div></div>
+          <div class="field-row"><div><div class="field-label">Weight</div><div class="field-value" id="v-weight">—</div></div></div>
+          <div class="field-row"><div><div class="field-label">Body fat %</div><div class="field-value" id="v-bodyfat">—</div></div></div>
+        </div>
+      </div>
+      <div class="section" id="s-goals">
+        <div class="section-header">
+          <span class="section-title">Goals</span>
+          <button class="edit-btn" onclick="openModal('goals')">Edit</button>
+        </div>
+        <div class="card">
+          <div id="v-goals-wrap" class="pills"></div>
+          <div class="field-row"><div><div class="field-label">Biggest obstacle</div><div class="field-value" id="v-obstacle">—</div></div></div>
+        </div>
+      </div>
     </div>
-    <div class="card">
-      <div class="field-row">
-        <div><div class="field-label">Experience</div><div class="field-value" id="v-experience">—</div></div>
-      </div>
-      <div class="field-row">
-        <div><div class="field-label">Equipment</div><div class="field-value" id="v-equipment">—</div></div>
-      </div>
-      <div class="field-row">
-        <div><div class="field-label">Training days</div><div class="field-value" id="v-days">—</div></div>
-      </div>
-      <div class="field-row">
-        <div><div class="field-label">Workout time</div><div class="field-value" id="v-workout-time">—</div></div>
-      </div>
-      <div class="field-row">
-        <div><div class="field-label">Injuries / limitations</div><div class="field-value" id="v-injuries">—</div></div>
-      </div>
-    </div>
-  </div>
 
-  <!-- NUTRITION -->
-  <div class="section" id="s-nutrition">
-    <div class="section-header">
-      <span class="section-title">Food & schedule</span>
-      <button class="edit-btn" onclick="openModal('nutrition')">Edit</button>
+    <!-- Bottom right: Training + Nutrition -->
+    <div>
+      <div class="section" id="s-training" style="margin-bottom:24px">
+        <div class="section-header">
+          <span class="section-title">Training</span>
+          <button class="edit-btn" onclick="openModal('training')">Edit</button>
+        </div>
+        <div class="card">
+          <div class="field-row"><div><div class="field-label">Experience</div><div class="field-value" id="v-experience">—</div></div></div>
+          <div class="field-row"><div><div class="field-label">Equipment</div><div class="field-value" id="v-equipment">—</div></div></div>
+          <div class="field-row"><div><div class="field-label">Training days</div><div class="field-value" id="v-days">—</div></div></div>
+          <div class="field-row"><div><div class="field-label">Workout time</div><div class="field-value" id="v-workout-time">—</div></div></div>
+          <div class="field-row"><div><div class="field-label">Injuries / limitations</div><div class="field-value" id="v-injuries">—</div></div></div>
+        </div>
+      </div>
+      <div class="section" id="s-nutrition">
+        <div class="section-header">
+          <span class="section-title">Food & schedule</span>
+          <button class="edit-btn" onclick="openModal('nutrition')">Edit</button>
+        </div>
+        <div class="card">
+          <div class="field-row"><div><div class="field-label">Diet</div><div class="field-value" id="v-diet">—</div></div></div>
+          <div class="field-row"><div><div class="field-label">Eating situation</div><div class="field-value" id="v-cooking">—</div></div></div>
+          <div class="field-row"><div><div class="field-label">Restrictions / allergies</div><div class="field-value" id="v-restrictions">—</div></div></div>
+          <div class="field-row"><div><div class="field-label">Sleep</div><div class="field-value" id="v-sleep">—</div></div></div>
+          <div class="field-row"><div><div class="field-label">Wearable</div><div class="field-value" id="v-wearable">—</div></div></div>
+        </div>
+      </div>
     </div>
-    <div class="card">
-      <div class="field-row">
-        <div><div class="field-label">Diet</div><div class="field-value" id="v-diet">—</div></div>
-      </div>
-      <div class="field-row">
-        <div><div class="field-label">Eating situation</div><div class="field-value" id="v-cooking">—</div></div>
-      </div>
-      <div class="field-row">
-        <div><div class="field-label">Restrictions / allergies</div><div class="field-value" id="v-restrictions">—</div></div>
-      </div>
-      <div class="field-row">
-        <div><div class="field-label">Sleep</div><div class="field-value" id="v-sleep">—</div></div>
-      </div>
-      <div class="field-row">
-        <div><div class="field-label">Wearable</div><div class="field-value" id="v-wearable">—</div></div>
-      </div>
-    </div>
-  </div>
+
+  </div><!-- /page-bottom -->
 
   <a href="index.html" class="danger-link">← Back to home</a>
 
-  </div><!-- /page-main -->
-</div><!-- /page-inner -->
 </div><!-- /page -->
 
 <!-- EDIT MODALS -->
@@ -518,14 +476,6 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-// ── Sidebar scroll ───────────────────────────────────────────────────────────
-function scrollTo(id) {
-  const el = document.getElementById(id);
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-  event.target.classList.add('active');
 }
 
 // ── Init ─────────────────────────────────────────────────────────────────────
