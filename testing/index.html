@@ -106,7 +106,7 @@ nav {
 .hero-headline em {
   font-family: 'Playfair Display', Georgia, serif;
   font-style: italic;
-  color: rgba(255,255,255,0.75);
+  color: #7C3AFF;
   display: block;
   font-size: 0.88em;
   letter-spacing: -1px;
@@ -137,7 +137,7 @@ nav {
   transition: opacity .2s, transform .2s;
   white-space: nowrap;
 }
-.hero-cta:hover { opacity: .88; transform: translateY(-1px); }
+.hero-cta:hover { background: #7C3AFF; color: #fff; transform: translateY(-1px); }
 .hero-cta-icon {
   width: 28px; height: 28px;
   flex-shrink: 0;
@@ -775,10 +775,14 @@ footer {
   .hero-right {
     padding-left: 0;
     gap: 14px;
+    width: 100%;
   }
   .hero-cta {
     font-size: 16px;
-    padding: 16px 28px;
+    padding: 18px 28px;
+    border-radius: 14px;
+    width: 100%;
+    justify-content: center;
   }
   .hero-sub {
     font-size: 14px;
