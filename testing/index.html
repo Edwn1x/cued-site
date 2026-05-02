@@ -56,34 +56,34 @@ nav {
 /* ── Hero ── */
 .hero {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
   padding: 0 clamp(32px, 7vw, 100px);
   position: relative;
   overflow: hidden;
 }
 
-/* Full-bleed background image */
+/* Full-bleed background image — lighter so the phone shows through */
 .hero-bg {
   position: absolute;
   inset: 0;
   width: 100%; height: 100%;
   object-fit: cover;
   object-position: center 40%;
-  filter: brightness(0.32) contrast(1.1) saturate(0.65);
+  filter: brightness(0.62) contrast(1.05) saturate(0.75);
   z-index: 0;
 }
 
-/* Gradient overlays on top of video */
+/* Gradient: heavy black on left so text reads, fades to near-transparent on right */
 .hero::before {
   content: '';
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 60% 80% at 10% 50%, rgba(124,58,255,0.10) 0%, transparent 65%),
-    linear-gradient(to right, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.3) 45%, rgba(0,0,0,0.65) 100%),
-    linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, transparent 20%, transparent 75%, rgba(0,0,0,0.6) 100%);
+    radial-gradient(ellipse 55% 80% at 8% 50%, rgba(124,58,255,0.12) 0%, transparent 60%),
+    linear-gradient(to right, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 38%, rgba(0,0,0,0.08) 65%, rgba(0,0,0,0.0) 100%),
+    linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, transparent 15%, transparent 80%, rgba(0,0,0,0.45) 100%);
   z-index: 1;
   pointer-events: none;
 }
@@ -92,7 +92,7 @@ nav {
 .hero-left {
   position: relative;
   z-index: 2;
-  max-width: 680px;
+  padding-right: clamp(32px, 4vw, 80px);
 }
 .hero-headline {
   font-family: 'DM Sans', -apple-system, sans-serif;
@@ -740,9 +740,10 @@ footer {
 
 @media (max-width: 768px) {
   .hero {
-    padding: 100px 28px 60px;
+    grid-template-columns: 1fr;
+    padding: 120px 28px 80px;
   }
-  .hero-left { max-width: 100%; }
+  .hero-left { padding-right: 0; }
   .iphone {
     width: min(260px, 70vw);
     transform: perspective(1000px) rotateY(0deg) rotateX(2deg);
