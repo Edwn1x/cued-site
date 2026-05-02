@@ -56,23 +56,23 @@ nav {
 /* ── Hero ── */
 .hero {
   min-height: 100vh;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   padding: 0 clamp(32px, 7vw, 100px);
   position: relative;
   overflow: hidden;
 }
 
-/* Full-bleed background video */
-.hero-video {
+/* Full-bleed background image */
+.hero-bg {
   position: absolute;
   inset: 0;
   width: 100%; height: 100%;
   object-fit: cover;
-  filter: brightness(0.28) contrast(1.1) saturate(0.6);
+  object-position: center 40%;
+  filter: brightness(0.32) contrast(1.1) saturate(0.65);
   z-index: 0;
-  transition: opacity 1.5s ease;
 }
 
 /* Gradient overlays on top of video */
@@ -92,11 +92,11 @@ nav {
 .hero-left {
   position: relative;
   z-index: 2;
-  padding-right: clamp(32px, 4vw, 80px);
+  max-width: 680px;
 }
 .hero-headline {
   font-family: 'DM Sans', -apple-system, sans-serif;
-  font-size: clamp(44px, 6vw, 82px);
+  font-size: clamp(48px, 7vw, 96px);
   font-weight: 700;
   line-height: 1.05;
   letter-spacing: -2px;
@@ -136,15 +136,6 @@ nav {
   font-weight: 300;
 }
 
-/* ── Right ── */
-.hero-right {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 80px 0;
-}
 
 /* ════════════════════════════════════════════
    HYPERREALISTIC iPHONE 15 PRO
@@ -604,6 +595,112 @@ nav {
 }
 
 /* ── Mobile ── */
+/* ── How it works section ── */
+.hiw {
+  background: #080809;
+  padding: clamp(80px, 10vw, 140px) clamp(32px, 7vw, 100px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(48px, 6vw, 100px);
+  align-items: center;
+}
+.hiw-left {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+.hiw-label {
+  font-size: 11px;
+  font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+  color: #7C3AFF;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.hiw-headline {
+  font-size: clamp(32px, 4vw, 56px);
+  font-weight: 700;
+  letter-spacing: -2px;
+  line-height: 1.05;
+  color: #fff;
+  margin-bottom: 16px;
+}
+.hiw-sub {
+  font-size: 16px;
+  color: rgba(255,255,255,0.45);
+  font-weight: 300;
+  line-height: 1.7;
+  max-width: 420px;
+}
+.hiw-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.hiw-step {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.hiw-step-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(124,58,255,0.15);
+  border: 1px solid rgba(124,58,255,0.3);
+  color: #7C3AFF;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.hiw-step-body h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 4px;
+  letter-spacing: -.2px;
+}
+.hiw-step-body p {
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+  font-weight: 300;
+  line-height: 1.6;
+}
+.hiw-right {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.hiw-right .iphone {
+  width: clamp(260px, 28vw, 360px);
+  /* Reset entrance animation for hiw phone — it's below fold */
+  opacity: 1;
+  animation: none;
+  transform: perspective(1200px) rotateY(-6deg) rotateX(2deg);
+}
+.hiw-img {
+  width: 100%;
+  max-width: 520px;
+  border-radius: 24px;
+  object-fit: cover;
+  aspect-ratio: 4/3;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+}
+
+@media (max-width: 768px) {
+  .hiw {
+    grid-template-columns: 1fr;
+    gap: 48px;
+    text-align: center;
+  }
+  .hiw-step { text-align: left; }
+  .hiw-right .iphone {
+    width: min(260px, 70vw);
+    transform: perspective(1000px) rotateY(0deg) rotateX(2deg);
+  }
+}
+
 /* ── Footer ── */
 footer {
   background: #060607;
@@ -643,15 +740,9 @@ footer {
 
 @media (max-width: 768px) {
   .hero {
-    grid-template-columns: 1fr;
-    text-align: center;
     padding: 100px 28px 60px;
-    gap: 56px;
-    overflow-x: clip;
   }
-  .hero-left { padding-right: 0; }
-  .hero-cta { margin: 0 auto; }
-  .hero-right { order: -1; }
+  .hero-left { max-width: 100%; }
   .iphone {
     width: min(260px, 70vw);
     transform: perspective(1000px) rotateY(0deg) rotateX(2deg);
@@ -676,12 +767,7 @@ footer {
 
 <section class="hero">
 
-  <video class="hero-video" id="hv1" autoplay muted playsinline>
-    <source src="https://videos.pexels.com/video-files/4859758/4859758-hd_1920_1080_25fps.mp4" type="video/mp4">
-  </video>
-  <video class="hero-video" id="hv2" muted playsinline style="opacity:0">
-    <source src="https://videos.pexels.com/video-files/3125907/3125907-hd_1920_1080_25fps.mp4" type="video/mp4">
-  </video>
+  <img class="hero-bg" src="../images/hero-bg.jpeg" alt="">
 
   <div class="hero-left">
     <h1 class="hero-headline">
@@ -695,8 +781,43 @@ footer {
     <p class="hero-sub">Personal coaching for everyone. No app. No gym. Just texts.</p>
   </div>
 
-  <div class="hero-right">
+</section>
 
+<!-- ── How it works ── -->
+<section class="hiw">
+
+  <div class="hiw-left">
+    <div>
+      <p class="hiw-label">How it works</p>
+      <h2 class="hiw-headline">Your coach lives<br>in your Messages</h2>
+      <p class="hiw-sub">No app to download. No subscription gym. Cued coaches you entirely through iMessage — workouts, check-ins, nutrition, accountability.</p>
+    </div>
+    <div class="hiw-steps">
+      <div class="hiw-step">
+        <div class="hiw-step-num">1</div>
+        <div class="hiw-step-body">
+          <h3>Sign up in 60 seconds</h3>
+          <p>Share your goals, schedule, and current fitness level. No forms, no onboarding maze.</p>
+        </div>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-step-num">2</div>
+        <div class="hiw-step-body">
+          <h3>Get your plan every morning</h3>
+          <p>Your coach texts you today's workout and nutrition tips — right in Messages.</p>
+        </div>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-step-num">3</div>
+        <div class="hiw-step-body">
+          <h3>Check in. Make progress.</h3>
+          <p>Text when you're done. Your coach logs it, adapts, and keeps you on track.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hiw-right">
     <!-- HYPERREALISTIC iPHONE -->
     <div class="iphone">
 
@@ -761,8 +882,8 @@ footer {
 
       <div class="iphone-glow"></div>
     </div><!-- /iphone -->
-
   </div>
+
 </section>
 
 <footer>
@@ -783,19 +904,6 @@ footer {
 
 <script>
 (function () {
-
-  /* ── Video crossfade ── */
-  var v1 = document.getElementById('hv1');
-  var v2 = document.getElementById('hv2');
-  var active = v1, next = v2;
-  v2.load();
-  function crossfade() {
-    next.currentTime = 0; next.play();
-    next.style.opacity = '1'; active.style.opacity = '0';
-    var tmp = active; active = next; next = tmp;
-  }
-  v1.addEventListener('ended', crossfade);
-  v2.addEventListener('ended', crossfade);
 
   /* ── Chat animation ── */
   var container = document.getElementById('chatMsgs');
