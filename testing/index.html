@@ -721,6 +721,125 @@ nav {
   }
 }
 
+/* ── Hero frosted glass bottom fade ── */
+.hero-frost {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 160px;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: linear-gradient(to top,
+    rgba(8,8,9,0.85) 0%,
+    rgba(8,8,9,0.4) 40%,
+    transparent 100%);
+  -webkit-backdrop-filter: blur(0px);
+  backdrop-filter: blur(0px);
+  /* mask so blur only shows at very bottom */
+  -webkit-mask-image: linear-gradient(to top, black 0%, black 40%, transparent 100%);
+  mask-image: linear-gradient(to top, black 0%, black 40%, transparent 100%);
+}
+.hero-frost.visible {
+  opacity: 1;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+/* ── Highlights (dark theme adaptation) ── */
+.highlights {
+  padding: clamp(80px,10vw,140px) clamp(24px,6vw,100px);
+  background: #080809;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.highlights-i { max-width: 1100px; margin: 0 auto; }
+.highlights-hd { text-align: center; margin-bottom: 56px; }
+.highlights-hd h2 {
+  font-size: clamp(36px,5vw,60px);
+  font-weight: 700;
+  letter-spacing: -2.5px;
+  color: #fff;
+  line-height: 1.05;
+}
+.hl-tabs {
+  display: flex; gap: 8px; justify-content: center;
+  flex-wrap: wrap; margin-bottom: 48px;
+}
+.hl-tab {
+  padding: 10px 22px; border-radius: 980px;
+  font-size: 14px; font-weight: 500;
+  color: rgba(255,255,255,0.4);
+  background: none; border: 1px solid rgba(255,255,255,0.12);
+  cursor: pointer; transition: all .2s;
+  font-family: 'DM Sans', -apple-system, sans-serif;
+}
+.hl-tab:hover { color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.25); }
+.hl-tab.active { background: #fff; color: #080809; border-color: #fff; }
+.hl-carousel { position: relative; padding: 0 48px; }
+.hl-arrow {
+  position: absolute; top: 50%; transform: translateY(-60%);
+  z-index: 10; width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .2s; font-size: 18px;
+  color: rgba(255,255,255,0.6); line-height: 1; flex-shrink: 0;
+}
+.hl-arrow:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+.hl-arrow.prev { left: 0; }
+.hl-arrow.next { right: 0; }
+.hl-panels { overflow: hidden; }
+.hl-track {
+  display: flex;
+  transition: transform .6s cubic-bezier(.4,0,.2,1);
+  will-change: transform;
+}
+.hl-panel {
+  flex: 0 0 100%; display: flex;
+  align-items: center; gap: clamp(40px,6vw,96px);
+  opacity: .3; transform: scale(.97);
+  transition: opacity .6s ease, transform .6s ease;
+  pointer-events: none;
+}
+.hl-panel.active { opacity: 1; transform: scale(1); pointer-events: auto; }
+.hl-icon {
+  flex-shrink: 0; width: 340px; height: 340px;
+  border-radius: 28px; display: flex;
+  align-items: center; justify-content: center;
+  font-size: 96px; overflow: hidden;
+  background: rgba(255,255,255,0.04);
+}
+.hl-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 28px; }
+.hl-body { flex: 1; }
+.hl-badge {
+  display: inline-block; font-size: 11px; font-weight: 600;
+  color: #7C3AFF; background: rgba(124,58,255,0.12);
+  padding: 4px 12px; border-radius: 980px;
+  letter-spacing: .5px; margin-bottom: 20px;
+}
+.hl-body h3 {
+  font-size: clamp(26px,3.5vw,42px); font-weight: 700;
+  letter-spacing: -1.5px; color: #fff;
+  margin-bottom: 16px; line-height: 1.1;
+}
+.hl-body p {
+  font-size: 17px; color: rgba(255,255,255,0.45);
+  font-weight: 300; line-height: 1.65; max-width: 460px;
+}
+.hl-dots { display: flex; gap: 8px; justify-content: center; margin-top: 40px; }
+.hl-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  transition: all .3s; cursor: pointer; border: none;
+}
+.hl-dot.active { width: 20px; border-radius: 3px; background: #fff; }
+@media (max-width: 900px) { .hl-arrow { display: none; } .hl-carousel { padding: 0; } }
+@media (max-width: 768px) {
+  .hl-panel { flex-direction: column; }
+  .hl-icon { width: 100%; height: 220px; border-radius: 20px; }
+  .hl-tabs { gap: 6px; }
+  .hl-tab { font-size: 13px; padding: 8px 16px; }
+}
+
 /* ── Footer ── */
 footer {
   background: #060607;
@@ -830,6 +949,8 @@ footer {
     <p class="hero-sub">Personal coaching for everyone.<br>No app. Just texts.</p>
   </div>
 
+  <div class="hero-frost" id="heroFrost"></div>
+
 </section>
 
 <!-- ── How it works ── -->
@@ -933,6 +1054,79 @@ footer {
     </div><!-- /iphone -->
   </div>
 
+</section>
+
+<!-- ── Highlights ── -->
+<section class="highlights" id="highlights">
+  <div class="highlights-i">
+    <div class="highlights-hd">
+      <h2>Get the highlights.</h2>
+    </div>
+    <div class="hl-tabs">
+      <button class="hl-tab active" data-tab="training">Training</button>
+      <button class="hl-tab" data-tab="nutrition">Nutrition</button>
+      <button class="hl-tab" data-tab="recovery">Recovery</button>
+      <button class="hl-tab" data-tab="accountability">Accountability</button>
+      <button class="hl-tab" data-tab="adaptability">Adaptability</button>
+    </div>
+    <div class="hl-carousel">
+      <button class="hl-arrow prev" id="hlPrev">&#8592;</button>
+      <button class="hl-arrow next" id="hlNext">&#8594;</button>
+      <div class="hl-panels">
+        <div class="hl-track" id="hlTrack">
+          <div class="hl-panel active" data-panel="training">
+            <div class="hl-icon">
+              <img src="../images/barbell.jpg" alt="Training">
+            </div>
+            <div class="hl-body">
+              <span class="hl-badge">Built for you</span>
+              <h3>Your workout, ready before you even ask.</h3>
+              <p>Every morning you get your exact session — exercises, sets, weights — built on your history and what your body can handle that day. No guesswork, no planning.</p>
+            </div>
+          </div>
+          <div class="hl-panel" data-panel="nutrition">
+            <div class="hl-icon">
+              <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=700&q=80" alt="Nutrition">
+            </div>
+            <div class="hl-body">
+              <span class="hl-badge">Calibrated daily</span>
+              <h3>Eat for what you actually did today.</h3>
+              <p>Heavy leg day? More carbs. Rest day? Lighter meals. Your food plan shifts with your training automatically — no app, no calorie logging, no guessing.</p>
+            </div>
+          </div>
+          <div class="hl-panel" data-panel="recovery">
+            <div class="hl-icon">
+              <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=700&q=80" alt="Recovery">
+            </div>
+            <div class="hl-body">
+              <span class="hl-badge">Always watching</span>
+              <h3>Know when to rest — and when to push.</h3>
+              <p>Cued reads your sleep and HRV data to decide if today calls for a hard session or a deload. No burnout, no wasted easy days when you had more in the tank.</p>
+            </div>
+          </div>
+          <div class="hl-panel" data-panel="accountability">
+            <div class="hl-icon" style="background:rgba(255,255,255,0.04);font-size:96px">💬</div>
+            <div class="hl-body">
+              <span class="hl-badge">Always there</span>
+              <h3>The nudge you need. Not the spam you don't.</h3>
+              <p>Your coach knows when to push and when to back off. Miss a few days? A gentle check-in, not a guilt trip. Crushing it? Your coach notices that too.</p>
+            </div>
+          </div>
+          <div class="hl-panel" data-panel="adaptability">
+            <div class="hl-icon">
+              <img src="../images/wearable.jpg" alt="Adaptability">
+            </div>
+            <div class="hl-body">
+              <span class="hl-badge">Always evolving</span>
+              <h3>A coach that learns you over time.</h3>
+              <p>Only 40 minutes today? Traveling? Skipped a session? Cued adjusts on the fly — your plan always fits your life, not the other way around.</p>
+            </div>
+          </div>
+        </div><!-- /hl-track -->
+      </div><!-- /hl-panels -->
+      <div class="hl-dots" id="hlDots"></div>
+    </div>
+  </div>
 </section>
 
 <footer>
@@ -1071,6 +1265,61 @@ footer {
   // Start after phone entrance animation settles
   setTimeout(runConversation, 1400);
 
+}());
+
+/* ── Hero frosted glass bottom fade on scroll ── */
+(function() {
+  var frost = document.getElementById('heroFrost');
+  if (!frost) return;
+  window.addEventListener('scroll', function() {
+    frost.classList.toggle('visible', window.scrollY > 40);
+  }, { passive: true });
+}());
+
+/* ── Highlights carousel ── */
+(function(){
+  var tabs = Array.from(document.querySelectorAll('.hl-tab'));
+  var panels = Array.from(document.querySelectorAll('.hl-panel'));
+  var track = document.getElementById('hlTrack');
+  var dotsEl = document.getElementById('hlDots');
+  var prevBtn = document.getElementById('hlPrev');
+  var nextBtn = document.getElementById('hlNext');
+  if (!tabs.length || !panels.length || !track) return;
+
+  var current = 0;
+  var timer = null;
+  var INTERVAL = 4500;
+
+  panels.forEach(function(_, i) {
+    var d = document.createElement('button');
+    d.className = 'hl-dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', function() { goTo(i, true); });
+    dotsEl.appendChild(d);
+  });
+  var dots = Array.from(dotsEl.querySelectorAll('.hl-dot'));
+
+  function goTo(idx, userInitiated) {
+    panels[current].classList.remove('active');
+    tabs[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = (idx + panels.length) % panels.length;
+    panels[current].classList.add('active');
+    tabs[current].classList.add('active');
+    dots[current].classList.add('active');
+    track.style.transform = 'translateX(-' + current + '00%)';
+    if (userInitiated) resetTimer();
+  }
+
+  function resetTimer() {
+    clearInterval(timer);
+    timer = setInterval(function() { goTo(current + 1, false); }, INTERVAL);
+  }
+
+  tabs.forEach(function(tab, i) { tab.addEventListener('click', function() { goTo(i, true); }); });
+  prevBtn.addEventListener('click', function() { goTo(current - 1, true); });
+  nextBtn.addEventListener('click', function() { goTo(current + 1, true); });
+
+  resetTimer();
 }());
 </script>
 </body>
