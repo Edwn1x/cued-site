@@ -78,10 +78,15 @@ html, body { height: 100%; }
 .co-success p{font-size:15px;color:rgba(255,255,255,0.45);font-weight:300;line-height:1.6;max-width:300px}
 /* Mobile: bottom sheet on small screens */
 @media(max-width:600px){
-  .co-bg{align-items:flex-end;padding:0}
-  .co-sheet{border-radius:24px 24px 0 0;max-height:92vh;transform:translateY(100%);opacity:1}
+  .co-bg{align-items:flex-end;padding:0;/* use dvh so keyboard resize doesn't push sheet */height:100dvh}
+  .co-sheet{width:100%;box-sizing:border-box;border-radius:24px 24px 0 0;max-height:92dvh;transform:translateY(100%);opacity:1;overflow:hidden}
   .co-bg.open .co-sheet{transform:translateY(0);opacity:1}
   .co-handle{display:block;width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.15);margin:14px auto 0;flex-shrink:0}
+  .co-msgs{padding:16px 16px}
+  .co-input-area{padding:10px 14px 16px}
+  .co-input{font-size:16px;/* prevent iOS auto-zoom on focus */}
+  .co-chips{gap:7px}
+  .co-chip{font-size:13px;padding:8px 14px}
 }
 body {
   font-family: 'DM Sans', -apple-system, sans-serif;
