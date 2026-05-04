@@ -753,70 +753,6 @@ nav {
   z-index: 3;
 }
 
-/* CSS phone frame */
-.sw-phone {
-  width: 280px;
-  height: 560px;
-  background: #0a0a0c;
-  border-radius: 44px;
-  border: 2px solid rgba(255,255,255,0.12);
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.04),
-    0 40px 80px rgba(0,0,0,0.8),
-    0 0 60px rgba(124,58,255,0.08);
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Notch */
-.sw-phone-notch {
-  width: 100px;
-  height: 28px;
-  background: #0a0a0c;
-  border-radius: 0 0 18px 18px;
-  margin: 0 auto;
-  flex-shrink: 0;
-  position: relative;
-  z-index: 2;
-}
-
-/* Status bar */
-.sw-status {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 18px 0;
-  font-size: 11px;
-  color: rgba(255,255,255,0.7);
-  font-weight: 600;
-  font-family: -apple-system, sans-serif;
-  flex-shrink: 0;
-}
-
-/* Contact header */
-.sw-contact {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 8px 0 10px;
-  border-bottom: 0.5px solid rgba(255,255,255,0.08);
-  flex-shrink: 0;
-}
-.sw-contact-avatar {
-  width: 40px; height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #7C3AFF, #A78BFA);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 17px; font-weight: 700; color: #fff;
-  font-family: -apple-system, sans-serif;
-  margin-bottom: 4px;
-}
-.sw-contact-name {
-  font-size: 12px; font-weight: 600; color: #fff;
-  font-family: -apple-system, sans-serif;
-}
-
 /* Conversation area — states stack, crossfade */
 .sw-convos {
   flex: 1;
@@ -826,70 +762,21 @@ nav {
 .sw-convo {
   position: absolute;
   inset: 0;
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
   overflow: hidden;
   opacity: 0;
   transition: opacity 0.4s ease;
 }
 .sw-convo.active { opacity: 1; }
 
-/* Message bubbles */
-.sw-msg {
-  max-width: 82%;
-  padding: 8px 12px;
-  border-radius: 16px;
-  font-size: 13px;
-  line-height: 1.45;
-  font-family: -apple-system, sans-serif;
+/* Walkthrough phone — reuse hero iphone system with context overrides */
+.sw-phone-wrap .iphone {
+  width: 280px;
+  transform: none;
+  filter: drop-shadow(0 40px 60px rgba(0,0,0,0.85)) drop-shadow(0 0 30px rgba(124,58,255,0.12));
 }
-.sw-msg.them {
-  background: #2c2c2e;
-  color: #fff;
-  border-bottom-left-radius: 4px;
-  align-self: flex-start;
-}
-.sw-msg.me {
-  background: #007AFF;
-  color: #fff;
-  border-bottom-right-radius: 4px;
-  align-self: flex-end;
-}
-.sw-ts {
-  text-align: center;
-  font-size: 9px;
-  color: rgba(255,255,255,0.3);
-  font-family: -apple-system, sans-serif;
-  margin: 2px 0;
-}
-/* Input bar */
-.sw-phone-input {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 12px 16px;
-  border-top: 0.5px solid rgba(255,255,255,0.07);
-  flex-shrink: 0;
-}
-.sw-phone-input-field {
-  flex: 1;
-  background: rgba(255,255,255,0.06);
-  border: 0.5px solid rgba(255,255,255,0.1);
-  border-radius: 18px;
-  padding: 7px 12px;
-  font-size: 10px;
-  color: rgba(255,255,255,0.2);
-  font-family: -apple-system, sans-serif;
-}
-.sw-phone-send {
-  width: 26px; height: 26px;
-  background: #007AFF;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 11px; flex-shrink: 0;
-}
+.sw-phone-wrap .iphone-frame { border-radius: 44px; }
+.sw-phone-wrap .iphone-inner { border-radius: calc(44px - 3px); }
+.sw-phone-wrap .screen { border-radius: calc(44px - 3px); }
 
 /* ── Left step content (hidden during entry, shows during walkthrough) ── */
 .sw-steps-wrap {
@@ -1245,67 +1132,109 @@ footer {
 
     <!-- Phone -->
     <div class="sw-phone-wrap" id="swPhoneWrap">
-      <div class="sw-phone">
-        <div class="sw-notch-bar">
-          <div class="sw-status">
-            <span>9:41</span>
-            <span style="display:flex;gap:4px;align-items:center;font-size:10px">▲▲▲ ✦ ▮</span>
-          </div>
-          <div class="sw-phone-notch"></div>
+      <div class="iphone">
+        <!-- Titanium chassis -->
+        <div class="iphone-frame">
+          <div class="iphone-inner"></div>
         </div>
 
-        <div class="sw-contact">
-          <div class="sw-contact-avatar">C</div>
-          <div class="sw-contact-name">Cued</div>
-        </div>
+        <!-- Physical side buttons -->
+        <div class="iphone-btn-action"></div>
+        <div class="iphone-btn-vol-up"></div>
+        <div class="iphone-btn-vol-down"></div>
+        <div class="iphone-btn-power"></div>
 
-        <!-- Conversations -->
-        <div class="sw-convos">
-
-          <!-- State 0: empty / typing hint -->
-          <div class="sw-convo active" id="swConvo0">
-            <div class="sw-ts">Today 6:42 AM</div>
-            <div class="sw-msg them" style="display:flex;gap:5px;align-items:center;background:#2c2c2e;color:rgba(255,255,255,0.4)">
-              <span style="display:inline-flex;gap:3px">
-                <span style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.4);animation:swDot 1.2s ease-in-out infinite"></span>
-                <span style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.4);animation:swDot 1.2s ease-in-out .2s infinite"></span>
-                <span style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.4);animation:swDot 1.2s ease-in-out .4s infinite"></span>
+        <!-- Screen contents -->
+        <div class="screen">
+          <!-- Status bar -->
+          <div class="s-status">
+            <span class="s-time">9:41</span>
+            <span class="s-icons">
+              <span class="s-signal">
+                <span></span><span></span><span></span><span></span>
               </span>
+              <span class="s-wifi"><span class="s-wifi-dot"></span></span>
+              <span class="s-battery">
+                <span class="s-battery-body"><span class="s-battery-fill"></span></span>
+                <span class="s-battery-tip"></span>
+              </span>
+            </span>
+          </div>
+
+          <!-- Dynamic island -->
+          <div class="s-island"></div>
+
+          <!-- Messages nav -->
+          <div class="s-imsg-nav">
+            <div class="s-imsg-nav-wrap">
+              <div class="s-avatar">C</div>
+              <div class="s-contact-name">Cued</div>
             </div>
+            <div class="s-imsg-back">‹ Messages</div>
           </div>
 
-          <!-- State 1: Sign up -->
-          <div class="sw-convo" id="swConvo1">
-            <div class="sw-ts">Today 6:42 AM</div>
-            <div class="sw-msg them">hey! welcome to cued. i'm your coach now — no pressure lol. what's your main goal rn? trying to build muscle, lose weight, get more active, or something else?</div>
-            <div class="sw-msg me">build muscle mostly, i'm pretty skinny</div>
-            <div class="sw-msg them">bet. do you have gym access or are we working with bodyweight?</div>
-            <div class="sw-msg me">i go to the RSF</div>
+          <!-- Conversation states (crossfade) -->
+          <div class="sw-convos">
+
+            <!-- State 0: typing hint -->
+            <div class="sw-convo active" id="swConvo0">
+              <div class="s-msgs">
+                <div class="s-ts">Today 6:42 AM</div>
+                <div class="s-row them">
+                  <div class="s-bubble them" style="display:flex;gap:5px;align-items:center">
+                    <span style="display:inline-flex;gap:3px">
+                      <span style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.4);animation:swDot 1.2s ease-in-out infinite"></span>
+                      <span style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.4);animation:swDot 1.2s ease-in-out .2s infinite"></span>
+                      <span style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.4);animation:swDot 1.2s ease-in-out .4s infinite"></span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- State 1: Sign up -->
+            <div class="sw-convo" id="swConvo1">
+              <div class="s-msgs">
+                <div class="s-ts">Today 6:42 AM</div>
+                <div class="s-row them"><div class="s-bubble them">hey! welcome to cued. i'm your coach now — no pressure lol. what's your main goal rn? trying to build muscle, lose weight, get more active, or something else?</div></div>
+                <div class="s-row me"><div class="s-bubble me">build muscle mostly, i'm pretty skinny</div></div>
+                <div class="s-row them"><div class="s-bubble them">bet. do you have gym access or are we working with bodyweight?</div></div>
+                <div class="s-row me"><div class="s-bubble me">i go to the RSF</div></div>
+              </div>
+            </div>
+
+            <!-- State 2: Morning plan -->
+            <div class="sw-convo" id="swConvo2">
+              <div class="s-msgs">
+                <div class="s-ts">Today 7:00 AM</div>
+                <div class="s-row them"><div class="s-bubble them">morning. today's push day — chest, shoulders, tris. here's the move:<br><br>bench press 4x8<br>ohp 3x10<br>incline db press 3x12<br>lateral raises 3x15<br>tricep pushdowns 3x12<br><br>text me when you're heading to the gym</div></div>
+                <div class="s-row me"><div class="s-bubble me">let's go</div></div>
+              </div>
+            </div>
+
+            <!-- State 3: Check in -->
+            <div class="sw-convo" id="swConvo3">
+              <div class="s-msgs">
+                <div class="s-ts">Today 9:05 AM</div>
+                <div class="s-row me"><div class="s-bubble me">done. bench felt heavy today</div></div>
+                <div class="s-row them"><div class="s-bubble them">logged. heavy how — couldn't finish your reps, or just grinding?</div></div>
+                <div class="s-row me"><div class="s-bubble me">last set i only got 6</div></div>
+                <div class="s-row them"><div class="s-bubble them">that's fine, we'll hold at this weight next week til all 4 sets are clean. solid session tho, you showed up</div></div>
+              </div>
+            </div>
+
+          </div><!-- /sw-convos -->
+
+          <!-- Input bar -->
+          <div class="s-input">
+            <div class="s-input-field">iMessage</div>
+            <div class="s-input-send">↑</div>
           </div>
 
-          <!-- State 2: Morning plan -->
-          <div class="sw-convo" id="swConvo2">
-            <div class="sw-ts">Today 7:00 AM</div>
-            <div class="sw-msg them">morning. today's push day — chest, shoulders, tris. here's the move:<br><br>bench press 4x8<br>ohp 3x10<br>incline db press 3x12<br>lateral raises 3x15<br>tricep pushdowns 3x12<br><br>text me when you're heading to the gym</div>
-            <div class="sw-msg me">let's go</div>
-          </div>
-
-          <!-- State 3: Check in -->
-          <div class="sw-convo" id="swConvo3">
-            <div class="sw-ts">Today 9:05 AM</div>
-            <div class="sw-msg me">done. bench felt heavy today</div>
-            <div class="sw-msg them">logged. heavy how — couldn't finish your reps, or just grinding?</div>
-            <div class="sw-msg me">last set i only got 6</div>
-            <div class="sw-msg them">that's fine, we'll hold at this weight next week til all 4 sets are clean. solid session tho, you showed up</div>
-          </div>
-
-        </div><!-- /sw-convos -->
-
-        <div class="sw-phone-input">
-          <div class="sw-phone-input-field">iMessage</div>
-          <div class="sw-phone-send">↑</div>
-        </div>
-      </div>
+          <!-- Glass glare -->
+          <div class="iphone-glare"></div>
+        </div><!-- /screen -->
+      </div><!-- /iphone -->
     </div><!-- /sw-phone-wrap -->
 
   </div><!-- /sw-inner -->
