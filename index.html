@@ -412,7 +412,7 @@ nav {
   height: 10px;
   position: relative;
 }
-.s-wifi::before, .s-wifi::after, .s-wifi-dot {
+.s-wifi::before, .s-wifi::after {
   position: absolute;
   border: 1.5px solid #fff;
   border-radius: 50%;
@@ -433,12 +433,11 @@ nav {
   opacity: .8;
 }
 .s-wifi-dot {
+  position: absolute;
   width: 3px; height: 3px;
   background: #fff;
-  border: none;
   border-radius: 50%;
   bottom: 0; left: 5.5px;
-  transform: none;
 }
 
 .s-battery {
@@ -758,6 +757,7 @@ nav {
   flex: 1;
   position: relative;
   overflow: hidden;
+  min-height: 0; /* allow flex shrink */
 }
 .sw-convo {
   position: absolute;
@@ -765,8 +765,19 @@ nav {
   overflow: hidden;
   opacity: 0;
   transition: opacity 0.4s ease;
+  display: flex;
+  flex-direction: column;
 }
 .sw-convo.active { opacity: 1; }
+/* s-msgs inside each convo must fill the absolute pane */
+.sw-convo .s-msgs {
+  flex: 1;
+  overflow: hidden;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
 /* Walkthrough phone — reuse hero iphone system with context overrides */
 .sw-phone-wrap .iphone {
