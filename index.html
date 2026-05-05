@@ -1044,18 +1044,21 @@ nav {
 
 /* ── Mobile layout ── */
 @media (max-width: 768px) {
-  .sw-entry-top { padding-left: 6vw; font-size: clamp(28px, 8vw, 48px); }
-  .sw-entry-bot { padding-right: 6vw; font-size: clamp(24px, 7vw, 42px); }
+  .sw-entry-top { padding-left: 6vw; font-size: clamp(32px, 9vw, 52px); letter-spacing: -2px; }
+  .sw-entry-bot { padding-right: 6vw; font-size: clamp(28px, 8vw, 46px); letter-spacing: -1.5px; }
   .sw-steps-wrap {
     width: 100%;
-    padding: 0 clamp(24px, 6vw, 48px);
+    padding: 0 clamp(24px, 7vw, 48px);
     align-items: flex-end;
-    padding-bottom: clamp(32px, 6vh, 60px);
+    padding-bottom: clamp(40px, 8vh, 80px);
     top: auto;
   }
-  .sw-step-num { font-size: 40px; }
-  .sw-step-title { font-size: clamp(22px, 6vw, 30px); }
-  .sw-step-desc { font-size: 14px; }
+  .sw-step { max-width: 100%; width: 100%; }
+  .sw-step-num { font-size: 11px; margin-bottom: 14px; }
+  .sw-step-title { font-size: clamp(28px, 8vw, 42px); letter-spacing: -1.5px; margin-bottom: 14px; }
+  .sw-step-desc { font-size: 15px; line-height: 1.6; max-width: 100%; }
+  .ph-shell { width: 220px; }
+  .ph-bubble { font-size: 10px; }
 }
 
 /* Typing dot for sw entry convo */
@@ -1717,6 +1720,7 @@ footer {
   /* Initialize: show only convo0 */
   convos.forEach(function(c,i){ c.style.display = i===0 ? 'flex' : 'none'; });
 
+  
   function onScroll() {
     var rect = outer.getBoundingClientRect();
     var outerH = outer.offsetHeight;
