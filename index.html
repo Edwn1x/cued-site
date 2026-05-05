@@ -126,7 +126,15 @@ nav {
   padding: 8px 20px;
   border-radius: 980px;
   text-decoration: none;
-  transition: opacity .2s;
+  transition: opacity .3s, transform .3s;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+}
+.nv-signup.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 .nv-signup:hover { opacity: .85; }
 
@@ -1780,9 +1788,14 @@ footer {
 /* ── Hero frosted glass bottom fade on scroll ── */
 (function() {
   var frost = document.getElementById('heroFrost');
+  var nvSignup = document.querySelector('.nv-signup');
+  var hero = document.querySelector('.hero');
   if (!frost) return;
   window.addEventListener('scroll', function() {
     frost.classList.toggle('visible', window.scrollY > 40);
+    if (nvSignup && hero) {
+      nvSignup.classList.toggle('visible', window.scrollY > hero.offsetHeight * 0.8);
+    }
   }, { passive: true });
 }());
 
