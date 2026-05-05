@@ -752,6 +752,197 @@ nav {
   z-index: 3;
 }
 
+/* ── Rebuilt phone mockup ── */
+.ph-shell {
+  position: relative;
+  width: 280px;
+  aspect-ratio: 9 / 19.5;
+  background: linear-gradient(160deg,#c8c8ca 0%,#a0a0a2 15%,#7a7a7c 30%,#5c5c5e 45%,#6e6e70 55%,#9a9a9c 70%,#b8b8ba 82%,#888 100%);
+  border-radius: 44px;
+  padding: 3px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.85), 0 0 40px rgba(124,58,255,0.15);
+}
+.ph-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 44px;
+  background: linear-gradient(135deg,rgba(255,255,255,0.55) 0%,rgba(255,255,255,0.1) 20%,transparent 45%,rgba(255,255,255,0.04) 75%,rgba(255,255,255,0.12) 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+.ph-btn-action,.ph-btn-vol-up,.ph-btn-vol-down,.ph-btn-power {
+  position: absolute;
+  width: 3.5px;
+  background: linear-gradient(to left,#6a6a6c,#9a9a9c,#7a7a7c);
+  border-radius: 2px 0 0 2px;
+  z-index: 3;
+}
+.ph-btn-action  { left:-4px; top:13%; height:5%; }
+.ph-btn-vol-up  { left:-4px; top:20%; height:9%; }
+.ph-btn-vol-down{ left:-4px; top:31%; height:9%; }
+.ph-btn-power   { right:-4px; top:28%; height:14%; border-radius:0 2px 2px 0; background:linear-gradient(to right,#6a6a6c,#9a9a9c,#7a7a7c); }
+.ph-screen {
+  width: 100%;
+  height: 100%;
+  border-radius: 41px;
+  background: #000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.ph-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px 4px;
+  flex-shrink: 0;
+}
+.ph-time {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  font-family: -apple-system, sans-serif;
+  letter-spacing: -.3px;
+}
+.ph-status-icons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.ph-island {
+  width: 33%;
+  height: 28px;
+  background: #000;
+  border-radius: 20px;
+  margin: 2px auto 0;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.06);
+}
+.ph-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0 8px;
+  border-bottom: 0.5px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
+  position: relative;
+}
+.ph-nav-back {
+  position: absolute;
+  left: 12px;
+  font-size: 11px;
+  color: #007AFF;
+  font-family: -apple-system, sans-serif;
+}
+.ph-nav-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.ph-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg,#7C3AFF,#A78BFA);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 700; color: #fff;
+  font-family: -apple-system, sans-serif;
+}
+.ph-contact {
+  font-size: 11px; font-weight: 600; color: #fff;
+  font-family: -apple-system, sans-serif;
+}
+.ph-convos {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+  position: relative;
+}
+.ph-convo {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+}
+.ph-convo.active {
+  display: flex;
+}
+.ph-msgs {
+  flex: 1;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: hidden;
+}
+.ph-ts {
+  text-align: center;
+  font-size: 9.5px;
+  color: rgba(255,255,255,0.35);
+  font-family: -apple-system, sans-serif;
+  margin: 2px 0;
+}
+.ph-row { display: flex; }
+.ph-row.them { justify-content: flex-start; }
+.ph-row.me   { justify-content: flex-end; }
+.ph-bubble {
+  padding: 7px 11px;
+  border-radius: 16px;
+  font-size: 11px;
+  line-height: 1.45;
+  font-family: -apple-system, sans-serif;
+  max-width: 80%;
+}
+.ph-bubble.them {
+  background: #2c2c2e;
+  color: #fff;
+  border-bottom-left-radius: 4px;
+}
+.ph-bubble.me {
+  background: #007AFF;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.ph-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.6);
+  margin: 0 2px;
+  animation: phDot 1.2s ease-in-out infinite;
+}
+.ph-dot:nth-child(2) { animation-delay: .2s; }
+.ph-dot:nth-child(3) { animation-delay: .4s; }
+@keyframes phDot {
+  0%,60%,100% { transform: translateY(0); opacity: .4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+.ph-input-bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 12px 16px;
+  border-top: 0.5px solid rgba(255,255,255,0.07);
+  flex-shrink: 0;
+}
+.ph-input-field {
+  flex: 1;
+  background: rgba(255,255,255,0.06);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  border-radius: 18px;
+  padding: 7px 12px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.25);
+  font-family: -apple-system, sans-serif;
+}
+.ph-input-send {
+  width: 24px; height: 24px;
+  background: #007AFF;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 11px; flex-shrink: 0;
+}
+
 /* Conversation area — states stack, crossfade */
 .sw-convos {
   flex: 1;
@@ -783,9 +974,12 @@ nav {
 .sw-phone-wrap .iphone {
   width: 280px;
   transform: none;
-  filter: drop-shadow(0 40px 60px rgba(0,0,0,0.85)) drop-shadow(0 0 30px rgba(124,58,255,0.12));
+  filter: none;
 }
-.sw-phone-wrap .iphone-frame { border-radius: 44px; }
+.sw-phone-wrap .iphone-frame {
+  border-radius: 44px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.85), 0 0 40px rgba(124,58,255,0.15);
+}
 .sw-phone-wrap .iphone-inner { border-radius: calc(44px - 3px); }
 .sw-phone-wrap .screen { border-radius: calc(44px - 3px); }
 
@@ -1143,109 +1337,83 @@ footer {
 
     <!-- Phone -->
     <div class="sw-phone-wrap" id="swPhoneWrap">
-      <div class="iphone">
-        <!-- Titanium chassis -->
-        <div class="iphone-frame">
-          <div class="iphone-inner"></div>
-        </div>
+      <div class="ph-shell">
+        <!-- Side buttons -->
+        <div class="ph-btn-action"></div>
+        <div class="ph-btn-vol-up"></div>
+        <div class="ph-btn-vol-down"></div>
+        <div class="ph-btn-power"></div>
 
-        <!-- Physical side buttons -->
-        <div class="iphone-btn-action"></div>
-        <div class="iphone-btn-vol-up"></div>
-        <div class="iphone-btn-vol-down"></div>
-        <div class="iphone-btn-power"></div>
-
-        <!-- Screen contents -->
-        <div class="screen">
+        <!-- Screen -->
+        <div class="ph-screen">
           <!-- Status bar -->
-          <div class="s-status">
-            <span class="s-time">9:41</span>
-            <span class="s-icons">
-              <span class="s-signal">
-                <span></span><span></span><span></span><span></span>
-              </span>
-              <span class="s-wifi"><span class="s-wifi-dot"></span></span>
-              <span class="s-battery">
-                <span class="s-battery-body"><span class="s-battery-fill"></span></span>
-                <span class="s-battery-tip"></span>
-              </span>
+          <div class="ph-status">
+            <span class="ph-time">9:41</span>
+            <span class="ph-status-icons">
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="white"><rect x="0" y="4" width="3" height="8" opacity=".4" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" opacity=".6" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"><path d="M1 3.5 C3.5 1 12.5 1 15 3.5" opacity=".5"/><path d="M3 6 C4.8 4.2 11.2 4.2 13 6" opacity=".75"/><path d="M5.5 8.5 C6.5 7.5 9.5 7.5 10.5 8.5"/><circle cx="8" cy="11" r="1" fill="white" stroke="none"/></svg>
+              <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="white" stroke-opacity=".35"/><rect x="2" y="2" width="13" height="8" rx="2" fill="white"/><path d="M23 4.5v3a2 2 0 0 0 0-3z" fill="white" fill-opacity=".4"/></svg>
             </span>
           </div>
 
           <!-- Dynamic island -->
-          <div class="s-island"></div>
+          <div class="ph-island"></div>
 
-          <!-- Messages nav -->
-          <div class="s-imsg-nav">
-            <div class="s-imsg-nav-wrap">
-              <div class="s-avatar">C</div>
-              <div class="s-contact-name">Cued</div>
+          <!-- iMessage nav -->
+          <div class="ph-nav">
+            <span class="ph-nav-back">‹ Messages</span>
+            <div class="ph-nav-center">
+              <div class="ph-avatar">C</div>
+              <span class="ph-contact">Cued ›</span>
             </div>
-            <div class="s-imsg-back">‹ Messages</div>
           </div>
 
-          <!-- Conversation states (crossfade) -->
-          <div class="sw-convos">
-
-            <!-- State 0: typing hint -->
-            <div class="sw-convo active" id="swConvo0">
-              <div class="s-msgs">
-                <div class="s-ts">Today 6:42 AM</div>
-                <div class="s-row them">
-                  <div class="s-bubble them" style="display:flex;gap:5px;align-items:center">
-                    <span style="display:inline-flex;gap:3px">
-                      <span style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.4);animation:swDot 1.2s ease-in-out infinite"></span>
-                      <span style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.4);animation:swDot 1.2s ease-in-out .2s infinite"></span>
-                      <span style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.4);animation:swDot 1.2s ease-in-out .4s infinite"></span>
-                    </span>
+          <!-- Conversations -->
+          <div class="ph-convos" id="phConvos">
+            <div class="ph-convo" id="swConvo0">
+              <div class="ph-msgs">
+                <div class="ph-ts">Today 6:42 AM</div>
+                <div class="ph-row them">
+                  <div class="ph-bubble them">
+                    <span class="ph-dot"></span><span class="ph-dot"></span><span class="ph-dot"></span>
                   </div>
                 </div>
               </div>
             </div>
-
-            <!-- State 1: Sign up -->
-            <div class="sw-convo" id="swConvo1">
-              <div class="s-msgs">
-                <div class="s-ts">Today 6:42 AM</div>
-                <div class="s-row them"><div class="s-bubble them">hey! welcome to cued. i'm your coach now — no pressure lol. what's your main goal rn? trying to build muscle, lose weight, get more active, or something else?</div></div>
-                <div class="s-row me"><div class="s-bubble me">build muscle mostly, i'm pretty skinny</div></div>
-                <div class="s-row them"><div class="s-bubble them">bet. do you have gym access or are we working with bodyweight?</div></div>
-                <div class="s-row me"><div class="s-bubble me">i go to the RSF</div></div>
+            <div class="ph-convo" id="swConvo1">
+              <div class="ph-msgs">
+                <div class="ph-ts">Today 6:42 AM</div>
+                <div class="ph-row them"><div class="ph-bubble them">hey! welcome to cued. i'm your coach now — no pressure lol. what's your main goal rn?</div></div>
+                <div class="ph-row me"><div class="ph-bubble me">build muscle mostly, i'm pretty skinny</div></div>
+                <div class="ph-row them"><div class="ph-bubble them">bet. do you have gym access or are we working with bodyweight?</div></div>
+                <div class="ph-row me"><div class="ph-bubble me">i go to the RSF</div></div>
               </div>
             </div>
-
-            <!-- State 2: Morning plan -->
-            <div class="sw-convo" id="swConvo2">
-              <div class="s-msgs">
-                <div class="s-ts">Today 7:00 AM</div>
-                <div class="s-row them"><div class="s-bubble them">morning. today's push day — chest, shoulders, tris. here's the move:<br><br>bench press 4x8<br>ohp 3x10<br>incline db press 3x12<br>lateral raises 3x15<br>tricep pushdowns 3x12<br><br>text me when you're heading to the gym</div></div>
-                <div class="s-row me"><div class="s-bubble me">let's go</div></div>
+            <div class="ph-convo" id="swConvo2">
+              <div class="ph-msgs">
+                <div class="ph-ts">Today 7:00 AM</div>
+                <div class="ph-row them"><div class="ph-bubble them">morning. today's push day — chest, shoulders, tris.<br><br>bench press 4x8<br>ohp 3x10<br>incline db press 3x12<br>lateral raises 3x15<br><br>text me when you're heading out</div></div>
+                <div class="ph-row me"><div class="ph-bubble me">let's go</div></div>
               </div>
             </div>
-
-            <!-- State 3: Check in -->
-            <div class="sw-convo" id="swConvo3">
-              <div class="s-msgs">
-                <div class="s-ts">Today 9:05 AM</div>
-                <div class="s-row me"><div class="s-bubble me">done. bench felt heavy today</div></div>
-                <div class="s-row them"><div class="s-bubble them">logged. heavy how — couldn't finish your reps, or just grinding?</div></div>
-                <div class="s-row me"><div class="s-bubble me">last set i only got 6</div></div>
-                <div class="s-row them"><div class="s-bubble them">that's fine, we'll hold at this weight next week til all 4 sets are clean. solid session tho, you showed up</div></div>
+            <div class="ph-convo" id="swConvo3">
+              <div class="ph-msgs">
+                <div class="ph-ts">Today 9:05 AM</div>
+                <div class="ph-row me"><div class="ph-bubble me">done. bench felt heavy today</div></div>
+                <div class="ph-row them"><div class="ph-bubble them">logged. heavy how — grinding or couldn't finish?</div></div>
+                <div class="ph-row me"><div class="ph-bubble me">last set i only got 6</div></div>
+                <div class="ph-row them"><div class="ph-bubble them">that's fine, we'll hold at this weight til all 4 sets are clean. solid session tho</div></div>
               </div>
             </div>
-
-          </div><!-- /sw-convos -->
-
-          <!-- Input bar -->
-          <div class="s-input">
-            <div class="s-input-field">iMessage</div>
-            <div class="s-input-send">↑</div>
           </div>
 
-          <!-- Glass glare -->
-          <div class="iphone-glare"></div>
-        </div><!-- /screen -->
-      </div><!-- /iphone -->
+          <!-- Input bar -->
+          <div class="ph-input-bar">
+            <div class="ph-input-field">iMessage</div>
+            <div class="ph-input-send">↑</div>
+          </div>
+        </div><!-- /ph-screen -->
+      </div><!-- /ph-shell -->
     </div><!-- /sw-phone-wrap -->
 
   </div><!-- /sw-inner -->
@@ -1517,7 +1685,7 @@ footer {
   }
 
   var activeStep = -1;
-  var activeConvo = 0;
+  var activeConvo = -1;
 
   function setStep(idx) {
     if (activeStep === idx) return;
@@ -1527,9 +1695,16 @@ footer {
 
   function setConvo(idx) {
     if (activeConvo === idx) return;
-    convos.forEach(function(c,i){ c.classList.toggle('active', i===idx); });
+    convos.forEach(function(c,i){
+      var show = i === idx;
+      c.classList.toggle('active', show);
+      c.style.display = show ? 'flex' : 'none';
+    });
     activeConvo = idx;
   }
+
+  /* Initialize: show only convo0 */
+  convos.forEach(function(c,i){ c.style.display = i===0 ? 'flex' : 'none'; });
 
   function onScroll() {
     var rect = outer.getBoundingClientRect();
