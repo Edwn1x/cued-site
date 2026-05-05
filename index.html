@@ -696,11 +696,11 @@ nav {
 
 /* Outer scroll container — tall enough for entry + 3 states + buffer */
 .sw-outer {
-  height: 600vh;
+  height: 450vh;
   background: #080809;
   position: relative;
 }
-@media (max-width: 768px) { .sw-outer { height: 700vh; } }
+@media (max-width: 768px) { .sw-outer { height: 550vh; } }
 
 /* Sticky inner — locks to viewport */
 .sw-inner {
@@ -722,27 +722,29 @@ nav {
   align-items: center;
   justify-content: center;
   gap: 0;
-  z-index: 2;
+  z-index: 4;
   pointer-events: none;
 }
 .sw-entry-top {
-  font-size: clamp(36px, 5vw, 72px);
+  font-size: clamp(52px, 6.5vw, 88px);
   font-weight: 700;
-  letter-spacing: -2.5px;
+  letter-spacing: -3px;
   color: #fff;
   line-height: 1.0;
   align-self: flex-start;
   padding-left: 12vw;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.8), 0 0 60px rgba(0,0,0,0.6);
 }
 .sw-entry-bot {
   font-family: 'Playfair Display', Georgia, serif;
   font-style: italic;
-  font-size: clamp(32px, 4.5vw, 64px);
+  font-size: clamp(46px, 6vw, 82px);
   color: rgba(255,255,255,0.7);
-  letter-spacing: -1px;
+  letter-spacing: -2px;
   line-height: 1.0;
   align-self: flex-end;
   padding-right: 12vw;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.8), 0 0 60px rgba(0,0,0,0.6);
 }
 
 /* ── Phone (entry: centered large; walkthrough: right column) ── */
@@ -755,7 +757,7 @@ nav {
 /* ── Rebuilt phone mockup ── */
 .ph-shell {
   position: relative;
-  width: 280px;
+  width: 320px;
   aspect-ratio: 9 / 19.5;
   background: linear-gradient(160deg,#c8c8ca 0%,#a0a0a2 15%,#7a7a7c 30%,#5c5c5e 45%,#6e6e70 55%,#9a9a9c 70%,#b8b8ba 82%,#888 100%);
   border-radius: 44px;
@@ -972,7 +974,7 @@ nav {
 
 /* Walkthrough phone — reuse hero iphone system with context overrides */
 .sw-phone-wrap .iphone {
-  width: 280px;
+  width: 320px;
   transform: none;
   filter: none;
 }
@@ -987,10 +989,10 @@ nav {
 .sw-steps-wrap {
   position: absolute;
   left: 0; top: 0; bottom: 0;
-  width: 42%;
+  width: 55%;
   display: flex;
   align-items: center;
-  padding-left: clamp(32px, 6vw, 100px);
+  padding-left: clamp(80px, 12vw, 180px);
   z-index: 2;
   opacity: 0;
   pointer-events: none;
@@ -1000,35 +1002,44 @@ nav {
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 0.3s ease, transform 0.3s ease;
-  max-width: 380px;
+  max-width: 580px;
+  width: 90%;
 }
 .sw-step.active {
   opacity: 1;
   transform: translateY(0);
 }
 .sw-step-num {
-  font-size: 56px;
-  font-weight: 700;
-  color: #7C3AFF;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.4);
   line-height: 1;
-  margin-bottom: 12px;
-  letter-spacing: -3px;
-  opacity: 0.5;
+  margin-bottom: 24px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 1;
 }
 .sw-step-title {
-  font-size: clamp(26px, 3vw, 38px);
+  font-size: clamp(52px, 6.5vw, 88px);
   font-weight: 700;
   color: #fff;
-  letter-spacing: -1.5px;
-  line-height: 1.1;
-  margin-bottom: 14px;
+  letter-spacing: -3px;
+  line-height: 1.0;
+  margin-bottom: 28px;
+}
+.sw-step-title em {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: -1px;
 }
 .sw-step-desc {
-  font-size: 16px;
-  color: rgba(255,255,255,0.45);
+  font-size: 18px;
+  color: rgba(255,255,255,0.5);
   font-weight: 300;
-  line-height: 1.65;
-  max-width: 340px;
+  line-height: 1.75;
+  max-width: 520px;
 }
 
 /* ── Mobile layout ── */
@@ -1319,19 +1330,19 @@ footer {
     <!-- Left step text -->
     <div class="sw-steps-wrap" id="swStepsWrap">
       <div class="sw-step active" id="swStep1">
-        <div class="sw-step-num">01</div>
-        <div class="sw-step-title">Sign up in 60 seconds</div>
-        <div class="sw-step-desc">Share your goals, schedule, and fitness level. No forms, no onboarding maze.</div>
+        <div class="sw-step-num">Step 01</div>
+        <div class="sw-step-title">One conversation.<br><em>Your coach is ready.</em></div>
+        <div class="sw-step-desc">Goals, schedule, gym access — tell us once. No forms, no app, no onboarding maze. Just text.</div>
       </div>
       <div class="sw-step" id="swStep2">
-        <div class="sw-step-num">02</div>
-        <div class="sw-step-title">Get your plan every morning</div>
-        <div class="sw-step-desc">Your coach texts you today's workout and nutrition tips — right in Messages.</div>
+        <div class="sw-step-num">Step 02</div>
+        <div class="sw-step-title">Your plan lands<br><em>every morning.</em></div>
+        <div class="sw-step-desc">Workout. Nutrition. Recovery. Built for today — not a generic program from a PDF.</div>
       </div>
       <div class="sw-step" id="swStep3">
-        <div class="sw-step-num">03</div>
-        <div class="sw-step-title">Check in. Make progress.</div>
-        <div class="sw-step-desc">Text when you're done. Your coach logs it, adapts, and keeps you on track.</div>
+        <div class="sw-step-num">Step 03</div>
+        <div class="sw-step-title">Text back.<br><em>It gets smarter.</em></div>
+        <div class="sw-step-desc">Log your session in a message. Your coach adjusts, remembers, and keeps you moving forward.</div>
       </div>
     </div>
 
@@ -1673,9 +1684,9 @@ footer {
     }
     return {
       entryX: vw/2, entryY: vh/2,
-      entryScale: 1.15,
-      walkX: vw*0.68, walkY: vh/2,
-      walkScale: 0.82,
+      entryScale: 0.95,
+      walkX: vw*0.76, walkY: vh/2,
+      walkScale: 0.92,
     };
   }
 
