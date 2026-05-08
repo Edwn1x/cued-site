@@ -11,11 +11,11 @@
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200;12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=EB+Garamond:ital,wght@0,700;1,400;1,700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
 <link rel="preload" as="image" href="images/hero-bg.jpeg">
 <style>
-:root{--accent:#7C3AFF;--accent2:#6B2EE6;--text:#1a1a1e;--text2:#4a4a52;--text3:#8a8a92;--border:#e5e5ea;--border2:#d1d1d6;--f:'DM Sans',-apple-system,sans-serif;}
+:root{--accent:#7C3AFF;--accent2:#6B2EE6;--text:#1a1a1e;--text2:#4a4a52;--text3:#8a8a92;--border:#e5e5ea;--border2:#d1d1d6;--f:'Bricolage Grotesque',-apple-system,sans-serif;}
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body { height: 100%; }
 /* ── CHAT SIGNUP OVERLAY ── */
@@ -89,7 +89,7 @@ html, body { height: 100%; }
   .co-chip{font-size:13px;padding:8px 14px}
 }
 body {
-  font-family: 'DM Sans', -apple-system, sans-serif;
+  font-family: 'Bricolage Grotesque', -apple-system, sans-serif;
   background: #080809;
   color: #F5F5F7;
   -webkit-font-smoothing: antialiased;
@@ -180,21 +180,19 @@ nav {
   padding-bottom: 4px;
 }
 .hero-headline {
-  font-family: 'DM Sans', -apple-system, sans-serif;
-  font-size: clamp(44px, 6.5vw, 88px);
-  font-weight: 700;
-  line-height: 1.0;
-  letter-spacing: -2.5px;
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: clamp(48px, 7vw, 96px);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.5px;
   color: #fff;
-  max-width: 520px;
+  max-width: 640px;
+  text-transform: lowercase;
 }
 .hero-headline em {
-  font-family: 'Playfair Display', Georgia, serif;
   font-style: italic;
   color: rgba(255,255,255,0.75);
-  display: block;
-  font-size: 0.88em;
-  letter-spacing: -1px;
+  display: inline;
 }
 
 /* ── CTA block — right side, vertically centered-ish ── */
@@ -234,11 +232,12 @@ nav {
   display: block;
 }
 .hero-sub {
-  font-size: 16px;
-  color: rgba(255,255,255,0.65);
-  font-weight: 400;
-  line-height: 1.6;
-  max-width: 280px;
+  font-size: 15px;
+  color: rgba(255,255,255,0.5);
+  font-weight: 300;
+  line-height: 1.7;
+  max-width: 340px;
+  letter-spacing: 0.1px;
 }
 
 
@@ -734,21 +733,22 @@ nav {
   pointer-events: none;
 }
 .sw-entry-top {
+  font-family: 'EB Garamond', Georgia, serif;
   font-size: clamp(52px, 6.5vw, 88px);
-  font-weight: 700;
-  letter-spacing: -3px;
+  font-weight: 400;
+  letter-spacing: -0.5px;
   color: #fff;
-  line-height: 1.0;
+  line-height: 1.05;
   align-self: flex-start;
   padding-left: 12vw;
   text-shadow: 0 2px 24px rgba(0,0,0,0.8), 0 0 60px rgba(0,0,0,0.6);
 }
 .sw-entry-bot {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'EB Garamond', Georgia, serif;
   font-style: italic;
   font-size: clamp(46px, 6vw, 82px);
   color: rgba(255,255,255,0.7);
-  letter-spacing: -2px;
+  letter-spacing: -0.5px;
   line-height: 1.0;
   align-self: flex-end;
   padding-right: 12vw;
@@ -1028,19 +1028,19 @@ nav {
   opacity: 1;
 }
 .sw-step-title {
+  font-family: 'EB Garamond', Georgia, serif;
   font-size: clamp(52px, 6.5vw, 88px);
-  font-weight: 700;
+  font-weight: 400;
   color: #fff;
-  letter-spacing: -3px;
-  line-height: 1.0;
+  letter-spacing: -0.5px;
+  line-height: 1.05;
   margin-bottom: 28px;
 }
 .sw-step-title em {
-  font-family: 'Playfair Display', Georgia, serif;
   font-style: italic;
-  font-weight: 700;
+  font-weight: 400;
   color: rgba(255,255,255,0.7);
-  letter-spacing: -1px;
+  letter-spacing: -0.5px;
 }
 .sw-step-desc {
   font-size: 18px;
@@ -1052,8 +1052,8 @@ nav {
 
 /* ── Mobile layout ── */
 @media (max-width: 768px) {
-  .sw-entry-top { padding-left: 6vw; font-size: clamp(32px, 9vw, 52px); letter-spacing: -2px; }
-  .sw-entry-bot { padding-right: 6vw; font-size: clamp(28px, 8vw, 46px); letter-spacing: -1.5px; }
+  .sw-entry-top { padding-left: 6vw; font-size: clamp(32px, 9vw, 52px); letter-spacing: -0.5px; }
+  .sw-entry-bot { padding-right: 6vw; font-size: clamp(28px, 8vw, 46px); letter-spacing: -0.5px; }
   .sw-steps-wrap {
     width: 100%;
     padding: 0 clamp(24px, 7vw, 48px);
@@ -1063,7 +1063,7 @@ nav {
   }
   .sw-step { max-width: 100%; width: 100%; }
   .sw-step-num { font-size: 11px; margin-bottom: 14px; }
-  .sw-step-title { font-size: clamp(28px, 8vw, 42px); letter-spacing: -1.5px; margin-bottom: 14px; }
+  .sw-step-title { font-size: clamp(28px, 8vw, 42px); letter-spacing: -0.5px; margin-bottom: 14px; }
   .sw-step-desc { font-size: 15px; line-height: 1.6; max-width: 100%; }
   .ph-shell { width: 220px; }
   .ph-bubble { font-size: 10px; }
@@ -1111,9 +1111,10 @@ nav {
 .highlights-i { max-width: 1100px; margin: 0 auto; }
 .highlights-hd { text-align: center; margin-bottom: 56px; }
 .highlights-hd h2 {
+  font-family: 'EB Garamond', Georgia, serif;
   font-size: clamp(36px,5vw,60px);
-  font-weight: 700;
-  letter-spacing: -2.5px;
+  font-weight: 400;
+  letter-spacing: -0.5px;
   color: #fff;
   line-height: 1.05;
 }
@@ -1127,7 +1128,7 @@ nav {
   color: rgba(255,255,255,0.4);
   background: none; border: 1px solid rgba(255,255,255,0.12);
   cursor: pointer; transition: all .2s;
-  font-family: 'DM Sans', -apple-system, sans-serif;
+  font-family: 'Bricolage Grotesque', -apple-system, sans-serif;
 }
 .hl-tab:hover { color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.25); }
 .hl-tab.active { background: #fff; color: #080809; border-color: #fff; }
@@ -1173,8 +1174,9 @@ nav {
   letter-spacing: .5px; margin-bottom: 20px;
 }
 .hl-body h3 {
-  font-size: clamp(26px,3.5vw,42px); font-weight: 700;
-  letter-spacing: -1.5px; color: #fff;
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: clamp(26px,3.5vw,42px); font-weight: 400;
+  letter-spacing: -0.5px; color: #fff;
   margin-bottom: 16px; line-height: 1.1;
 }
 .hl-body p {
@@ -1243,8 +1245,8 @@ footer {
   }
   .hero-left { flex: none; }
   .hero-headline {
-    font-size: clamp(36px, 11vw, 52px);
-    letter-spacing: -1.5px;
+    font-size: clamp(38px, 11vw, 56px);
+    letter-spacing: -0.5px;
     max-width: 100%;
   }
   .hero-right {
