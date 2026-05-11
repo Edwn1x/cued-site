@@ -1,0 +1,2090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Cued — AI fitness coaching over text</title>
+<meta name="description" content="Stop chudding. Start gymmaxxing.">
+<meta property="og:title" content="Cued — AI fitness coaching over text">
+<meta property="og:description" content="Stop chudding. Start gymmaxxing.">
+<meta property="og:image" content="images/og-image.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200;12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=EB+Garamond:ital,wght@0,700;1,400;1,700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+<link rel="preload" as="image" href="images/hero-bg.jpeg">
+<style>
+:root{--accent:#7C3AFF;--accent2:#6B2EE6;--text:#1a1a1e;--text2:#4a4a52;--text3:#8a8a92;--border:#e5e5ea;--border2:#d1d1d6;--f:'Bricolage Grotesque',-apple-system,sans-serif;}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+/* ── CHAT SIGNUP OVERLAY ── */
+.co-bg{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);opacity:0;pointer-events:none;transition:opacity .35s ease;display:flex;align-items:center;justify-content:center;padding:24px}
+.co-bg.open{opacity:1;pointer-events:all}
+/* Centered modal card */
+.co-sheet{width:100%;max-width:480px;background:#111113;border:1px solid rgba(255,255,255,0.1);border-radius:24px;display:flex;flex-direction:column;max-height:88vh;transform:translateY(20px) scale(0.97);opacity:0;transition:transform .45s cubic-bezier(.16,1,.3,1),opacity .45s cubic-bezier(.16,1,.3,1)}
+.co-bg.open .co-sheet{transform:translateY(0) scale(1);opacity:1}
+.co-handle{display:none}
+/* Header */
+.co-head{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 0;flex-shrink:0}
+.co-head-info{display:flex;align-items:center;gap:12px}
+.co-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#7C3AFF,#A78BFA);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.co-head-name{font-size:14px;font-weight:600;color:#fff;line-height:1.2}
+.co-head-sub{font-size:11px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:5px}
+.co-head-sub::before{content:'';width:6px;height:6px;border-radius:50%;background:#34C759;display:inline-block}
+.co-close{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.08);border:none;cursor:pointer;font-size:13px;color:rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;transition:background .2s,color .2s}
+.co-close:hover{background:rgba(255,255,255,0.14);color:#fff}
+/* Messages */
+.co-msgs{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:10px;scrollbar-width:none}
+.co-msgs::-webkit-scrollbar{display:none}
+.co-msg{max-width:82%;padding:11px 15px;font-size:14px;line-height:1.55;border-radius:18px;opacity:0;transform:translateY(8px);transition:opacity .3s ease,transform .3s ease;font-family:var(--f)}
+.co-msg.show{opacity:1;transform:translateY(0)}
+.co-msg.coach{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.9);border-bottom-left-radius:4px;align-self:flex-start;border:1px solid rgba(255,255,255,0.08)}
+.co-msg.user{background:#7C3AFF;color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
+/* Typing indicator */
+.co-typing{align-self:flex-start;display:inline-flex;gap:5px;padding:12px 16px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.08);border-radius:18px;border-bottom-left-radius:4px}
+.co-typing .co-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.35);animation:htB 1.2s ease-in-out infinite}
+.co-typing .co-dot:nth-child(2){animation-delay:.15s}
+.co-typing .co-dot:nth-child(3){animation-delay:.3s}
+@keyframes htB{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+/* Input area */
+.co-input-area{flex-shrink:0;padding:12px 20px 20px;border-top:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:10px}
+.co-input-row{display:flex;gap:8px;align-items:center}
+.co-input{flex:1;padding:12px 18px;border:1.5px solid rgba(255,255,255,0.12);border-radius:980px;font-size:14px;font-family:var(--f);color:#fff;background:rgba(255,255,255,0.06);outline:none;transition:border-color .2s}
+.co-input:focus{border-color:rgba(124,58,255,0.7)}
+.co-input::placeholder{color:rgba(255,255,255,0.25)}
+.co-send{width:40px;height:40px;border-radius:50%;background:#7C3AFF;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s;color:#fff}
+.co-send:hover{background:#6B2EE6}
+.co-send svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* Chips */
+.co-chips{display:flex;flex-wrap:wrap;gap:8px}
+.co-chip{padding:9px 18px;border-radius:980px;border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);font-size:13px;font-family:var(--f);color:rgba(255,255,255,0.6);cursor:pointer;transition:all .15s}
+.co-chip:hover{border-color:rgba(124,58,255,0.5);color:#fff;background:rgba(124,58,255,0.1)}
+.co-chip.sel,.co-chip.multi.sel{border-color:#7C3AFF;background:rgba(124,58,255,0.18);color:#fff}
+/* Confirm button */
+.co-confirm{width:100%;padding:13px;border-radius:980px;background:#fff;color:#080809;border:none;font-size:15px;font-weight:600;font-family:var(--f);cursor:pointer;transition:background .2s,color .2s}
+.co-confirm:hover{background:#7C3AFF;color:#fff}
+/* Consent */
+.co-consent-wrap{background:rgba(255,255,255,0.04);border-radius:14px;padding:14px;border:1.5px solid rgba(255,255,255,0.08)}
+.co-consent-label{display:flex;align-items:flex-start;gap:10px;cursor:pointer}
+.co-consent-box{flex-shrink:0;margin-top:2px;width:18px;height:18px;border-radius:4px;border:2px solid rgba(255,255,255,0.2);background:transparent;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.co-consent-box.checked{background:#7C3AFF;border-color:#7C3AFF}
+.co-consent-text{font-size:11px;color:rgba(255,255,255,0.35);line-height:1.6}
+.co-consent-text a{color:rgba(124,58,255,0.9)}
+/* Success */
+.co-success{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 28px;text-align:center;gap:12px}
+.co-success-icon{font-size:48px;margin-bottom:8px}
+.co-success h3{font-size:22px;font-weight:700;letter-spacing:-.5px;color:#fff}
+.co-success p{font-size:15px;color:rgba(255,255,255,0.45);font-weight:300;line-height:1.6;max-width:300px}
+/* Mobile: bottom sheet on small screens */
+@media(max-width:600px){
+  .co-bg{align-items:flex-end;padding:0;/* use dvh so keyboard resize doesn't push sheet */height:100dvh}
+  .co-sheet{width:100%;box-sizing:border-box;border-radius:24px 24px 0 0;max-height:92dvh;transform:translateY(100%);opacity:1;overflow:hidden}
+  .co-bg.open .co-sheet{transform:translateY(0);opacity:1}
+  .co-handle{display:block;width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.15);margin:14px auto 0;flex-shrink:0}
+  .co-msgs{padding:16px 16px}
+  .co-input-area{padding:10px 14px 16px}
+  .co-input{font-size:16px;/* prevent iOS auto-zoom on focus */}
+  .co-chips{gap:7px}
+  .co-chip{font-size:13px;padding:8px 14px}
+}
+body {
+  font-family: 'Bricolage Grotesque', -apple-system, sans-serif;
+  background: #080809;
+  color: #F5F5F7;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ── Nav ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 0 clamp(24px, 5vw, 56px);
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nv-logo {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -.4px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+.nv-logo svg { width: 24px; height: 24px; }
+.nv-signup {
+  background: #fff;
+  color: #080809;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: 980px;
+  text-decoration: none;
+  transition: opacity .3s, transform .3s;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+}
+.nv-signup.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.nv-signup:hover { opacity: .85; }
+
+/* ── Hero ── */
+.hero {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 clamp(32px, 6vw, 80px) clamp(48px, 7vh, 80px);
+}
+
+/* Full-bleed background — bright enough to see the phone */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center 35%;
+  filter: brightness(0.72) contrast(1.05) saturate(0.8);
+  z-index: 0;
+}
+
+/* Subtle dark vignette — bottom and edges only, image stays readable */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.2) 30%, transparent 60%),
+    linear-gradient(to right, rgba(0,0,0,0.55) 0%, transparent 35%),
+    linear-gradient(to left, rgba(0,0,0,0.3) 0%, transparent 30%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ── Headline — bottom-left ── */
+.hero-left {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  padding-bottom: 4px;
+}
+.hero-headline {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: clamp(48px, 7vw, 96px);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.5px;
+  color: #fff;
+  max-width: 640px;
+  text-transform: lowercase;
+}
+.hero-headline em {
+  font-style: italic;
+  color: rgba(255,255,255,0.75);
+  display: inline;
+}
+
+/* ── CTA block — right side, vertically centered-ish ── */
+.hero-right {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  padding-bottom: 4px;
+  padding-left: clamp(40px, 6vw, 100px);
+}
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  color: #080809;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 18px 32px;
+  border-radius: 980px;
+  text-decoration: none;
+  transition: opacity .2s, transform .2s;
+  white-space: nowrap;
+}
+.hero-cta:hover { background: #7C3AFF; color: #fff; transform: translateY(-1px); }
+.hero-cta-icon {
+  width: 28px; height: 28px;
+  flex-shrink: 0;
+  border-radius: 7px;
+  overflow: hidden;
+}
+.hero-cta-icon img {
+  width: 100%; height: 100%;
+  display: block;
+}
+.hero-sub {
+  font-size: 15px;
+  color: rgba(255,255,255,0.5);
+  font-weight: 300;
+  line-height: 1.7;
+  max-width: 340px;
+  letter-spacing: 0.1px;
+}
+
+
+/* ════════════════════════════════════════════
+   HYPERREALISTIC iPHONE 15 PRO
+   ════════════════════════════════════════════ */
+.iphone {
+  position: relative;
+  width: clamp(240px, 26vw, 340px);
+  /* 9:19.5 ratio */
+  aspect-ratio: 9 / 19.5;
+  /* Slight perspective tilt */
+  transform: perspective(1200px) rotateY(-6deg) rotateX(2deg);
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 60px 80px rgba(0,0,0,0.8)) drop-shadow(0 0 40px rgba(124,58,255,0.18));
+}
+
+/* Titanium outer frame — the physical chassis */
+.iphone-frame {
+  position: absolute;
+  inset: 0;
+  border-radius: clamp(38px, 5.5vw, 54px);
+  /* Titanium brushed gradient */
+  background: linear-gradient(
+    160deg,
+    #c8c8ca 0%,
+    #a0a0a2 15%,
+    #7a7a7c 30%,
+    #5c5c5e 45%,
+    #6e6e70 55%,
+    #9a9a9c 70%,
+    #b8b8ba 82%,
+    #888 100%
+  );
+  padding: 3px; /* frame thickness */
+}
+
+/* Glass back / screen surround */
+.iphone-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: calc(clamp(38px, 5.5vw, 54px) - 3px);
+  background: #000;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Specular highlight — top-left sheen on frame */
+.iphone-frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.55) 0%,
+    rgba(255,255,255,0.1) 20%,
+    transparent 45%,
+    rgba(255,255,255,0.04) 75%,
+    rgba(255,255,255,0.12) 100%
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Screen glass glare overlay */
+.iphone-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    145deg,
+    rgba(255,255,255,0.06) 0%,
+    rgba(255,255,255,0.02) 30%,
+    transparent 60%
+  );
+  z-index: 50;
+  pointer-events: none;
+}
+
+/* Side buttons — power button right */
+.iphone-btn-power {
+  position: absolute;
+  right: -4px;
+  top: 28%;
+  width: 3.5px;
+  height: 14%;
+  background: linear-gradient(to right, #6a6a6c, #9a9a9c, #7a7a7c);
+  border-radius: 0 2px 2px 0;
+  z-index: 20;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+/* Volume buttons left */
+.iphone-btn-vol-up {
+  position: absolute;
+  left: -4px;
+  top: 20%;
+  width: 3.5px;
+  height: 9%;
+  background: linear-gradient(to left, #6a6a6c, #9a9a9c, #7a7a7c);
+  border-radius: 2px 0 0 2px;
+  z-index: 20;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+}
+.iphone-btn-vol-down {
+  position: absolute;
+  left: -4px;
+  top: 31%;
+  width: 3.5px;
+  height: 9%;
+  background: linear-gradient(to left, #6a6a6c, #9a9a9c, #7a7a7c);
+  border-radius: 2px 0 0 2px;
+  z-index: 20;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+/* Action button (mute toggle) — smaller, above vol up */
+.iphone-btn-action {
+  position: absolute;
+  left: -4px;
+  top: 13%;
+  width: 3.5px;
+  height: 5%;
+  background: linear-gradient(to left, #6a6a6c, #9a9a9c, #7a7a7c);
+  border-radius: 2px 0 0 2px;
+  z-index: 20;
+}
+
+/* ── Screen content ── */
+.screen {
+  position: absolute;
+  inset: 3px; /* inside frame padding */
+  border-radius: calc(clamp(38px, 5.5vw, 54px) - 3px);
+  background: #000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Status bar */
+.s-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 22px 4px;
+  flex-shrink: 0;
+}
+.s-time {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  font-family: -apple-system, sans-serif;
+  letter-spacing: -.3px;
+}
+.s-icons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.s-signal {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5px;
+  height: 10px;
+}
+.s-signal span {
+  width: 2.5px;
+  background: #fff;
+  border-radius: 1px;
+}
+.s-signal span:nth-child(1) { height: 30%; opacity: .4; }
+.s-signal span:nth-child(2) { height: 55%; opacity: .6; }
+.s-signal span:nth-child(3) { height: 80%; }
+.s-signal span:nth-child(4) { height: 100%; }
+
+.s-wifi {
+  width: 14px;
+  height: 10px;
+  position: relative;
+}
+.s-wifi::before, .s-wifi::after {
+  position: absolute;
+  border: 1.5px solid #fff;
+  border-radius: 50%;
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+  transform: rotate(-45deg);
+}
+.s-wifi::before {
+  content: '';
+  width: 12px; height: 12px;
+  top: -1px; left: 1px;
+  opacity: .5;
+}
+.s-wifi::after {
+  content: '';
+  width: 7px; height: 7px;
+  top: 1.5px; left: 3.5px;
+  opacity: .8;
+}
+.s-wifi-dot {
+  position: absolute;
+  width: 3px; height: 3px;
+  background: #fff;
+  border-radius: 50%;
+  bottom: 0; left: 5.5px;
+}
+
+.s-battery {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+.s-battery-body {
+  width: 22px; height: 11px;
+  border: 1.5px solid rgba(255,255,255,0.55);
+  border-radius: 3px;
+  padding: 1.5px;
+  position: relative;
+}
+.s-battery-fill {
+  width: 55%;
+  height: 100%;
+  background: #fff;
+  border-radius: 1.5px;
+}
+.s-battery-tip {
+  width: 2px; height: 5px;
+  background: rgba(255,255,255,0.55);
+  border-radius: 0 1px 1px 0;
+}
+
+/* Dynamic island */
+.s-island {
+  width: 33%;
+  height: 30px;
+  background: #000;
+  border-radius: 20px;
+  margin: 4px auto 0;
+  flex-shrink: 0;
+  position: relative;
+  /* subtle inner edge */
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.06), inset 0 1px 3px rgba(0,0,0,0.8);
+}
+
+/* Messages nav bar */
+.s-imsg-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 10px 0 8px;
+  border-bottom: 0.5px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
+}
+.s-imsg-back {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  color: #007AFF;
+  font-family: -apple-system, sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.s-imsg-nav-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.s-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7C3AFF, #A78BFA);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; font-weight: 700; color: #fff;
+  font-family: -apple-system, sans-serif;
+  flex-shrink: 0;
+}
+.s-contact-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  font-family: -apple-system, sans-serif;
+  display: flex; align-items: center; gap: 2px;
+}
+.s-contact-name::after {
+  content: '›';
+  color: rgba(255,255,255,0.35);
+  font-size: 13px;
+}
+
+/* Messages */
+.s-msgs {
+  flex: 1;
+  overflow: hidden;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.s-ts {
+  text-align: center;
+  font-size: 9.5px;
+  color: rgba(255,255,255,0.3);
+  font-family: -apple-system, sans-serif;
+  margin: 2px 0;
+}
+.s-row { display: flex; }
+.s-row.them { justify-content: flex-start; }
+.s-row.me   { justify-content: flex-end; }
+
+.s-bubble {
+  padding: 7px 11px;
+  border-radius: 16px;
+  font-size: clamp(9px, 1.3vw, 12px);
+  line-height: 1.45;
+  font-family: -apple-system, sans-serif;
+  max-width: 80%;
+}
+.s-bubble.them {
+  background: #2c2c2e;
+  color: #fff;
+  border-bottom-left-radius: 4px;
+}
+.s-bubble.me {
+  background: #007AFF;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.s-bubble.me.done { background: #34C759; }
+
+/* Input bar */
+.s-input {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 12px 18px;
+  border-top: 0.5px solid rgba(255,255,255,0.07);
+  flex-shrink: 0;
+}
+.s-input-field {
+  flex: 1;
+  background: rgba(255,255,255,0.06);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  border-radius: 18px;
+  padding: 7px 12px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.25);
+  font-family: -apple-system, sans-serif;
+}
+.s-input-send {
+  width: 26px; height: 26px;
+  background: #007AFF;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+/* Ambient glow beneath phone */
+.iphone-glow {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 100px;
+  background: radial-gradient(ellipse at center, rgba(124,58,255,0.25) 0%, transparent 70%);
+  filter: blur(24px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ── Phone entrance animation ── */
+.iphone {
+  opacity: 0;
+  animation: phoneEnter 1.1s cubic-bezier(.16,1,.3,1) 0.3s forwards;
+}
+@keyframes phoneEnter {
+  0%   { opacity: 0; transform: perspective(1200px) rotateY(-6deg) rotateX(2deg) translateY(48px) scale(0.93); }
+  100% { opacity: 1; transform: perspective(1200px) rotateY(-6deg) rotateX(2deg) translateY(0)    scale(1); }
+}
+@media (max-width: 768px) {
+  @keyframes phoneEnter {
+    0%   { opacity: 0; transform: perspective(1000px) rotateY(0deg) rotateX(2deg) translateY(40px) scale(0.93); }
+    100% { opacity: 1; transform: perspective(1000px) rotateY(0deg) rotateX(2deg) translateY(0)    scale(1); }
+  }
+}
+
+/* Glow pulse after entrance */
+.iphone-glow {
+  animation: glowPulse 3s ease-in-out 1.4s infinite;
+}
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+
+/* Hero-left entrance */
+.hero-left {
+  opacity: 0;
+  animation: leftEnter 1s cubic-bezier(.16,1,.3,1) 0.15s forwards;
+}
+@keyframes leftEnter {
+  0%   { opacity: 0; transform: translateY(24px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Chat bubble pop-in */
+@keyframes bubbleIn {
+  0%   { opacity: 0; transform: scale(0.85) translateY(6px); }
+  100% { opacity: 1; transform: scale(1)    translateY(0); }
+}
+.s-row, .s-ts {
+  opacity: 0;
+}
+.s-row.show, .s-ts.show {
+  animation: bubbleIn 0.35s cubic-bezier(.16,1,.3,1) forwards;
+}
+/* Typing row just fades in — no scale */
+.s-row.typing-row.show {
+  animation: none;
+  opacity: 1;
+}
+
+/* Typing indicator */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: #2c2c2e;
+  border-radius: 16px;
+  border-bottom-left-radius: 4px;
+  width: fit-content;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.typing-indicator.show { opacity: 1; }
+.typing-indicator span {
+  width: 5px; height: 5px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 50%;
+  animation: typingDot 1.2s ease-in-out infinite;
+}
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingDot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30%            { transform: translateY(-4px); opacity: 1; }
+}
+
+/* ══════════════════════════════════════════════
+   SECTION 2 — STICKY SCROLL WALKTHROUGH
+   ══════════════════════════════════════════════ */
+
+/* Outer scroll container — tall enough for entry + 3 states + buffer */
+.sw-outer {
+  height: 450vh;
+  background: #080809;
+  position: relative;
+}
+@media (max-width: 768px) { .sw-outer { height: 550vh; } }
+
+/* Sticky inner — locks to viewport */
+.sw-inner {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Entry headline (centered, fades out on transition) ── */
+.sw-entry {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+.sw-entry-top {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: clamp(52px, 6.5vw, 88px);
+  font-weight: 400;
+  letter-spacing: -0.5px;
+  color: #fff;
+  line-height: 1.05;
+  align-self: flex-start;
+  padding-left: 12vw;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.8), 0 0 60px rgba(0,0,0,0.6);
+}
+.sw-entry-bot {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: clamp(46px, 6vw, 82px);
+  color: rgba(255,255,255,0.7);
+  letter-spacing: -0.5px;
+  line-height: 1.0;
+  align-self: flex-end;
+  padding-right: 12vw;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.8), 0 0 60px rgba(0,0,0,0.6);
+}
+
+/* ── Phone (entry: centered large; walkthrough: right column) ── */
+.sw-phone-wrap {
+  position: absolute;
+  will-change: transform;
+  z-index: 3;
+}
+
+/* ── Rebuilt phone mockup ── */
+.ph-shell {
+  position: relative;
+  width: 320px;
+  aspect-ratio: 9 / 19.5;
+  background: linear-gradient(160deg,#c8c8ca 0%,#a0a0a2 15%,#7a7a7c 30%,#5c5c5e 45%,#6e6e70 55%,#9a9a9c 70%,#b8b8ba 82%,#888 100%);
+  border-radius: 44px;
+  padding: 3px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.85), 0 0 40px rgba(124,58,255,0.15);
+}
+.ph-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 44px;
+  background: linear-gradient(135deg,rgba(255,255,255,0.55) 0%,rgba(255,255,255,0.1) 20%,transparent 45%,rgba(255,255,255,0.04) 75%,rgba(255,255,255,0.12) 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+.ph-btn-action,.ph-btn-vol-up,.ph-btn-vol-down,.ph-btn-power {
+  position: absolute;
+  width: 3.5px;
+  background: linear-gradient(to left,#6a6a6c,#9a9a9c,#7a7a7c);
+  border-radius: 2px 0 0 2px;
+  z-index: 3;
+}
+.ph-btn-action  { left:-4px; top:13%; height:5%; }
+.ph-btn-vol-up  { left:-4px; top:20%; height:9%; }
+.ph-btn-vol-down{ left:-4px; top:31%; height:9%; }
+.ph-btn-power   { right:-4px; top:28%; height:14%; border-radius:0 2px 2px 0; background:linear-gradient(to right,#6a6a6c,#9a9a9c,#7a7a7c); }
+.ph-screen {
+  width: 100%;
+  height: 100%;
+  border-radius: 41px;
+  background: #000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.ph-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px 4px;
+  flex-shrink: 0;
+}
+.ph-time {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  font-family: -apple-system, sans-serif;
+  letter-spacing: -.3px;
+}
+.ph-status-icons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.ph-island {
+  width: 33%;
+  height: 28px;
+  background: #000;
+  border-radius: 20px;
+  margin: 2px auto 0;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.06);
+}
+.ph-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0 8px;
+  border-bottom: 0.5px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
+  position: relative;
+}
+.ph-nav-back {
+  position: absolute;
+  left: 12px;
+  font-size: 11px;
+  color: #007AFF;
+  font-family: -apple-system, sans-serif;
+}
+.ph-nav-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.ph-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg,#7C3AFF,#A78BFA);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 700; color: #fff;
+  font-family: -apple-system, sans-serif;
+}
+.ph-contact {
+  font-size: 11px; font-weight: 600; color: #fff;
+  font-family: -apple-system, sans-serif;
+}
+.ph-convos {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+  position: relative;
+}
+.ph-convo {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+}
+.ph-convo.active {
+  display: flex;
+}
+.ph-msgs {
+  flex: 1;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: hidden;
+}
+.ph-ts {
+  text-align: center;
+  font-size: 9.5px;
+  color: rgba(255,255,255,0.35);
+  font-family: -apple-system, sans-serif;
+  margin: 2px 0;
+}
+.ph-row { display: flex; }
+.ph-row.them { justify-content: flex-start; }
+.ph-row.me   { justify-content: flex-end; }
+.ph-bubble {
+  padding: 7px 11px;
+  border-radius: 16px;
+  font-size: 11px;
+  line-height: 1.45;
+  font-family: -apple-system, sans-serif;
+  max-width: 80%;
+}
+.ph-bubble.them {
+  background: #2c2c2e;
+  color: #fff;
+  border-bottom-left-radius: 4px;
+}
+.ph-bubble.me {
+  background: #007AFF;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.ph-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.6);
+  margin: 0 2px;
+  animation: phDot 1.2s ease-in-out infinite;
+}
+.ph-dot:nth-child(2) { animation-delay: .2s; }
+.ph-dot:nth-child(3) { animation-delay: .4s; }
+@keyframes phDot {
+  0%,60%,100% { transform: translateY(0); opacity: .4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+.ph-input-bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 12px 16px;
+  border-top: 0.5px solid rgba(255,255,255,0.07);
+  flex-shrink: 0;
+}
+.ph-input-field {
+  flex: 1;
+  background: rgba(255,255,255,0.06);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  border-radius: 18px;
+  padding: 7px 12px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.25);
+  font-family: -apple-system, sans-serif;
+}
+.ph-input-send {
+  width: 24px; height: 24px;
+  background: #007AFF;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 11px; flex-shrink: 0;
+}
+
+/* Conversation area — states stack, crossfade */
+.sw-convos {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  min-height: 0; /* allow flex shrink */
+}
+.sw-convo {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  display: flex;
+  flex-direction: column;
+}
+.sw-convo.active { opacity: 1; }
+/* s-msgs inside each convo must fill the absolute pane */
+.sw-convo .s-msgs {
+  flex: 1;
+  overflow: hidden;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Walkthrough phone — reuse hero iphone system with context overrides */
+.sw-phone-wrap .iphone {
+  width: 320px;
+  transform: none;
+  filter: none;
+}
+.sw-phone-wrap .iphone-frame {
+  border-radius: 44px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.85), 0 0 40px rgba(124,58,255,0.15);
+}
+.sw-phone-wrap .iphone-inner { border-radius: calc(44px - 3px); }
+.sw-phone-wrap .screen { border-radius: calc(44px - 3px); }
+
+/* ── Left step content (hidden during entry, shows during walkthrough) ── */
+.sw-steps-wrap {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 55%;
+  display: flex;
+  align-items: center;
+  padding-left: clamp(80px, 12vw, 180px);
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+}
+.sw-step {
+  position: absolute;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  max-width: 580px;
+  width: 90%;
+}
+.sw-step.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+.sw-step-num {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.4);
+  line-height: 1;
+  margin-bottom: 24px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 1;
+}
+.sw-step-title {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: clamp(52px, 6.5vw, 88px);
+  font-weight: 400;
+  color: #fff;
+  letter-spacing: -0.5px;
+  line-height: 1.05;
+  margin-bottom: 28px;
+}
+.sw-step-title em {
+  font-style: italic;
+  font-weight: 400;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: -0.5px;
+}
+.sw-step-desc {
+  font-size: 18px;
+  color: rgba(255,255,255,0.5);
+  font-weight: 300;
+  line-height: 1.75;
+  max-width: 520px;
+}
+
+/* ── Mobile layout ── */
+@media (max-width: 768px) {
+  .sw-entry-top { padding-left: 6vw; font-size: clamp(32px, 9vw, 52px); letter-spacing: -0.5px; }
+  .sw-entry-bot { padding-right: 6vw; font-size: clamp(28px, 8vw, 46px); letter-spacing: -0.5px; }
+  .sw-steps-wrap {
+    width: 100%;
+    padding: 0 clamp(24px, 7vw, 48px);
+    align-items: flex-end;
+    padding-bottom: clamp(40px, 8vh, 80px);
+    top: auto;
+  }
+  .sw-step { max-width: 100%; width: 100%; }
+  .sw-step-num { font-size: 11px; margin-bottom: 14px; }
+  .sw-step-title { font-size: clamp(28px, 8vw, 42px); letter-spacing: -0.5px; margin-bottom: 14px; }
+  .sw-step-desc { font-size: 15px; line-height: 1.6; max-width: 100%; }
+  .ph-shell { width: 220px; }
+  .ph-bubble { font-size: 10px; }
+}
+
+/* Typing dot for sw entry convo */
+@keyframes swDot {
+  0%,60%,100%{transform:translateY(0);opacity:.4}
+  30%{transform:translateY(-4px);opacity:1}
+}
+/* Notch bar layout fix */
+.sw-notch-bar { position: relative; flex-shrink: 0; }
+
+/* ── Hero frosted glass bottom fade ── */
+.hero-frost {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 160px;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: linear-gradient(to top,
+    rgba(8,8,9,0.85) 0%,
+    rgba(8,8,9,0.4) 40%,
+    transparent 100%);
+  -webkit-backdrop-filter: blur(0px);
+  backdrop-filter: blur(0px);
+  /* mask so blur only shows at very bottom */
+  -webkit-mask-image: linear-gradient(to top, black 0%, black 40%, transparent 100%);
+  mask-image: linear-gradient(to top, black 0%, black 40%, transparent 100%);
+}
+.hero-frost.visible {
+  opacity: 1;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+/* ── Highlights (dark theme adaptation) ── */
+.highlights {
+  padding: clamp(80px,10vw,140px) clamp(24px,6vw,100px);
+  background: #080809;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.highlights-i { max-width: 1100px; margin: 0 auto; }
+.highlights-hd { text-align: center; margin-bottom: 56px; }
+.highlights-hd h2 {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: clamp(36px,5vw,60px);
+  font-weight: 400;
+  letter-spacing: -0.5px;
+  color: #fff;
+  line-height: 1.05;
+}
+.hl-tabs {
+  display: flex; gap: 8px; justify-content: center;
+  flex-wrap: wrap; margin-bottom: 48px;
+}
+.hl-tab {
+  padding: 10px 22px; border-radius: 980px;
+  font-size: 14px; font-weight: 500;
+  color: rgba(255,255,255,0.4);
+  background: none; border: 1px solid rgba(255,255,255,0.12);
+  cursor: pointer; transition: all .2s;
+  font-family: 'Bricolage Grotesque', -apple-system, sans-serif;
+}
+.hl-tab:hover { color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.25); }
+.hl-tab.active { background: #fff; color: #080809; border-color: #fff; }
+.hl-carousel { position: relative; padding: 0 48px; }
+.hl-arrow {
+  position: absolute; top: 50%; transform: translateY(-60%);
+  z-index: 10; width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .2s; font-size: 18px;
+  color: rgba(255,255,255,0.6); line-height: 1; flex-shrink: 0;
+}
+.hl-arrow:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+.hl-arrow.prev { left: 0; }
+.hl-arrow.next { right: 0; }
+.hl-panels { overflow: hidden; }
+.hl-track {
+  display: flex;
+  transition: transform .6s cubic-bezier(.4,0,.2,1);
+  will-change: transform;
+}
+.hl-panel {
+  flex: 0 0 100%; display: flex;
+  align-items: center; gap: clamp(40px,6vw,96px);
+  opacity: .3; transform: scale(.97);
+  transition: opacity .6s ease, transform .6s ease;
+  pointer-events: none;
+}
+.hl-panel.active { opacity: 1; transform: scale(1); pointer-events: auto; }
+.hl-icon {
+  flex-shrink: 0; width: 340px; height: 340px;
+  border-radius: 28px; display: flex;
+  align-items: center; justify-content: center;
+  font-size: 96px; overflow: hidden;
+  background: rgba(255,255,255,0.04);
+}
+.hl-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 28px; }
+.hl-body { flex: 1; }
+.hl-badge {
+  display: inline-block; font-size: 11px; font-weight: 600;
+  color: #7C3AFF; background: rgba(124,58,255,0.12);
+  padding: 4px 12px; border-radius: 980px;
+  letter-spacing: .5px; margin-bottom: 20px;
+}
+.hl-body h3 {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: clamp(26px,3.5vw,42px); font-weight: 400;
+  letter-spacing: -0.5px; color: #fff;
+  margin-bottom: 16px; line-height: 1.1;
+}
+.hl-body p {
+  font-size: 17px; color: rgba(255,255,255,0.45);
+  font-weight: 300; line-height: 1.65; max-width: 460px;
+}
+.hl-dots { display: flex; gap: 8px; justify-content: center; margin-top: 40px; }
+.hl-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  transition: all .3s; cursor: pointer; border: none;
+}
+.hl-dot.active { width: 20px; border-radius: 3px; background: #fff; }
+@media (max-width: 900px) { .hl-arrow { display: none; } .hl-carousel { padding: 0; } }
+@media (max-width: 768px) {
+  .hl-panel { flex-direction: column; }
+  .hl-icon { width: 100%; height: 220px; border-radius: 20px; }
+  .hl-tabs { gap: 6px; }
+  .hl-tab { font-size: 13px; padding: 8px 16px; }
+}
+
+/* ── Footer ── */
+footer {
+  background: #060607;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 32px clamp(24px, 5vw, 56px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ft-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -.4px;
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+}
+.ft-logo svg { width: 20px; height: 20px; opacity: .5; }
+.ft-links {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+.ft-links a {
+  font-size: 12px;
+  color: rgba(255,255,255,0.3);
+  text-decoration: none;
+  transition: color .2s;
+}
+.ft-links a:hover { color: rgba(255,255,255,0.7); }
+.ft-copy {
+  font-size: 12px;
+  color: rgba(255,255,255,0.2);
+}
+
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: 0 24px 56px;
+    gap: 28px;
+  }
+  .hero-left { flex: none; }
+  .hero-headline {
+    font-size: clamp(38px, 11vw, 56px);
+    letter-spacing: -0.5px;
+    max-width: 100%;
+  }
+  .hero-right {
+    padding-left: 0;
+    gap: 14px;
+    width: 100%;
+  }
+  .hero-cta {
+    font-size: 16px;
+    padding: 18px 28px;
+    border-radius: 14px;
+    width: 100%;
+    justify-content: center;
+  }
+  .hero-sub {
+    font-size: 14px;
+    max-width: 100%;
+    text-align: center;
+  }
+  .iphone {
+    width: min(260px, 70vw);
+    transform: perspective(1000px) rotateY(0deg) rotateX(2deg);
+  }
+  /* Scale phone internals proportionally using font-size on the container */
+  .screen { font-size: 75%; }
+  .s-bubble { font-size: clamp(9px, 2.8vw, 13px); }
+  .s-ts { font-size: clamp(8px, 2.2vw, 10px); }
+  .s-avatar { width: 36px; height: 36px; font-size: 15px; }
+  .s-island { width: 36%; height: 26px; }
+  .s-msgs { padding: 8px 10px; gap: 5px; }
+  .s-input-field { font-size: clamp(9px, 2.5vw, 12px); }
+}
+</style>
+</head>
+<body>
+
+<!-- CHAT SIGNUP OVERLAY -->
+<div class="co-bg" id="coOverlay">
+  <div class="co-sheet" id="coSheet">
+    <div class="co-handle"></div>
+    <div class="co-head">
+      <div class="co-head-info">
+        <div class="co-avatar">🏋️</div>
+        <div>
+          <div class="co-head-name">Cued Coach</div>
+          <div class="co-head-sub">Active now</div>
+        </div>
+      </div>
+      <button class="co-close" id="coClose">✕</button>
+    </div>
+    <div class="co-msgs" id="coMsgs"></div>
+    <div class="co-input-area" id="coInputArea"></div>
+  </div>
+</div>
+
+<nav>
+  <a href="index.html" class="nv-logo">cued</a>
+  <a href="#" class="nv-signup" onclick="openChatSignup();return false">Get started</a>
+</nav>
+
+<section class="hero">
+
+  <img class="hero-bg" src="images/hero-bg.jpeg" alt="">
+
+  <div class="hero-left">
+    <h1 class="hero-headline">
+      The fitness coach<br>you can't ghost
+      <em>all on Messages</em>
+    </h1>
+  </div>
+
+  <div class="hero-right">
+    <a href="#" class="hero-cta" onclick="openChatSignup();return false">
+      <span class="hero-cta-icon"><img src="images/imessage-icon.png" alt="Messages"></span>
+      Start Training
+    </a>
+    <p class="hero-sub">Personal coaching for everyone.<br>No app. Just texts.</p>
+  </div>
+
+  <div class="hero-frost" id="heroFrost"></div>
+
+</section>
+
+<!-- ══ SECTION 2: STICKY SCROLL WALKTHROUGH ══ -->
+<div class="sw-outer" id="swOuter">
+  <div class="sw-inner" id="swInner">
+
+    <!-- Entry headline -->
+    <div class="sw-entry" id="swEntry">
+      <span class="sw-entry-top">Your personal coach</span>
+      <span class="sw-entry-bot">lives in your Messages</span>
+    </div>
+
+    <!-- Left step text -->
+    <div class="sw-steps-wrap" id="swStepsWrap">
+      <div class="sw-step active" id="swStep1">
+        <div class="sw-step-num">Step 01</div>
+        <div class="sw-step-title">One conversation.<br><em>Your coach is ready.</em></div>
+        <div class="sw-step-desc">Goals, schedule, gym access — tell us once. No forms, no app, no onboarding maze. Just text.</div>
+      </div>
+      <div class="sw-step" id="swStep2">
+        <div class="sw-step-num">Step 02</div>
+        <div class="sw-step-title">Your plan lands<br><em>every morning.</em></div>
+        <div class="sw-step-desc">Workout. Nutrition. Recovery. Built for today — not a generic program from a PDF.</div>
+      </div>
+      <div class="sw-step" id="swStep3">
+        <div class="sw-step-num">Step 03</div>
+        <div class="sw-step-title">Text back.<br><em>It gets smarter.</em></div>
+        <div class="sw-step-desc">Log your session in a message. Your coach adjusts, remembers, and keeps you moving forward.</div>
+      </div>
+    </div>
+
+    <!-- Phone -->
+    <div class="sw-phone-wrap" id="swPhoneWrap">
+      <div class="ph-shell">
+        <!-- Side buttons -->
+        <div class="ph-btn-action"></div>
+        <div class="ph-btn-vol-up"></div>
+        <div class="ph-btn-vol-down"></div>
+        <div class="ph-btn-power"></div>
+
+        <!-- Screen -->
+        <div class="ph-screen">
+          <!-- Status bar -->
+          <div class="ph-status">
+            <span class="ph-time">9:41</span>
+            <span class="ph-status-icons">
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="white"><rect x="0" y="4" width="3" height="8" opacity=".4" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" opacity=".6" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"><path d="M1 3.5 C3.5 1 12.5 1 15 3.5" opacity=".5"/><path d="M3 6 C4.8 4.2 11.2 4.2 13 6" opacity=".75"/><path d="M5.5 8.5 C6.5 7.5 9.5 7.5 10.5 8.5"/><circle cx="8" cy="11" r="1" fill="white" stroke="none"/></svg>
+              <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="white" stroke-opacity=".35"/><rect x="2" y="2" width="13" height="8" rx="2" fill="white"/><path d="M23 4.5v3a2 2 0 0 0 0-3z" fill="white" fill-opacity=".4"/></svg>
+            </span>
+          </div>
+
+          <!-- Dynamic island -->
+          <div class="ph-island"></div>
+
+          <!-- iMessage nav -->
+          <div class="ph-nav">
+            <span class="ph-nav-back">‹ Messages</span>
+            <div class="ph-nav-center">
+              <div class="ph-avatar">C</div>
+              <span class="ph-contact">Cued ›</span>
+            </div>
+          </div>
+
+          <!-- Conversations -->
+          <div class="ph-convos" id="phConvos">
+            <div class="ph-convo" id="swConvo0">
+              <div class="ph-msgs">
+                <div class="ph-ts">Today 6:42 AM</div>
+                <div class="ph-row them">
+                  <div class="ph-bubble them">
+                    <span class="ph-dot"></span><span class="ph-dot"></span><span class="ph-dot"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="ph-convo" id="swConvo1">
+              <div class="ph-msgs">
+                <div class="ph-ts">Today 6:42 AM</div>
+                <div class="ph-row them"><div class="ph-bubble them">hey! welcome to cued. i'm your coach now — no pressure lol. what's your main goal rn?</div></div>
+                <div class="ph-row me"><div class="ph-bubble me">build muscle mostly, i'm pretty skinny</div></div>
+                <div class="ph-row them"><div class="ph-bubble them">bet. do you have gym access or are we working with bodyweight?</div></div>
+                <div class="ph-row me"><div class="ph-bubble me">i go to the RSF</div></div>
+              </div>
+            </div>
+            <div class="ph-convo" id="swConvo2">
+              <div class="ph-msgs">
+                <div class="ph-ts">Today 7:00 AM</div>
+                <div class="ph-row them"><div class="ph-bubble them">morning. today's push day — chest, shoulders, tris.<br><br>bench press 4x8<br>ohp 3x10<br>incline db press 3x12<br>lateral raises 3x15<br><br>text me when you're heading out</div></div>
+                <div class="ph-row me"><div class="ph-bubble me">let's go</div></div>
+              </div>
+            </div>
+            <div class="ph-convo" id="swConvo3">
+              <div class="ph-msgs">
+                <div class="ph-ts">Today 9:05 AM</div>
+                <div class="ph-row me"><div class="ph-bubble me">done. bench felt heavy today</div></div>
+                <div class="ph-row them"><div class="ph-bubble them">logged. heavy how — grinding or couldn't finish?</div></div>
+                <div class="ph-row me"><div class="ph-bubble me">last set i only got 6</div></div>
+                <div class="ph-row them"><div class="ph-bubble them">that's fine, we'll hold at this weight til all 4 sets are clean. solid session tho</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Input bar -->
+          <div class="ph-input-bar">
+            <div class="ph-input-field">iMessage</div>
+            <div class="ph-input-send">↑</div>
+          </div>
+        </div><!-- /ph-screen -->
+      </div><!-- /ph-shell -->
+    </div><!-- /sw-phone-wrap -->
+
+  </div><!-- /sw-inner -->
+</div><!-- /sw-outer -->
+
+<!-- ── Highlights ── -->
+<section class="highlights" id="highlights">
+  <div class="highlights-i">
+    <div class="highlights-hd">
+      <h2>Get the highlights.</h2>
+    </div>
+    <div class="hl-tabs">
+      <button class="hl-tab active" data-tab="training">Training</button>
+      <button class="hl-tab" data-tab="nutrition">Nutrition</button>
+      <button class="hl-tab" data-tab="recovery">Recovery</button>
+      <button class="hl-tab" data-tab="accountability">Accountability</button>
+      <button class="hl-tab" data-tab="adaptability">Adaptability</button>
+    </div>
+    <div class="hl-carousel">
+      <button class="hl-arrow prev" id="hlPrev">&#8592;</button>
+      <button class="hl-arrow next" id="hlNext">&#8594;</button>
+      <div class="hl-panels">
+        <div class="hl-track" id="hlTrack">
+          <div class="hl-panel active" data-panel="training">
+            <div class="hl-icon">
+              <img src="images/barbell.jpg" alt="Training">
+            </div>
+            <div class="hl-body">
+              <span class="hl-badge">Built for you</span>
+              <h3>Your workout, ready before you even ask.</h3>
+              <p>Every morning you get your exact session — exercises, sets, weights — built on your history and what your body can handle that day. No guesswork, no planning.</p>
+            </div>
+          </div>
+          <div class="hl-panel" data-panel="nutrition">
+            <div class="hl-icon">
+              <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=700&q=80" alt="Nutrition">
+            </div>
+            <div class="hl-body">
+              <span class="hl-badge">Calibrated daily</span>
+              <h3>Eat for what you actually did today.</h3>
+              <p>Heavy leg day? More carbs. Rest day? Lighter meals. Your food plan shifts with your training automatically — no app, no calorie logging, no guessing.</p>
+            </div>
+          </div>
+          <div class="hl-panel" data-panel="recovery">
+            <div class="hl-icon">
+              <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=700&q=80" alt="Recovery">
+            </div>
+            <div class="hl-body">
+              <span class="hl-badge">Always watching</span>
+              <h3>Know when to rest — and when to push.</h3>
+              <p>Cued reads your sleep and HRV data to decide if today calls for a hard session or a deload. No burnout, no wasted easy days when you had more in the tank.</p>
+            </div>
+          </div>
+          <div class="hl-panel" data-panel="accountability">
+            <div class="hl-icon" style="background:rgba(255,255,255,0.04);font-size:96px">💬</div>
+            <div class="hl-body">
+              <span class="hl-badge">Always there</span>
+              <h3>The nudge you need. Not the spam you don't.</h3>
+              <p>Your coach knows when to push and when to back off. Miss a few days? A gentle check-in, not a guilt trip. Crushing it? Your coach notices that too.</p>
+            </div>
+          </div>
+          <div class="hl-panel" data-panel="adaptability">
+            <div class="hl-icon">
+              <img src="images/wearable.jpg" alt="Adaptability">
+            </div>
+            <div class="hl-body">
+              <span class="hl-badge">Always evolving</span>
+              <h3>A coach that learns you over time.</h3>
+              <p>Only 40 minutes today? Traveling? Skipped a session? Cued adjusts on the fly — your plan always fits your life, not the other way around.</p>
+            </div>
+          </div>
+        </div><!-- /hl-track -->
+      </div><!-- /hl-panels -->
+      <div class="hl-dots" id="hlDots"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <a href="index.html" class="ft-logo">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true">
+      <rect width="32" height="32" rx="4" fill="currentColor" fill-opacity="0.08"/>
+      <path d="M21 9.5L12.5 9.5C10 9.5 8 11.5 8 14v4c0 2.5 2 4.5 4.5 4.5H21" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter"/>
+    </svg>
+    cued
+  </a>
+  <div class="ft-links">
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+    <a href="mailto:hello@cued.fit">Contact</a>
+  </div>
+  <span class="ft-copy">&copy; 2026 Cued</span>
+</footer>
+
+<script>
+(function () {
+
+  /* ── Chat animation ── */
+  var container = document.getElementById('chatMsgs');
+
+  // Conversation script — cycles through these on loop
+  var conversations = [
+    [
+      { type: 'ts',   text: 'Messages · Today 6:42 AM' },
+      { type: 'them', text: 'Morning. Today is a 30 min easy run + 10 min core. Ready when you are 🏃' },
+      { type: 'me',   text: "let's go" },
+      { type: 'them', text: 'Text "done" when you finish. I\'ll log it.' },
+      { type: 'ts',   text: 'Today 7:25 AM' },
+      { type: 'me',   text: 'done', cls: 'done' },
+      { type: 'them', text: 'Nice work. 4 sessions this week — ahead of last week\'s 3 🔥' },
+    ],
+    [
+      { type: 'ts',   text: 'Messages · Today 8:10 AM' },
+      { type: 'them', text: 'Today is upper body — bench, rows, OHP. 45 min. I\'ll send the full plan now 💪' },
+      { type: 'me',   text: 'what weight should i use for bench?' },
+      { type: 'them', text: 'Start at 65% of your max. If rep 8 feels easy, go heavier next set.' },
+      { type: 'me',   text: 'got it, starting now' },
+      { type: 'ts',   text: 'Today 9:05 AM' },
+      { type: 'me',   text: 'done. felt way stronger than last week', cls: 'done' },
+      { type: 'them', text: 'That\'s the adaptation kicking in. Rest tomorrow — we\'ll hit legs Thursday 🎯' },
+    ],
+    [
+      { type: 'ts',   text: 'Messages · Today 12:30 PM' },
+      { type: 'them', text: 'Lunch check-in — how\'s the eating going today?' },
+      { type: 'me',   text: 'had eggs and toast this morning, about to grab lunch' },
+      { type: 'them', text: 'Nice. Aim for protein + veggies at lunch. Dining hall tip: grilled chicken + any two sides.' },
+      { type: 'me',   text: 'easy, will do' },
+      { type: 'them', text: 'You\'re on track for the week. Keep it up 🙌' },
+    ],
+  ];
+
+  var convIndex = 0;
+  var TYPING_DELAY_THEM = 1200; // ms to show typing indicator
+  var TYPING_DELAY_SHORT = 700;
+  var MSG_PAUSE = 600;          // pause between messages
+  var END_PAUSE = 3000;         // pause at end before reset
+
+  function sleep(ms) { return new Promise(function(r){ setTimeout(r, ms); }); }
+
+  function addTimestamp(text) {
+    var el = document.createElement('div');
+    el.className = 's-ts';
+    el.textContent = text;
+    container.appendChild(el);
+    requestAnimationFrame(function(){ el.classList.add('show'); });
+    container.scrollTop = container.scrollHeight;
+    return el;
+  }
+
+  function addBubble(msg) {
+    var row = document.createElement('div');
+    row.className = 's-row ' + msg.type;
+    var bubble = document.createElement('div');
+    bubble.className = 's-bubble ' + msg.type + (msg.cls ? ' ' + msg.cls : '');
+    bubble.textContent = msg.text;
+    row.appendChild(bubble);
+    container.appendChild(row);
+    requestAnimationFrame(function(){ row.classList.add('show'); });
+    container.scrollTop = container.scrollHeight;
+    return row;
+  }
+
+  function showTyping() {
+    var row = document.createElement('div');
+    row.className = 's-row them typing-row';
+    var indicator = document.createElement('div');
+    indicator.className = 'typing-indicator';
+    indicator.innerHTML = '<span></span><span></span><span></span>';
+    row.appendChild(indicator);
+    container.appendChild(row);
+    container.scrollTop = container.scrollHeight;
+    requestAnimationFrame(function(){
+      row.classList.add('show');
+      indicator.classList.add('show');
+    });
+    return row;
+  }
+
+  async function runConversation() {
+    var msgs = conversations[convIndex % conversations.length];
+    convIndex++;
+
+    // Clear old messages except the first timestamp node
+    container.innerHTML = '';
+
+    for (var i = 0; i < msgs.length; i++) {
+      var msg = msgs[i];
+
+      if (msg.type === 'ts') {
+        await sleep(MSG_PAUSE);
+        addTimestamp(msg.text);
+        continue;
+      }
+
+      // Show typing indicator for "them" messages
+      if (msg.type === 'them') {
+        var typingRow = showTyping();
+        await sleep(msg.text.length > 60 ? TYPING_DELAY_THEM : TYPING_DELAY_SHORT);
+        typingRow.remove();
+      } else {
+        await sleep(MSG_PAUSE);
+      }
+
+      addBubble(msg);
+      await sleep(MSG_PAUSE);
+    }
+
+    await sleep(END_PAUSE);
+    runConversation();
+  }
+
+  // Start after phone entrance animation settles
+  setTimeout(runConversation, 1400);
+
+}());
+
+/* ── Sticky scroll walkthrough ── */
+(function(){
+  var outer    = document.getElementById('swOuter');
+  var entry    = document.getElementById('swEntry');
+  var stepsWrap= document.getElementById('swStepsWrap');
+  var phoneWrap= document.getElementById('swPhoneWrap');
+  var steps    = [
+    document.getElementById('swStep1'),
+    document.getElementById('swStep2'),
+    document.getElementById('swStep3'),
+  ];
+  var convos   = [
+    document.getElementById('swConvo0'),
+    document.getElementById('swConvo1'),
+    document.getElementById('swConvo2'),
+    document.getElementById('swConvo3'),
+  ];
+  if (!outer || !phoneWrap) return;
+
+  var isMobile = window.innerWidth <= 768;
+  window.addEventListener('resize', function(){ isMobile = window.innerWidth <= 768; });
+
+  function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+  function prog(p,a,b){ return clamp((p-a)/(b-a),0,1); }
+  function ease(t){ return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2; }
+  function lerp(a,b,t){ return a+(b-a)*t; }
+
+  /* Target phone positions:
+     entry  : centered, large
+     walkthrough: right side, smaller */
+  function getTargets() {
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
+    if (isMobile) {
+      return {
+        entryX: vw/2, entryY: vh*0.38,
+        entryScale: 1,
+        walkX: vw/2, walkY: vh*0.34,
+        walkScale: 0.72,
+      };
+    }
+    return {
+      entryX: vw/2, entryY: vh/2,
+      entryScale: 0.95,
+      walkX: vw*0.76, walkY: vh/2,
+      walkScale: 0.92,
+    };
+  }
+
+  /* Which convo index to show for a given state (0=entry,1-3=steps) */
+  function convoForState(state) {
+    return state; // 0→convo0, 1→convo1, etc.
+  }
+
+  var activeStep = -1;
+  var activeConvo = -1;
+
+  function setStep(idx) {
+    if (activeStep === idx) return;
+    steps.forEach(function(s,i){ s.classList.toggle('active', i===idx); });
+    activeStep = idx;
+  }
+
+  function setConvo(idx) {
+    if (activeConvo === idx) return;
+    convos.forEach(function(c,i){
+      var show = i === idx;
+      c.classList.toggle('active', show);
+      c.style.display = show ? 'flex' : 'none';
+    });
+    activeConvo = idx;
+  }
+
+  /* Initialize: show only convo0 */
+  convos.forEach(function(c,i){ c.style.display = i===0 ? 'flex' : 'none'; });
+
+  
+  function onScroll() {
+    var rect = outer.getBoundingClientRect();
+    var outerH = outer.offsetHeight;
+    var vh = window.innerHeight;
+    /* progress 0→1 over entire outer height */
+    var p = clamp(-rect.top / (outerH - vh), 0, 1);
+
+    var t = getTargets();
+
+    /* --- Phase 1: entry transition (0→0.18) --- */
+    var transP = ease(prog(p, 0, 0.18));
+
+    /* Phone position */
+    var px = lerp(t.entryX, t.walkX, transP);
+    var py = lerp(t.entryY, t.walkY, transP);
+    var ps = lerp(t.entryScale, t.walkScale, transP);
+    phoneWrap.style.transform = 'translate(-50%,-50%) translate('+px+'px,'+py+'px) scale('+ps+')';
+    phoneWrap.style.left = '0';
+    phoneWrap.style.top  = '0';
+
+    /* Entry headline fades out */
+    var entryOpacity = 1 - ease(prog(p, 0.06, 0.18));
+    entry.style.opacity = entryOpacity;
+
+    /* Steps + left col fade in */
+    var stepsOpacity = ease(prog(p, 0.12, 0.22));
+    stepsWrap.style.opacity = stepsOpacity;
+
+    /* --- Phase 2: three walkthrough states (0.20→0.92) --- */
+    /* Each state gets ~24% of total scroll */
+    var stateP = prog(p, 0.20, 0.92);
+    var stateIdx = Math.min(2, Math.floor(stateP * 3)); // 0,1,2
+
+    /* Convo: show convo0 during entry transition, then 1/2/3 */
+    if (p < 0.18) {
+      setConvo(0);
+    } else {
+      setConvo(stateIdx + 1);
+    }
+    setStep(stateIdx);
+  }
+
+  /* Initial position — phone centered */
+  (function init(){
+    var t = getTargets();
+    phoneWrap.style.transform = 'translate(-50%,-50%) translate('+t.entryX+'px,'+t.entryY+'px) scale('+t.entryScale+')';
+    phoneWrap.style.left = '0';
+    phoneWrap.style.top  = '0';
+    phoneWrap.style.position = 'absolute';
+  })();
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  onScroll();
+}());
+
+/* ── Hero frosted glass bottom fade on scroll ── */
+(function() {
+  var frost = document.getElementById('heroFrost');
+  var nvSignup = document.querySelector('.nv-signup');
+  var hero = document.querySelector('.hero');
+  if (!frost) return;
+  window.addEventListener('scroll', function() {
+    frost.classList.toggle('visible', window.scrollY > 40);
+    if (nvSignup && hero) {
+      nvSignup.classList.toggle('visible', window.scrollY > hero.offsetHeight * 0.8);
+    }
+  }, { passive: true });
+}());
+
+/* ── Highlights carousel ── */
+(function(){
+  var tabs = Array.from(document.querySelectorAll('.hl-tab'));
+  var panels = Array.from(document.querySelectorAll('.hl-panel'));
+  var track = document.getElementById('hlTrack');
+  var dotsEl = document.getElementById('hlDots');
+  var prevBtn = document.getElementById('hlPrev');
+  var nextBtn = document.getElementById('hlNext');
+  if (!tabs.length || !panels.length || !track) return;
+
+  var current = 0;
+  var timer = null;
+  var INTERVAL = 4500;
+
+  panels.forEach(function(_, i) {
+    var d = document.createElement('button');
+    d.className = 'hl-dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', function() { goTo(i, true); });
+    dotsEl.appendChild(d);
+  });
+  var dots = Array.from(dotsEl.querySelectorAll('.hl-dot'));
+
+  function goTo(idx, userInitiated) {
+    panels[current].classList.remove('active');
+    tabs[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = (idx + panels.length) % panels.length;
+    panels[current].classList.add('active');
+    tabs[current].classList.add('active');
+    dots[current].classList.add('active');
+    track.style.transform = 'translateX(-' + current + '00%)';
+    if (userInitiated) resetTimer();
+  }
+
+  function resetTimer() {
+    clearInterval(timer);
+    timer = setInterval(function() { goTo(current + 1, false); }, INTERVAL);
+  }
+
+  tabs.forEach(function(tab, i) { tab.addEventListener('click', function() { goTo(i, true); }); });
+  prevBtn.addEventListener('click', function() { goTo(current - 1, true); });
+  nextBtn.addEventListener('click', function() { goTo(current + 1, true); });
+
+  resetTimer();
+}());
+
+/* ── CHAT SIGNUP OVERLAY ── */
+(function(){
+  const BACKEND='https://web-production-90171c.up.railway.app/signup';
+  const overlay=document.getElementById('coOverlay');
+  const msgs=document.getElementById('coMsgs');
+  const inputArea=document.getElementById('coInputArea');
+  document.getElementById('coClose').addEventListener('click',closeOverlay);
+  overlay.addEventListener('click',e=>{if(e.target===overlay)closeOverlay();});
+
+  let sdata={};
+  let consentChecked=false;
+
+  function scrollBottom(){
+    requestAnimationFrame(()=>{
+      msgs.scrollTop=msgs.scrollHeight;
+    });
+  }
+
+  function addMsg(text,who,delay=0){
+    return new Promise(resolve=>{
+      setTimeout(()=>{
+        const m=document.createElement('div');
+        m.className='co-msg '+who;
+        m.innerHTML=text;
+        msgs.appendChild(m);
+        requestAnimationFrame(()=>{
+          m.classList.add('show');
+          m.scrollIntoView({block:'nearest',behavior:'smooth'});
+        });
+        resolve();
+      },delay);
+    });
+  }
+
+  function showTyping(){
+    const t=document.createElement('div');
+    t.className='co-typing';
+    t.innerHTML='<div class="co-dot"></div><div class="co-dot"></div><div class="co-dot"></div>';
+    msgs.appendChild(t);
+    scrollBottom();
+    return t;
+  }
+
+  function coachSay(text,typingMs=700){
+    return new Promise(resolve=>{
+      const t=showTyping();
+      setTimeout(()=>{
+        msgs.removeChild(t);
+        addMsg(text,'coach').then(resolve);
+      },typingMs);
+    });
+  }
+
+  function clearInput(){inputArea.innerHTML='';}
+
+  function textInput(placeholder,type='text'){
+    return new Promise(resolve=>{
+      clearInput();
+      const row=document.createElement('div');
+      row.className='co-input-row';
+      const inp=document.createElement('input');
+      inp.className='co-input';
+      inp.placeholder=placeholder;
+      inp.type=type;
+      inp.setAttribute('inputmode',type==='tel'?'tel':type==='number'?'numeric':'text');
+      const btn=document.createElement('button');
+      btn.className='co-send';
+      btn.innerHTML='<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+      function submit(){
+        const val=inp.value.trim();
+        if(!val)return;
+        addMsg(val,'user');
+        clearInput();
+        resolve(val);
+      }
+      btn.addEventListener('click',submit);
+      inp.addEventListener('keydown',e=>{if(e.key==='Enter')submit();});
+      row.appendChild(inp);
+      row.appendChild(btn);
+      inputArea.appendChild(row);
+      scrollBottom();
+      inp.focus();
+    });
+  }
+
+  function chips(options,multi=false){
+    return new Promise(resolve=>{
+      clearInput();
+      const wrap=document.createElement('div');
+      wrap.className='co-chips';
+      const selected=new Set();
+      options.forEach(opt=>{
+        const c=document.createElement('button');
+        c.className='co-chip'+(multi?' multi':'');
+        c.textContent=opt.label;
+        c.addEventListener('click',()=>{
+          if(!multi){
+            addMsg(opt.label,'user');
+            clearInput();
+            resolve([opt.value]);
+          } else {
+            c.classList.toggle('sel');
+            selected.has(opt.value)?selected.delete(opt.value):selected.add(opt.value);
+          }
+        });
+        wrap.appendChild(c);
+      });
+      inputArea.appendChild(wrap);
+      if(multi){
+        const btn=document.createElement('button');
+        btn.className='co-confirm';
+        btn.textContent='Confirm →';
+        btn.addEventListener('click',()=>{
+          if(!selected.size)return;
+          const labels=options.filter(o=>selected.has(o.value)).map(o=>o.label).join(', ');
+          addMsg(labels,'user');
+          clearInput();
+          resolve([...selected]);
+        });
+        inputArea.appendChild(btn);
+      }
+      scrollBottom();
+    });
+  }
+
+  function consentStep(){
+    return new Promise(resolve=>{
+      clearInput();
+      const wrap=document.createElement('div');
+      wrap.className='co-consent-wrap';
+      const lbl=document.createElement('label');
+      lbl.className='co-consent-label';
+      const box=document.createElement('div');
+      box.className='co-consent-box';
+      const txt=document.createElement('span');
+      txt.className='co-consent-text';
+      txt.innerHTML='I agree to receive recurring automated SMS messages from Cued including workout plans, meal suggestions, and coaching check-ins. Message frequency: 5–8 msgs/day. Msg &amp; data rates may apply. Reply STOP to cancel. Reply HELP for help. <a href="terms.html" target="_blank">Terms</a> &amp; <a href="privacy.html" target="_blank">Privacy</a>.';
+      lbl.appendChild(box);
+      lbl.appendChild(txt);
+      lbl.addEventListener('click',()=>{
+        consentChecked=!consentChecked;
+        box.classList.toggle('checked',consentChecked);
+        box.innerHTML=consentChecked?'<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>':'';
+      });
+      wrap.appendChild(lbl);
+      const btn=document.createElement('button');
+      btn.className='co-confirm';
+      btn.style.marginTop='10px';
+      btn.textContent='Start coaching me →';
+      btn.addEventListener('click',()=>{
+        if(!consentChecked){
+          box.style.borderColor='#F87171';
+          setTimeout(()=>box.style.borderColor='',1200);
+          return;
+        }
+        clearInput();
+        resolve(true);
+      });
+      inputArea.appendChild(wrap);
+      inputArea.appendChild(btn);
+    });
+  }
+
+  async function runChat(){
+    msgs.innerHTML='';
+    clearInput();
+    sdata={};
+    consentChecked=false;
+
+    await coachSay("Hey! I'm your Cued coach. Let's get you set up — takes about 60 seconds. What's your first name?",900);
+    sdata.name=await textInput('Your first name');
+    await coachSay(`Nice to meet you, ${sdata.name}! How old are you?`,600);
+    sdata.age=await textInput('Your age','number');
+    await coachSay("What's your gender?",600);
+    const [gender]=await chips([{label:'Male',value:'male'},{label:'Female',value:'female'},{label:'Non-binary',value:'non_binary'},{label:'Prefer not to say',value:'prefer_not_to_say'}]);
+    sdata.gender=gender;
+    await coachSay("What are you training for? Pick everything that applies.",700);
+    const goals=await chips([{label:'Lose fat',value:'fat_loss'},{label:'Build muscle',value:'muscle_building'},{label:'Get stronger',value:'strength'},{label:'General fitness',value:'general_fitness'},{label:'Running / Endurance',value:'endurance'}],true);
+    sdata.goal=goals.join(',');
+    await coachSay("What's been your biggest obstacle so far?",600);
+    const [obstacle]=await chips([{label:'Staying consistent',value:'consistency'},{label:'Nutrition / what to eat',value:'nutrition'},{label:'Not knowing what to do',value:'knowledge'},{label:'Not enough time',value:'time'},{label:'Motivation / accountability',value:'motivation'},{label:'Injuries',value:'injuries'}]);
+    sdata.biggest_obstacle=obstacle;
+    await coachSay("How long have you been training seriously?",600);
+    const [exp]=await chips([{label:'Just starting out',value:'none'},{label:'Under 6 months',value:'beginner'},{label:'6 months – 2 years',value:'intermediate'},{label:'2+ years',value:'advanced'}]);
+    sdata.experience=exp;
+    await coachSay("What equipment do you have access to?",600);
+    const [equip]=await chips([{label:'Full gym',value:'full_gym'},{label:'Limited gym',value:'limited_gym'},{label:'Home gym',value:'home_gym'},{label:'Bodyweight only',value:'bodyweight'}]);
+    sdata.equipment=equip;
+    await coachSay("Last thing — what's your phone number? That's where I'll text you.",700);
+    sdata.phone=await textInput('(510) 555-1234','tel');
+    await coachSay("Almost there! One quick consent before I can text you:",600);
+    await consentStep();
+    sdata.sms_consent=true;
+
+    clearInput();
+    await coachSay(`Perfect, ${sdata.name}! Setting up your profile...`,500);
+    sdata.timezone=Intl.DateTimeFormat().resolvedOptions().timeZone;
+    try {
+      const res=await fetch(BACKEND,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sdata)});
+      const data=await res.json();
+      if(data.status==='ok'||data.status==='exists'){
+        msgs.innerHTML='';
+        const s=document.createElement('div');
+        s.className='co-success';
+        s.innerHTML=`<div class="co-success-icon">🎉</div><h3>You're in, ${sdata.name}!</h3><p>Your first coaching text is on its way. Keep an eye on your messages — your coach is getting your plan ready.</p>`;
+        msgs.appendChild(s);
+        inputArea.innerHTML='';
+      } else {
+        await coachSay("Hmm, something went wrong. Try again?",400);
+        showRetry();
+      }
+    } catch {
+      await coachSay("Connection error — check your internet and try again.",400);
+      showRetry();
+    }
+  }
+
+  function showRetry(){
+    clearInput();
+    const btn=document.createElement('button');
+    btn.className='co-confirm';
+    btn.textContent='Try again';
+    btn.addEventListener('click',runChat);
+    inputArea.appendChild(btn);
+  }
+
+  window.openChatSignup=function(){
+    overlay.classList.add('open');
+    document.body.style.overflow='hidden';
+    if(!msgs.children.length) runChat();
+  };
+
+  function closeOverlay(){
+    overlay.classList.remove('open');
+    document.body.style.overflow='';
+  }
+})();
+</script>
+</body>
+</html>
