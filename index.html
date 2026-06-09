@@ -1,2089 +1,818 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!--
+  Cued — production landing page.
+  Vanilla HTML/CSS/JS, no build step. Deploys via GitHub Pages from /main.
+  Section flow: Hero → Explainer → Claims → Tri-card → Replaces → Missed day → Schedule → Weekly summary → Signup → FAQ → Footer.
+  TODO: wire the real signup handler on .cta-primary (currently anchors to #signup section only).
+-->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cued — AI fitness coaching over text</title>
-<meta name="description" content="Stop chudding. Start gymmaxxing.">
-<meta property="og:title" content="Cued — AI fitness coaching over text">
-<meta property="og:description" content="Stop chudding. Start gymmaxxing.">
+<title>Cued — the fitness coach made for college.</title>
+<meta name="description" content="A coach you text. Built by Berkeley students for the actual rhythm of college life — class schedules, dorm gyms, midterm szn, dining hall food.">
+<meta property="og:title" content="Cued — the fitness coach made for college.">
+<meta property="og:description" content="A coach you text. Built by Berkeley students for the actual rhythm of college life — class schedules, dorm gyms, midterm szn, dining hall food.">
 <meta property="og:image" content="images/og-image.png">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200;12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=EB+Garamond:ital,wght@0,700;1,400;1,700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
-<link rel="preload" as="image" href="images/hero-bg.jpeg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hedvig+Letters+Serif:opsz@12..24&family=Inter+Tight:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--accent:#7C3AFF;--accent2:#6B2EE6;--text:#1a1a1e;--text2:#4a4a52;--text3:#8a8a92;--border:#e5e5ea;--border2:#d1d1d6;--f:'Bricolage Grotesque',-apple-system,sans-serif;}
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { height: 100%; }
-/* ── CHAT SIGNUP OVERLAY ── */
-.co-bg{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);opacity:0;pointer-events:none;transition:opacity .35s ease;display:flex;align-items:center;justify-content:center;padding:24px}
-.co-bg.open{opacity:1;pointer-events:all}
-/* Centered modal card */
-.co-sheet{width:100%;max-width:480px;background:#111113;border:1px solid rgba(255,255,255,0.1);border-radius:24px;display:flex;flex-direction:column;max-height:88vh;transform:translateY(20px) scale(0.97);opacity:0;transition:transform .45s cubic-bezier(.16,1,.3,1),opacity .45s cubic-bezier(.16,1,.3,1)}
-.co-bg.open .co-sheet{transform:translateY(0) scale(1);opacity:1}
-.co-handle{display:none}
-/* Header */
-.co-head{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 0;flex-shrink:0}
-.co-head-info{display:flex;align-items:center;gap:12px}
-.co-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#7C3AFF,#A78BFA);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
-.co-head-name{font-size:14px;font-weight:600;color:#fff;line-height:1.2}
-.co-head-sub{font-size:11px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:5px}
-.co-head-sub::before{content:'';width:6px;height:6px;border-radius:50%;background:#34C759;display:inline-block}
-.co-close{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.08);border:none;cursor:pointer;font-size:13px;color:rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;transition:background .2s,color .2s}
-.co-close:hover{background:rgba(255,255,255,0.14);color:#fff}
-/* Messages */
-.co-msgs{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:10px;scrollbar-width:none}
-.co-msgs::-webkit-scrollbar{display:none}
-.co-msg{max-width:82%;padding:11px 15px;font-size:14px;line-height:1.55;border-radius:18px;opacity:0;transform:translateY(8px);transition:opacity .3s ease,transform .3s ease;font-family:var(--f)}
-.co-msg.show{opacity:1;transform:translateY(0)}
-.co-msg.coach{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.9);border-bottom-left-radius:4px;align-self:flex-start;border:1px solid rgba(255,255,255,0.08)}
-.co-msg.user{background:#7C3AFF;color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
-/* Typing indicator */
-.co-typing{align-self:flex-start;display:inline-flex;gap:5px;padding:12px 16px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.08);border-radius:18px;border-bottom-left-radius:4px}
-.co-typing .co-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.35);animation:htB 1.2s ease-in-out infinite}
-.co-typing .co-dot:nth-child(2){animation-delay:.15s}
-.co-typing .co-dot:nth-child(3){animation-delay:.3s}
-@keyframes htB{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
-/* Input area */
-.co-input-area{flex-shrink:0;padding:12px 20px 20px;border-top:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;gap:10px}
-.co-input-row{display:flex;gap:8px;align-items:center}
-.co-input{flex:1;padding:12px 18px;border:1.5px solid rgba(255,255,255,0.12);border-radius:980px;font-size:14px;font-family:var(--f);color:#fff;background:rgba(255,255,255,0.06);outline:none;transition:border-color .2s}
-.co-input:focus{border-color:rgba(124,58,255,0.7)}
-.co-input::placeholder{color:rgba(255,255,255,0.25)}
-.co-send{width:40px;height:40px;border-radius:50%;background:#7C3AFF;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s;color:#fff}
-.co-send:hover{background:#6B2EE6}
-.co-send svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-/* Chips */
-.co-chips{display:flex;flex-wrap:wrap;gap:8px}
-.co-chip{padding:9px 18px;border-radius:980px;border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);font-size:13px;font-family:var(--f);color:rgba(255,255,255,0.6);cursor:pointer;transition:all .15s}
-.co-chip:hover{border-color:rgba(124,58,255,0.5);color:#fff;background:rgba(124,58,255,0.1)}
-.co-chip.sel,.co-chip.multi.sel{border-color:#7C3AFF;background:rgba(124,58,255,0.18);color:#fff}
-/* Confirm button */
-.co-confirm{width:100%;padding:13px;border-radius:980px;background:#fff;color:#080809;border:none;font-size:15px;font-weight:600;font-family:var(--f);cursor:pointer;transition:background .2s,color .2s}
-.co-confirm:hover{background:#7C3AFF;color:#fff}
-/* Consent */
-.co-consent-wrap{background:rgba(255,255,255,0.04);border-radius:14px;padding:14px;border:1.5px solid rgba(255,255,255,0.08)}
-.co-consent-label{display:flex;align-items:flex-start;gap:10px;cursor:pointer}
-.co-consent-box{flex-shrink:0;margin-top:2px;width:18px;height:18px;border-radius:4px;border:2px solid rgba(255,255,255,0.2);background:transparent;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.co-consent-box.checked{background:#7C3AFF;border-color:#7C3AFF}
-.co-consent-text{font-size:11px;color:rgba(255,255,255,0.35);line-height:1.6}
-.co-consent-text a{color:rgba(124,58,255,0.9)}
-/* Success */
-.co-success{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 28px;text-align:center;gap:12px}
-.co-success-icon{font-size:48px;margin-bottom:8px}
-.co-success h3{font-size:22px;font-weight:700;letter-spacing:-.5px;color:#fff}
-.co-success p{font-size:15px;color:rgba(255,255,255,0.45);font-weight:300;line-height:1.6;max-width:300px}
-/* Mobile: bottom sheet on small screens */
+:root{
+  --bg:#FAFAF7;          /* warm off-white, less clinical than pure white */
+  --bg-alt:#F4F4EF;
+  --ink:#0A1628;
+  --ink-2:#4A5A6E;
+  --ink-3:#8A95A5;
+  --blue:#1086FF;            /* fliptexts intro blue */
+  --blue-2:#0A6FE0;
+  --blue-soft:#E8F1FF;
+  --border:#E5EAF2;
+  --bubble-gray:#E9E9EB;
+  --bubble-blue:#1086FF;
+  --radius:18px;
+  --radius-sm:12px;
+  --shadow-phone:0 24px 80px rgba(10,22,40,.18);
+
+  --f-serif:'Hedvig Letters Serif', Georgia, 'Times New Roman', serif;
+  --f-ui:'Inter Tight', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --f-body:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  /* Brand wordmark only. Stand-in for Neue Einstellung (paid Monotype).
+     To swap to Quicksand: change 'Outfit' below + the Google Fonts link above. */
+  --f-brand:'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:var(--f-body);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5;overflow:hidden}
+a{color:inherit;text-decoration:none}
+
+/* ===== SCROLL DECK ===== */
+.deck{
+  height:100vh;
+  height:100dvh;
+  overflow-y:auto;
+  overflow-x:hidden;
+  scroll-snap-type:y mandatory;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+  -webkit-overflow-scrolling:touch;
+  position:relative;
+}
+.deck::-webkit-scrollbar{display:none}
+.page{
+  min-height:100vh;
+  min-height:100dvh;
+  width:100%;
+  scroll-snap-align:start;
+  scroll-snap-stop:always;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:96px 24px 64px;
+}
+/* Hero needs more top padding so the headline sits lower in the viewport,
+   visually centered after accounting for the fixed nav. */
+.page--hero{padding-top:24vh;padding-bottom:4vh;align-items:flex-start;overflow:hidden}
+/* Decorative drawing pinned to the left edge of the hero, behind content. */
+.hero-art{
+  position:absolute;
+  left:-2vw;
+  bottom:-3vh;
+  width:clamp(240px,26vw,420px);
+  height:auto;
+  opacity:.445;
+  pointer-events:none;
+  user-select:none;
+  z-index:0;
+  /* The SVG wraps an embedded PNG with a white background — blend mode
+     drops the white pixels into the page so only the drawing remains. */
+  mix-blend-mode:multiply;
+}
+.page--hero > *:not(.hero-art){position:relative;z-index:1}
+@media(max-width:900px){.hero-art{display:none}}
+.page--last{scroll-snap-align:end;min-height:auto}
+.page--auto{min-height:auto;scroll-snap-align:start}
+
+/* ===== NAV ===== */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:22px clamp(28px,8vw,120px);
+  background:transparent;
+  pointer-events:none;
+}
+nav > *{pointer-events:auto}
+.brand{font-family:var(--f-brand);font-size:24px;font-weight:400;letter-spacing:-.2px;color:var(--ink)}
+.nav-links{display:flex;align-items:center;gap:24px;font-family:var(--f-ui)}
+.nav-links a{font-size:14px;color:var(--ink-2);font-weight:500;transition:color .15s}
+.nav-links a:hover{color:var(--ink)}
+.nav-cta{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-ui);font-size:14px;font-weight:500;color:var(--ink-2);transition:color .15s}
+.nav-cta:hover{color:var(--ink)}
+.nav-cta-arrow{display:inline-block;transition:transform .2s ease}
+.nav-cta:hover .nav-cta-arrow{transform:translateX(3px)}
+@media(max-width:760px){
+  nav{padding:14px 20px}
+  .brand{font-size:18px}
+  .nav-cta{display:none}
+}
+
+/* ===== PAGE INDICATORS (right rail) ===== */
+.indicators{
+  position:fixed;right:18px;top:50%;transform:translateY(-50%);
+  z-index:40;display:none;flex-direction:column;gap:8px;
+  pointer-events:auto;
+}
+@media(min-width:900px){.indicators{display:flex}}
+.indicators button{
+  display:flex;align-items:center;justify-content:flex-end;
+  width:64px;height:14px;padding:0 6px 0 30px;background:transparent;border:none;cursor:pointer;
+  position:relative;
+}
+.indicators button .dot{
+  display:block;height:3px;width:18px;border-radius:999px;background:#D6DCE5;transition:width .25s ease,background .25s ease;
+}
+.indicators button[aria-current="true"] .dot{width:36px;background:var(--ink)}
+.indicators button:hover .dot{background:var(--ink-2)}
+
+/* ===== ANNOUNCEMENT PILL (top of hero) ===== 
+.announce{position:absolute;top:84px;left:50%;transform:translateX(-50%);display:flex;justify-content:center;z-index:5}
+.announce a{display:inline-flex;align-items:center;gap:8px;background:var(--blue-soft);color:var(--blue-2);font-family:var(--f-ui);font-size:13px;font-weight:600;padding:7px 14px;border-radius:999px;transition:background .15s}
+.announce a:hover{background:#dce8fb}
+.announce .dot{width:6px;height:6px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 4px rgba(16,134,255,.18)}
+*/
+/* ===== HERO (centered, serif) ===== */
+.hero-inner{max-width:960px;width:100%;text-align:center;display:flex;flex-direction:column;align-items:center}
+.hero-h1{
+  font-family:var(--f-serif);
+  font-weight:500;
+  font-size:clamp(2.2rem,4.4vw,4.2rem);
+  line-height:.98;
+  letter-spacing:-1.4px;
+  color:var(--ink);
+  margin-bottom:44px;
+  max-width:20ch;
+}
+.hero-h1 em{font-style:italic;color:var(--blue)}
+.hero-sub{
+  font-family:var(--f-body);
+  font-size:clamp(14.5px,1.1vw,16px);
+  color:var(--ink-2);
+  line-height:1.6;
+  max-width:480px;
+  margin-bottom:48px;
+  font-weight:400;
+}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:72px}
+.cta-primary{display:inline-flex;align-items:center;gap:8px;padding:15px 26px;background:var(--blue);color:#fff;font-family:var(--f-ui);font-size:15px;font-weight:600;border-radius:999px;border:none;cursor:pointer;transition:background .15s,transform .15s,box-shadow .15s}
+.cta-primary:hover{background:var(--blue-2);transform:translateY(-1px);box-shadow:0 12px 28px rgba(16,134,255,.28)}
+.cta-secondary{display:inline-flex;align-items:center;gap:8px;padding:15px 24px;background:transparent;color:var(--ink);font-family:var(--f-ui);font-size:15px;font-weight:600;border-radius:999px;border:1px solid var(--border);cursor:pointer;transition:background .15s,border-color .15s}
+.cta-secondary:hover{background:var(--bg-alt);border-color:#cfd6e2}
+
+/* ===== HERO: mobile tightening =====
+   Pull the headline higher in the viewport, shrink it so it wraps to ~3
+   tight lines instead of 4 cramped ones, and close the gaps so the
+   block reads as one composition rather than floating elements. */
+@media(max-width:760px){
+  .page--hero{padding-top:12vh;padding-bottom:6vh}
+  .hero-h1{
+    font-size:clamp(2rem,9vw,2.6rem);
+    letter-spacing:-1px;
+    line-height:1.02;
+    max-width:14ch;
+    margin-bottom:28px;
+  }
+  .hero-sub{font-size:15px;margin-bottom:32px;max-width:340px;padding:0 8px}
+  .hero-ctas{margin-bottom:48px;gap:10px}
+  .cta-primary,.cta-secondary{padding:13px 22px;font-size:14.5px}
+  .proof{margin-top:0;gap:14px}
+  .proof-label{font-size:10.5px;letter-spacing:1.6px}
+  .proof-row{gap:12px 18px;max-width:320px}
+  .proof-logo{font-size:13px}
+}
+
+/* ===== FLOATING CTA (shows on sections without an inline CTA) ===== */
+.float-cta{
+  position:fixed;left:50%;bottom:28px;transform:translate(-50%,12px);
+  display:inline-flex;align-items:center;gap:6px;
+  padding:9px 18px;border-radius:999px;
+  background:var(--blue);color:#fff;
+  border:1px solid var(--blue);
+  font-family:var(--f-ui);font-size:13px;font-weight:700;letter-spacing:-.1px;
+  box-shadow:0 8px 22px rgba(16,134,255,.28);
+  opacity:0;pointer-events:none;
+  transition:opacity .35s ease,transform .35s ease,background .2s,border-color .2s,color .2s,box-shadow .2s;
+  z-index:45;
+}
+.float-cta.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.float-cta:hover{background:#fff;border-color:rgba(16,134,255,.35);color:var(--blue);box-shadow:0 4px 14px rgba(10,22,40,.06)}
+.float-cta .arrow{display:inline-block;transition:transform .2s ease}
+.float-cta:hover .arrow{transform:translateX(3px)}
+@media(max-width:600px){.float-cta{bottom:18px;font-size:12.5px;padding:8px 16px}}
+
+/* social proof inside hero, beneath ctas */
+.proof{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:64px}
+.proof-label{font-family:var(--f-ui);font-size:11.5px;font-weight:600;letter-spacing:1.8px;color:var(--ink-3);text-transform:uppercase}
+.proof-row{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:24px 32px}
+.proof-logo{font-family:var(--f-ui);font-size:14.5px;font-weight:600;color:var(--ink-2);opacity:.6;letter-spacing:-.15px;transition:opacity .2s}
+.proof-logo:hover{opacity:.95}
+
 @media(max-width:600px){
-  .co-bg{align-items:flex-end;padding:0;/* use dvh so keyboard resize doesn't push sheet */height:100dvh}
-  .co-sheet{width:100%;box-sizing:border-box;border-radius:24px 24px 0 0;max-height:92dvh;transform:translateY(100%);opacity:1;overflow:hidden}
-  .co-bg.open .co-sheet{transform:translateY(0);opacity:1}
-  .co-handle{display:block;width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,0.15);margin:14px auto 0;flex-shrink:0}
-  .co-msgs{padding:16px 16px}
-  .co-input-area{padding:10px 14px 16px}
-  .co-input{font-size:16px;/* prevent iOS auto-zoom on focus */}
-  .co-chips{gap:7px}
-  .co-chip{font-size:13px;padding:8px 14px}
-}
-body {
-  font-family: 'Bricolage Grotesque', -apple-system, sans-serif;
-  background: #080809;
-  color: #F5F5F7;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  .proof-row{gap:14px 22px}
+  .proof-logo{font-size:13.5px}
+  .announce{top:72px}
 }
 
-/* ── Nav ── */
-nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  padding: 0 clamp(24px, 5vw, 56px);
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+/* ===== FEATURE PAGE (snap section: claim + phone) ===== */
+.feature{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;max-width:1180px;width:100%}
+.feature.reverse .feature-copy{order:2}
+.feature.reverse .feature-phone{order:1}
+.feature-copy{max-width:520px}
+.feature-eyebrow{font-family:var(--f-ui);font-size:12px;font-weight:700;letter-spacing:1.4px;color:var(--blue);text-transform:uppercase;margin-bottom:18px}
+.feature-h2{
+  font-family:var(--f-serif);
+  font-weight:400;
+  font-size:clamp(2.2rem,4.2vw,3.6rem);
+  line-height:1.04;
+  letter-spacing:-1px;
+  color:var(--ink);
+  margin-bottom:18px;
 }
-.nv-logo {
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: -.4px;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-}
-.nv-logo svg { width: 24px; height: 24px; }
-.nv-signup {
-  background: #fff;
-  color: #080809;
-  font-size: 13px;
-  font-weight: 600;
-  padding: 8px 20px;
-  border-radius: 980px;
-  text-decoration: none;
-  transition: opacity .3s, transform .3s;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-6px);
-}
-.nv-signup.visible {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-.nv-signup:hover { opacity: .85; }
-
-/* ── Hero ── */
-.hero {
-  min-height: 100vh;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: flex-end;
-  padding: 0 clamp(32px, 6vw, 80px) clamp(48px, 7vh, 80px);
+.feature-h2 em{font-style:italic;color:var(--blue)}
+.feature-copy p{font-family:var(--f-body);font-size:17px;color:var(--ink-2);line-height:1.6}
+.feature-phone{display:flex;justify-content:center}
+@media(max-width:900px){
+  .feature{grid-template-columns:1fr;gap:32px;text-align:center}
+  .feature.reverse .feature-copy,.feature.reverse .feature-phone{order:initial}
+  .feature-copy{margin:0 auto}
+  .page{padding:84px 22px 56px}
 }
 
-/* Full-bleed background — bright enough to see the phone */
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  object-position: center 35%;
-  filter: brightness(0.72) contrast(1.05) saturate(0.8);
-  z-index: 0;
+/* ===== PHONE COMPONENT ===== */
+.phone{width:300px;background:#0A1628;border-radius:42px;padding:10px;box-shadow:var(--shadow-phone);position:relative}
+.phone-screen{background:#fff;border-radius:34px;overflow:hidden;height:560px;display:flex;flex-direction:column;position:relative}
+.phone-notch{position:absolute;top:14px;left:50%;transform:translateX(-50%);width:96px;height:24px;background:#0A1628;border-radius:14px;z-index:3}
+.chat-header{padding:48px 16px 12px;text-align:center;border-bottom:1px solid #EEF1F5;background:#F7F8FA}
+.chat-header .ch-name{font-family:var(--f-ui);font-size:14px;font-weight:600;color:var(--ink);display:flex;justify-content:center;align-items:center;gap:6px}
+.chat-header .ch-name .ch-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#5BB3FF);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;font-family:var(--f-ui)}
+.chat-header .ch-sub{font-family:var(--f-ui);font-size:11px;color:var(--ink-3);margin-top:2px}
+.chat{padding:14px 12px;display:flex;flex-direction:column;gap:6px;overflow-y:auto;flex:1;font-family:var(--f-body)}
+.bub{max-width:78%;padding:9px 13px;border-radius:18px;font-size:14px;line-height:1.38;word-wrap:break-word;letter-spacing:-.1px}
+.bub.cued{align-self:flex-start;background:var(--bubble-gray);color:var(--ink);border-bottom-left-radius:5px}
+.bub.me{align-self:flex-end;background:var(--bubble-blue);color:#fff;border-bottom-right-radius:5px}
+.bub.tiny{font-size:11.5px;color:var(--ink-3);background:transparent;align-self:center;padding:4px 0;max-width:none}
+.chat-input{padding:8px 10px 14px;border-top:1px solid #EEF1F5;display:flex;align-items:center;gap:6px;background:#fff}
+.chat-input .input-fake{flex:1;height:28px;background:#F2F3F5;border-radius:14px;display:flex;align-items:center;padding:0 12px;font-family:var(--f-ui);font-size:12px;color:var(--ink-3)}
+.chat-input .send{width:28px;height:28px;border-radius:50%;background:var(--bubble-gray);display:inline-flex;align-items:center;justify-content:center;color:var(--ink-3);font-size:14px}
+
+/* ===== EXPLAINER PAGE (under hero) ===== */
+.explainer-inner{max-width:680px;width:100%;text-align:center;display:flex;flex-direction:column;align-items:center;gap:22px}
+.explainer-h{font-family:var(--f-serif);font-weight:500;font-size:clamp(2rem,3.6vw,3rem);line-height:1.04;letter-spacing:-1.2px;color:var(--ink);margin-bottom:8px}
+.explainer-inner p{font-family:var(--f-body);font-size:clamp(16px,1.3vw,18px);color:var(--ink-2);line-height:1.65;max-width:580px;margin:0 auto}
+.explainer-founder{font-family:var(--f-ui)!important;font-size:clamp(12px,1vw,13.5px)!important;font-weight:600!important;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink-3)!important;margin-top:14px!important;max-width:none!important;line-height:1.4!important}
+
+/* ===== CLAIMS PAGE (12 capability claims, 3-col grid) ===== */
+.claims-inner{max-width:1180px;width:100%;display:flex;flex-direction:column;gap:64px}
+.claims-head{max-width:780px}
+.claims-h{font-family:var(--f-serif);font-weight:500;font-size:clamp(2rem,4vw,3.4rem);letter-spacing:-1.4px;line-height:1.04;color:var(--ink);margin-bottom:18px}
+.claims-sub{font-family:var(--f-body);font-size:clamp(15px,1.2vw,17px);color:var(--ink-2);line-height:1.6;max-width:560px}
+.claims-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0 32px}
+.claim{display:flex;align-items:center;gap:12px;padding:18px 0;border-top:1px solid var(--border);font-family:var(--f-ui);font-size:clamp(15px,1.2vw,17px);font-weight:500;color:var(--ink);letter-spacing:-.2px}
+.claim-check{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--blue);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;font-family:var(--f-ui)}
+.claim--more{color:var(--ink-3)}
+.claim--more .claim-check{background:var(--ink-3)}
+@media(max-width:900px){
+  .claims-grid{grid-template-columns:repeat(2,1fr);gap:0 24px}
+  .claims-inner{gap:48px}
+}
+@media(max-width:560px){
+  .claims-grid{grid-template-columns:1fr}
+  .claim{padding:14px 0}
 }
 
-/* Subtle dark vignette — bottom and edges only, image stays readable */
-.hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.2) 30%, transparent 60%),
-    linear-gradient(to right, rgba(0,0,0,0.55) 0%, transparent 35%),
-    linear-gradient(to left, rgba(0,0,0,0.3) 0%, transparent 30%);
-  z-index: 1;
-  pointer-events: none;
+/* ===== TRI-CARD PAGE (combined: morning plan + fuel + proactive nudge) ===== */
+.tricard-inner{max-width:1240px;width:100%}
+.tricard-head{text-align:center;margin-bottom:48px}
+.tricard-h{font-family:var(--f-serif);font-weight:500;font-size:clamp(2rem,3.6vw,3rem);letter-spacing:-1.2px;line-height:1.04;color:var(--ink);margin-bottom:12px}
+.tricard-head p{font-family:var(--f-body);color:var(--ink-2);font-size:17px;max-width:540px;margin:0 auto;line-height:1.55}
+.tricard-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.tricard{border-radius:24px;padding:28px;display:flex;flex-direction:column;gap:24px;min-height:460px;position:relative;overflow:hidden}
+.tricard--mint{background:#E6F3E8}
+.tricard--cream{background:#F5EFE2}
+.tricard--lavender{background:#ECE9F8}
+.tricard-bubble{align-self:flex-start;background:var(--blue);color:#fff;padding:10px 14px;border-radius:18px;border-bottom-left-radius:5px;font-family:var(--f-body);font-size:14px;line-height:1.35;max-width:90%}
+.tricard-copy{font-family:var(--f-ui);font-size:clamp(20px,1.8vw,26px);font-weight:700;line-height:1.18;letter-spacing:-.4px;color:var(--ink);text-transform:uppercase;flex:0 1 auto}
+.tricard-copy .hl{background:var(--blue);color:#fff;padding:0 6px;border-radius:4px;display:inline-block}
+.tricard-mini{display:flex;flex-direction:column;gap:5px;margin-top:auto;padding-top:18px}
+.tricard-mini .bub{font-size:12.5px;padding:7px 11px;max-width:100%;background:rgba(255,255,255,.65);color:var(--ink);border-radius:14px;border-bottom-left-radius:5px;line-height:1.4;letter-spacing:-.1px}
+@media(max-width:900px){
+  .tricard-grid{grid-template-columns:1fr;gap:16px}
+  .tricard{min-height:auto;padding:24px;gap:18px}
+  .tricard-head{margin-bottom:32px}
 }
 
-/* ── Headline — bottom-left ── */
-.hero-left {
-  position: relative;
-  z-index: 2;
-  flex: 1;
-  padding-bottom: 4px;
-}
-.hero-headline {
-  font-family: 'EB Garamond', Georgia, serif;
-  font-size: clamp(48px, 7vw, 96px);
-  font-weight: 300;
-  line-height: 1.05;
-  letter-spacing: -0.5px;
-  color: #fff;
-  max-width: 640px;
-  text-transform: lowercase;
-}
-.hero-headline em {
-  font-style: italic;
-  color: rgba(255,255,255,0.75);
-  display: inline;
+/* ===== REPLACES PAGE (positioning: replaces 8 apps) ===== */
+.replaces-inner{max-width:880px;width:100%;text-align:center;display:flex;flex-direction:column;align-items:center;gap:36px}
+.replaces-head{display:flex;flex-direction:column;align-items:center}
+.replaces-eyebrow{font-family:var(--f-ui);font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink-3);margin-bottom:14px;font-weight:600}
+.replaces-h{font-family:var(--f-serif);font-weight:500;font-size:clamp(2rem,3.6vw,3rem);letter-spacing:-1.2px;line-height:1.04;color:var(--ink)}
+.replaces-grid{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(4,1fr);gap:32px 24px;width:100%}
+.replaces-grid li{display:flex;flex-direction:column;align-items:center;gap:12px;padding:6px 0;opacity:.78}
+.replaces-grid li img{width:56px;height:56px;object-fit:cover;border-radius:14px;box-shadow:0 2px 8px rgba(10,22,40,.08);filter:grayscale(.4)}
+.replaces-grid li span{font-family:var(--f-ui);font-size:clamp(14px,1.2vw,16px);font-weight:500;color:var(--ink-2);text-decoration:line-through;text-decoration-thickness:1.5px;text-decoration-color:rgba(10,22,40,.5);text-align:center;line-height:1.3}
+.replaces-foot{font-family:var(--f-serif);font-style:italic;font-size:clamp(20px,2vw,28px);color:var(--blue);letter-spacing:-.4px;margin-top:6px}
+@media(max-width:760px){
+  .replaces-grid{grid-template-columns:repeat(2,1fr);gap:24px 18px}
+  .replaces-grid li img{width:48px;height:48px;border-radius:12px}
 }
 
-/* ── CTA block — right side, vertically centered-ish ── */
-.hero-right {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 16px;
-  padding-bottom: 4px;
-  padding-left: clamp(40px, 6vw, 100px);
-}
-.hero-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  background: #fff;
-  color: #080809;
-  font-size: 18px;
-  font-weight: 600;
-  padding: 18px 32px;
-  border-radius: 980px;
-  text-decoration: none;
-  transition: opacity .2s, transform .2s;
-  white-space: nowrap;
-}
-.hero-cta:hover { background: #7C3AFF; color: #fff; transform: translateY(-1px); }
-.hero-cta-icon {
-  width: 28px; height: 28px;
-  flex-shrink: 0;
-  border-radius: 7px;
-  overflow: hidden;
-}
-.hero-cta-icon img {
-  width: 100%; height: 100%;
-  display: block;
-}
-.hero-sub {
-  font-size: 15px;
-  color: rgba(255,255,255,0.5);
-  font-weight: 300;
-  line-height: 1.7;
-  max-width: 340px;
-  letter-spacing: 0.1px;
+/* ===== PHONE: mobile override =====
+   On mobile the user is already holding a phone — a phone-shaped frame
+   inside their phone breaks the illusion. Strip the shell so the chat
+   reads as if it IS their Messages app. */
+@media(max-width:760px){
+  .phone{width:100%;max-width:360px;background:transparent;padding:0;border-radius:0;box-shadow:none}
+  .phone-notch{display:none}
+  .phone-screen{border-radius:0;height:auto;background:transparent;overflow:visible}
+  .chat-header{padding:0 0 12px;background:transparent;border-bottom:1px solid var(--border)}
+  .chat{padding:14px 0 0;overflow-y:visible;flex:0 1 auto}
+  .bub{font-size:15px}
+  .chat-input{display:none}
 }
 
+/* ===== CTA PAGE ===== */
+.cta-inner{text-align:center;max-width:840px;display:flex;flex-direction:column;align-items:center}
+.cta-h{font-family:var(--f-serif);font-weight:400;font-size:clamp(2.6rem,5vw,4.6rem);line-height:1.04;letter-spacing:-1.4px;color:var(--ink);margin-bottom:20px;max-width:14ch}
+.cta-h em{font-style:italic;color:var(--blue)}
+.cta-inner p{font-family:var(--f-body);font-size:17.5px;color:var(--ink-2);max-width:560px;margin:0 auto 30px;line-height:1.6}
+.cta-inner .cta-primary{font-size:16px;padding:17px 30px}
+.cta-faq-link{display:inline-block;margin-top:18px;font-family:var(--f-ui);font-size:14px;color:var(--ink-3);font-weight:500}
+.cta-faq-link:hover{color:var(--ink-2)}
 
-/* ════════════════════════════════════════════
-   HYPERREALISTIC iPHONE 15 PRO
-   ════════════════════════════════════════════ */
-.iphone {
-  position: relative;
-  width: clamp(240px, 26vw, 340px);
-  /* 9:19.5 ratio */
-  aspect-ratio: 9 / 19.5;
-  /* Slight perspective tilt */
-  transform: perspective(1200px) rotateY(-6deg) rotateX(2deg);
-  transform-style: preserve-3d;
-  filter: drop-shadow(0 60px 80px rgba(0,0,0,0.8)) drop-shadow(0 0 40px rgba(124,58,255,0.18));
-}
+/* ===== FAQ PAGE ===== */
+.faq-wrap{max-width:840px;width:100%}
+.faq-head{text-align:center;margin-bottom:32px}
+.faq-head h2{font-family:var(--f-serif);font-weight:400;font-size:clamp(2.2rem,4vw,3.4rem);letter-spacing:-1px;color:var(--ink);margin-bottom:8px}
+.faq-head p{font-family:var(--f-body);font-size:16px;color:var(--ink-2)}
+.faq-list details{border-top:1px solid var(--border)}
+.faq-list details:last-child{border-bottom:1px solid var(--border)}
+.faq-list summary{list-style:none;cursor:pointer;padding:22px 0;display:flex;justify-content:space-between;align-items:center;gap:20px;font-family:var(--f-ui);font-size:17px;font-weight:600;color:var(--ink);letter-spacing:-.2px}
+.faq-list summary::-webkit-details-marker{display:none}
+.faq-list summary::after{content:'+';font-family:var(--f-ui);font-size:22px;font-weight:300;color:var(--ink-3);transition:color .15s;flex-shrink:0}
+.faq-list details[open] summary::after{content:'–';color:var(--blue)}
+.faq-list details[open] summary{color:var(--blue)}
+.faq-body{font-family:var(--f-body);padding:0 0 22px;color:var(--ink-2);font-size:15.5px;line-height:1.65;max-width:680px}
 
-/* Titanium outer frame — the physical chassis */
-.iphone-frame {
-  position: absolute;
-  inset: 0;
-  border-radius: clamp(38px, 5.5vw, 54px);
-  /* Titanium brushed gradient */
-  background: linear-gradient(
-    160deg,
-    #c8c8ca 0%,
-    #a0a0a2 15%,
-    #7a7a7c 30%,
-    #5c5c5e 45%,
-    #6e6e70 55%,
-    #9a9a9c 70%,
-    #b8b8ba 82%,
-    #888 100%
-  );
-  padding: 3px; /* frame thickness */
-}
-
-/* Glass back / screen surround */
-.iphone-inner {
-  width: 100%;
-  height: 100%;
-  border-radius: calc(clamp(38px, 5.5vw, 54px) - 3px);
-  background: #000;
-  overflow: hidden;
-  position: relative;
+/* ===== FOOTER ===== */
+footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--border)}
+.footer-inner{max-width:1240px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
+.footer-links{display:flex;align-items:center;gap:22px;font-family:var(--f-ui)}
+.footer-links a{font-size:14px;color:var(--ink-2);font-weight:500;transition:color .15s}
+.footer-links a:hover{color:var(--ink)}
+.footer-meta{max-width:1240px;margin:22px auto 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;font-family:var(--f-ui);font-size:13px;color:var(--ink-3)}
+@media(max-width:600px){
+  .footer-inner,.footer-meta{flex-direction:column;align-items:flex-start}
+  .footer-links{flex-wrap:wrap;gap:14px}
 }
 
-/* Specular highlight — top-left sheen on frame */
-.iphone-frame::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(
-    135deg,
-    rgba(255,255,255,0.55) 0%,
-    rgba(255,255,255,0.1) 20%,
-    transparent 45%,
-    rgba(255,255,255,0.04) 75%,
-    rgba(255,255,255,0.12) 100%
-  );
-  pointer-events: none;
-  z-index: 10;
-}
-
-/* Screen glass glare overlay */
-.iphone-glare {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(
-    145deg,
-    rgba(255,255,255,0.06) 0%,
-    rgba(255,255,255,0.02) 30%,
-    transparent 60%
-  );
-  z-index: 50;
-  pointer-events: none;
-}
-
-/* Side buttons — power button right */
-.iphone-btn-power {
-  position: absolute;
-  right: -4px;
-  top: 28%;
-  width: 3.5px;
-  height: 14%;
-  background: linear-gradient(to right, #6a6a6c, #9a9a9c, #7a7a7c);
-  border-radius: 0 2px 2px 0;
-  z-index: 20;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
-}
-
-/* Volume buttons left */
-.iphone-btn-vol-up {
-  position: absolute;
-  left: -4px;
-  top: 20%;
-  width: 3.5px;
-  height: 9%;
-  background: linear-gradient(to left, #6a6a6c, #9a9a9c, #7a7a7c);
-  border-radius: 2px 0 0 2px;
-  z-index: 20;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
-}
-.iphone-btn-vol-down {
-  position: absolute;
-  left: -4px;
-  top: 31%;
-  width: 3.5px;
-  height: 9%;
-  background: linear-gradient(to left, #6a6a6c, #9a9a9c, #7a7a7c);
-  border-radius: 2px 0 0 2px;
-  z-index: 20;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
-}
-
-/* Action button (mute toggle) — smaller, above vol up */
-.iphone-btn-action {
-  position: absolute;
-  left: -4px;
-  top: 13%;
-  width: 3.5px;
-  height: 5%;
-  background: linear-gradient(to left, #6a6a6c, #9a9a9c, #7a7a7c);
-  border-radius: 2px 0 0 2px;
-  z-index: 20;
-}
-
-/* ── Screen content ── */
-.screen {
-  position: absolute;
-  inset: 3px; /* inside frame padding */
-  border-radius: calc(clamp(38px, 5.5vw, 54px) - 3px);
-  background: #000;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Status bar */
-.s-status {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 22px 4px;
-  flex-shrink: 0;
-}
-.s-time {
-  font-size: 13px;
-  font-weight: 700;
-  color: #fff;
-  font-family: -apple-system, sans-serif;
-  letter-spacing: -.3px;
-}
-.s-icons {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-.s-signal {
-  display: flex;
-  align-items: flex-end;
-  gap: 1.5px;
-  height: 10px;
-}
-.s-signal span {
-  width: 2.5px;
-  background: #fff;
-  border-radius: 1px;
-}
-.s-signal span:nth-child(1) { height: 30%; opacity: .4; }
-.s-signal span:nth-child(2) { height: 55%; opacity: .6; }
-.s-signal span:nth-child(3) { height: 80%; }
-.s-signal span:nth-child(4) { height: 100%; }
-
-.s-wifi {
-  width: 14px;
-  height: 10px;
-  position: relative;
-}
-.s-wifi::before, .s-wifi::after {
-  position: absolute;
-  border: 1.5px solid #fff;
-  border-radius: 50%;
-  border-bottom-color: transparent;
-  border-left-color: transparent;
-  transform: rotate(-45deg);
-}
-.s-wifi::before {
-  content: '';
-  width: 12px; height: 12px;
-  top: -1px; left: 1px;
-  opacity: .5;
-}
-.s-wifi::after {
-  content: '';
-  width: 7px; height: 7px;
-  top: 1.5px; left: 3.5px;
-  opacity: .8;
-}
-.s-wifi-dot {
-  position: absolute;
-  width: 3px; height: 3px;
-  background: #fff;
-  border-radius: 50%;
-  bottom: 0; left: 5.5px;
-}
-
-.s-battery {
-  display: flex;
-  align-items: center;
-  gap: 1px;
-}
-.s-battery-body {
-  width: 22px; height: 11px;
-  border: 1.5px solid rgba(255,255,255,0.55);
-  border-radius: 3px;
-  padding: 1.5px;
-  position: relative;
-}
-.s-battery-fill {
-  width: 55%;
-  height: 100%;
-  background: #fff;
-  border-radius: 1.5px;
-}
-.s-battery-tip {
-  width: 2px; height: 5px;
-  background: rgba(255,255,255,0.55);
-  border-radius: 0 1px 1px 0;
-}
-
-/* Dynamic island */
-.s-island {
-  width: 33%;
-  height: 30px;
-  background: #000;
-  border-radius: 20px;
-  margin: 4px auto 0;
-  flex-shrink: 0;
-  position: relative;
-  /* subtle inner edge */
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.06), inset 0 1px 3px rgba(0,0,0,0.8);
-}
-
-/* Messages nav bar */
-.s-imsg-nav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  padding: 10px 0 8px;
-  border-bottom: 0.5px solid rgba(255,255,255,0.08);
-  flex-shrink: 0;
-}
-.s-imsg-back {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 11px;
-  color: #007AFF;
-  font-family: -apple-system, sans-serif;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-.s-imsg-nav-wrap {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-.s-avatar {
-  width: 40px; height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #7C3AFF, #A78BFA);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 17px; font-weight: 700; color: #fff;
-  font-family: -apple-system, sans-serif;
-  flex-shrink: 0;
-}
-.s-contact-name {
-  font-size: 12px;
-  font-weight: 600;
-  color: #fff;
-  font-family: -apple-system, sans-serif;
-  display: flex; align-items: center; gap: 2px;
-}
-.s-contact-name::after {
-  content: '›';
-  color: rgba(255,255,255,0.35);
-  font-size: 13px;
-}
-
-/* Messages */
-.s-msgs {
-  flex: 1;
-  overflow: hidden;
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.s-ts {
-  text-align: center;
-  font-size: 9.5px;
-  color: rgba(255,255,255,0.3);
-  font-family: -apple-system, sans-serif;
-  margin: 2px 0;
-}
-.s-row { display: flex; }
-.s-row.them { justify-content: flex-start; }
-.s-row.me   { justify-content: flex-end; }
-
-.s-bubble {
-  padding: 7px 11px;
-  border-radius: 16px;
-  font-size: clamp(9px, 1.3vw, 12px);
-  line-height: 1.45;
-  font-family: -apple-system, sans-serif;
-  max-width: 80%;
-}
-.s-bubble.them {
-  background: #2c2c2e;
-  color: #fff;
-  border-bottom-left-radius: 4px;
-}
-.s-bubble.me {
-  background: #007AFF;
-  color: #fff;
-  border-bottom-right-radius: 4px;
-}
-.s-bubble.me.done { background: #34C759; }
-
-/* Input bar */
-.s-input {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 8px 12px 18px;
-  border-top: 0.5px solid rgba(255,255,255,0.07);
-  flex-shrink: 0;
-}
-.s-input-field {
-  flex: 1;
-  background: rgba(255,255,255,0.06);
-  border: 0.5px solid rgba(255,255,255,0.12);
-  border-radius: 18px;
-  padding: 7px 12px;
-  font-size: 10px;
-  color: rgba(255,255,255,0.25);
-  font-family: -apple-system, sans-serif;
-}
-.s-input-send {
-  width: 26px; height: 26px;
-  background: #007AFF;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  color: #fff;
-  font-size: 11px;
-  flex-shrink: 0;
-}
-
-/* Ambient glow beneath phone */
-.iphone-glow {
-  position: absolute;
-  bottom: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80%;
-  height: 100px;
-  background: radial-gradient(ellipse at center, rgba(124,58,255,0.25) 0%, transparent 70%);
-  filter: blur(24px);
-  pointer-events: none;
-  z-index: -1;
-}
-
-/* ── Phone entrance animation ── */
-.iphone {
-  opacity: 0;
-  animation: phoneEnter 1.1s cubic-bezier(.16,1,.3,1) 0.3s forwards;
-}
-@keyframes phoneEnter {
-  0%   { opacity: 0; transform: perspective(1200px) rotateY(-6deg) rotateX(2deg) translateY(48px) scale(0.93); }
-  100% { opacity: 1; transform: perspective(1200px) rotateY(-6deg) rotateX(2deg) translateY(0)    scale(1); }
-}
-@media (max-width: 768px) {
-  @keyframes phoneEnter {
-    0%   { opacity: 0; transform: perspective(1000px) rotateY(0deg) rotateX(2deg) translateY(40px) scale(0.93); }
-    100% { opacity: 1; transform: perspective(1000px) rotateY(0deg) rotateX(2deg) translateY(0)    scale(1); }
-  }
-}
-
-/* Glow pulse after entrance */
-.iphone-glow {
-  animation: glowPulse 3s ease-in-out 1.4s infinite;
-}
-@keyframes glowPulse {
-  0%, 100% { opacity: 0.6; }
-  50%       { opacity: 1; }
-}
-
-/* Hero-left entrance */
-.hero-left {
-  opacity: 0;
-  animation: leftEnter 1s cubic-bezier(.16,1,.3,1) 0.15s forwards;
-}
-@keyframes leftEnter {
-  0%   { opacity: 0; transform: translateY(24px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-/* Chat bubble pop-in */
-@keyframes bubbleIn {
-  0%   { opacity: 0; transform: scale(0.85) translateY(6px); }
-  100% { opacity: 1; transform: scale(1)    translateY(0); }
-}
-.s-row, .s-ts {
-  opacity: 0;
-}
-.s-row.show, .s-ts.show {
-  animation: bubbleIn 0.35s cubic-bezier(.16,1,.3,1) forwards;
-}
-/* Typing row just fades in — no scale */
-.s-row.typing-row.show {
-  animation: none;
-  opacity: 1;
-}
-
-/* Typing indicator */
-.typing-indicator {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 12px;
-  background: #2c2c2e;
-  border-radius: 16px;
-  border-bottom-left-radius: 4px;
-  width: fit-content;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-.typing-indicator.show { opacity: 1; }
-.typing-indicator span {
-  width: 5px; height: 5px;
-  background: rgba(255,255,255,0.5);
-  border-radius: 50%;
-  animation: typingDot 1.2s ease-in-out infinite;
-}
-.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-@keyframes typingDot {
-  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-  30%            { transform: translateY(-4px); opacity: 1; }
-}
-
-/* ══════════════════════════════════════════════
-   SECTION 2 — STICKY SCROLL WALKTHROUGH
-   ══════════════════════════════════════════════ */
-
-/* Outer scroll container — tall enough for entry + 3 states + buffer */
-.sw-outer {
-  height: 450vh;
-  background: #080809;
-  position: relative;
-}
-@media (max-width: 768px) { .sw-outer { height: 550vh; } }
-
-/* Sticky inner — locks to viewport */
-.sw-inner {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ── Entry headline (centered, fades out on transition) ── */
-.sw-entry {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  z-index: 4;
-  pointer-events: none;
-}
-.sw-entry-top {
-  font-family: 'EB Garamond', Georgia, serif;
-  font-size: clamp(52px, 6.5vw, 88px);
-  font-weight: 400;
-  letter-spacing: -0.5px;
-  color: #fff;
-  line-height: 1.05;
-  align-self: flex-start;
-  padding-left: 12vw;
-  text-shadow: 0 2px 24px rgba(0,0,0,0.8), 0 0 60px rgba(0,0,0,0.6);
-}
-.sw-entry-bot {
-  font-family: 'EB Garamond', Georgia, serif;
-  font-style: italic;
-  font-size: clamp(46px, 6vw, 82px);
-  color: rgba(255,255,255,0.7);
-  letter-spacing: -0.5px;
-  line-height: 1.0;
-  align-self: flex-end;
-  padding-right: 12vw;
-  text-shadow: 0 2px 24px rgba(0,0,0,0.8), 0 0 60px rgba(0,0,0,0.6);
-}
-
-/* ── Phone (entry: centered large; walkthrough: right column) ── */
-.sw-phone-wrap {
-  position: absolute;
-  will-change: transform;
-  z-index: 3;
-}
-
-/* ── Rebuilt phone mockup ── */
-.ph-shell {
-  position: relative;
-  width: 320px;
-  aspect-ratio: 9 / 19.5;
-  background: linear-gradient(160deg,#c8c8ca 0%,#a0a0a2 15%,#7a7a7c 30%,#5c5c5e 45%,#6e6e70 55%,#9a9a9c 70%,#b8b8ba 82%,#888 100%);
-  border-radius: 44px;
-  padding: 3px;
-  box-shadow: 0 40px 80px rgba(0,0,0,0.85), 0 0 40px rgba(124,58,255,0.15);
-}
-.ph-shell::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 44px;
-  background: linear-gradient(135deg,rgba(255,255,255,0.55) 0%,rgba(255,255,255,0.1) 20%,transparent 45%,rgba(255,255,255,0.04) 75%,rgba(255,255,255,0.12) 100%);
-  pointer-events: none;
-  z-index: 2;
-}
-.ph-btn-action,.ph-btn-vol-up,.ph-btn-vol-down,.ph-btn-power {
-  position: absolute;
-  width: 3.5px;
-  background: linear-gradient(to left,#6a6a6c,#9a9a9c,#7a7a7c);
-  border-radius: 2px 0 0 2px;
-  z-index: 3;
-}
-.ph-btn-action  { left:-4px; top:13%; height:5%; }
-.ph-btn-vol-up  { left:-4px; top:20%; height:9%; }
-.ph-btn-vol-down{ left:-4px; top:31%; height:9%; }
-.ph-btn-power   { right:-4px; top:28%; height:14%; border-radius:0 2px 2px 0; background:linear-gradient(to right,#6a6a6c,#9a9a9c,#7a7a7c); }
-.ph-screen {
-  width: 100%;
-  height: 100%;
-  border-radius: 41px;
-  background: #000;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-.ph-status {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 20px 4px;
-  flex-shrink: 0;
-}
-.ph-time {
-  font-size: 13px;
-  font-weight: 700;
-  color: #fff;
-  font-family: -apple-system, sans-serif;
-  letter-spacing: -.3px;
-}
-.ph-status-icons {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-.ph-island {
-  width: 33%;
-  height: 28px;
-  background: #000;
-  border-radius: 20px;
-  margin: 2px auto 0;
-  flex-shrink: 0;
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.06);
-}
-.ph-nav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 0 8px;
-  border-bottom: 0.5px solid rgba(255,255,255,0.08);
-  flex-shrink: 0;
-  position: relative;
-}
-.ph-nav-back {
-  position: absolute;
-  left: 12px;
-  font-size: 11px;
-  color: #007AFF;
-  font-family: -apple-system, sans-serif;
-}
-.ph-nav-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-}
-.ph-avatar {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  background: linear-gradient(135deg,#7C3AFF,#A78BFA);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px; font-weight: 700; color: #fff;
-  font-family: -apple-system, sans-serif;
-}
-.ph-contact {
-  font-size: 11px; font-weight: 600; color: #fff;
-  font-family: -apple-system, sans-serif;
-}
-.ph-convos {
-  flex: 1;
-  overflow: hidden;
-  min-height: 0;
-  position: relative;
-}
-.ph-convo {
-  display: none;
-  flex-direction: column;
-  height: 100%;
-}
-.ph-convo.active {
-  display: flex;
-}
-.ph-msgs {
-  flex: 1;
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  overflow: hidden;
-}
-.ph-ts {
-  text-align: center;
-  font-size: 9.5px;
-  color: rgba(255,255,255,0.35);
-  font-family: -apple-system, sans-serif;
-  margin: 2px 0;
-}
-.ph-row { display: flex; }
-.ph-row.them { justify-content: flex-start; }
-.ph-row.me   { justify-content: flex-end; }
-.ph-bubble {
-  padding: 7px 11px;
-  border-radius: 16px;
-  font-size: 11px;
-  line-height: 1.45;
-  font-family: -apple-system, sans-serif;
-  max-width: 80%;
-}
-.ph-bubble.them {
-  background: #2c2c2e;
-  color: #fff;
-  border-bottom-left-radius: 4px;
-}
-.ph-bubble.me {
-  background: #007AFF;
-  color: #fff;
-  border-bottom-right-radius: 4px;
-}
-.ph-dot {
-  display: inline-block;
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.6);
-  margin: 0 2px;
-  animation: phDot 1.2s ease-in-out infinite;
-}
-.ph-dot:nth-child(2) { animation-delay: .2s; }
-.ph-dot:nth-child(3) { animation-delay: .4s; }
-@keyframes phDot {
-  0%,60%,100% { transform: translateY(0); opacity: .4; }
-  30% { transform: translateY(-4px); opacity: 1; }
-}
-.ph-input-bar {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 8px 12px 16px;
-  border-top: 0.5px solid rgba(255,255,255,0.07);
-  flex-shrink: 0;
-}
-.ph-input-field {
-  flex: 1;
-  background: rgba(255,255,255,0.06);
-  border: 0.5px solid rgba(255,255,255,0.12);
-  border-radius: 18px;
-  padding: 7px 12px;
-  font-size: 10px;
-  color: rgba(255,255,255,0.25);
-  font-family: -apple-system, sans-serif;
-}
-.ph-input-send {
-  width: 24px; height: 24px;
-  background: #007AFF;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 11px; flex-shrink: 0;
-}
-
-/* Conversation area — states stack, crossfade */
-.sw-convos {
-  flex: 1;
-  position: relative;
-  overflow: hidden;
-  min-height: 0; /* allow flex shrink */
-}
-.sw-convo {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  display: flex;
-  flex-direction: column;
-}
-.sw-convo.active { opacity: 1; }
-/* s-msgs inside each convo must fill the absolute pane */
-.sw-convo .s-msgs {
-  flex: 1;
-  overflow: hidden;
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-/* Walkthrough phone — reuse hero iphone system with context overrides */
-.sw-phone-wrap .iphone {
-  width: 320px;
-  transform: none;
-  filter: none;
-}
-.sw-phone-wrap .iphone-frame {
-  border-radius: 44px;
-  box-shadow: 0 40px 80px rgba(0,0,0,0.85), 0 0 40px rgba(124,58,255,0.15);
-}
-.sw-phone-wrap .iphone-inner { border-radius: calc(44px - 3px); }
-.sw-phone-wrap .screen { border-radius: calc(44px - 3px); }
-
-/* ── Left step content (hidden during entry, shows during walkthrough) ── */
-.sw-steps-wrap {
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 55%;
-  display: flex;
-  align-items: center;
-  padding-left: clamp(80px, 12vw, 180px);
-  z-index: 2;
-  opacity: 0;
-  pointer-events: none;
-}
-.sw-step {
-  position: absolute;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  max-width: 580px;
-  width: 90%;
-}
-.sw-step.active {
-  opacity: 1;
-  transform: translateY(0);
-}
-.sw-step-num {
-  font-size: 13px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.4);
-  line-height: 1;
-  margin-bottom: 24px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  opacity: 1;
-}
-.sw-step-title {
-  font-family: 'EB Garamond', Georgia, serif;
-  font-size: clamp(52px, 6.5vw, 88px);
-  font-weight: 400;
-  color: #fff;
-  letter-spacing: -0.5px;
-  line-height: 1.05;
-  margin-bottom: 28px;
-}
-.sw-step-title em {
-  font-style: italic;
-  font-weight: 400;
-  color: rgba(255,255,255,0.7);
-  letter-spacing: -0.5px;
-}
-.sw-step-desc {
-  font-size: 18px;
-  color: rgba(255,255,255,0.5);
-  font-weight: 300;
-  line-height: 1.75;
-  max-width: 520px;
-}
-
-/* ── Mobile layout ── */
-@media (max-width: 768px) {
-  .sw-entry-top { padding-left: 6vw; font-size: clamp(32px, 9vw, 52px); letter-spacing: -0.5px; }
-  .sw-entry-bot { padding-right: 6vw; font-size: clamp(28px, 8vw, 46px); letter-spacing: -0.5px; }
-  .sw-steps-wrap {
-    width: 100%;
-    padding: 0 clamp(24px, 7vw, 48px);
-    align-items: flex-end;
-    padding-bottom: clamp(40px, 8vh, 80px);
-    top: auto;
-  }
-  .sw-step { max-width: 100%; width: 100%; }
-  .sw-step-num { font-size: 11px; margin-bottom: 14px; }
-  .sw-step-title { font-size: clamp(28px, 8vw, 42px); letter-spacing: -0.5px; margin-bottom: 14px; }
-  .sw-step-desc { font-size: 15px; line-height: 1.6; max-width: 100%; }
-  .ph-shell { width: 220px; }
-  .ph-bubble { font-size: 10px; }
-}
-
-/* Typing dot for sw entry convo */
-@keyframes swDot {
-  0%,60%,100%{transform:translateY(0);opacity:.4}
-  30%{transform:translateY(-4px);opacity:1}
-}
-/* Notch bar layout fix */
-.sw-notch-bar { position: relative; flex-shrink: 0; }
-
-/* ── Hero frosted glass bottom fade ── */
-.hero-frost {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 160px;
-  z-index: 3;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  background: linear-gradient(to top,
-    rgba(8,8,9,0.85) 0%,
-    rgba(8,8,9,0.4) 40%,
-    transparent 100%);
-  -webkit-backdrop-filter: blur(0px);
-  backdrop-filter: blur(0px);
-  /* mask so blur only shows at very bottom */
-  -webkit-mask-image: linear-gradient(to top, black 0%, black 40%, transparent 100%);
-  mask-image: linear-gradient(to top, black 0%, black 40%, transparent 100%);
-}
-.hero-frost.visible {
-  opacity: 1;
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-}
-
-/* ── Highlights (dark theme adaptation) ── */
-.highlights {
-  padding: clamp(80px,10vw,140px) clamp(24px,6vw,100px);
-  background: #080809;
-  border-top: 1px solid rgba(255,255,255,0.06);
-}
-.highlights-i { max-width: 1100px; margin: 0 auto; }
-.highlights-hd { text-align: center; margin-bottom: 56px; }
-.highlights-hd h2 {
-  font-family: 'EB Garamond', Georgia, serif;
-  font-size: clamp(36px,5vw,60px);
-  font-weight: 400;
-  letter-spacing: -0.5px;
-  color: #fff;
-  line-height: 1.05;
-}
-.hl-tabs {
-  display: flex; gap: 8px; justify-content: center;
-  flex-wrap: wrap; margin-bottom: 48px;
-}
-.hl-tab {
-  padding: 10px 22px; border-radius: 980px;
-  font-size: 14px; font-weight: 500;
-  color: rgba(255,255,255,0.4);
-  background: none; border: 1px solid rgba(255,255,255,0.12);
-  cursor: pointer; transition: all .2s;
-  font-family: 'Bricolage Grotesque', -apple-system, sans-serif;
-}
-.hl-tab:hover { color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.25); }
-.hl-tab.active { background: #fff; color: #080809; border-color: #fff; }
-.hl-carousel { position: relative; padding: 0 48px; }
-.hl-arrow {
-  position: absolute; top: 50%; transform: translateY(-60%);
-  z-index: 10; width: 44px; height: 44px; border-radius: 50%;
-  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: all .2s; font-size: 18px;
-  color: rgba(255,255,255,0.6); line-height: 1; flex-shrink: 0;
-}
-.hl-arrow:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
-.hl-arrow.prev { left: 0; }
-.hl-arrow.next { right: 0; }
-.hl-panels { overflow: hidden; }
-.hl-track {
-  display: flex;
-  transition: transform .6s cubic-bezier(.4,0,.2,1);
-  will-change: transform;
-}
-.hl-panel {
-  flex: 0 0 100%; display: flex;
-  align-items: center; gap: clamp(40px,6vw,96px);
-  opacity: .3; transform: scale(.97);
-  transition: opacity .6s ease, transform .6s ease;
-  pointer-events: none;
-}
-.hl-panel.active { opacity: 1; transform: scale(1); pointer-events: auto; }
-.hl-icon {
-  flex-shrink: 0; width: 340px; height: 340px;
-  border-radius: 28px; display: flex;
-  align-items: center; justify-content: center;
-  font-size: 96px; overflow: hidden;
-  background: rgba(255,255,255,0.04);
-}
-.hl-icon img { width: 100%; height: 100%; object-fit: cover; border-radius: 28px; }
-.hl-body { flex: 1; }
-.hl-badge {
-  display: inline-block; font-size: 11px; font-weight: 600;
-  color: #7C3AFF; background: rgba(124,58,255,0.12);
-  padding: 4px 12px; border-radius: 980px;
-  letter-spacing: .5px; margin-bottom: 20px;
-}
-.hl-body h3 {
-  font-family: 'EB Garamond', Georgia, serif;
-  font-size: clamp(26px,3.5vw,42px); font-weight: 400;
-  letter-spacing: -0.5px; color: #fff;
-  margin-bottom: 16px; line-height: 1.1;
-}
-.hl-body p {
-  font-size: 17px; color: rgba(255,255,255,0.45);
-  font-weight: 300; line-height: 1.65; max-width: 460px;
-}
-.hl-dots { display: flex; gap: 8px; justify-content: center; margin-top: 40px; }
-.hl-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: rgba(255,255,255,0.15);
-  transition: all .3s; cursor: pointer; border: none;
-}
-.hl-dot.active { width: 20px; border-radius: 3px; background: #fff; }
-@media (max-width: 900px) { .hl-arrow { display: none; } .hl-carousel { padding: 0; } }
-@media (max-width: 768px) {
-  .hl-panel { flex-direction: column; }
-  .hl-icon { width: 100%; height: 220px; border-radius: 20px; }
-  .hl-tabs { gap: 6px; }
-  .hl-tab { font-size: 13px; padding: 8px 16px; }
-}
-
-/* ── Footer ── */
-footer {
-  background: #060607;
-  border-top: 1px solid rgba(255,255,255,0.06);
-  padding: 32px clamp(24px, 5vw, 56px);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.ft-logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -.4px;
-  color: rgba(255,255,255,0.5);
-  text-decoration: none;
-}
-.ft-logo svg { width: 20px; height: 20px; opacity: .5; }
-.ft-links {
-  display: flex;
-  gap: 24px;
-  align-items: center;
-}
-.ft-links a {
-  font-size: 12px;
-  color: rgba(255,255,255,0.3);
-  text-decoration: none;
-  transition: color .2s;
-}
-.ft-links a:hover { color: rgba(255,255,255,0.7); }
-.ft-copy {
-  font-size: 12px;
-  color: rgba(255,255,255,0.2);
-}
-
-@media (max-width: 768px) {
-  .hero {
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-end;
-    padding: 0 24px 56px;
-    gap: 28px;
-  }
-  .hero-left { flex: none; }
-  .hero-headline {
-    font-size: clamp(38px, 11vw, 56px);
-    letter-spacing: -0.5px;
-    max-width: 100%;
-  }
-  .hero-right {
-    padding-left: 0;
-    gap: 14px;
-    width: 100%;
-  }
-  .hero-cta {
-    font-size: 16px;
-    padding: 18px 28px;
-    border-radius: 14px;
-    width: 100%;
-    justify-content: center;
-  }
-  .hero-sub {
-    font-size: 14px;
-    max-width: 100%;
-    text-align: center;
-  }
-  .iphone {
-    width: min(260px, 70vw);
-    transform: perspective(1000px) rotateY(0deg) rotateX(2deg);
-  }
-  /* Scale phone internals proportionally using font-size on the container */
-  .screen { font-size: 75%; }
-  .s-bubble { font-size: clamp(9px, 2.8vw, 13px); }
-  .s-ts { font-size: clamp(8px, 2.2vw, 10px); }
-  .s-avatar { width: 36px; height: 36px; font-size: 15px; }
-  .s-island { width: 36%; height: 26px; }
-  .s-msgs { padding: 8px 10px; gap: 5px; }
-  .s-input-field { font-size: clamp(9px, 2.5vw, 12px); }
-}
+/* ===== FAQ PAGE: don't force full-screen, allow natural height ===== */
+.page.page--faq{align-items:flex-start;padding-top:120px;padding-bottom:80px;min-height:auto;scroll-snap-align:start}
+.page.page--footer{align-items:flex-start;padding-top:0;padding-bottom:0;min-height:auto;scroll-snap-align:end;display:block}
+.page.page--footer footer{margin-top:0}
 </style>
 </head>
 <body>
 
-<!-- CHAT SIGNUP OVERLAY -->
-<div class="co-bg" id="coOverlay">
-  <div class="co-sheet" id="coSheet">
-    <div class="co-handle"></div>
-    <div class="co-head">
-      <div class="co-head-info">
-        <div class="co-avatar">🏋️</div>
-        <div>
-          <div class="co-head-name">Cued Coach</div>
-          <div class="co-head-sub">Active now</div>
-        </div>
-      </div>
-      <button class="co-close" id="coClose">✕</button>
-    </div>
-    <div class="co-msgs" id="coMsgs"></div>
-    <div class="co-input-area" id="coInputArea"></div>
+<!-- ===== NAV (fixed, over deck) ===== -->
+<nav id="nav">
+  <a href="#" class="brand">cued</a>
+  <div class="nav-links">
+    <a href="#signup" class="nav-cta">get started</a>
   </div>
-</div>
-
-<nav>
-  <a href="index.html" class="nv-logo">cued</a>
-  <a href="#" class="nv-signup" onclick="openChatSignup();return false">Get started</a>
 </nav>
 
-<section class="hero">
+<!-- ===== RIGHT-RAIL PAGE INDICATORS ===== -->
+<div class="indicators" id="indicators" aria-label="Page progress">
+  <!-- buttons injected by JS -->
+</div>
 
-  <img class="hero-bg" src="images/hero-bg.jpeg" alt="">
+<!-- ===== FLOATING CTA (toggled by JS based on visible page) ===== -->
+<a href="#signup" class="float-cta" id="floatCta" aria-label="Join the waitlist">
+  Join the waitlist <span class="arrow">→</span>
+</a>
 
-  <div class="hero-left">
-    <h1 class="hero-headline">
-      The fitness coach<br>you can't ghost
-      <em>all on Messages</em>
-    </h1>
-  </div>
+<!-- ===== SCROLL DECK ===== -->
+<main class="deck" id="deck">
 
-  <div class="hero-right">
-    <a href="#" class="hero-cta" onclick="openChatSignup();return false">
-      <span class="hero-cta-icon"><img src="images/imessage-icon.png" alt="Messages"></span>
-      Start Training
-    </a>
-    <p class="hero-sub">Personal coaching for everyone.<br>No app. Just texts.</p>
-  </div>
+  <!-- ===== PAGE 0 — HERO ===== -->
+  <section class="page page--hero" data-label="Cued" data-title="Cued" data-hide-float-cta>
+    <img src="images/berkeley-drawing.svg" alt="" class="hero-art" aria-hidden="true">
+   <!-- <div class="announce">
+      <a href="#signup">
+        <span class="dot"></span>
+        New: Cued is now in open beta →
+      </a>
+    </div> -->
 
-  <div class="hero-frost" id="heroFrost"></div>
-
-</section>
-
-<!-- ══ SECTION 2: STICKY SCROLL WALKTHROUGH ══ -->
-<div class="sw-outer" id="swOuter">
-  <div class="sw-inner" id="swInner">
-
-    <!-- Entry headline -->
-    <div class="sw-entry" id="swEntry">
-      <span class="sw-entry-top">Your personal coach</span>
-      <span class="sw-entry-bot">lives in your Messages</span>
-    </div>
-
-    <!-- Left step text -->
-    <div class="sw-steps-wrap" id="swStepsWrap">
-      <div class="sw-step active" id="swStep1">
-        <div class="sw-step-num">Step 01</div>
-        <div class="sw-step-title">One conversation.<br><em>Your coach is ready.</em></div>
-        <div class="sw-step-desc">Goals, schedule, gym access — tell us once. No forms, no app, no onboarding maze. Just text.</div>
+    <div class="hero-inner">
+      <h1 class="hero-h1">
+        Your personal fitness coach that<em><br>texts first.</em><br>
+        Made for college life.
+      </h1>
+      <p class="hero-sub">
+        It reads the boring signals — sleep, class schedule, recovery, even what's on the dining hall menu — and tells you what to do next. Plan your week, dial in recovery, build the streak.
+      </p>
+      <div class="hero-ctas">
+        <a href="#signup" class="cta-primary">Join the waitlist →</a>
+        <a href="#faq" class="cta-secondary">FAQs</a>
       </div>
-      <div class="sw-step" id="swStep2">
-        <div class="sw-step-num">Step 02</div>
-        <div class="sw-step-title">Your plan lands<br><em>every morning.</em></div>
-        <div class="sw-step-desc">Workout. Nutrition. Recovery. Built for today — not a generic program from a PDF.</div>
+
+      <!-- social proof, beneath ctas -->
+      <!-- TODO: confirm partner usage rights -->
+      <div class="proof">
+        <div class="proof-label">Plays well with</div>
+        <div class="proof-row">
+          <span class="proof-logo">Apple Health</span>
+          <span class="proof-logo">Strava</span>
+          <span class="proof-logo">Whoop</span>
+          <span class="proof-logo">Garmin</span>
+          <span class="proof-logo">Oura</span>
+          <span class="proof-logo">Apple Watch</span>
+        </div>
       </div>
-      <div class="sw-step" id="swStep3">
-        <div class="sw-step-num">Step 03</div>
-        <div class="sw-step-title">Text back.<br><em>It gets smarter.</em></div>
-        <div class="sw-step-desc">Log your session in a message. Your coach adjusts, remembers, and keeps you moving forward.</div>
+    </div>
+
+  </section>
+
+  <!-- ===== PAGE 1 — Explainer (what Cued is) ===== -->
+  <section class="page page--explainer" data-label="What it is" data-title="What Cued is">
+    <div class="explainer-inner">
+      <h2 class="explainer-h">what cued is.</h2>
+      <p>let's be honest — sticking to your fitness goals as a college student is hard. between class, work, midterms, and trying to have a life, the gym is usually the first thing that drops.</p>
+      <p>we know because we're students too. and we got tired of juggling four different apps just to keep a workout streak going.</p>
+      <p>so we built cued. a coach you text. it reads your week — sleep, schedule, what's around you — and tells you exactly what to do next. no app. no dashboard. no $200-a-month coach.</p>
+      <p class="explainer-founder">Built at Berkeley, by students, for students.</p>
+    </div>
+  </section>
+
+  <!-- ===== PAGE 2 — Claims list (12 capabilities) ===== -->
+  <section class="page page--claims" data-label="What it does" data-title="Here's what it actually does.">
+    <div class="claims-inner">
+      <div class="claims-head">
+        <h2 class="claims-h">here's what it actually does.</h2>
+        <p class="claims-sub">no app to download. no new account. you just text cued like you'd text a friend who happens to know what they're doing — and it handles the rest.</p>
+      </div>
+      <div class="claims-grid">
+        <div class="claim"><span class="claim-check">✓</span> Proactively plans your week</div>
+        <div class="claim"><span class="claim-check">✓</span> Knows when you're cooked</div>
+        <div class="claim"><span class="claim-check">✓</span> Lives in your iMessage</div>
+        <div class="claim"><span class="claim-check">✓</span> Adapts to your schedule</div>
+        <div class="claim"><span class="claim-check">✓</span> Listens to your wearable</div>
+        <div class="claim"><span class="claim-check">✓</span> Holds you accountable</div>
+        <div class="claim"><span class="claim-check">✓</span> Builds the streak</div>
+        <div class="claim"><span class="claim-check">✓</span> Tracks every set</div>
+        <div class="claim"><span class="claim-check">✓</span> Is a real coach</div>
+        <div class="claim"><span class="claim-check">✓</span> Knows your body</div>
+        <div class="claim"><span class="claim-check">✓</span> Picks the right fuel</div>
+        <div class="claim claim--more"><span class="claim-check">+</span> And more</div>
       </div>
     </div>
+  </section>
 
-    <!-- Phone -->
-    <div class="sw-phone-wrap" id="swPhoneWrap">
-      <div class="ph-shell">
-        <!-- Side buttons -->
-        <div class="ph-btn-action"></div>
-        <div class="ph-btn-vol-up"></div>
-        <div class="ph-btn-vol-down"></div>
-        <div class="ph-btn-power"></div>
+  <!-- ===== PAGE 3 — Tri-card (morning plan + fuel + proactive nudge) ===== -->
+  <section class="page page--tricard" data-label="It just gets you" data-title="It just... gets you.">
+    <div class="tricard-inner">
+      <div class="tricard-head">
+        <h2 class="tricard-h">it just... gets you.</h2>
+        <p>you don't have to ask. cued sees what's coming up and texts you the right thing at the right time.</p>
+      </div>
+      <div class="tricard-grid">
 
-        <!-- Screen -->
-        <div class="ph-screen">
-          <!-- Status bar -->
-          <div class="ph-status">
-            <span class="ph-time">9:41</span>
-            <span class="ph-status-icons">
-              <svg width="17" height="12" viewBox="0 0 17 12" fill="white"><rect x="0" y="4" width="3" height="8" opacity=".4" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" opacity=".6" rx="1"/><rect x="9" y="0.5" width="3" height="11.5" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
-              <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"><path d="M1 3.5 C3.5 1 12.5 1 15 3.5" opacity=".5"/><path d="M3 6 C4.8 4.2 11.2 4.2 13 6" opacity=".75"/><path d="M5.5 8.5 C6.5 7.5 9.5 7.5 10.5 8.5"/><circle cx="8" cy="11" r="1" fill="white" stroke="none"/></svg>
-              <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="white" stroke-opacity=".35"/><rect x="2" y="2" width="13" height="8" rx="2" fill="white"/><path d="M23 4.5v3a2 2 0 0 0 0-3z" fill="white" fill-opacity=".4"/></svg>
-            </span>
+        <article class="tricard tricard--mint">
+          <div class="tricard-bubble">early 8am, what should i do?</div>
+          <h3 class="tricard-copy">Cued checks your <span class="hl">sleep</span> and builds the day's session before you're out of bed.</h3>
+          <div class="tricard-mini">
+            <div class="bub cued">slept 5h, you've got lab till 6.</div>
+            <div class="bub cued">25min upper push at the rsf. easy day 💪</div>
           </div>
+        </article>
 
-          <!-- Dynamic island -->
-          <div class="ph-island"></div>
-
-          <!-- iMessage nav -->
-          <div class="ph-nav">
-            <span class="ph-nav-back">‹ Messages</span>
-            <div class="ph-nav-center">
-              <div class="ph-avatar">C</div>
-              <span class="ph-contact">Cued ›</span>
-            </div>
+        <article class="tricard tricard--cream">
+          <div class="tricard-bubble">dining hall has chicken tonight</div>
+          <h3 class="tricard-copy">Cued knows the <span class="hl">context</span> and gives you a real answer — macros or plain English.</h3>
+          <div class="tricard-mini">
+            <div class="bub cued">grab 2 scoops, rice, veggies. ~40g protein.</div>
+            <div class="bub cued">skip the dessert bar tonight, you're already over 🫡</div>
           </div>
+        </article>
 
-          <!-- Conversations -->
-          <div class="ph-convos" id="phConvos">
-            <div class="ph-convo" id="swConvo0">
-              <div class="ph-msgs">
-                <div class="ph-ts">Today 6:42 AM</div>
-                <div class="ph-row them">
-                  <div class="ph-bubble them">
-                    <span class="ph-dot"></span><span class="ph-dot"></span><span class="ph-dot"></span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="ph-convo" id="swConvo1">
-              <div class="ph-msgs">
-                <div class="ph-ts">Today 6:42 AM</div>
-                <div class="ph-row them"><div class="ph-bubble them">hey! welcome to cued. i'm your coach now — no pressure lol. what's your main goal rn?</div></div>
-                <div class="ph-row me"><div class="ph-bubble me">build muscle mostly, i'm pretty skinny</div></div>
-                <div class="ph-row them"><div class="ph-bubble them">bet. do you have gym access or are we working with bodyweight?</div></div>
-                <div class="ph-row me"><div class="ph-bubble me">i go to the RSF</div></div>
-              </div>
-            </div>
-            <div class="ph-convo" id="swConvo2">
-              <div class="ph-msgs">
-                <div class="ph-ts">Today 7:00 AM</div>
-                <div class="ph-row them"><div class="ph-bubble them">morning. today's push day — chest, shoulders, tris.<br><br>bench press 4x8<br>ohp 3x10<br>incline db press 3x12<br>lateral raises 3x15<br><br>text me when you're heading out</div></div>
-                <div class="ph-row me"><div class="ph-bubble me">let's go</div></div>
-              </div>
-            </div>
-            <div class="ph-convo" id="swConvo3">
-              <div class="ph-msgs">
-                <div class="ph-ts">Today 9:05 AM</div>
-                <div class="ph-row me"><div class="ph-bubble me">done. bench felt heavy today</div></div>
-                <div class="ph-row them"><div class="ph-bubble them">logged. heavy how — grinding or couldn't finish?</div></div>
-                <div class="ph-row me"><div class="ph-bubble me">last set i only got 6</div></div>
-                <div class="ph-row them"><div class="ph-bubble them">that's fine, we'll hold at this weight til all 4 sets are clean. solid session tho</div></div>
-              </div>
-            </div>
+        <article class="tricard tricard--lavender">
+          <div class="tricard-bubble">yo, you have midterms next week — your sleep is fried ngl.</div>
+          <h3 class="tricard-copy">Cued texts <span class="hl">first</span> when it matters — gently, never naggy.</h3>
+          <div class="tricard-mini">
+            <div class="bub cued">we'll pull deadlifts to after finals.</div>
+            <div class="bub cued">20min walk + 8min mobility. that's the assignment.</div>
           </div>
+        </article>
 
-          <!-- Input bar -->
-          <div class="ph-input-bar">
-            <div class="ph-input-field">iMessage</div>
-            <div class="ph-input-send">↑</div>
-          </div>
-        </div><!-- /ph-screen -->
-      </div><!-- /ph-shell -->
-    </div><!-- /sw-phone-wrap -->
-
-  </div><!-- /sw-inner -->
-</div><!-- /sw-outer -->
-
-<!-- ── Highlights ── -->
-<section class="highlights" id="highlights">
-  <div class="highlights-i">
-    <div class="highlights-hd">
-      <h2>Get the highlights.</h2>
+      </div>
     </div>
-    <div class="hl-tabs">
-      <button class="hl-tab active" data-tab="training">Training</button>
-      <button class="hl-tab" data-tab="nutrition">Nutrition</button>
-      <button class="hl-tab" data-tab="recovery">Recovery</button>
-      <button class="hl-tab" data-tab="accountability">Accountability</button>
-      <button class="hl-tab" data-tab="adaptability">Adaptability</button>
-    </div>
-    <div class="hl-carousel">
-      <button class="hl-arrow prev" id="hlPrev">&#8592;</button>
-      <button class="hl-arrow next" id="hlNext">&#8594;</button>
-      <div class="hl-panels">
-        <div class="hl-track" id="hlTrack">
-          <div class="hl-panel active" data-panel="training">
-            <div class="hl-icon">
-              <img src="images/barbell.jpg" alt="Training">
-            </div>
-            <div class="hl-body">
-              <span class="hl-badge">Built for you</span>
-              <h3>Your workout, ready before you even ask.</h3>
-              <p>Every morning you get your exact session — exercises, sets, weights — built on your history and what your body can handle that day. No guesswork, no planning.</p>
-            </div>
-          </div>
-          <div class="hl-panel" data-panel="nutrition">
-            <div class="hl-icon">
-              <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=700&q=80" alt="Nutrition">
-            </div>
-            <div class="hl-body">
-              <span class="hl-badge">Calibrated daily</span>
-              <h3>Eat for what you actually did today.</h3>
-              <p>Heavy leg day? More carbs. Rest day? Lighter meals. Your food plan shifts with your training automatically — no app, no calorie logging, no guessing.</p>
-            </div>
-          </div>
-          <div class="hl-panel" data-panel="recovery">
-            <div class="hl-icon">
-              <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=700&q=80" alt="Recovery">
-            </div>
-            <div class="hl-body">
-              <span class="hl-badge">Always watching</span>
-              <h3>Know when to rest — and when to push.</h3>
-              <p>Cued reads your sleep and HRV data to decide if today calls for a hard session or a deload. No burnout, no wasted easy days when you had more in the tank.</p>
-            </div>
-          </div>
-          <div class="hl-panel" data-panel="accountability">
-            <div class="hl-icon" style="background:rgba(255,255,255,0.04);font-size:96px">💬</div>
-            <div class="hl-body">
-              <span class="hl-badge">Always there</span>
-              <h3>The nudge you need. Not the spam you don't.</h3>
-              <p>Your coach knows when to push and when to back off. Miss a few days? A gentle check-in, not a guilt trip. Crushing it? Your coach notices that too.</p>
-            </div>
-          </div>
-          <div class="hl-panel" data-panel="adaptability">
-            <div class="hl-icon">
-              <img src="images/wearable.jpg" alt="Adaptability">
-            </div>
-            <div class="hl-body">
-              <span class="hl-badge">Always evolving</span>
-              <h3>A coach that learns you over time.</h3>
-              <p>Only 40 minutes today? Traveling? Skipped a session? Cued adjusts on the fly — your plan always fits your life, not the other way around.</p>
-            </div>
-          </div>
-        </div><!-- /hl-track -->
-      </div><!-- /hl-panels -->
-      <div class="hl-dots" id="hlDots"></div>
-    </div>
-  </div>
-</section>
+  </section>
 
-<footer>
-  <a href="index.html" class="ft-logo">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true">
-      <rect width="32" height="32" rx="4" fill="currentColor" fill-opacity="0.08"/>
-      <path d="M21 9.5L12.5 9.5C10 9.5 8 11.5 8 14v4c0 2.5 2 4.5 4.5 4.5H21" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter"/>
-    </svg>
-    cued
-  </a>
-  <div class="ft-links">
-    <a href="privacy.html">Privacy</a>
-    <a href="terms.html">Terms</a>
-    <a href="mailto:hello@cued.fit">Contact</a>
-  </div>
-  <span class="ft-copy">&copy; 2026 Cued</span>
-</footer>
+  <!-- ===== PAGE 4 — Replaces all this (positioning) ===== -->
+  <section class="page page--replaces" data-label="Replaces all this" data-title="Replaces all this.">
+    <div class="replaces-inner">
+      <div class="replaces-head">
+        <p class="replaces-eyebrow">Stop juggling apps.</p>
+        <h2 class="replaces-h">Replaces all this.</h2>
+      </div>
+      <ul class="replaces-grid">
+        <li><img src="images/app-icons/MyFitnessPal%20Review.jpg" alt=""><span>MyFitnessPal</span></li>
+        <li><img src="images/app-icons/MacroFactor-MacroTracker_icon.png" alt=""><span>MacroFactor</span></li>
+        <li><img src="images/app-icons/macrofactor_workouts.webp" alt=""><span>MacroFactor Workouts</span></li>
+        <li><img src="images/app-icons/hevy.png" alt=""><span>Hevy</span></li>
+        <li><img src="images/app-icons/mynetdiary.jpg" alt=""><span>MyNetDiary</span></li>
+        <li><img src="images/app-icons/reminders_app.webp" alt=""><span>Reminders</span></li>
+        <li><img src="images/app-icons/notes.png" alt=""><span>Notes</span></li>
+        <li><img src="images/app-icons/pen_paper.png" alt=""><span>Pen and paper</span></li>
+      </ul>
+      <p class="replaces-foot">One number. From your dorm, the library, the gym floor — wherever.</p>
+    </div>
+  </section>
+
+  <!-- ===== PAGE 5 — Missed day ===== -->
+  <section class="page" data-label="Built for messy weeks" data-title="A coach built for the messy weeks.">
+    <div class="feature reverse">
+      <div class="feature-copy">
+        <div class="feature-eyebrow">Real life happens</div>
+        <h2 class="feature-h2">A coach built for <em>midterm</em> weeks.</h2>
+        <p>Missed two days for a problem set? Cued doesn't moralize about it. It reshapes the week around what's still on the table — no shame, no scolding, just the next step.</p>
+      </div>
+      <div class="feature-phone">
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="chat-header">
+              <div class="ch-name"><span class="ch-avatar">C</span> Cued</div>
+              <div class="ch-sub">active now</div>
+            </div>
+            <div class="chat">
+              <div class="bub tiny">Wed 8:14 AM</div>
+              <div class="bub me">missed yesterday, had to lock in and study for my ochem midterm</div>
+              <div class="bub cued">all good. happens with midterms</div>
+              <div class="bub cued">we'll fold yesterday's pull into thursday and shorten friday. you keep the week.</div>
+              <div class="bub me">love that</div>
+              <div class="bub cued">today: 20min easy run, 5min mobility. just show up 🫡</div>
+            </div>
+            <div class="chat-input"><div class="input-fake">iMessage</div><div class="send">↑</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE 6 — Schedule ===== -->
+  <section class="page" data-label="Fits your day" data-title="Fits your day, not the other way around.">
+    <div class="feature">
+      <div class="feature-copy">
+        <div class="feature-eyebrow">Fits your day, not the other way around</div>
+        <h2 class="feature-h2">Reads your <em>class</em> schedule like a coach would.</h2>
+        <p>You ask "do i have time between lecture and section?" — Cued already knows. It picks the window, builds the session to fit, and gets out of the way.</p>
+      </div>
+      <div class="feature-phone">
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="chat-header">
+              <div class="ch-name"><span class="ch-avatar">C</span> Cued</div>
+              <div class="ch-sub">active now</div>
+            </div>
+            <div class="chat">
+              <div class="bub tiny">Today 4:48 PM</div>
+              <div class="bub me">im free between lecture and section? does that work?</div>
+              <div class="bub cued">you have a 45min gap from 2:15. rsf is across campus so account for the walk.</div>
+              <div class="bub cued">queued a 30min push session. want me to push section reading to tonight so you're not rushed?</div>
+              <div class="bub me">yes please</div>
+              <div class="bub cued">done. all set for 2:20 😎</div>
+            </div>
+            <div class="chat-input"><div class="input-fake">iMessage</div><div class="send">↑</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE 7 — Weekly summary ===== -->
+  <section class="page" data-label="Progress without the dashboard" data-title="The Sunday text you actually read.">
+    <div class="feature">
+      <div class="feature-copy">
+        <div class="feature-eyebrow">Progress, without the dashboard</div>
+        <h2 class="feature-h2">The Sunday text you <em>actually</em> read.</h2>
+        <p>Every Sunday night, a short text. Not a dashboard. Volume, sleep, what worked, what to fix, and the rough plan for the week ahead.</p>
+      </div>
+      <div class="feature-phone">
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="chat-header">
+              <div class="ch-name"><span class="ch-avatar">C</span> Cued</div>
+              <div class="ch-sub">active now</div>
+            </div>
+            <div class="chat">
+              <div class="bub tiny">Sun 8:45 PM</div>
+              <div class="bub cued">week in review 📝</div>
+              <div class="bub cued">4 sessions, 3h 10m. friday night out cost you 2h of sleep (no judgment).</div>
+              <div class="bub cued">streak: 6 weeks. squat top set +5lb.</div>
+              <div class="bub cued">midterm next thursday — i'm shortening tue + wed so you can study. cool?</div>
+              <div class="bub me">cool. ty</div>
+              <div class="bub cued">rest up. monday's a build day.</div>
+            </div>
+            <div class="chat-input"><div class="input-fake">iMessage</div><div class="send">↑</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE 8 — CTA ===== -->
+  <section class="page" id="signup" data-label="Start texting" data-title="Stop guessing. Start texting." data-hide-float-cta>
+    <div class="cta-inner">
+      <h2 class="cta-h">Stop guessing. <em>Start</em> texting.</h2>
+      <p>Cued is in open beta. Free while we're early. Cancel by replying "stop" any time.</p>
+      <!-- TODO: wire to real signup handler -->
+      <a href="#" class="cta-primary">Join the waitlist →</a>
+      <a href="#faq" class="cta-faq-link">FAQs ↓</a>
+    </div>
+  </section>
+
+  <!-- ===== PAGE 9 — FAQ (free height) ===== -->
+  <section class="page page--faq" id="faq" data-label="FAQs" data-title="FAQs">
+    <div class="faq-wrap">
+      <div class="faq-head">
+        <h2>FAQs</h2>
+        <p>The stuff people ask before they sign up.</p>
+      </div>
+      <div class="faq-list">
+        <details>
+          <summary>Do I need to download an app?</summary>
+          <div class="faq-body">Nope. Cued lives entirely in your text messages. iMessage, SMS, whatever you already use. No app, no login, no new account to manage.</div>
+        </details>
+        <details>
+          <summary>How much does it cost?</summary>
+          <div class="faq-body">Free during the open beta. When we move out of beta, early users will get founding-member pricing locked in — details to come.</div>
+        </details>
+        <details>
+          <summary>What data does Cued use?</summary>
+          <div class="faq-body">Only what you connect: your wearable (sleep, HRV, heart rate), your calendar (for scheduling), and the goals/preferences you share over text. Nothing more, nothing sold.</div>
+        </details>
+        <details>
+          <summary>How does the wearable connect?</summary>
+          <div class="faq-body">A one-time link via Apple Health, Whoop, Oura, Garmin, or Strava. Takes about 30 seconds. After that, Cued reads passively — you don't have to do anything.</div>
+        </details>
+        <details>
+          <summary>Is this actually a coach or just a chatbot?</summary>
+          <div class="faq-body">Cued is an AI built around real coaching principles — progressive overload, recovery-aware programming, autoregulation. It's not a generic chatbot; every plan is personalized to your data and revised continuously.</div>
+        </details>
+        <details>
+          <summary>What about privacy?</summary>
+          <div class="faq-body">Your conversations and health data are encrypted in transit and at rest. We never sell data and never share it with third parties. You can delete everything any time by texting "delete me".</div>
+        </details>
+        <details>
+          <summary>Can I cancel any time?</summary>
+          <div class="faq-body">Reply "stop" and Cued stops texting immediately. No retention dance, no exit survey. Come back whenever.</div>
+        </details>
+        <details>
+          <summary>Who is Cued for?</summary>
+          <div class="faq-body">We built Cued for college students — that's the rhythm we know. Class schedules that shift every semester, dorm gyms and the RSF, dining hall food, weeks where midterms eat your sleep. If that sounds familiar, you're who we built this for. (Post-grads and anyone juggling a busy life are welcome too — the patterns hold.)</div>
+        </details>
+        <details>
+          <summary>Who's behind Cued?</summary>
+          <div class="faq-body">Two Berkeley students who got tired of switching between four apps just to keep a workout streak going. We're still students; we're still figuring it out alongside you.</div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER (final page, free height) ===== -->
+  <section class="page page--footer" aria-label="Footer" data-hide-float-cta>
+    <footer>
+      <div class="footer-inner">
+        <a href="#" class="brand">cued</a>
+        <div class="footer-links">
+          <a href="privacy.html">Privacy</a>
+          <a href="terms.html">Terms</a>
+          <a href="mailto:hello@cued.fit">Contact</a>
+        </div>
+      </div>
+      <div class="footer-meta">
+        <span>© 2026 Cued. Made in Berkeley, For Berkeley.</span>
+      </div>
+    </footer>
+  </section>
+
+</main>
 
 <script>
-(function () {
-
-  /* ── Chat animation ── */
-  var container = document.getElementById('chatMsgs');
-
-  // Conversation script — cycles through these on loop
-  var conversations = [
-    [
-      { type: 'ts',   text: 'Messages · Today 6:42 AM' },
-      { type: 'them', text: 'Morning. Today is a 30 min easy run + 10 min core. Ready when you are 🏃' },
-      { type: 'me',   text: "let's go" },
-      { type: 'them', text: 'Text "done" when you finish. I\'ll log it.' },
-      { type: 'ts',   text: 'Today 7:25 AM' },
-      { type: 'me',   text: 'done', cls: 'done' },
-      { type: 'them', text: 'Nice work. 4 sessions this week — ahead of last week\'s 3 🔥' },
-    ],
-    [
-      { type: 'ts',   text: 'Messages · Today 8:10 AM' },
-      { type: 'them', text: 'Today is upper body — bench, rows, OHP. 45 min. I\'ll send the full plan now 💪' },
-      { type: 'me',   text: 'what weight should i use for bench?' },
-      { type: 'them', text: 'Start at 65% of your max. If rep 8 feels easy, go heavier next set.' },
-      { type: 'me',   text: 'got it, starting now' },
-      { type: 'ts',   text: 'Today 9:05 AM' },
-      { type: 'me',   text: 'done. felt way stronger than last week', cls: 'done' },
-      { type: 'them', text: 'That\'s the adaptation kicking in. Rest tomorrow — we\'ll hit legs Thursday 🎯' },
-    ],
-    [
-      { type: 'ts',   text: 'Messages · Today 12:30 PM' },
-      { type: 'them', text: 'Lunch check-in — how\'s the eating going today?' },
-      { type: 'me',   text: 'had eggs and toast this morning, about to grab lunch' },
-      { type: 'them', text: 'Nice. Aim for protein + veggies at lunch. Dining hall tip: grilled chicken + any two sides.' },
-      { type: 'me',   text: 'easy, will do' },
-      { type: 'them', text: 'You\'re on track for the week. Keep it up 🙌' },
-    ],
-  ];
-
-  var convIndex = 0;
-  var TYPING_DELAY_THEM = 1200; // ms to show typing indicator
-  var TYPING_DELAY_SHORT = 700;
-  var MSG_PAUSE = 600;          // pause between messages
-  var END_PAUSE = 3000;         // pause at end before reset
-
-  function sleep(ms) { return new Promise(function(r){ setTimeout(r, ms); }); }
-
-  function addTimestamp(text) {
-    var el = document.createElement('div');
-    el.className = 's-ts';
-    el.textContent = text;
-    container.appendChild(el);
-    requestAnimationFrame(function(){ el.classList.add('show'); });
-    container.scrollTop = container.scrollHeight;
-    return el;
-  }
-
-  function addBubble(msg) {
-    var row = document.createElement('div');
-    row.className = 's-row ' + msg.type;
-    var bubble = document.createElement('div');
-    bubble.className = 's-bubble ' + msg.type + (msg.cls ? ' ' + msg.cls : '');
-    bubble.textContent = msg.text;
-    row.appendChild(bubble);
-    container.appendChild(row);
-    requestAnimationFrame(function(){ row.classList.add('show'); });
-    container.scrollTop = container.scrollHeight;
-    return row;
-  }
-
-  function showTyping() {
-    var row = document.createElement('div');
-    row.className = 's-row them typing-row';
-    var indicator = document.createElement('div');
-    indicator.className = 'typing-indicator';
-    indicator.innerHTML = '<span></span><span></span><span></span>';
-    row.appendChild(indicator);
-    container.appendChild(row);
-    container.scrollTop = container.scrollHeight;
-    requestAnimationFrame(function(){
-      row.classList.add('show');
-      indicator.classList.add('show');
-    });
-    return row;
-  }
-
-  async function runConversation() {
-    var msgs = conversations[convIndex % conversations.length];
-    convIndex++;
-
-    // Clear old messages except the first timestamp node
-    container.innerHTML = '';
-
-    for (var i = 0; i < msgs.length; i++) {
-      var msg = msgs[i];
-
-      if (msg.type === 'ts') {
-        await sleep(MSG_PAUSE);
-        addTimestamp(msg.text);
-        continue;
-      }
-
-      // Show typing indicator for "them" messages
-      if (msg.type === 'them') {
-        var typingRow = showTyping();
-        await sleep(msg.text.length > 60 ? TYPING_DELAY_THEM : TYPING_DELAY_SHORT);
-        typingRow.remove();
-      } else {
-        await sleep(MSG_PAUSE);
-      }
-
-      addBubble(msg);
-      await sleep(MSG_PAUSE);
-    }
-
-    await sleep(END_PAUSE);
-    runConversation();
-  }
-
-  // Start after phone entrance animation settles
-  setTimeout(runConversation, 1400);
-
-}());
-
-/* ── Sticky scroll walkthrough ── */
+// === Build right-rail page indicators from .page sections ===
 (function(){
-  var outer    = document.getElementById('swOuter');
-  var entry    = document.getElementById('swEntry');
-  var stepsWrap= document.getElementById('swStepsWrap');
-  var phoneWrap= document.getElementById('swPhoneWrap');
-  var steps    = [
-    document.getElementById('swStep1'),
-    document.getElementById('swStep2'),
-    document.getElementById('swStep3'),
-  ];
-  var convos   = [
-    document.getElementById('swConvo0'),
-    document.getElementById('swConvo1'),
-    document.getElementById('swConvo2'),
-    document.getElementById('swConvo3'),
-  ];
-  if (!outer || !phoneWrap) return;
+  const deck = document.getElementById('deck');
+  const indicatorsEl = document.getElementById('indicators');
+  // Skip the footer "page" from indicator list — it's not a real content stop
+  const pages = Array.from(deck.querySelectorAll('.page')).filter(p => !p.classList.contains('page--footer'));
 
-  var isMobile = window.innerWidth <= 768;
-  window.addEventListener('resize', function(){ isMobile = window.innerWidth <= 768; });
-
-  function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
-  function prog(p,a,b){ return clamp((p-a)/(b-a),0,1); }
-  function ease(t){ return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2; }
-  function lerp(a,b,t){ return a+(b-a)*t; }
-
-  /* Target phone positions:
-     entry  : centered, large
-     walkthrough: right side, smaller */
-  function getTargets() {
-    var vw = window.innerWidth;
-    var vh = window.innerHeight;
-    if (isMobile) {
-      return {
-        entryX: vw/2, entryY: vh*0.38,
-        entryScale: 1,
-        walkX: vw/2, walkY: vh*0.34,
-        walkScale: 0.72,
-      };
-    }
-    return {
-      entryX: vw/2, entryY: vh/2,
-      entryScale: 0.95,
-      walkX: vw*0.76, walkY: vh/2,
-      walkScale: 0.92,
-    };
-  }
-
-  /* Which convo index to show for a given state (0=entry,1-3=steps) */
-  function convoForState(state) {
-    return state; // 0→convo0, 1→convo1, etc.
-  }
-
-  var activeStep = -1;
-  var activeConvo = -1;
-
-  function setStep(idx) {
-    if (activeStep === idx) return;
-    steps.forEach(function(s,i){ s.classList.toggle('active', i===idx); });
-    activeStep = idx;
-  }
-
-  function setConvo(idx) {
-    if (activeConvo === idx) return;
-    convos.forEach(function(c,i){
-      var show = i === idx;
-      c.classList.toggle('active', show);
-      c.style.display = show ? 'flex' : 'none';
+  pages.forEach((p, i) => {
+    const label = p.getAttribute('data-label') || `Section ${i + 1}`;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.setAttribute('aria-label', `Go to: ${label}`);
+    btn.dataset.index = i;
+    btn.innerHTML = '<span class="dot"></span>';
+    btn.addEventListener('click', () => {
+      p.scrollIntoView({behavior:'smooth', block:'start'});
     });
-    activeConvo = idx;
-  }
-
-  /* Initialize: show only convo0 */
-  convos.forEach(function(c,i){ c.style.display = i===0 ? 'flex' : 'none'; });
-
-  
-  function onScroll() {
-    var rect = outer.getBoundingClientRect();
-    var outerH = outer.offsetHeight;
-    var vh = window.innerHeight;
-    /* progress 0→1 over entire outer height */
-    var p = clamp(-rect.top / (outerH - vh), 0, 1);
-
-    var t = getTargets();
-
-    /* --- Phase 1: entry transition (0→0.18) --- */
-    var transP = ease(prog(p, 0, 0.18));
-
-    /* Phone position */
-    var px = lerp(t.entryX, t.walkX, transP);
-    var py = lerp(t.entryY, t.walkY, transP);
-    var ps = lerp(t.entryScale, t.walkScale, transP);
-    phoneWrap.style.transform = 'translate(-50%,-50%) translate('+px+'px,'+py+'px) scale('+ps+')';
-    phoneWrap.style.left = '0';
-    phoneWrap.style.top  = '0';
-
-    /* Entry headline fades out */
-    var entryOpacity = 1 - ease(prog(p, 0.06, 0.18));
-    entry.style.opacity = entryOpacity;
-
-    /* Steps + left col fade in */
-    var stepsOpacity = ease(prog(p, 0.12, 0.22));
-    stepsWrap.style.opacity = stepsOpacity;
-
-    /* --- Phase 2: three walkthrough states (0.20→0.92) --- */
-    /* Each state gets ~24% of total scroll */
-    var stateP = prog(p, 0.20, 0.92);
-    var stateIdx = Math.min(2, Math.floor(stateP * 3)); // 0,1,2
-
-    /* Convo: show convo0 during entry transition, then 1/2/3 */
-    if (p < 0.18) {
-      setConvo(0);
-    } else {
-      setConvo(stateIdx + 1);
-    }
-    setStep(stateIdx);
-  }
-
-  /* Initial position — phone centered */
-  (function init(){
-    var t = getTargets();
-    phoneWrap.style.transform = 'translate(-50%,-50%) translate('+t.entryX+'px,'+t.entryY+'px) scale('+t.entryScale+')';
-    phoneWrap.style.left = '0';
-    phoneWrap.style.top  = '0';
-    phoneWrap.style.position = 'absolute';
-  })();
-
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll);
-  onScroll();
-}());
-
-/* ── Hero frosted glass bottom fade on scroll ── */
-(function() {
-  var frost = document.getElementById('heroFrost');
-  var nvSignup = document.querySelector('.nv-signup');
-  var hero = document.querySelector('.hero');
-  if (!frost) return;
-  window.addEventListener('scroll', function() {
-    frost.classList.toggle('visible', window.scrollY > 40);
-    if (nvSignup && hero) {
-      nvSignup.classList.toggle('visible', window.scrollY > hero.offsetHeight * 0.8);
-    }
-  }, { passive: true });
-}());
-
-/* ── Highlights carousel ── */
-(function(){
-  var tabs = Array.from(document.querySelectorAll('.hl-tab'));
-  var panels = Array.from(document.querySelectorAll('.hl-panel'));
-  var track = document.getElementById('hlTrack');
-  var dotsEl = document.getElementById('hlDots');
-  var prevBtn = document.getElementById('hlPrev');
-  var nextBtn = document.getElementById('hlNext');
-  if (!tabs.length || !panels.length || !track) return;
-
-  var current = 0;
-  var timer = null;
-  var INTERVAL = 4500;
-
-  panels.forEach(function(_, i) {
-    var d = document.createElement('button');
-    d.className = 'hl-dot' + (i === 0 ? ' active' : '');
-    d.addEventListener('click', function() { goTo(i, true); });
-    dotsEl.appendChild(d);
+    indicatorsEl.appendChild(btn);
   });
-  var dots = Array.from(dotsEl.querySelectorAll('.hl-dot'));
 
-  function goTo(idx, userInitiated) {
-    panels[current].classList.remove('active');
-    tabs[current].classList.remove('active');
-    dots[current].classList.remove('active');
-    current = (idx + panels.length) % panels.length;
-    panels[current].classList.add('active');
-    tabs[current].classList.add('active');
-    dots[current].classList.add('active');
-    track.style.transform = 'translateX(-' + current + '00%)';
-    if (userInitiated) resetTimer();
-  }
+  // Highlight current page via IntersectionObserver
+  const btns = Array.from(indicatorsEl.querySelectorAll('button'));
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting && e.intersectionRatio > 0.5) {
+        const idx = pages.indexOf(e.target);
+        btns.forEach((b, i) => {
+          if (i === idx) b.setAttribute('aria-current', 'true');
+          else b.removeAttribute('aria-current');
+        });
+      }
+    });
+  }, {root: deck, threshold: [0.5, 0.6]});
+  pages.forEach(p => io.observe(p));
+})();
 
-  function resetTimer() {
-    clearInterval(timer);
-    timer = setInterval(function() { goTo(current + 1, false); }, INTERVAL);
-  }
-
-  tabs.forEach(function(tab, i) { tab.addEventListener('click', function() { goTo(i, true); }); });
-  prevBtn.addEventListener('click', function() { goTo(current - 1, true); });
-  nextBtn.addEventListener('click', function() { goTo(current + 1, true); });
-
-  resetTimer();
-}());
-
-/* ── CHAT SIGNUP OVERLAY ── */
+// === Keyboard nav: arrow up/down / pageup/pagedown jump between sections ===
 (function(){
-  const BACKEND='https://web-production-90171c.up.railway.app/signup';
-  const overlay=document.getElementById('coOverlay');
-  const msgs=document.getElementById('coMsgs');
-  const inputArea=document.getElementById('coInputArea');
-  document.getElementById('coClose').addEventListener('click',closeOverlay);
-  overlay.addEventListener('click',e=>{if(e.target===overlay)closeOverlay();});
-
-  let sdata={};
-  let consentChecked=false;
-
-  function scrollBottom(){
-    requestAnimationFrame(()=>{
-      msgs.scrollTop=msgs.scrollHeight;
+  const deck = document.getElementById('deck');
+  const pages = Array.from(deck.querySelectorAll('.page'));
+  function currentIndex(){
+    const t = deck.scrollTop;
+    let best = 0, bestDist = Infinity;
+    pages.forEach((p, i) => {
+      const d = Math.abs(p.offsetTop - t);
+      if (d < bestDist){ bestDist = d; best = i; }
     });
+    return best;
   }
-
-  function addMsg(text,who,delay=0){
-    return new Promise(resolve=>{
-      setTimeout(()=>{
-        const m=document.createElement('div');
-        m.className='co-msg '+who;
-        m.innerHTML=text;
-        msgs.appendChild(m);
-        requestAnimationFrame(()=>{
-          m.classList.add('show');
-          m.scrollIntoView({block:'nearest',behavior:'smooth'});
-        });
-        resolve();
-      },delay);
-    });
-  }
-
-  function showTyping(){
-    const t=document.createElement('div');
-    t.className='co-typing';
-    t.innerHTML='<div class="co-dot"></div><div class="co-dot"></div><div class="co-dot"></div>';
-    msgs.appendChild(t);
-    scrollBottom();
-    return t;
-  }
-
-  function coachSay(text,typingMs=700){
-    return new Promise(resolve=>{
-      const t=showTyping();
-      setTimeout(()=>{
-        msgs.removeChild(t);
-        addMsg(text,'coach').then(resolve);
-      },typingMs);
-    });
-  }
-
-  function clearInput(){inputArea.innerHTML='';}
-
-  function textInput(placeholder,type='text'){
-    return new Promise(resolve=>{
-      clearInput();
-      const row=document.createElement('div');
-      row.className='co-input-row';
-      const inp=document.createElement('input');
-      inp.className='co-input';
-      inp.placeholder=placeholder;
-      inp.type=type;
-      inp.setAttribute('inputmode',type==='tel'?'tel':type==='number'?'numeric':'text');
-      const btn=document.createElement('button');
-      btn.className='co-send';
-      btn.innerHTML='<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
-      function submit(){
-        const val=inp.value.trim();
-        if(!val)return;
-        addMsg(val,'user');
-        clearInput();
-        resolve(val);
-      }
-      btn.addEventListener('click',submit);
-      inp.addEventListener('keydown',e=>{if(e.key==='Enter')submit();});
-      row.appendChild(inp);
-      row.appendChild(btn);
-      inputArea.appendChild(row);
-      scrollBottom();
-      inp.focus();
-    });
-  }
-
-  function chips(options,multi=false){
-    return new Promise(resolve=>{
-      clearInput();
-      const wrap=document.createElement('div');
-      wrap.className='co-chips';
-      const selected=new Set();
-      options.forEach(opt=>{
-        const c=document.createElement('button');
-        c.className='co-chip'+(multi?' multi':'');
-        c.textContent=opt.label;
-        c.addEventListener('click',()=>{
-          if(!multi){
-            addMsg(opt.label,'user');
-            clearInput();
-            resolve([opt.value]);
-          } else {
-            c.classList.toggle('sel');
-            selected.has(opt.value)?selected.delete(opt.value):selected.add(opt.value);
-          }
-        });
-        wrap.appendChild(c);
-      });
-      inputArea.appendChild(wrap);
-      if(multi){
-        const btn=document.createElement('button');
-        btn.className='co-confirm';
-        btn.textContent='Confirm →';
-        btn.addEventListener('click',()=>{
-          if(!selected.size)return;
-          const labels=options.filter(o=>selected.has(o.value)).map(o=>o.label).join(', ');
-          addMsg(labels,'user');
-          clearInput();
-          resolve([...selected]);
-        });
-        inputArea.appendChild(btn);
-      }
-      scrollBottom();
-    });
-  }
-
-  function consentStep(){
-    return new Promise(resolve=>{
-      clearInput();
-      const wrap=document.createElement('div');
-      wrap.className='co-consent-wrap';
-      const lbl=document.createElement('label');
-      lbl.className='co-consent-label';
-      const box=document.createElement('div');
-      box.className='co-consent-box';
-      const txt=document.createElement('span');
-      txt.className='co-consent-text';
-      txt.innerHTML='I agree to receive recurring automated SMS messages from Cued including workout plans, meal suggestions, and coaching check-ins. Message frequency: 5–8 msgs/day. Msg &amp; data rates may apply. Reply STOP to cancel. Reply HELP for help. <a href="terms.html" target="_blank">Terms</a> &amp; <a href="privacy.html" target="_blank">Privacy</a>.';
-      lbl.appendChild(box);
-      lbl.appendChild(txt);
-      lbl.addEventListener('click',()=>{
-        consentChecked=!consentChecked;
-        box.classList.toggle('checked',consentChecked);
-        box.innerHTML=consentChecked?'<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>':'';
-      });
-      wrap.appendChild(lbl);
-      const btn=document.createElement('button');
-      btn.className='co-confirm';
-      btn.style.marginTop='10px';
-      btn.textContent='Start coaching me →';
-      btn.addEventListener('click',()=>{
-        if(!consentChecked){
-          box.style.borderColor='#F87171';
-          setTimeout(()=>box.style.borderColor='',1200);
-          return;
-        }
-        clearInput();
-        resolve(true);
-      });
-      inputArea.appendChild(wrap);
-      inputArea.appendChild(btn);
-    });
-  }
-
-  async function runChat(){
-    msgs.innerHTML='';
-    clearInput();
-    sdata={};
-    consentChecked=false;
-
-    await coachSay("Hey! I'm your Cued coach. Let's get you set up — takes about 60 seconds. What's your first name?",900);
-    sdata.name=await textInput('Your first name');
-    await coachSay(`Nice to meet you, ${sdata.name}! How old are you?`,600);
-    sdata.age=await textInput('Your age','number');
-    await coachSay("What's your gender?",600);
-    const [gender]=await chips([{label:'Male',value:'male'},{label:'Female',value:'female'},{label:'Non-binary',value:'non_binary'},{label:'Prefer not to say',value:'prefer_not_to_say'}]);
-    sdata.gender=gender;
-    await coachSay("What are you training for? Pick everything that applies.",700);
-    const goals=await chips([{label:'Lose fat',value:'fat_loss'},{label:'Build muscle',value:'muscle_building'},{label:'Get stronger',value:'strength'},{label:'General fitness',value:'general_fitness'},{label:'Running / Endurance',value:'endurance'}],true);
-    sdata.goal=goals.join(',');
-    await coachSay("What's been your biggest obstacle so far?",600);
-    const [obstacle]=await chips([{label:'Staying consistent',value:'consistency'},{label:'Nutrition / what to eat',value:'nutrition'},{label:'Not knowing what to do',value:'knowledge'},{label:'Not enough time',value:'time'},{label:'Motivation / accountability',value:'motivation'},{label:'Injuries',value:'injuries'}]);
-    sdata.biggest_obstacle=obstacle;
-    await coachSay("How long have you been training seriously?",600);
-    const [exp]=await chips([{label:'Just starting out',value:'none'},{label:'Under 6 months',value:'beginner'},{label:'6 months – 2 years',value:'intermediate'},{label:'2+ years',value:'advanced'}]);
-    sdata.experience=exp;
-    await coachSay("What equipment do you have access to?",600);
-    const [equip]=await chips([{label:'Full gym',value:'full_gym'},{label:'Limited gym',value:'limited_gym'},{label:'Home gym',value:'home_gym'},{label:'Bodyweight only',value:'bodyweight'}]);
-    sdata.equipment=equip;
-    await coachSay("Last thing — what's your phone number? That's where I'll text you.",700);
-    sdata.phone=await textInput('(510) 555-1234','tel');
-    await coachSay("Almost there! One quick consent before I can text you:",600);
-    await consentStep();
-    sdata.sms_consent=true;
-
-    clearInput();
-    await coachSay(`Perfect, ${sdata.name}! Setting up your profile...`,500);
-    sdata.timezone=Intl.DateTimeFormat().resolvedOptions().timeZone;
-    try {
-      const res=await fetch(BACKEND,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sdata)});
-      const data=await res.json();
-      if(data.status==='ok'||data.status==='exists'){
-        msgs.innerHTML='';
-        const s=document.createElement('div');
-        s.className='co-success';
-        s.innerHTML=`<div class="co-success-icon">🎉</div><h3>You're in, ${sdata.name}!</h3><p>Your first coaching text is on its way. Keep an eye on your messages — your coach is getting your plan ready.</p>`;
-        msgs.appendChild(s);
-        inputArea.innerHTML='';
-      } else {
-        await coachSay("Hmm, something went wrong. Try again?",400);
-        showRetry();
-      }
-    } catch {
-      await coachSay("Connection error — check your internet and try again.",400);
-      showRetry();
+  window.addEventListener('keydown', (e) => {
+    const tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
+    if (e.key === 'ArrowDown' || e.key === 'PageDown'){
+      e.preventDefault();
+      const next = Math.min(pages.length - 1, currentIndex() + 1);
+      pages[next].scrollIntoView({behavior:'smooth', block:'start'});
+    } else if (e.key === 'ArrowUp' || e.key === 'PageUp'){
+      e.preventDefault();
+      const prev = Math.max(0, currentIndex() - 1);
+      pages[prev].scrollIntoView({behavior:'smooth', block:'start'});
     }
-  }
+  });
+})();
 
-  function showRetry(){
-    clearInput();
-    const btn=document.createElement('button');
-    btn.className='co-confirm';
-    btn.textContent='Try again';
-    btn.addEventListener('click',runChat);
-    inputArea.appendChild(btn);
-  }
+// === Floating CTA: show on every page except those flagged [data-hide-float-cta] ===
+(function(){
+  const deck = document.getElementById('deck');
+  const floatCta = document.getElementById('floatCta');
+  if (!deck || !floatCta) return;
+  const pages = Array.from(deck.querySelectorAll('.page'));
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting && e.intersectionRatio > 0.5) {
+        const hide = e.target.hasAttribute('data-hide-float-cta');
+        floatCta.classList.toggle('show', !hide);
+      }
+    });
+  }, {root: deck, threshold: [0.5, 0.6]});
+  pages.forEach(p => io.observe(p));
+})();
 
-  window.openChatSignup=function(){
-    overlay.classList.add('open');
-    document.body.style.overflow='hidden';
-    if(!msgs.children.length) runChat();
-  };
-
-  function closeOverlay(){
-    overlay.classList.remove('open');
-    document.body.style.overflow='';
-  }
+// === In-deck anchor scrolling for any [href="#signup"] link ===
+// The deck (not the document) is the scroll container, so native anchor
+// jumps don't move it. Intercept these clicks and call scrollIntoView on the
+// target inside the deck. Covers the nav CTA and the hero "Text Cued Now"
+// button — anything pointing to #signup.
+(function(){
+  document.querySelectorAll('a[href="#signup"]').forEach((a) => {
+    a.addEventListener('click', (e) => {
+      const target = document.getElementById('signup');
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
 })();
 </script>
+
 </body>
 </html>
