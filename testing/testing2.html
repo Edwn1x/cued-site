@@ -113,8 +113,9 @@ nav > *{pointer-events:auto}
 .nav-cta-arrow{display:inline-block;transition:transform .2s ease}
 .nav-cta:hover .nav-cta-arrow{transform:translateX(3px)}
 @media(max-width:760px){
-  nav{padding:16px 20px}
-  .brand{font-size:22px}
+  nav{padding:14px 20px}
+  .brand{font-size:18px}
+  .nav-cta{display:none}
 }
 
 /* ===== PAGE INDICATORS (right rail) ===== */
@@ -168,6 +169,28 @@ nav > *{pointer-events:auto}
 .cta-primary:hover{background:var(--blue-2);transform:translateY(-1px);box-shadow:0 12px 28px rgba(16,134,255,.28)}
 .cta-secondary{display:inline-flex;align-items:center;gap:8px;padding:15px 24px;background:transparent;color:var(--ink);font-family:var(--f-ui);font-size:15px;font-weight:600;border-radius:999px;border:1px solid var(--border);cursor:pointer;transition:background .15s,border-color .15s}
 .cta-secondary:hover{background:var(--bg-alt);border-color:#cfd6e2}
+
+/* ===== HERO: mobile tightening =====
+   Pull the headline higher in the viewport, shrink it so it wraps to ~3
+   tight lines instead of 4 cramped ones, and close the gaps so the
+   block reads as one composition rather than floating elements. */
+@media(max-width:760px){
+  .page--hero{padding-top:12vh;padding-bottom:6vh}
+  .hero-h1{
+    font-size:clamp(2rem,9vw,2.6rem);
+    letter-spacing:-1px;
+    line-height:1.02;
+    max-width:14ch;
+    margin-bottom:28px;
+  }
+  .hero-sub{font-size:15px;margin-bottom:32px;max-width:340px;padding:0 8px}
+  .hero-ctas{margin-bottom:48px;gap:10px}
+  .cta-primary,.cta-secondary{padding:13px 22px;font-size:14.5px}
+  .proof{margin-top:0;gap:14px}
+  .proof-label{font-size:10.5px;letter-spacing:1.6px}
+  .proof-row{gap:12px 18px;max-width:320px}
+  .proof-logo{font-size:13px}
+}
 
 /* ===== FLOATING CTA (shows on sections without an inline CTA) ===== */
 .float-cta{
