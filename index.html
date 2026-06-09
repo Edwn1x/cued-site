@@ -81,7 +81,7 @@ a{color:inherit;text-decoration:none}
 .hero-art{
   position:absolute;
   left:-2vw;
-  bottom:-3vh;
+  bottom:12vh;
   width:clamp(240px,26vw,420px);
   height:auto;
   opacity:.445;
@@ -212,6 +212,33 @@ nav > *{pointer-events:auto}
 .float-cta .arrow{display:inline-block;transition:transform .2s ease}
 .float-cta:hover .arrow{transform:translateX(3px)}
 @media(max-width:600px){.float-cta{bottom:18px;font-size:12.5px;padding:8px 16px}}
+
+/* ===== WAITLIST MODAL ===== */
+.wl-overlay{position:fixed;inset:0;background:rgba(10,22,40,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:100;display:none;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .25s ease}
+.wl-overlay.open{display:flex}
+.wl-overlay.show{opacity:1}
+.wl-modal{background:var(--bg);border-radius:24px;padding:36px clamp(28px,4vw,40px);width:100%;max-width:440px;box-shadow:0 24px 80px rgba(10,22,40,.28);position:relative;transform:translateY(12px);transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.wl-overlay.show .wl-modal{transform:translateY(0)}
+.wl-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:transparent;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--ink-3);font-size:18px;transition:color .15s,background .15s}
+.wl-close:hover{color:var(--ink);background:var(--bg-alt)}
+.wl-h{font-family:var(--f-serif);font-weight:500;font-size:clamp(1.6rem,2.4vw,2rem);letter-spacing:-.8px;line-height:1.04;color:var(--ink);margin-bottom:8px}
+.wl-sub{font-family:var(--f-body);font-size:14.5px;color:var(--ink-2);line-height:1.55;margin-bottom:24px}
+.wl-form{display:flex;flex-direction:column;gap:12px}
+.wl-field{display:flex;flex-direction:column;gap:6px}
+.wl-field label{font-family:var(--f-ui);font-size:11.5px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink-3)}
+.wl-field label .opt{text-transform:none;letter-spacing:.2px;color:var(--ink-3);font-weight:400;margin-left:4px}
+.wl-field input{font-family:var(--f-body);font-size:15px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:#fff;color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s;width:100%}
+.wl-field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(16,134,255,.12)}
+.wl-submit{margin-top:8px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 22px;background:var(--blue);color:#fff;font-family:var(--f-ui);font-size:15px;font-weight:600;border-radius:999px;border:none;cursor:pointer;transition:background .15s,transform .15s,box-shadow .15s}
+.wl-submit:hover:not(:disabled){background:var(--blue-2);transform:translateY(-1px);box-shadow:0 8px 22px rgba(16,134,255,.28)}
+.wl-submit:disabled{opacity:.55;cursor:not-allowed}
+.wl-error{font-family:var(--f-ui);font-size:13px;color:#C03030;margin-top:4px;min-height:18px}
+.wl-success{text-align:center;display:none}
+.wl-success.show{display:block}
+.wl-success-icon{font-size:38px;margin-bottom:10px}
+.wl-success h3{font-family:var(--f-serif);font-weight:500;font-size:clamp(1.6rem,2.4vw,2rem);letter-spacing:-.8px;color:var(--ink);margin-bottom:10px}
+.wl-success p{font-family:var(--f-body);font-size:15px;color:var(--ink-2);line-height:1.55;max-width:320px;margin:0 auto}
+.wl-form.hidden{display:none}
 
 /* social proof inside hero, beneath ctas */
 .proof{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:64px}
@@ -715,6 +742,39 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
 
 </main>
 
+<!-- ===== WAITLIST MODAL ===== -->
+<div class="wl-overlay" id="waitlistOverlay" role="dialog" aria-modal="true" aria-labelledby="wlTitle" aria-hidden="true">
+  <div class="wl-modal" role="document">
+    <button type="button" class="wl-close" id="waitlistClose" aria-label="Close">✕</button>
+    <form class="wl-form" id="waitlistForm" novalidate>
+      <h2 id="wlTitle" class="wl-h">Join the waitlist.</h2>
+      <p class="wl-sub">We'll text you when we go live. No spam — just one message.</p>
+
+      <div class="wl-field">
+        <label for="wlName">Name</label>
+        <input id="wlName" name="name" type="text" autocomplete="given-name" required>
+      </div>
+      <div class="wl-field">
+        <label for="wlPhone">Phone</label>
+        <input id="wlPhone" name="phone" type="tel" autocomplete="tel" placeholder="(510) 555-1234" required>
+      </div>
+      <div class="wl-field">
+        <label for="wlEmail">Email <span class="opt">(optional)</span></label>
+        <input id="wlEmail" name="email" type="email" autocomplete="email">
+      </div>
+
+      <div class="wl-error" id="wlError" aria-live="polite"></div>
+      <button type="submit" class="wl-submit" id="wlSubmit">Join the waitlist →</button>
+    </form>
+
+    <div class="wl-success" id="waitlistSuccess">
+      <div class="wl-success-icon">🎉</div>
+      <h3>You're on the list.</h3>
+      <p>We'll text you the moment we go live. Welcome to cued.</p>
+    </div>
+  </div>
+</div>
+
 <script>
 // === Build right-rail page indicators from .page sections ===
 (function(){
@@ -797,19 +857,126 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
   pages.forEach(p => io.observe(p));
 })();
 
-// === In-deck anchor scrolling for any [href="#signup"] link ===
-// The deck (not the document) is the scroll container, so native anchor
-// jumps don't move it. Intercept these clicks and call scrollIntoView on the
-// target inside the deck. Covers the nav CTA and the hero "Text Cued Now"
-// button — anything pointing to #signup.
+// === Waitlist modal: open from any "Join the waitlist" CTA ===
+// Every CTA that points at #signup (and the signup-section "Join the waitlist"
+// button) now opens the waitlist modal instead of scrolling. Modal posts to
+// the Railway /waitlist endpoint with { name, phone, email, source, ts }.
 (function(){
+  const WAITLIST_ENDPOINT = 'https://web-production-90171c.up.railway.app/waitlist';
+
+  const overlay  = document.getElementById('waitlistOverlay');
+  const modal    = overlay && overlay.querySelector('.wl-modal');
+  const closeBtn = document.getElementById('waitlistClose');
+  const form     = document.getElementById('waitlistForm');
+  const success  = document.getElementById('waitlistSuccess');
+  const submit   = document.getElementById('wlSubmit');
+  const errorEl  = document.getElementById('wlError');
+  const nameEl   = document.getElementById('wlName');
+  const phoneEl  = document.getElementById('wlPhone');
+  const emailEl  = document.getElementById('wlEmail');
+  if (!overlay || !form) return;
+
+  let lastFocus = null;
+
+  function open(source){
+    lastFocus = document.activeElement;
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden', 'false');
+    // reset visible state for re-opens after a successful submit
+    form.classList.remove('hidden');
+    success.classList.remove('show');
+    errorEl.textContent = '';
+    submit.disabled = false;
+    submit.textContent = 'Join the waitlist →';
+    overlay.dataset.source = source || 'unknown';
+    requestAnimationFrame(() => overlay.classList.add('show'));
+    setTimeout(() => nameEl && nameEl.focus(), 280);
+  }
+
+  function close(){
+    overlay.classList.remove('show');
+    overlay.setAttribute('aria-hidden', 'true');
+    setTimeout(() => {
+      overlay.classList.remove('open');
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }, 250);
+  }
+
+  // Open modal from every Join-the-waitlist CTA. Catches:
+  // - hero a[href="#signup"] primary CTA
+  // - nav a[href="#signup"] "get started" link
+  // - floating #floatCta
+  // - signup-section a[href="#"].cta-primary (the page-7 button)
   document.querySelectorAll('a[href="#signup"]').forEach((a) => {
     a.addEventListener('click', (e) => {
-      const target = document.getElementById('signup');
-      if (!target) return;
       e.preventDefault();
-      target.scrollIntoView({behavior:'smooth', block:'start'});
+      const source = a.classList.contains('nav-cta') ? 'nav'
+                   : a.classList.contains('float-cta') ? 'floating'
+                   : a.closest('.hero-inner') ? 'hero' : 'link';
+      open(source);
     });
+  });
+  // The signup-section button uses href="#" rather than #signup
+  const signupBtn = document.querySelector('#signup .cta-primary');
+  if (signupBtn){
+    signupBtn.addEventListener('click', (e) => { e.preventDefault(); open('signup-section'); });
+  }
+
+  // Close interactions
+  closeBtn && closeBtn.addEventListener('click', close);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('open')) close();
+  });
+
+  // Light validation helpers
+  function validPhone(v){ return v.replace(/\D/g,'').length >= 10; }
+  function validEmail(v){ return !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()); }
+
+  // Submit handler
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorEl.textContent = '';
+    const name  = nameEl.value.trim();
+    const phone = phoneEl.value.trim();
+    const email = emailEl.value.trim();
+    if (!name)  { errorEl.textContent = 'Please add your name.'; nameEl.focus();  return; }
+    if (!validPhone(phone)){ errorEl.textContent = "That phone number doesn't look right."; phoneEl.focus(); return; }
+    if (!validEmail(email)){ errorEl.textContent = "That email doesn't look right."; emailEl.focus(); return; }
+
+    submit.disabled = true;
+    submit.textContent = 'Joining…';
+
+    const payload = {
+      name, phone,
+      email: email || null,
+      source: overlay.dataset.source || 'unknown',
+      ts: new Date().toISOString(),
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      active: false,
+      status: 'waitlist',
+    };
+
+    try {
+      const res = await fetch(WAITLIST_ENDPOINT, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && (data.status === 'ok' || data.status === 'exists' || res.status === 200 || res.status === 201)){
+        form.classList.add('hidden');
+        success.classList.add('show');
+      } else {
+        errorEl.textContent = (data && data.message) || 'Something went wrong. Try again?';
+        submit.disabled = false;
+        submit.textContent = 'Join the waitlist →';
+      }
+    } catch (err) {
+      errorEl.textContent = 'Connection error. Check your internet and try again.';
+      submit.disabled = false;
+      submit.textContent = 'Join the waitlist →';
+    }
   });
 })();
 </script>
