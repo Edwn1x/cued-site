@@ -89,6 +89,9 @@ a{color:inherit;text-decoration:none}
   pointer-events:none;
   user-select:none;
   z-index:0;
+  /* The SVG wraps an embedded PNG with a white background — blend mode
+     drops the white pixels into the page so only the drawing remains. */
+  mix-blend-mode:multiply;
 }
 .page--hero > *:not(.hero-art){position:relative;z-index:1}
 @media(max-width:900px){.hero-art{display:none}}
@@ -197,16 +200,16 @@ nav > *{pointer-events:auto}
   position:fixed;left:50%;bottom:28px;transform:translate(-50%,12px);
   display:inline-flex;align-items:center;gap:6px;
   padding:9px 18px;border-radius:999px;
-  background:#fff;color:var(--blue);
-  border:1px solid rgba(16,134,255,.35);
+  background:var(--blue);color:#fff;
+  border:1px solid var(--blue);
   font-family:var(--f-ui);font-size:13px;font-weight:700;letter-spacing:-.1px;
-  box-shadow:0 4px 14px rgba(10,22,40,.06);
+  box-shadow:0 8px 22px rgba(16,134,255,.28);
   opacity:0;pointer-events:none;
   transition:opacity .35s ease,transform .35s ease,background .2s,border-color .2s,color .2s,box-shadow .2s;
   z-index:45;
 }
 .float-cta.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
-.float-cta:hover{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 8px 22px rgba(16,134,255,.28)}
+.float-cta:hover{background:#fff;border-color:rgba(16,134,255,.35);color:var(--blue);box-shadow:0 4px 14px rgba(10,22,40,.06)}
 .float-cta .arrow{display:inline-block;transition:transform .2s ease}
 .float-cta:hover .arrow{transform:translateX(3px)}
 @media(max-width:600px){.float-cta{bottom:18px;font-size:12.5px;padding:8px 16px}}
@@ -265,6 +268,67 @@ nav > *{pointer-events:auto}
 .chat-input{padding:8px 10px 14px;border-top:1px solid #EEF1F5;display:flex;align-items:center;gap:6px;background:#fff}
 .chat-input .input-fake{flex:1;height:28px;background:#F2F3F5;border-radius:14px;display:flex;align-items:center;padding:0 12px;font-family:var(--f-ui);font-size:12px;color:var(--ink-3)}
 .chat-input .send{width:28px;height:28px;border-radius:50%;background:var(--bubble-gray);display:inline-flex;align-items:center;justify-content:center;color:var(--ink-3);font-size:14px}
+
+/* ===== EXPLAINER PAGE (under hero) ===== */
+.explainer-inner{max-width:680px;width:100%;text-align:center;display:flex;flex-direction:column;align-items:center;gap:22px}
+.explainer-h{font-family:var(--f-serif);font-weight:500;font-size:clamp(2rem,3.6vw,3rem);line-height:1.04;letter-spacing:-1.2px;color:var(--ink);margin-bottom:8px}
+.explainer-inner p{font-family:var(--f-body);font-size:clamp(16px,1.3vw,18px);color:var(--ink-2);line-height:1.65;max-width:580px;margin:0 auto}
+.explainer-founder{font-family:var(--f-ui)!important;font-size:clamp(12px,1vw,13.5px)!important;font-weight:600!important;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink-3)!important;margin-top:14px!important;max-width:none!important;line-height:1.4!important}
+
+/* ===== CLAIMS PAGE (12 capability claims, 3-col grid) ===== */
+.claims-inner{max-width:1180px;width:100%;display:flex;flex-direction:column;gap:64px}
+.claims-head{max-width:780px}
+.claims-h{font-family:var(--f-serif);font-weight:500;font-size:clamp(2rem,4vw,3.4rem);letter-spacing:-1.4px;line-height:1.04;color:var(--ink);margin-bottom:18px}
+.claims-sub{font-family:var(--f-body);font-size:clamp(15px,1.2vw,17px);color:var(--ink-2);line-height:1.6;max-width:560px}
+.claims-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0 32px}
+.claim{display:flex;align-items:center;gap:12px;padding:18px 0;border-top:1px solid var(--border);font-family:var(--f-ui);font-size:clamp(15px,1.2vw,17px);font-weight:500;color:var(--ink);letter-spacing:-.2px}
+.claim-check{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--blue);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;font-family:var(--f-ui)}
+.claim--more{color:var(--ink-3)}
+.claim--more .claim-check{background:var(--ink-3)}
+@media(max-width:900px){
+  .claims-grid{grid-template-columns:repeat(2,1fr);gap:0 24px}
+  .claims-inner{gap:48px}
+}
+@media(max-width:560px){
+  .claims-grid{grid-template-columns:1fr}
+  .claim{padding:14px 0}
+}
+
+/* ===== TRI-CARD PAGE (combined: morning plan + fuel + proactive nudge) ===== */
+.tricard-inner{max-width:1240px;width:100%}
+.tricard-head{text-align:center;margin-bottom:48px}
+.tricard-h{font-family:var(--f-serif);font-weight:500;font-size:clamp(2rem,3.6vw,3rem);letter-spacing:-1.2px;line-height:1.04;color:var(--ink);margin-bottom:12px}
+.tricard-head p{font-family:var(--f-body);color:var(--ink-2);font-size:17px;max-width:540px;margin:0 auto;line-height:1.55}
+.tricard-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.tricard{border-radius:24px;padding:28px;display:flex;flex-direction:column;gap:24px;min-height:460px;position:relative;overflow:hidden}
+.tricard--mint{background:#E6F3E8}
+.tricard--cream{background:#F5EFE2}
+.tricard--lavender{background:#ECE9F8}
+.tricard-bubble{align-self:flex-start;background:var(--blue);color:#fff;padding:10px 14px;border-radius:18px;border-bottom-left-radius:5px;font-family:var(--f-body);font-size:14px;line-height:1.35;max-width:90%}
+.tricard-copy{font-family:var(--f-ui);font-size:clamp(20px,1.8vw,26px);font-weight:700;line-height:1.18;letter-spacing:-.4px;color:var(--ink);text-transform:uppercase;flex:0 1 auto}
+.tricard-copy .hl{background:var(--blue);color:#fff;padding:0 6px;border-radius:4px;display:inline-block}
+.tricard-mini{display:flex;flex-direction:column;gap:5px;margin-top:auto;padding-top:18px}
+.tricard-mini .bub{font-size:12.5px;padding:7px 11px;max-width:100%;background:rgba(255,255,255,.65);color:var(--ink);border-radius:14px;border-bottom-left-radius:5px;line-height:1.4;letter-spacing:-.1px}
+@media(max-width:900px){
+  .tricard-grid{grid-template-columns:1fr;gap:16px}
+  .tricard{min-height:auto;padding:24px;gap:18px}
+  .tricard-head{margin-bottom:32px}
+}
+
+/* ===== REPLACES PAGE (positioning: replaces 8 apps) ===== */
+.replaces-inner{max-width:880px;width:100%;text-align:center;display:flex;flex-direction:column;align-items:center;gap:36px}
+.replaces-head{display:flex;flex-direction:column;align-items:center}
+.replaces-eyebrow{font-family:var(--f-ui);font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink-3);margin-bottom:14px;font-weight:600}
+.replaces-h{font-family:var(--f-serif);font-weight:500;font-size:clamp(2rem,3.6vw,3rem);letter-spacing:-1.2px;line-height:1.04;color:var(--ink)}
+.replaces-grid{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(4,1fr);gap:32px 24px;width:100%}
+.replaces-grid li{display:flex;flex-direction:column;align-items:center;gap:12px;padding:6px 0;opacity:.78}
+.replaces-grid li img{width:56px;height:56px;object-fit:cover;border-radius:14px;box-shadow:0 2px 8px rgba(10,22,40,.08);filter:grayscale(.4)}
+.replaces-grid li span{font-family:var(--f-ui);font-size:clamp(14px,1.2vw,16px);font-weight:500;color:var(--ink-2);text-decoration:line-through;text-decoration-thickness:1.5px;text-decoration-color:rgba(10,22,40,.5);text-align:center;line-height:1.3}
+.replaces-foot{font-family:var(--f-serif);font-style:italic;font-size:clamp(20px,2vw,28px);color:var(--blue);letter-spacing:-.4px;margin-top:6px}
+@media(max-width:760px){
+  .replaces-grid{grid-template-columns:repeat(2,1fr);gap:24px 18px}
+  .replaces-grid li img{width:48px;height:48px;border-radius:12px}
+}
 
 /* ===== PHONE: mobile override =====
    On mobile the user is already holding a phone — a phone-shaped frame
@@ -356,11 +420,11 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
 
     <div class="hero-inner">
       <h1 class="hero-h1">
-        The personal fitness coach that <em>texts first</em><br>
-        before workouts get messy.
+        Your personal fitness coach that<em><br>texts first.</em><br>
+        Made for college life.
       </h1>
       <p class="hero-sub">
-        It reads the boring signals — sleep, schedule, recovery, training history, goals — and tells you what to do next. Plan your week, dial in recovery, build the streak.
+        It reads the boring signals — sleep, class schedule, recovery, even what's on the dining hall menu — and tells you what to do next. Plan your week, dial in recovery, build the streak.
       </p>
       <div class="hero-ctas">
         <a href="#signup" class="cta-primary">Text Cued Now →</a>
@@ -384,44 +448,109 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
 
   </section>
 
-  <!-- ===== PAGE 1 — Morning plan ===== -->
-  <section class="page" data-label="Wakes up before you do" data-title="Wakes up before you do.">
-    <div class="feature">
-      <div class="feature-copy">
-        <div class="feature-eyebrow">Morning plan</div>
-        <h2 class="feature-h2">Wakes up <em>before</em> you do.</h2>
-        <p>Cued checks your sleep, soreness, and calendar before you've even opened your eyes — then hands you the day's session, ready to go.</p>
+  <!-- ===== PAGE 1 — Explainer (what Cued is) ===== -->
+  <section class="page page--explainer" data-label="What it is" data-title="What Cued is">
+    <div class="explainer-inner">
+      <h2 class="explainer-h">what cued is.</h2>
+      <p>let's be honest — sticking to your fitness goals as a college student is hard. between class, work, midterms, and trying to have a life, the gym is usually the first thing that drops.</p>
+      <p>we know because we're students too. and we got tired of juggling four different apps just to keep a workout streak going.</p>
+      <p>so we built cued. a coach you text. it reads your week — sleep, schedule, what's around you — and tells you exactly what to do next. no app. no dashboard. no $200-a-month coach.</p>
+      <p class="explainer-founder">Built at Berkeley, by students, for students.</p>
+    </div>
+  </section>
+
+  <!-- ===== PAGE 2 — Claims list (12 capabilities) ===== -->
+  <section class="page page--claims" data-label="What it does" data-title="Here's what it actually does.">
+    <div class="claims-inner">
+      <div class="claims-head">
+        <h2 class="claims-h">here's what it actually does.</h2>
+        <p class="claims-sub">no app to download. no new account. you just text cued like you'd text a friend who happens to know what they're doing — and it handles the rest.</p>
       </div>
-      <div class="feature-phone">
-        <div class="phone">
-          <div class="phone-notch"></div>
-          <div class="phone-screen">
-            <div class="chat-header">
-              <div class="ch-name"><span class="ch-avatar">C</span> Cued</div>
-              <div class="ch-sub">active now</div>
-            </div>
-            <div class="chat">
-              <div class="bub tiny">Today 7:02 AM</div>
-              <div class="bub me">what should i do today?</div>
-              <div class="bub cued">you slept 6h 12m, hrv's down a touch.</div>
-              <div class="bub cued">legs are still toast from monday's squats.</div>
-              <div class="bub cued">do 25min upper push + 10min zone 2. easy day 💪</div>
-              <div class="bub me">perfect, sending</div>
-            </div>
-            <div class="chat-input"><div class="input-fake">iMessage</div><div class="send">↑</div></div>
-          </div>
-        </div>
+      <div class="claims-grid">
+        <div class="claim"><span class="claim-check">✓</span> Proactively plans your week</div>
+        <div class="claim"><span class="claim-check">✓</span> Knows when you're cooked</div>
+        <div class="claim"><span class="claim-check">✓</span> Lives in your iMessage</div>
+        <div class="claim"><span class="claim-check">✓</span> Adapts to your schedule</div>
+        <div class="claim"><span class="claim-check">✓</span> Listens to your wearable</div>
+        <div class="claim"><span class="claim-check">✓</span> Holds you accountable</div>
+        <div class="claim"><span class="claim-check">✓</span> Builds the streak</div>
+        <div class="claim"><span class="claim-check">✓</span> Tracks every set</div>
+        <div class="claim"><span class="claim-check">✓</span> Is a real coach</div>
+        <div class="claim"><span class="claim-check">✓</span> Knows your body</div>
+        <div class="claim"><span class="claim-check">✓</span> Picks the right fuel</div>
+        <div class="claim claim--more"><span class="claim-check">+</span> And more</div>
       </div>
     </div>
   </section>
 
-  <!-- ===== PAGE 2 — Missed day ===== -->
-  <section class="page" data-label="No guilt, just a reroute" data-title="No guilt. Just a reroute.">
+  <!-- ===== PAGE 3 — Tri-card (morning plan + fuel + proactive nudge) ===== -->
+  <section class="page page--tricard" data-label="It just gets you" data-title="It just... gets you.">
+    <div class="tricard-inner">
+      <div class="tricard-head">
+        <h2 class="tricard-h">it just... gets you.</h2>
+        <p>you don't have to ask. cued sees what's coming up and texts you the right thing at the right time.</p>
+      </div>
+      <div class="tricard-grid">
+
+        <article class="tricard tricard--mint">
+          <div class="tricard-bubble">early 8am, what should i do?</div>
+          <h3 class="tricard-copy">Cued checks your <span class="hl">sleep</span> and builds the day's session before you're out of bed.</h3>
+          <div class="tricard-mini">
+            <div class="bub cued">slept 5h, you've got lab till 6.</div>
+            <div class="bub cued">25min upper push at the rsf. easy day 💪</div>
+          </div>
+        </article>
+
+        <article class="tricard tricard--cream">
+          <div class="tricard-bubble">dining hall has chicken tonight</div>
+          <h3 class="tricard-copy">Cued knows the <span class="hl">context</span> and gives you a real answer — macros or plain English.</h3>
+          <div class="tricard-mini">
+            <div class="bub cued">grab 2 scoops, rice, veggies. ~40g protein.</div>
+            <div class="bub cued">skip the dessert bar tonight, you're already over 🫡</div>
+          </div>
+        </article>
+
+        <article class="tricard tricard--lavender">
+          <div class="tricard-bubble">yo, you have midterms next week — your sleep is fried ngl.</div>
+          <h3 class="tricard-copy">Cued texts <span class="hl">first</span> when it matters — gently, never naggy.</h3>
+          <div class="tricard-mini">
+            <div class="bub cued">we'll pull deadlifts to after finals.</div>
+            <div class="bub cued">20min walk + 8min mobility. that's the assignment.</div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE 4 — Replaces all this (positioning) ===== -->
+  <section class="page page--replaces" data-label="Replaces all this" data-title="Replaces all this.">
+    <div class="replaces-inner">
+      <div class="replaces-head">
+        <p class="replaces-eyebrow">Stop juggling apps.</p>
+        <h2 class="replaces-h">Replaces all this.</h2>
+      </div>
+      <ul class="replaces-grid">
+        <li><img src="app%20icons/MyFitnessPal%20Review.jpg" alt=""><span>MyFitnessPal</span></li>
+        <li><img src="app%20icons/MacroFactor-MacroTracker_icon.png" alt=""><span>MacroFactor</span></li>
+        <li><img src="app%20icons/macrofactor_workouts.webp" alt=""><span>MacroFactor Workouts</span></li>
+        <li><img src="app%20icons/hevy.png" alt=""><span>Hevy</span></li>
+        <li><img src="app%20icons/mynetdiary.jpg" alt=""><span>MyNetDiary</span></li>
+        <li><img src="app%20icons/reminders_app.webp" alt=""><span>Reminders</span></li>
+        <li><img src="app%20icons/notes.png" alt=""><span>Notes</span></li>
+        <li><img src="app%20icons/pen_paper.png" alt=""><span>Pen and paper</span></li>
+      </ul>
+      <p class="replaces-foot">One number. From your dorm, the library, the gym floor — wherever.</p>
+    </div>
+  </section>
+
+  <!-- ===== PAGE 5 — Missed day ===== -->
+  <section class="page" data-label="Built for messy weeks" data-title="A coach built for the messy weeks.">
     <div class="feature reverse">
       <div class="feature-copy">
-        <div class="feature-eyebrow">Missed day</div>
-        <h2 class="feature-h2">No guilt. <em>Just</em> a reroute.</h2>
-        <p>Skipped yesterday? Cued doesn't moralize about it. It reshapes the week around what's still on the table.</p>
+        <div class="feature-eyebrow">Real life happens</div>
+        <h2 class="feature-h2">A coach built for <em>midterm</em> weeks.</h2>
+        <p>Missed two days for a problem set? Cued doesn't moralize about it. It reshapes the week around what's still on the table — no shame, no scolding, just the next step.</p>
       </div>
       <div class="feature-phone">
         <div class="phone">
@@ -433,8 +562,8 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
             </div>
             <div class="chat">
               <div class="bub tiny">Wed 8:14 AM</div>
-              <div class="bub me">missed yesterday, work blew up</div>
-              <div class="bub cued">all good. happens.</div>
+              <div class="bub me">missed yesterday, had to lock in and study for my ochem midterm</div>
+              <div class="bub cued">all good. happens with midterms</div>
               <div class="bub cued">we'll fold yesterday's pull into thursday and shorten friday. you keep the week.</div>
               <div class="bub me">love that</div>
               <div class="bub cued">today: 20min easy run, 5min mobility. just show up 🫡</div>
@@ -446,13 +575,13 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
     </div>
   </section>
 
-  <!-- ===== PAGE 3 — Schedule ===== -->
-  <section class="page" data-label="Reads your calendar" data-title="Reads your calendar like a coach would.">
+  <!-- ===== PAGE 6 — Schedule ===== -->
+  <section class="page" data-label="Fits your day" data-title="Fits your day, not the other way around.">
     <div class="feature">
       <div class="feature-copy">
-        <div class="feature-eyebrow">Schedule check</div>
-        <h2 class="feature-h2">Reads your calendar <em>like</em> a coach would.</h2>
-        <p>You ask "do i have time tonight?" — Cued already knows. It picks the window, builds the session to fit, and gets out of the way.</p>
+        <div class="feature-eyebrow">Fits your day, not the other way around</div>
+        <h2 class="feature-h2">Reads your <em>class</em> schedule like a coach would.</h2>
+        <p>You ask "do i have time between lecture and section?" — Cued already knows. It picks the window, builds the session to fit, and gets out of the way.</p>
       </div>
       <div class="feature-phone">
         <div class="phone">
@@ -464,11 +593,11 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
             </div>
             <div class="chat">
               <div class="bub tiny">Today 4:48 PM</div>
-              <div class="bub me">do i have time tonight?</div>
-              <div class="bub cued">you have a 7:15–8:00pm window after dinner.</div>
-              <div class="bub cued">that's enough for the 35min full-body i had queued. want me to bump it 5min later so you don't rush?</div>
+              <div class="bub me">im free between lecture and section? does that work?</div>
+              <div class="bub cued">you have a 45min gap from 2:15. rsf is across campus so account for the walk.</div>
+              <div class="bub cued">queued a 30min push session. want me to push section reading to tonight so you're not rushed?</div>
               <div class="bub me">yes please</div>
-              <div class="bub cued">done. you're set for 7:20 😎</div>
+              <div class="bub cued">done. all set for 2:20 😎</div>
             </div>
             <div class="chat-input"><div class="input-fake">iMessage</div><div class="send">↑</div></div>
           </div>
@@ -477,44 +606,12 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
     </div>
   </section>
 
-  <!-- ===== PAGE 4 — Nutrition ===== -->
-  <section class="page" data-label="Knows what to eat next" data-title="Knows what you should eat next.">
-    <div class="feature reverse">
-      <div class="feature-copy">
-        <div class="feature-eyebrow">Fuel</div>
-        <h2 class="feature-h2">Knows what you should <em>eat</em> next.</h2>
-        <p>Post-lift, pre-run, late-night, traveling — Cued knows the context and gives you a real, specific answer. Macros if you want, plain English if you don't.</p>
-      </div>
-      <div class="feature-phone">
-        <div class="phone">
-          <div class="phone-notch"></div>
-          <div class="phone-screen">
-            <div class="chat-header">
-              <div class="ch-name"><span class="ch-avatar">C</span> Cued</div>
-              <div class="ch-sub">active now</div>
-            </div>
-            <div class="chat">
-              <div class="bub tiny">Today 6:31 PM</div>
-              <div class="bub me">what should i eat post-lift?</div>
-              <div class="bub cued">~40g protein + 60–80g carbs within the hour.</div>
-              <div class="bub cued">easy option: greek yogurt + banana + honey + a scoop of whey. ~480 cal.</div>
-              <div class="bub cued">if you want real food: 6oz chicken, rice bowl, side of fruit.</div>
-              <div class="bub me">going with the yogurt</div>
-              <div class="bub cued">good call. logged.</div>
-            </div>
-            <div class="chat-input"><div class="input-fake">iMessage</div><div class="send">↑</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== PAGE 5 — Weekly summary ===== -->
-  <section class="page" data-label="Weekly recap you actually read" data-title="The weekly recap you actually read.">
+  <!-- ===== PAGE 7 — Weekly summary ===== -->
+  <section class="page" data-label="Progress without the dashboard" data-title="The Sunday text you actually read.">
     <div class="feature">
       <div class="feature-copy">
-        <div class="feature-eyebrow">Sunday review</div>
-        <h2 class="feature-h2">The weekly recap you <em>actually</em> read.</h2>
+        <div class="feature-eyebrow">Progress, without the dashboard</div>
+        <h2 class="feature-h2">The Sunday text you <em>actually</em> read.</h2>
         <p>Every Sunday night, a short text. Not a dashboard. Volume, sleep, what worked, what to fix, and the rough plan for the week ahead.</p>
       </div>
       <div class="feature-phone">
@@ -528,9 +625,9 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
             <div class="chat">
               <div class="bub tiny">Sun 8:45 PM</div>
               <div class="bub cued">week in review 📝</div>
-              <div class="bub cued">5 sessions, 3h 40m total. avg sleep 7h 18m (up 24min).</div>
-              <div class="bub cued">streak: 11 weeks. squat top set +5lb.</div>
-              <div class="bub cued">next week we ease pull volume — your right shoulder's been chatty. cool?</div>
+              <div class="bub cued">4 sessions, 3h 10m. friday night out cost you 2h of sleep (no judgment).</div>
+              <div class="bub cued">streak: 6 weeks. squat top set +5lb.</div>
+              <div class="bub cued">midterm next thursday — i'm shortening tue + wed so you can study. cool?</div>
               <div class="bub me">cool. ty</div>
               <div class="bub cued">rest up. monday's a build day.</div>
             </div>
@@ -541,38 +638,7 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
     </div>
   </section>
 
-  <!-- ===== PAGE 6 — Proactive nudge ===== -->
-  <section class="page" data-label="Texts first when it matters" data-title="Texts first when it matters.">
-    <div class="feature reverse">
-      <div class="feature-copy">
-        <div class="feature-eyebrow">Proactive nudge</div>
-        <h2 class="feature-h2">Texts <em>first</em> when it matters.</h2>
-        <p>Recovery dipping. Sleep slipping. Two missed days. Cued notices and reaches out before the wheels come off — gently, never naggy.</p>
-      </div>
-      <div class="feature-phone">
-        <div class="phone">
-          <div class="phone-notch"></div>
-          <div class="phone-screen">
-            <div class="chat-header">
-              <div class="ch-name"><span class="ch-avatar">C</span> Cued</div>
-              <div class="ch-sub">active now</div>
-            </div>
-            <div class="chat">
-              <div class="bub tiny">Thu 9:12 AM</div>
-              <div class="bub cued">hey — hrv's been low 3 days, sleep is short.</div>
-              <div class="bub cued">not a problem yet. but let's pull the deadlift session forward to next week and do something easy today.</div>
-              <div class="bub cued">20min walk + 8min mobility. that's the assignment.</div>
-              <div class="bub me">honestly needed to hear that</div>
-              <div class="bub cued">i know 🫡</div>
-            </div>
-            <div class="chat-input"><div class="input-fake">iMessage</div><div class="send">↑</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== PAGE 7 — CTA ===== -->
+  <!-- ===== PAGE 8 — CTA ===== -->
   <section class="page" id="signup" data-label="Start texting" data-title="Stop guessing. Start texting." data-hide-float-cta>
     <div class="cta-inner">
       <h2 class="cta-h">Stop guessing. <em>Start</em> texting.</h2>
@@ -583,7 +649,7 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
     </div>
   </section>
 
-  <!-- ===== PAGE 8 — FAQ (free height) ===== -->
+  <!-- ===== PAGE 9 — FAQ (free height) ===== -->
   <section class="page page--faq" id="faq" data-label="FAQs" data-title="FAQs">
     <div class="faq-wrap">
       <div class="faq-head">
@@ -621,7 +687,11 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
         </details>
         <details>
           <summary>Who is Cued for?</summary>
-          <div class="faq-body">Anyone serious enough about training to want a real plan, but practical enough to not want another app cluttering their phone. Lifters, runners, hybrid athletes, weekend warriors — all welcome.</div>
+          <div class="faq-body">We built Cued for college students — that's the rhythm we know. Class schedules that shift every semester, dorm gyms and the RSF, dining hall food, weeks where midterms eat your sleep. If that sounds familiar, you're who we built this for. (Post-grads and anyone juggling a busy life are welcome too — the patterns hold.)</div>
+        </details>
+        <details>
+          <summary>Who's behind Cued?</summary>
+          <div class="faq-body">Two Berkeley students who got tired of switching between four apps just to keep a workout streak going. We're still students; we're still figuring it out alongside you.</div>
         </details>
       </div>
     </div>
@@ -639,8 +709,7 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
         </div>
       </div>
       <div class="footer-meta">
-        <span>© 2026 Cued. Made with care for early athletes.</span>
-        <span>New: Cued is now in open beta →</span>
+        <span>© 2026 Cued. Made in Berkeley, For Berkeley.</span>
       </div>
     </footer>
   </section>
