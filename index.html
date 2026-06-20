@@ -34,8 +34,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Hedvig+Letters+Serif:opsz@12..24&family=Inter+Tight:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#FAFAF7;          /* warm off-white, less clinical than pure white */
-  --bg-alt:#F4F4EF;
+  --bg:#f6f6f6;          /* matches the hero drawing's paper-gray background */
+  --bg-alt:#EFEFEF;
   --ink:#0A1628;
   --ink-2:#4A5A6E;
   --ink-3:#8A95A5;
@@ -89,23 +89,24 @@ a{color:inherit;text-decoration:none}
 /* Hero needs more top padding so the headline sits lower in the viewport,
    visually centered after accounting for the fixed nav. */
 .page--hero{padding-top:28vh;padding-bottom:4vh;align-items:flex-start;overflow:hidden}
-/* Decorative drawing pinned to the left edge of the hero, behind content. */
+/* Decorative panoramic drawing spanning the full width along the bottom of the hero.
+   Berkeley Campanile on the left, SF skyline on the right. The hero section
+   background (#eeeeee) is set to match the image background so the image edges
+   blend seamlessly into the section. Negative bottom value pushes the drawing
+   below the fold so the brand-logos row above it isn't overlapped. */
 .hero-art{
   position:absolute;
-  left:-2vw;
-  bottom:0;
-  width:clamp(240px,26vw,420px);
+  left:0;
+  right:0;
+  bottom:-3vh;
+  width:100%;
   height:auto;
-  opacity:.445;
   pointer-events:none;
   user-select:none;
   z-index:0;
-  /* The SVG wraps an embedded PNG with a white background — blend mode
-     drops the white pixels into the page so only the drawing remains. */
-  mix-blend-mode:multiply;
 }
 .page--hero > *:not(.hero-art){position:relative;z-index:1}
-@media(max-width:900px){.hero-art{display:none}}
+@media(max-width:900px){.hero-art{bottom:-1.5vh}}
 .page--last{scroll-snap-align:end;min-height:auto}
 .page--auto{min-height:auto;scroll-snap-align:start}
 
@@ -455,7 +456,7 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
 
   <!-- ===== PAGE 0 — HERO ===== -->
   <section class="page page--hero" data-label="Cued" data-title="Cued" data-hide-float-cta data-hide-nav-brand>
-    <img src="images/berkeley-drawing.svg" alt="" class="hero-art" aria-hidden="true">
+    <img src="images/the-one.png" alt="" class="hero-art" aria-hidden="true">
    <!-- <div class="announce">
       <a href="#signup">
         <span class="dot"></span>
