@@ -55,6 +55,10 @@
   /* Brand wordmark only. Stand-in for Neue Einstellung (paid Monotype).
      To swap to Quicksand: change 'Outfit' below + the Google Fonts link above. */
   --f-brand:'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Motion easing — confident deceleration, no bounce. */
+  --ease-quint:cubic-bezier(.22,1,.36,1);
+  --ease-expo:cubic-bezier(.16,1,.3,1);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%}
@@ -429,7 +433,148 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
 .page.page--faq{align-items:flex-start;padding-top:120px;padding-bottom:80px;min-height:auto;scroll-snap-align:start}
 .page.page--footer{align-items:flex-start;padding-top:0;padding-bottom:0;min-height:auto;scroll-snap-align:end;display:block}
 .page.page--footer footer{margin-top:0}
+
+/* ===== TRY-IT-LIVE DEMO (scrollytelling: intro screen + 3 headline panels + 1 sticky macOS Messages window) =====
+   The intro head and each panel are their own full-screen snap stop, so the deck's
+   mandatory snap rests on them (no auto-skip through the section). The Messages
+   window is pinned (sticky) across the three panels; scrolling advances the
+   headline + scenario, while interaction only begins when the reader clicks in. */
+.page--demo{
+  display:block;min-height:auto;padding:0;position:relative;
+  /* The intro head + panels are the snap targets, not the section itself. */
+  scroll-snap-align:none;scroll-snap-stop:normal;
+}
+.demo-head{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:96px clamp(28px,6vw,96px);scroll-snap-align:start;scroll-snap-stop:always}
+.demo-h{font-family:var(--f-serif);font-weight:500;font-size:clamp(2.2rem,4vw,3.4rem);letter-spacing:-1.2px;line-height:1.04;color:var(--ink);margin-bottom:14px}
+.demo-h em{font-style:italic;color:var(--blue)}
+.demo-sub{font-family:var(--f-body);font-size:clamp(15px,1.2vw,17px);color:var(--ink-2);line-height:1.55;max-width:520px;margin:0 auto}
+/* Left column collapses to 0 (invisible scroll/snap track); the headline lives in
+   a caption pinned above the big centered window, swapped per scroll step by JS. */
+.demo-grid{max-width:none;margin:0;padding:0;display:grid;grid-template-columns:0 minmax(0,1fr);align-items:start}
+/* No overflow on the track: overflow would make it a scroll container and strip
+   the panels of their snap-target status in the deck (reintroducing auto-skip).
+   Clip on the panels themselves instead. */
+.demo-panels{width:0}
+.demo-panel{min-height:100dvh;width:0;overflow:hidden;scroll-snap-align:start;scroll-snap-stop:always}
+.demo-eyebrow{font-family:var(--f-ui);font-size:12px;font-weight:700;letter-spacing:1.4px;color:var(--blue);text-transform:uppercase;margin-bottom:14px}
+.demo-ph{font-family:var(--f-serif);font-weight:400;font-size:clamp(2rem,3.2vw,2.9rem);line-height:1.06;letter-spacing:-1px;color:var(--ink);margin:0}
+.demo-ph em{font-style:italic;color:var(--blue)}
+.demo-window{position:sticky;top:0;height:100dvh;display:flex;flex-direction:column;align-items:center;padding:40px clamp(20px,3vw,48px) 28px}
+.demo-caption{width:100%;max-width:880px;text-align:center;flex-shrink:0;min-height:auto;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:18px;opacity:0;transform:translateY(8px)}
+.demo-caption.in{opacity:1;transform:none;transition:opacity .45s var(--ease-quint),transform .45s var(--ease-quint)}
+
+/* macOS Messages window */
+.mw{width:100%;max-width:1180px;flex:1;min-height:0;margin:0 auto;background:#fff;border:1px solid rgba(10,22,40,.1);border-radius:14px;box-shadow:0 30px 90px rgba(10,22,40,.22),0 2px 8px rgba(10,22,40,.08);overflow:hidden;display:flex;flex-direction:column}
+.mw-titlebar{flex-shrink:0;height:52px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:0 16px;background:linear-gradient(#fbfbfd,#f3f3f6);border-bottom:1px solid var(--border)}
+.mw-lights{display:flex;align-items:center;gap:8px}
+.mw-lights span{width:12px;height:12px;border-radius:50%}
+.mw-lights .l-r{background:#ff5f57}.mw-lights .l-y{background:#febc2e}.mw-lights .l-g{background:#28c840}
+.mw-tl-left{display:flex;align-items:center;gap:16px}
+.mw-icon{color:var(--ink-3);display:inline-flex}
+.mw-icon svg{width:18px;height:18px;display:block}
+.mw-contact{display:flex;flex-direction:column;align-items:center;line-height:1.1}
+.mw-contact .mw-cav{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#5BB3FF);display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--f-ui);font-weight:700;font-size:12px;margin-bottom:3px}
+.mw-contact .mw-num{font-family:var(--f-ui);font-size:12.5px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:3px}
+.mw-contact .mw-num::after{content:'›';color:var(--ink-3);font-size:14px}
+.mw-tl-right{justify-self:end;display:flex;align-items:center;gap:14px}
+.mw-body{flex:1;display:flex;min-height:0}
+.mw-sidebar{width:74px;flex-shrink:0;border-right:1px solid var(--border);background:#fafafb;display:flex;flex-direction:column;align-items:center;gap:14px;padding:16px 0;overflow:hidden}
+.mw-av{width:42px;height:42px;border-radius:50%;background:#dfe3ea;position:relative;flex-shrink:0}
+.mw-av.cued{background:linear-gradient(135deg,var(--blue),#5BB3FF);display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--f-ui);font-weight:700;font-size:15px}
+.mw-av.unread::before{content:'';position:absolute;left:-9px;top:50%;transform:translateY(-50%);width:7px;height:7px;border-radius:50%;background:var(--blue)}
+.mw-chat{flex:1;display:flex;flex-direction:column;min-width:0;background:#fff}
+.mw-thread{flex:1;overflow-y:auto;padding:18px 18px 8px;display:flex;flex-direction:column;gap:6px;font-family:var(--f-body);scrollbar-width:thin}
+.mw-thread::-webkit-scrollbar{width:6px}.mw-thread::-webkit-scrollbar-thumb{background:#d7dce4;border-radius:3px}
+.mw-date{font-family:var(--f-ui);font-size:11px;color:var(--ink-3);text-align:center;padding:4px 0 2px}
+.mw-date b{color:var(--ink-2);font-weight:600}
+/* iMessage rich-link card (the cued.fit preview) */
+/* Typing indicator */
+.mw-typing{align-self:flex-start;background:var(--bubble-gray);border-radius:18px;border-bottom-left-radius:5px;padding:11px 14px;display:inline-flex;gap:4px}
+.mw-typing i{width:7px;height:7px;border-radius:50%;background:#9aa3b0;animation:mwDot 1.2s infinite ease-in-out}
+.mw-typing i:nth-child(2){animation-delay:.18s}.mw-typing i:nth-child(3){animation-delay:.36s}
+@keyframes mwDot{0%,60%,100%{opacity:.35;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+/* Bubble/card arrival */
+@keyframes mwPop{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+.mw-thread > *{animation:mwPop .4s var(--ease-quint) both}
+/* Suggested chips */
+.mw-chips{flex-shrink:0;display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px;border-top:1px solid var(--border)}
+.mw-chip{font-family:var(--f-ui);font-size:13px;font-weight:500;color:var(--blue);background:var(--blue-soft);border:1px solid transparent;border-radius:999px;padding:7px 13px;cursor:pointer;transition:background .15s,transform .12s}
+.mw-chip:hover{background:#dceafd}.mw-chip:active{transform:scale(.96)}
+.mw-replay{margin-left:auto;font-family:var(--f-ui);font-size:12.5px;font-weight:600;color:var(--ink-3);background:transparent;border:none;cursor:pointer;padding:7px 4px;display:none;align-items:center;gap:5px}
+.mw-replay.show{display:inline-flex}.mw-replay:hover{color:var(--ink)}
+/* Input bar */
+.mw-input{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:10px 14px 14px;border-top:1px solid var(--border);background:#fff}
+.mw-plus{width:26px;height:26px;flex-shrink:0;border-radius:50%;background:var(--bg-alt);color:var(--ink-3);border:none;cursor:pointer;font-size:17px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+.mw-field{flex:1;display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:16px;padding:7px 12px;min-width:0}
+.mw-field input{flex:1;border:none;outline:none;background:transparent;font-family:var(--f-body);font-size:14px;color:var(--ink);min-width:0}
+.mw-field input::placeholder{color:var(--ink-3)}
+.mw-send{width:24px;height:24px;flex-shrink:0;border-radius:50%;background:var(--blue);color:#fff;border:none;cursor:pointer;display:none;align-items:center;justify-content:center;font-size:13px}
+.mw-send.show{display:inline-flex}
+.mw-field-icons{display:flex;align-items:center;gap:8px;color:var(--ink-3)}
+/* Waitlist nudge bubble + button */
+.mw-nudge{align-self:flex-start;display:flex;flex-direction:column;gap:8px;max-width:82%}
+.mw-nudge .mw-nudge-btn{align-self:flex-start;font-family:var(--f-ui);font-size:13px;font-weight:600;color:#fff;background:var(--blue);border:none;border-radius:999px;padding:9px 16px;cursor:pointer;transition:background .15s}
+.mw-nudge .mw-nudge-btn:hover{background:var(--blue-2)}
+
+@media(max-width:900px){
+  /* Mobile: no sticky scrollytelling and no second snap stop — the intro
+     headline + window flow as ONE snap unit that fits a single screen, so the
+     input bar is never stranded below a mandatory snap. The per-scenario
+     caption is hidden (it collides with the fixed nav at the top and doubles up
+     on the intro headline); chips still swap the conversation itself. */
+  .demo-head{min-height:auto;padding:72px 20px 10px;scroll-snap-align:start;scroll-snap-stop:always}
+  .demo-head .demo-sub{display:none}
+  .demo-grid{grid-template-columns:1fr;padding:0 20px}
+  .demo-panels{display:none}
+  .demo-caption{display:none}
+  .demo-window{position:static;height:auto;padding:6px 0 0;scroll-snap-align:none}
+  .mw{height:clamp(420px,64vh,560px);flex:none;max-width:560px}
+  .mw-sidebar{display:none}
+}
+@media(max-width:560px){
+  .mw{height:clamp(400px,62vh,520px)}
+  .mw-titlebar{height:46px}
+  .mw-chips{padding:9px 12px}
+}
+
+/* ===== REVEAL CHOREOGRAPHY =====
+   Each section announces itself as it lands. JS tags choreographed children
+   with .r and a --i stagger index, then toggles .vis on the section as it
+   enters/leaves the viewport (reveals replay on re-entry). All hiding is
+   gated under html.js-anim (set synchronously in <head>) so the page renders
+   fully visible if JS is unavailable. Only opacity + transform animate. */
+.js-anim .page .r{
+  opacity:0;transform:translateY(18px);
+  transition:opacity .6s var(--ease-quint),transform .7s var(--ease-quint);
+  transition-delay:calc(var(--i,0) * var(--stagger,70ms));
+}
+/* Claims checklist fills in tighter/faster */
+.page--claims{--stagger:48ms}
+/* Replaces icon grid cascades a touch quicker */
+.page--replaces{--stagger:55ms}
+
+/* Replaces: strike line draws across each app name after the icons land */
+.page--replaces .replaces-grid li span{text-decoration:none;position:relative}
+.js-anim .page--replaces .replaces-grid li span::after{
+  content:'';position:absolute;left:0;right:0;top:54%;height:1.5px;
+  background:rgba(10,22,40,.5);transform:scaleX(0);transform-origin:left center;
+  transition:transform .5s var(--ease-quint);transition-delay:.45s;
+}
+
+/* ----- Revealed states (after initial states so they win on equal specificity) ----- */
+.page.vis .r{opacity:1;transform:none}
+.page--replaces.vis .replaces-grid li span::after{transform:scaleX(1)}
+
+@media (prefers-reduced-motion: reduce){
+  .js-anim .page .r{opacity:1!important;transform:none!important;transition:none!important}
+  .js-anim .page--replaces .replaces-grid li span::after{transform:scaleX(1)!important;transition:none!important}
+  .mw-thread > *{animation:none!important}
+  .mw-typing i{animation:none!important;opacity:.5!important}
+  .demo-panel{opacity:1!important}
+}
 </style>
+<!-- Enable reveal hiding synchronously, before first paint, so JS-off renders visible. -->
+<script>document.documentElement.classList.add('js-anim');</script>
 </head>
 <body>
 
@@ -456,7 +601,7 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
 
   <!-- ===== PAGE 0 — HERO ===== -->
   <section class="page page--hero" data-label="Cued" data-title="Cued" data-hide-float-cta data-hide-nav-brand>
-    <img src="images/the-one.png" alt="" class="hero-art" aria-hidden="true">
+    <img src="images/the-one.png" alt="" class="hero-art r" aria-hidden="true">
    <!-- <div class="announce">
       <a href="#signup">
         <span class="dot"></span>
@@ -465,22 +610,22 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
     </div> -->
 
     <div class="hero-inner">
-      <h1 class="hero-h1">
+      <h1 class="hero-h1 r">
         Meet <span class="brand-mark">cued</span>.<br>
         made for your college life.
       </h1>
-      <p class="hero-sub">
+      <p class="hero-sub r">
         Your personal fitness coach.<br>
         No app. No downloads. Just texts. Just for you.
       </p>
-      <div class="hero-ctas">
+      <div class="hero-ctas r">
         <a href="#signup" class="cta-primary">Join the waitlist →</a>
         <a href="#faq" class="cta-secondary">FAQs</a>
       </div>
 
       <!-- social proof, beneath ctas -->
       <!-- TODO: confirm partner usage rights -->
-      <div class="proof">
+      <div class="proof r">
         <div class="proof-label">Plays well with</div>
         <div class="proof-row">
           <span class="proof-logo">Apple Health</span>
@@ -592,94 +737,66 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
     </div>
   </section>
 
-  <!-- ===== PAGE 5 — Missed day ===== -->
-  <section class="page" data-label="Built for messy weeks" data-title="A coach built for the messy weeks.">
-    <div class="feature reverse">
-      <div class="feature-copy">
-        <div class="feature-eyebrow">Real life happens</div>
-        <h2 class="feature-h2">A coach built for <em>midterm</em> weeks.</h2>
-        <p>Missed two days for a problem set? Cued doesn't moralize about it. It reshapes the week around what's still on the table — no shame, no scolding, just the next step.</p>
-      </div>
-      <div class="feature-phone">
-        <div class="phone">
-          <div class="phone-notch"></div>
-          <div class="phone-screen">
-            <div class="chat-header">
-              <div class="ch-name"><span class="ch-avatar">C</span> Cued</div>
-              <div class="ch-sub">active now</div>
-            </div>
-            <div class="chat">
-              <div class="bub tiny">Wed 8:14 AM</div>
-              <div class="bub me">missed yesterday, had to lock in and study for my ochem midterm</div>
-              <div class="bub cued">all good. happens with midterms</div>
-              <div class="bub cued">we'll fold yesterday's pull into thursday and shorten friday. you keep the week.</div>
-              <div class="bub me">love that</div>
-              <div class="bub cued">today: 20min easy run, 5min mobility. just show up 🫡</div>
-            </div>
-            <div class="chat-input"><div class="input-fake">iMessage</div><div class="send">↑</div></div>
-          </div>
+  <!-- ===== PAGE 5 — Try-it-live demo (sticky macOS Messages window + 3 scroll panels;
+       replaces the old missed-day / schedule / weekly mockup sections) ===== -->
+  <section class="page page--demo" data-label="Try it live" data-title="Give cued a text." data-hide-float-cta>
+    <div class="demo-head">
+      <h2 class="demo-h">Give cued a text. <em>Try it live.</em></h2>
+      <p class="demo-sub">Cued's already loaded below. Scroll through a few real moments, tap a question, or type your own.</p>
+    </div>
+    <div class="demo-grid">
+      <!-- Hidden scroll/snap track. Each panel holds a scenario's headline (the
+           source of truth); JS clones the active panel's content into .demo-caption. -->
+      <div class="demo-panels" aria-hidden="true">
+        <div class="demo-panel" data-scenario="0">
+          <h3 class="demo-ph">A coach built for <em>midterm</em> weeks.</h3>
+        </div>
+        <div class="demo-panel" data-scenario="1">
+          <h3 class="demo-ph">Knows your <em>class</em> schedule.</h3>
+        </div>
+        <div class="demo-panel" data-scenario="2">
+          <h3 class="demo-ph">The recap text you <em>actually</em> read.</h3>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- ===== PAGE 6 — Schedule ===== -->
-  <section class="page" data-label="Fits your day" data-title="Fits your day, not the other way around.">
-    <div class="feature">
-      <div class="feature-copy">
-        <div class="feature-eyebrow">Fits your day, not the other way around</div>
-        <h2 class="feature-h2">Reads your <em>class</em> schedule like a coach would.</h2>
-        <p>You ask "do i have time between lecture and section?" — Cued already knows. It picks the window, builds the session to fit, and gets out of the way.</p>
-      </div>
-      <div class="feature-phone">
-        <div class="phone">
-          <div class="phone-notch"></div>
-          <div class="phone-screen">
-            <div class="chat-header">
-              <div class="ch-name"><span class="ch-avatar">C</span> Cued</div>
-              <div class="ch-sub">active now</div>
+      <div class="demo-window">
+        <div class="demo-caption" id="demoCaption"></div>
+        <div class="mw" id="mw" aria-label="Cued live demo conversation">
+          <div class="mw-titlebar">
+            <div class="mw-tl-left">
+              <div class="mw-lights" aria-hidden="true"><span class="l-r"></span><span class="l-y"></span><span class="l-g"></span></div>
+              <span class="mw-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>
             </div>
-            <div class="chat">
-              <div class="bub tiny">Today 4:48 PM</div>
-              <div class="bub me">im free between lecture and section? does that work?</div>
-              <div class="bub cued">you have a 45min gap from 2:15. rsf is across campus so account for the walk.</div>
-              <div class="bub cued">queued a 30min push session. want me to push section reading to tonight so you're not rushed?</div>
-              <div class="bub me">yes please</div>
-              <div class="bub cued">done. all set for 2:20 😎</div>
+            <div class="mw-contact">
+              <span class="mw-cav">C</span>
+              <span class="mw-num">cued</span>
             </div>
-            <div class="chat-input"><div class="input-fake">iMessage</div><div class="send">↑</div></div>
+            <div class="mw-tl-right">
+              <span class="mw-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></span>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== PAGE 7 — Weekly summary ===== -->
-  <section class="page" data-label="Progress without the dashboard" data-title="The Sunday text you actually read.">
-    <div class="feature">
-      <div class="feature-copy">
-        <div class="feature-eyebrow">Progress, without the dashboard</div>
-        <h2 class="feature-h2">The Sunday text you <em>actually</em> read.</h2>
-        <p>Every Sunday night, a short text. Not a dashboard. Volume, sleep, what worked, what to fix, and the rough plan for the week ahead.</p>
-      </div>
-      <div class="feature-phone">
-        <div class="phone">
-          <div class="phone-notch"></div>
-          <div class="phone-screen">
-            <div class="chat-header">
-              <div class="ch-name"><span class="ch-avatar">C</span> Cued</div>
-              <div class="ch-sub">active now</div>
+          <div class="mw-body">
+            <div class="mw-sidebar" aria-hidden="true">
+              <div class="mw-av cued unread">C</div>
+              <div class="mw-av"></div><div class="mw-av"></div><div class="mw-av"></div>
+              <div class="mw-av"></div><div class="mw-av"></div>
             </div>
-            <div class="chat">
-              <div class="bub tiny">Sun 8:45 PM</div>
-              <div class="bub cued">week in review 📝</div>
-              <div class="bub cued">4 sessions, 3h 10m. friday night out cost you 2h of sleep (no judgment).</div>
-              <div class="bub cued">streak: 6 weeks. squat top set +5lb.</div>
-              <div class="bub cued">midterm next thursday — i'm shortening tue + wed so you can study. cool?</div>
-              <div class="bub me">cool. ty</div>
-              <div class="bub cued">rest up. monday's a build day.</div>
+            <div class="mw-chat">
+              <div class="mw-thread" id="mwThread"></div>
+              <div class="mw-chips" id="mwChips">
+                <button type="button" class="mw-chip" data-chip="0">i missed two days 😅</button>
+                <button type="button" class="mw-chip" data-chip="1">free between lecture + section?</button>
+                <button type="button" class="mw-chip" data-chip="2">how'd my week go?</button>
+                <button type="button" class="mw-replay" id="mwReplay" aria-label="Replay the demo">↺ replay</button>
+              </div>
+              <form class="mw-input" id="mwForm">
+                <button type="button" class="mw-plus" aria-label="Add" tabindex="-1">+</button>
+                <div class="mw-field">
+                  <input type="text" id="mwInput" placeholder="iMessage" autocomplete="off" aria-label="Message cued">
+                  <span class="mw-field-icons" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></span>
+                </div>
+                <button type="submit" class="mw-send" id="mwSend" aria-label="Send">↑</button>
+              </form>
             </div>
-            <div class="chat-input"><div class="input-fake">iMessage</div><div class="send">↑</div></div>
           </div>
         </div>
       </div>
@@ -822,19 +939,21 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
     indicatorsEl.appendChild(btn);
   });
 
-  // Highlight current page via IntersectionObserver
+  // Highlight current page via IntersectionObserver. Center-band rootMargin works
+  // for both full-screen sections and the tall (multi-viewport) demo section.
   const btns = Array.from(indicatorsEl.querySelectorAll('button'));
   const io = new IntersectionObserver((entries) => {
     entries.forEach(e => {
-      if (e.isIntersecting && e.intersectionRatio > 0.5) {
+      if (e.isIntersecting) {
         const idx = pages.indexOf(e.target);
+        if (idx < 0) return;
         btns.forEach((b, i) => {
           if (i === idx) b.setAttribute('aria-current', 'true');
           else b.removeAttribute('aria-current');
         });
       }
     });
-  }, {root: deck, threshold: [0.5, 0.6]});
+  }, {root: deck, rootMargin: '-50% 0px -50% 0px', threshold: 0});
   pages.forEach(p => io.observe(p));
 })();
 
@@ -891,6 +1010,271 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
     });
   }, {root: deck, threshold: [0.5, 0.6]});
   pages.forEach(p => io.observe(p));
+
+  // Tall sections (e.g. the ~400vh live-demo) never cross the 0.5 ratio above,
+  // so the IO won't fire for them. Hide the float CTA whenever such a section
+  // covers the viewport center — let the user experience the demo uninterrupted.
+  const tallHide = deck.querySelector('.page--demo[data-hide-float-cta]');
+  if (tallHide && floatCta){
+    let t = false;
+    const chk = () => {
+      t = false;
+      const r = tallHide.getBoundingClientRect(), mid = window.innerHeight / 2;
+      if (r.top <= mid && r.bottom >= mid) floatCta.classList.remove('show');
+    };
+    deck.addEventListener('scroll', () => { if (!t){ t = true; requestAnimationFrame(chk); } }, {passive: true});
+  }
+})();
+
+// === Section reveal choreography ===
+// Tags each section's choreographed children with .r + a --i stagger index,
+// then toggles .vis on the section as it enters/leaves the deck viewport so
+// the entrances replay on every re-entry. Mirrors the IntersectionObserver
+// pattern used above (root: deck). Hiding is gated by html.js-anim (set in
+// <head>), so the page renders fully visible if this never runs.
+(function(){
+  const deck = document.getElementById('deck');
+  if (!deck) return;
+
+  // Per-section choreography: ordered child selectors that animate in.
+  // Order defines the stagger sequence; each match gets the next --i.
+  const MAP = [
+    ['.page--hero',      ['.hero-h1','.hero-sub','.hero-ctas','.proof','.hero-art']],
+    ['.page--explainer', ['.explainer-h','.explainer-inner p']],
+    ['.page--claims',    ['.claims-h','.claims-sub','.claim']],
+    ['.page--tricard',   ['.tricard-h','.tricard-head p','.tricard']],
+    ['.page--replaces',  ['.replaces-eyebrow','.replaces-h','.replaces-grid li','.replaces-foot']],
+    ['.page--faq',       ['.faq-head h2','.faq-head p','.faq-list details']],
+  ];
+
+  deck.querySelectorAll('.page').forEach(page => {
+    const entry = MAP.find(([sel]) => page.matches(sel));
+    if (entry){
+      let i = 0;
+      entry[1].forEach(sel => {
+        page.querySelectorAll(sel).forEach(el => {
+          el.classList.add('r');
+          el.style.setProperty('--i', i++);
+        });
+      });
+    }
+    // CTA / signup page
+    if (page.querySelector('.cta-inner')){
+      page.querySelectorAll('.cta-inner > *').forEach((el, i) => {
+        el.classList.add('r');
+        el.style.setProperty('--i', i);
+      });
+    }
+  });
+
+  // Toggle .vis as sections enter/leave — reveals replay on re-entry.
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting && e.intersectionRatio > 0.35) e.target.classList.add('vis');
+      else if (!e.isIntersecting) e.target.classList.remove('vis');
+    });
+  }, {root: deck, threshold: [0, 0.35]});
+  deck.querySelectorAll('.page').forEach(p => io.observe(p));
+})();
+
+// === Try-it-live demo: scroll-synced macOS Messages window ===
+// Three scroll panels drive the sticky chat window (scroll mode). Tapping a chip
+// or typing switches to interactive mode (the user's thread takes over) until the
+// reader scrolls to a different panel, which resumes scroll mode. No backend —
+// chips replay scripted answers; free text gets a typing indicator + waitlist nudge.
+(function(){
+  const deck      = document.getElementById('deck');
+  const mw        = document.getElementById('mw');
+  const thread    = document.getElementById('mwThread');
+  const chipsWrap = document.getElementById('mwChips');
+  const replayBtn = document.getElementById('mwReplay');
+  const form      = document.getElementById('mwForm');
+  const input     = document.getElementById('mwInput');
+  const sendBtn   = document.getElementById('mwSend');
+  if (!mw || !thread || !deck) return;
+
+  const reduce   = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isMobile = () => window.matchMedia('(max-width:900px)').matches;
+
+  // The three scripts the old phone mockups carried (kept verbatim), each given a
+  // leading user line so it reads as a real Q&A and matches its chip.
+  const SCENARIOS = [
+    { date:'Wed 8:14 AM', msgs:[
+      {from:'me',  t:"missed yesterday, had to lock in and study for my ochem midterm"},
+      {from:'cued',t:"all good. happens with midterms"},
+      {from:'cued',t:"we'll fold yesterday's pull into thursday and shorten friday. you keep the week."},
+      {from:'me',  t:"love that"},
+      {from:'cued',t:"today: 20min easy run, 5min mobility. just show up 🫡"},
+    ]},
+    { date:'Today 4:48 PM', msgs:[
+      {from:'me',  t:"im free between lecture and section? does that work?"},
+      {from:'cued',t:"you have a 45min gap from 2:15. rsf is across campus so account for the walk."},
+      {from:'cued',t:"queued a 30min push session. want me to push section reading to tonight so you're not rushed?"},
+      {from:'me',  t:"yes please"},
+      {from:'cued',t:"done. all set for 2:20 😎"},
+    ]},
+    { date:'Sun 8:45 PM', msgs:[
+      {from:'me',  t:"how'd my week go?"},
+      {from:'cued',t:"week in review 📝"},
+      {from:'cued',t:"4 sessions, 3h 10m. friday night out cost you 2h of sleep (no judgment)."},
+      {from:'cued',t:"streak: 6 weeks. squat top set +5lb."},
+      {from:'cued',t:"midterm next thursday — i'm shortening tue + wed so you can study. cool?"},
+      {from:'me',  t:"cool. ty"},
+      {from:'cued',t:"rest up. monday's a build day."},
+    ]},
+  ];
+
+  let token = 0;            // bumped to cancel stale staggered/typed renders
+  let activeIdx = -1;
+  let interacting = false;
+  const timers = [];
+  const clearTimers = () => { while (timers.length) clearTimeout(timers.pop()); };
+  const after = (ms, fn) => { const id = setTimeout(fn, ms); timers.push(id); return id; };
+  const scrollDown = () => { thread.scrollTop = thread.scrollHeight; };
+
+  function node(html){ const d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstChild; }
+  function bubble(from, text){
+    const b = document.createElement('div');
+    b.className = 'bub ' + (from === 'me' ? 'me' : 'cued');
+    b.textContent = text;
+    return b;
+  }
+  function dateRow(d){ const r = document.createElement('div'); r.className = 'mw-date'; r.textContent = d; return r; }
+  function typing(){
+    const t = document.createElement('div');
+    t.className = 'mw-typing';
+    t.innerHTML = '<i></i><i></i><i></i>';
+    thread.appendChild(t); scrollDown();
+    return t;
+  }
+
+  // Scroll mode: render a scenario's full conversation (staggered arrival).
+  function renderScenario(idx, instant){
+    clearTimers();
+    const my = ++token;
+    thread.innerHTML = '';
+    thread.appendChild(dateRow(SCENARIOS[idx].date));
+    const msgs = SCENARIOS[idx].msgs;
+    if (instant || reduce){ msgs.forEach(m => thread.appendChild(bubble(m.from, m.t))); scrollDown(); return; }
+    let delay = 140;
+    msgs.forEach(m => {
+      after(delay, () => { if (my === token){ thread.appendChild(bubble(m.from, m.t)); scrollDown(); } });
+      delay += 360;
+    });
+  }
+
+  // Play a list of cued replies, each preceded by a typing indicator.
+  function playReplies(my, replies, i){
+    i = i || 0;
+    if (my !== token || i >= replies.length) return;
+    const dots = typing();
+    after(reduce ? 0 : 700, () => {
+      if (my !== token){ dots.remove(); return; }
+      dots.remove();
+      thread.appendChild(bubble('cued', replies[i])); scrollDown();
+      after(350, () => playReplies(my, replies, i + 1));
+    });
+  }
+
+  function enterInteractive(){
+    interacting = true;
+    if (replayBtn) replayBtn.classList.add('show');
+  }
+
+  // Tap a chip: swap the caption, ask that scenario's question, play its answers.
+  function ask(idx, userText){
+    enterInteractive();
+    clearTimers();
+    activeIdx = idx; setCaption(idx);
+    const my = ++token;
+    thread.appendChild(bubble('me', userText)); scrollDown();
+    const replies = SCENARIOS[idx].msgs.filter(m => m.from === 'cued').map(m => m.t);
+    after(450, () => playReplies(my, replies));
+  }
+
+  function nudge(){
+    const wrap = document.createElement('div');
+    wrap.className = 'mw-nudge';
+    const b = document.createElement('div');
+    b.className = 'bub cued';
+    b.textContent = "this is just a taste 👀 the real cued texts you back for real — wanna get on the list?";
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mw-nudge-btn';
+    btn.textContent = 'Join the waitlist →';
+    btn.addEventListener('click', () => { if (window.openWaitlist) window.openWaitlist('demo'); });
+    wrap.appendChild(b); wrap.appendChild(btn);
+    thread.appendChild(wrap); scrollDown();
+  }
+
+  // Chips
+  chipsWrap.querySelectorAll('.mw-chip').forEach(chip => {
+    chip.addEventListener('click', () => ask(+chip.dataset.chip, chip.textContent));
+  });
+  // Replay → back to scroll mode for the current panel
+  if (replayBtn) replayBtn.addEventListener('click', () => {
+    interacting = false;
+    replayBtn.classList.remove('show');
+    renderScenario(activeIdx < 0 ? 0 : activeIdx);
+  });
+  // Free text
+  input.addEventListener('input', () => sendBtn.classList.toggle('show', input.value.trim().length > 0));
+  input.addEventListener('focus', enterInteractive);
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const v = input.value.trim();
+    if (!v) return;
+    enterInteractive();
+    clearTimers();
+    const my = ++token;
+    thread.appendChild(bubble('me', v)); scrollDown();
+    input.value = ''; sendBtn.classList.remove('show');
+    const dots = typing();
+    after(reduce ? 0 : 900, () => { if (my !== token){ dots.remove(); return; } dots.remove(); nudge(); });
+  });
+
+  // Hidden scroll/snap track → pinned caption + scenario rendering.
+  const panels  = Array.from(document.querySelectorAll('.demo-panel'));
+  const grid    = document.querySelector('.demo-grid');
+  const caption = document.getElementById('demoCaption');
+
+  // Clone the active panel's headline into the pinned caption (with a fade).
+  function setCaption(idx){
+    if (!caption || !panels[idx]) return;
+    caption.innerHTML = panels[idx].innerHTML;
+    caption.classList.remove('in'); void caption.offsetWidth; caption.classList.add('in');
+  }
+  function setActive(idx){
+    if (idx === activeIdx) return;          // same step: keep any interactive thread
+    activeIdx = idx;
+    if (interacting){ interacting = false; if (replayBtn) replayBtn.classList.remove('show'); }
+    setCaption(idx);
+    renderScenario(idx);
+  }
+
+  // Initial paint (instant; the section is below the fold at load).
+  setCaption(0);
+  renderScenario(0, true);
+  activeIdx = 0;
+
+  // Desktop: pick the step whose center is nearest the viewport center on scroll.
+  // (Robust for the zero-width track, where IntersectionObserver ratios are 0.)
+  if (!isMobile()){
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      if (grid){ const g = grid.getBoundingClientRect(); if (g.bottom < 0 || g.top > window.innerHeight) return; }
+      const mid = window.innerHeight / 2;
+      let best = 0, bd = Infinity;
+      panels.forEach((p, i) => {
+        const r = p.getBoundingClientRect();
+        const d = Math.abs((r.top + r.bottom) / 2 - mid);
+        if (d < bd){ bd = d; best = i; }
+      });
+      setActive(best);
+    };
+    deck.addEventListener('scroll', () => { if (!ticking){ ticking = true; requestAnimationFrame(update); } }, {passive: true});
+  }
 })();
 
 // === Waitlist modal: open from any "Join the waitlist" CTA ===
@@ -928,6 +1312,9 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
     requestAnimationFrame(() => overlay.classList.add('show'));
     setTimeout(() => nameEl && nameEl.focus(), 280);
   }
+  // Exposed so dynamically-created CTAs (e.g. the live-demo nudge button, which
+  // doesn't exist at load time) can open the same modal without re-binding.
+  window.openWaitlist = open;
 
   function close(){
     overlay.classList.remove('show');
