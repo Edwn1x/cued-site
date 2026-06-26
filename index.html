@@ -110,7 +110,20 @@ a{color:inherit;text-decoration:none}
   z-index:0;
 }
 .page--hero > *:not(.hero-art){position:relative;z-index:1}
-@media(max-width:900px){.hero-art{bottom:-1.5vh}}
+/* Mobile: the panoramic drawing would shrink the Campanile into the bottom-left
+   corner. Instead, blow the image up well past the viewport and shift it so the
+   clock tower (~14% across the source image) sits centered and dominant. The
+   hero's overflow:hidden clips the oversized edges (no horizontal scroll).
+   Position via left (not transform): the reveal system owns .hero-art's
+   transform and resets it to none, which would cancel any translate here. */
+@media(max-width:900px){
+  .hero-art{
+    width:300vw;
+    left:8vw;        /* 14% of 300vw = 42vw from img left → tower center at 50vw */
+    right:auto;
+    bottom:-1.5vh;
+  }
+}
 .page--last{scroll-snap-align:end;min-height:auto}
 .page--auto{min-height:auto;scroll-snap-align:start}
 
