@@ -118,10 +118,14 @@ a{color:inherit;text-decoration:none}
    transform and resets it to none, which would cancel any translate here. */
 @media(max-width:900px){
   .hero-art{
-    width:300vw;
-    left:8vw;        /* 14% of 300vw = 42vw from img left → tower center at 50vw */
+    width:240vw;
+    left:16vw;       /* ~14% of 240vw = 33.6vw from img left → tower center ≈ 50vw */
     right:auto;
-    bottom:-1.5vh;
+    /* Lift into the upper area so the bottom stays clear for text + CTA. max()
+       gives short phones a bigger lift (where the bottom content is a larger
+       share of the screen) while tall phones scale with vh. */
+    bottom:max(46vh,350px);
+    top:auto;
   }
 }
 .page--last{scroll-snap-align:end;min-height:auto}
@@ -209,26 +213,80 @@ nav .brand.show{opacity:1;transform:translateY(0);pointer-events:auto}
 .cta-secondary{display:inline-flex;align-items:center;gap:8px;padding:15px 24px;background:transparent;color:var(--ink);font-family:var(--f-ui);font-size:15px;font-weight:600;border-radius:999px;border:1px solid var(--border);cursor:pointer;transition:background .15s,border-color .15s}
 .cta-secondary:hover{background:var(--bg-alt);border-color:#cfd6e2}
 
-/* ===== HERO: mobile tightening =====
-   Pull the headline higher in the viewport, shrink it so it wraps to ~3
-   tight lines instead of 4 cramped ones, and close the gaps so the
-   block reads as one composition rather than floating elements. */
-@media(max-width:760px){
-  .page--hero{padding-top:12vh;padding-bottom:6vh}
-  .hero-h1{
-    font-size:clamp(2rem,9vw,2.6rem);
-    letter-spacing:-1px;
-    line-height:1.02;
-    max-width:14ch;
-    margin-bottom:28px;
+/* ===== HERO: mobile layout =====
+   Bottom-anchored, left-aligned composition: the Campanile reads as the upper
+   backdrop while the headline + sub sit low and the primary CTA spans the full
+   width like a native app button. The "plays well with" row is hidden here —
+   it's redundant with the "listens to your wearable" claim and the wearable
+   FAQ, and it crowds the bottom-weighted layout. Breakpoint matches the
+   hero-art mobile rule (900px) so the lifted tower + bottom-anchored text always
+   travel together. */
+@media(max-width:900px){
+  .page--hero{
+    flex-direction:column;
+    justify-content:flex-end;
+    align-items:stretch;
+    padding:13vh 22px 40px;
   }
-  .hero-sub{font-size:15px;margin-bottom:32px;max-width:340px;padding:0 8px}
-  .hero-ctas{margin-bottom:48px;gap:10px}
-  .cta-primary,.cta-secondary{padding:13px 22px;font-size:14.5px}
-  .proof{margin-top:0;gap:14px}
-  .proof-label{font-size:10.5px;letter-spacing:1.6px}
-  .proof-row{gap:12px 18px;max-width:320px}
-  .proof-logo{font-size:13px}
+  /* Scrim: fade the drawing out behind the text block so the headline + CTA stay
+     clean and legible (the blue "cued" wordmark would otherwise blend into the
+     blue line drawing). A bottom linear wash keeps the whole text column solid;
+     a soft radial brightens the bottom-left where the headline sits so it pops.
+     Sits above the art (z:0) but below content. */
+  .page--hero::after{
+    content:'';position:absolute;left:0;right:0;bottom:0;height:64%;
+    background:
+      radial-gradient(135% 55% at 22% 82%, var(--bg) 0%, var(--bg) 42%, rgba(246,246,246,0) 78%),
+      linear-gradient(to top, var(--bg) 78%, rgba(246,246,246,0) 100%);
+    z-index:0;pointer-events:none;
+  }
+  .hero-inner{align-items:flex-start;text-align:left;max-width:100%}
+  .hero-h1{
+    font-size:clamp(2.1rem,9vw,2.8rem);
+    letter-spacing:-1px;
+    line-height:1.03;
+    max-width:15ch;
+    margin-bottom:16px;
+  }
+  .hero-sub{
+    font-size:15px;
+    text-align:left;
+    max-width:32ch;
+    margin:0 0 26px;
+    padding:0;
+  }
+  .hero-ctas{
+    flex-direction:column;
+    align-items:stretch;
+    flex-wrap:nowrap;
+    width:100%;
+    gap:10px;
+    margin-bottom:0;
+  }
+  .cta-primary{
+    width:100%;
+    justify-content:center;
+    padding:17px 24px;
+    font-size:16px;
+    border-radius:14px;
+  }
+  /* FAQs becomes a quiet text link under the main CTA (mirrors the signup
+     section's .cta-faq-link), not a second full-width button. */
+  .hero-ctas .cta-secondary{
+    width:auto;
+    align-self:center;
+    margin-top:4px;
+    padding:6px 10px;
+    background:none;
+    border:none;
+    border-radius:0;
+    color:var(--ink-3);
+    font-size:14px;
+    font-weight:500;
+  }
+  .hero-ctas .cta-secondary::after{content:' ↓'}
+  .hero-ctas .cta-secondary:hover{background:none;color:var(--ink-2)}
+  .page--hero .proof{display:none}
 }
 
 /* ===== FLOATING CTA (shows on sections without an inline CTA) ===== */
@@ -629,7 +687,7 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
       </h1>
       <p class="hero-sub r">
         Your personal fitness coach.<br>
-        No app. No downloads. Just texts. Just for you.
+        No app. No downloads. <br>Just texts. Just for you.
       </p>
       <div class="hero-ctas r">
         <a href="#signup" class="cta-primary">Join the waitlist →</a>
