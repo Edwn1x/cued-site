@@ -123,8 +123,9 @@ a{color:inherit;text-decoration:none}
     right:auto;
     /* Lift into the upper area so the bottom stays clear for text + CTA. max()
        gives short phones a bigger lift (where the bottom content is a larger
-       share of the screen) while tall phones scale with vh. */
-    bottom:max(46vh,350px);
+       share of the screen) while tall phones scale with the viewport. dvh keeps
+       it aligned to the visible area under iOS's dynamic toolbar. */
+    bottom:max(46dvh,350px);
     top:auto;
   }
 }
@@ -155,6 +156,9 @@ nav .brand.show{opacity:1;transform:translateY(0);pointer-events:auto}
   nav{padding:14px 20px}
   .brand{font-size:18px}
   .nav-cta{display:none}
+  /* Hide the nav wordmark on mobile — it only clutters the corner (the hero h1
+     already says "cued", and the nav has no other controls on phones). */
+  nav .brand{display:none}
 }
 
 /* ===== PAGE INDICATORS (right rail) ===== */
@@ -222,11 +226,16 @@ nav .brand.show{opacity:1;transform:translateY(0);pointer-events:auto}
    hero-art mobile rule (900px) so the lifted tower + bottom-anchored text always
    travel together. */
 @media(max-width:900px){
-  .page--hero{
+  /* .page.page--hero (not just .page--hero) so this beats the generic
+     `.page{padding:...56px}` mobile rule that appears later in the sheet. */
+  .page.page--hero{
     flex-direction:column;
     justify-content:flex-end;
     align-items:stretch;
-    padding:13vh 22px 40px;
+    /* dvh (not vh) so iOS Safari/Chrome's dynamic toolbar doesn't measure
+       against the tall viewport and shove the block too high. Smaller bottom
+       pad lets the content settle lower/more grounded. */
+    padding:8dvh 22px 26px;
   }
   /* Scrim: fade the drawing out behind the text block so the headline + CTA stay
      clean and legible (the blue "cued" wordmark would otherwise blend into the
@@ -408,11 +417,20 @@ nav .brand.show{opacity:1;transform:translateY(0);pointer-events:auto}
 .claim--more .claim-check{background:var(--ink-3)}
 @media(max-width:900px){
   .claims-grid{grid-template-columns:repeat(2,1fr);gap:0 24px}
-  .claims-inner{gap:48px}
+  .claims-inner{gap:40px}
 }
 @media(max-width:560px){
-  .claims-grid{grid-template-columns:1fr}
-  .claim{padding:14px 0}
+  /* Mobile: keep two compact columns so all 12 claims fit one snap screen.
+     A single column overflowed 100dvh — the last items were cut off and the
+     floating CTA overlapped the bottom row. Tighten the head + padding to buy
+     the vertical room; check aligns to the first line for wrapped labels. */
+  .page--claims{padding-top:84px;padding-bottom:40px}
+  .claims-inner{gap:26px}
+  .claims-h{font-size:clamp(1.9rem,8vw,2.4rem);margin-bottom:12px}
+  .claims-sub{font-size:14px;line-height:1.5}
+  .claims-grid{grid-template-columns:1fr 1fr;gap:0 16px}
+  .claim{padding:11px 0;gap:9px;font-size:13.5px;align-items:flex-start}
+  .claim-check{width:19px;height:19px;font-size:11px;margin-top:1px}
 }
 
 /* ===== TRI-CARD PAGE (combined: morning plan + fuel + proactive nudge) ===== */
@@ -687,7 +705,7 @@ footer{padding:48px 28px 36px;background:var(--bg);border-top:1px solid var(--bo
       </h1>
       <p class="hero-sub r">
         Your personal fitness coach.<br>
-        No app. No downloads. <br>Just texts. Just for you.
+        No app — just texts.
       </p>
       <div class="hero-ctas r">
         <a href="#signup" class="cta-primary">Join the waitlist →</a>
