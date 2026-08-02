@@ -79,10 +79,14 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offse
 nav{
   position:fixed;top:0;left:0;right:0;z-index:50;
   display:flex;justify-content:space-between;align-items:center;
-  padding:16px clamp(20px,4vw,48px);
+  padding:20px clamp(32px,5vw,84px);
   background:var(--bg);   /* solid — bubbles scroll under it cleanly */
 }
 .brand{font-family:var(--f-brand);font-size:22px;font-weight:400;letter-spacing:-.2px;color:var(--ink)}
+/* Wordmark stays hidden while the hero is on screen — the hero is just the
+   bubble and the CTA. Fades in once the reader scrolls past. */
+nav .brand{opacity:0;pointer-events:none;transition:opacity .35s ease}
+nav .brand.show{opacity:1;pointer-events:auto}
 .nav-cta{background:none;border:none;cursor:pointer;font-family:var(--f-msg);font-size:15px;font-weight:500;color:var(--ink);padding:6px 2px}
 .nav-cta:hover{color:var(--blue)}
 
@@ -122,6 +126,9 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
   will-change:transform;
 }
 .anim .thread{transition:transform 380ms var(--ease)}
+/* Hero: a lone bubble at bottom:12vh would hug the corner — float it near
+   the vertical center instead. */
+#hero .thread{bottom:42vh}
 
 /* ===== BUBBLES ===== */
 .msg{
@@ -270,14 +277,12 @@ footer .fmeta{margin-top:10px}
 
 <main>
 
-  <!-- ===== HERO — 3 reveals, no header. Sentence case: it's an introduction. ===== -->
-  <section class="sec sec--pin" id="hero" style="--n:3">
+  <!-- ===== HERO — one bubble, nothing else. Sentence case: it's an introduction. ===== -->
+  <section class="sec sec--pin" id="hero" style="--n:1">
     <div class="stage">
       <div class="shell">
         <div class="thread">
-          <div class="msg cued" data-r>Hi! I'm Cued. Your personal fitness coach.</div>
-          <div class="msg cued" data-r>Made specifically with college students in mind.</div>
-          <div class="msg cued t" data-r>Let me give you a tour of what i can do for you.</div>
+          <div class="msg cued t" data-r>Hi! 👋 I'm Cued. Your personal fitness coach.</div>
         </div>
       </div>
     </div>
@@ -573,6 +578,19 @@ footer .fmeta{margin-top:10px}
   // images load.
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (isPin()){ measure(); sections.forEach(s => { s.k = -1; }); update(); } });
   window.addEventListener('load', () => { if (isPin()){ measure(); sections.forEach(s => { s.k = -1; }); update(); } });
+
+  // Nav wordmark: hidden while the hero is on screen, fades in after.
+  const brand = document.querySelector('nav .brand');
+  const hero = document.getElementById('hero');
+  if (brand && hero){
+    let bt = false;
+    const brandChk = () => {
+      bt = false;
+      brand.classList.toggle('show', hero.getBoundingClientRect().bottom < window.innerHeight * 0.25);
+    };
+    window.addEventListener('scroll', () => { if (!bt){ bt = true; requestAnimationFrame(brandChk); } }, {passive: true});
+    brandChk();
+  }
 
   // Close section (+ its CTA) fades in in both modes.
   const ioClose = new IntersectionObserver((entries) => {
