@@ -147,9 +147,11 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
   will-change:transform;
 }
 .anim .thread{transition:transform 380ms var(--ease)}
-/* Hero: a lone bubble at bottom:12vh would hug the corner — float it near
-   the vertical center instead. */
-#hero .thread{bottom:42vh}
+/* Hero: lift the thread off the bottom corner, but keep the anchor low enough
+   that the full three-bubble stack still fits under the nav — anchoring near
+   center clips the first bubble off the top of the stage once the follow-ups
+   push it up. */
+#hero .thread{bottom:18vh}
 
 /* ===== BUBBLES ===== */
 .msg{
@@ -321,7 +323,7 @@ footer .fmeta{margin-top:10px}
 </nav>
 
 <button type="button" class="float-cta" id="floatCta" aria-label="Join the waitlist">
-  Join the waitlist <span class="arrow" aria-hidden="true">→</span>
+  Join the waitlist
 </button>
 
 <main>
@@ -503,7 +505,7 @@ footer .fmeta{margin-top:10px}
       </div>
 
       <div class="wl-error" id="wlError" aria-live="polite"></div>
-      <button type="submit" class="wl-submit" id="wlSubmit">Join the waitlist →</button>
+      <button type="submit" class="wl-submit" id="wlSubmit">Join the waitlist</button>
     </form>
 
     <div class="wl-success" id="waitlistSuccess">
