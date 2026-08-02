@@ -46,6 +46,7 @@ The site is entirely self-contained vanilla HTML/CSS/JS with no framework or bui
 ## Images / Assets
 
 - `images/` — favicon SVG (blue, current brand), OG images, `app-icons/` (used in the "so you can delete these" section).
+- `images/hero-drawing.png` — the `the-one.png` Campanile drawing, cropped to the art band (1920×650), paper-gray background keyed to transparency, ink recolored to the brand blue. Referenced by the `index.html` hero, where it is "traced" in on scroll via SVG mask strokes (see the `.hero-art` comment in `index.html`).
 - `images/og-image-cued.png` and `og-image-cued-square.png` still carry the previous design's blue (`#1086FF`) and need regenerating.
-- Assets from previous design generations (hero backgrounds, `the-one.png` Berkeley drawing, wearable photo) remain in `images/` but are unreferenced by `index.html`.
+- Assets from previous design generations (hero backgrounds, `the-one.png` source drawing, wearable photo) remain in `images/` but are unreferenced by `index.html`.
 - Git LFS is configured for `videos/*.mp4` (see `.gitattributes`).

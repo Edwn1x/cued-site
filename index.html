@@ -153,6 +153,20 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
    push it up. */
 #hero .thread{bottom:18vh}
 
+/* ===== HERO ART — the live site's Campanile drawing ===== */
+/* images/hero-drawing.png is the-one.png with the paper-gray background keyed
+   to transparency and the ink recolored to the brand blue. In pin mode the
+   drawing is "traced" in as you scroll: the SVG mask strokes (rough zigzag
+   brush passes over the artwork, in drawing order — tower, building, left
+   foreground, horizon) reveal via stroke-dashoffset, a pure function of the
+   hero's scroll progress like every other reveal. Flow mode shows it fully
+   drawn; hidden on mobile, where the plain vertical thread leaves no room
+   for a panorama. */
+.hero-art{position:absolute;left:0;right:0;bottom:0;pointer-events:none}
+.hero-art svg{display:block;width:100%;max-height:62vh}
+.hero-art .trace{fill:none;stroke:#fff;stroke-width:64;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:767px){.hero-art{display:none}}
+
 /* ===== BUBBLES ===== */
 .msg{
   position:relative;max-width:46%;
@@ -331,6 +345,22 @@ footer .fmeta{margin-top:10px}
   <!-- ===== HERO — 3 reveals, nothing else on screen. Sentence case: it's an introduction. ===== -->
   <section class="sec sec--pin" id="hero" style="--n:3">
     <div class="stage">
+      <div class="hero-art" aria-hidden="true">
+        <svg viewBox="0 0 1920 650" preserveAspectRatio="xMinYMax meet">
+          <defs>
+            <!-- Mask stroke order = drawing order. Without JS the strokes have
+                 no dash, so the mask is fully open and the art shows complete. -->
+            <mask id="heroTrace" maskUnits="userSpaceOnUse">
+              <path class="trace" d="M246 26 L310 26 L322 74 L236 82 L202 123 L342 137 L348 175 L202 189 L194 228 L354 240 L348 284 L194 288 L190 339 L350 337 L404 395 L176 385"/>
+              <path class="trace" d="M176 393 L568 379 L568 445 L124 431 L124 495 L566 485 L598 543 L124 541 L124 592 L684 596 L626 640 L328 652"/>
+              <path class="trace" d="M0 443 L176 429 L176 492 L0 484 L0 540 L176 540 L176 588 L0 596"/>
+              <path class="trace" d="M540 564 L1124 568 L1500 615 L558 601 L576 650 L620 650"/>
+            </mask>
+          </defs>
+          <image href="images/hero-drawing.png" width="1920" height="650" mask="url(#heroTrace)"/>
+          <circle class="pen" r="7" fill="#007AFF" opacity="0"/>
+        </svg>
+      </div>
       <div class="shell">
         <div class="thread">
           <div class="msg cued" data-r>Hi! 👋 I'm Cued. Your personal fitness coach.</div>
@@ -582,6 +612,36 @@ footer .fmeta{margin-top:10px}
     }
   }
 
+  // === Hero art trace ===
+  // The Campanile drawing is revealed by scrubbing stroke-dashoffset on the
+  // SVG mask strokes, weighted by real path length so the pen moves at a
+  // constant speed. Idempotent like every reveal: scrubbing back un-draws.
+  // The pen dot rides the tip of the active stroke while mid-trace.
+  const artStrokes = Array.from(document.querySelectorAll('.hero-art .trace'));
+  const artPen = document.querySelector('.hero-art .pen');
+  const artLens = artStrokes.map(p => p.getTotalLength());
+  const artTotal = artLens.reduce((a, b) => a + b, 0);
+  function setTrace(t){
+    if (!artTotal) return;
+    const target = t * artTotal;
+    let acc = 0, tip = null;
+    artStrokes.forEach((p, i) => {
+      const L = artLens[i];
+      const local = Math.min(L, Math.max(0, target - acc));
+      p.style.strokeDasharray = L;
+      p.style.strokeDashoffset = L - local;
+      if (!tip && local > 0 && local < L) tip = p.getPointAtLength(local);
+      acc += L;
+    });
+    if (tip && t < 1){
+      artPen.setAttribute('cx', tip.x);
+      artPen.setAttribute('cy', tip.y);
+      artPen.setAttribute('opacity', '1');
+    } else {
+      artPen.setAttribute('opacity', '0');
+    }
+  }
+
   function update(){
     const vh = window.innerHeight;
     sections.forEach(s => {
@@ -593,6 +653,9 @@ footer .fmeta{margin-top:10px}
       // full thread holds for the last 1/n of the section before unpinning.
       const k = Math.min(n, 1 + Math.floor(p * n));
       apply(s, k);
+      // The drawing completes a beat before the hero unpins, so it's never
+      // caught half-finished as the section scrolls away.
+      if (s.el.id === 'hero') setTrace(Math.min(1, p / 0.92));
     });
   }
 
@@ -607,6 +670,7 @@ footer .fmeta{margin-top:10px}
   function setFlow(){
     if (io) io.disconnect();
     sections.forEach(s => { s.k = -1; s.thread.style.transform = ''; });
+    setTrace(1);   // no scrubbing in flow mode — show the drawing complete
     sizePolls();
     io = new IntersectionObserver((entries) => {
       entries.forEach(e => {
