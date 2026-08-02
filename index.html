@@ -165,8 +165,9 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
 .msg.apps img,.msg.apps svg{display:block;width:1.75em;height:1.75em;border-radius:.4em;flex:none}
 
 /* ===== POLL (iOS 26 Messages) ===== */
-/* Static — the reader is an observer on Cued's side, not a participant.
-   Width is matched to the widest sibling bubble by JS. */
+/* Width is matched to the widest Cued bubble by JS. The story auto-picks the
+   5:30 slot when the "locked" bubble reveals; rows are also clickable, and a
+   click retargets the highlight + rewrites the "locked" reply to match. */
 .poll{
   align-self:flex-end;display:flex;flex-direction:column;gap:.4em;
   margin-top:.48em;              /* ≈ .3em at bubble scale (this box is .62em) */
@@ -174,9 +175,30 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
 }
 .poll-row{
   display:flex;align-items:center;justify-content:space-between;gap:1em;
-  background:var(--poll-fill);border-radius:999px;padding:.8em 1em .8em 1.35em;
+  background:var(--poll-fill);border-radius:999px;padding:.5em .8em .5em 1.25em;
+  font:inherit;color:inherit;border:none;text-align:left;cursor:pointer;width:100%;
+  transition:background .25s ease;
 }
-.poll-row i{flex:none;width:1.5em;height:1.5em;border:2px solid var(--poll-ink);border-radius:50%}
+.poll-row i{
+  flex:none;width:1.3em;height:1.3em;border:2px solid var(--poll-ink);border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:background .25s ease;
+}
+/* Checkmark, scaled in on selection */
+.poll-row i::after{
+  content:'✓';color:#fff;font-size:.8em;font-weight:700;line-height:1;
+  transform:scale(0);transition:transform .28s var(--ease);
+}
+/* Selected state — ring fills, pill deepens, one quick pulse */
+.poll.chosen .poll-row.pick{background:#FADFB8}
+.poll.chosen .poll-row.pick i{background:var(--poll-ink)}
+.poll.chosen .poll-row.pick i::after{transform:scale(1)}
+.anim .poll.chosen .poll-row.pick{animation:pollPick .45s var(--ease)}
+@keyframes pollPick{
+  0%{transform:scale(1)}
+  35%{transform:scale(1.04)}
+  100%{transform:scale(1)}
+}
 
 /* ===== REVEAL STATES ===== */
 /* Hidden state gated behind html.js so a JS-less load renders fully visible. */
@@ -263,6 +285,8 @@ footer .fmeta{margin-top:10px}
   [data-r],[data-io],.hdr-flow{opacity:1!important;transform:none!important;transition:none!important}
   .thread{transition:none!important}
   .sec-h .hdr{transition:none!important}
+  .poll-row,.poll-row i{transition:none!important;animation:none!important}
+  .poll-row i::after{transition:none!important}
 }
 </style>
 <!-- Gate reveal-hiding synchronously so a JS-less load renders fully visible. -->
@@ -318,12 +342,12 @@ footer .fmeta{margin-top:10px}
           <div class="msg user t turn" data-r>alr bet lmk. i'll probably be studying at doe most of the weekend. ima head to crossroads tho</div>
           <h2 class="hdr-flow">and i act on it</h2>
           <div class="msg cued t turn" data-r>i looked at your schedule today, it seems like you have class from 2-5. which of these do you prefer?</div>
-          <div class="poll" data-r role="img" aria-label="Poll with three workout time options: 5:30 to 7pm, 12:30 to 1:30pm, 9 to 11am">
-            <div class="poll-row"><span>5:30pm – 7pm</span><i></i></div>
-            <div class="poll-row"><span>12:30pm – 1:30pm</span><i></i></div>
-            <div class="poll-row"><span>9am – 11am</span><i></i></div>
+          <div class="poll" data-r aria-label="Poll: pick a workout time">
+            <button type="button" class="poll-row pick" data-t="5:30" aria-pressed="true"><span>5:30pm – 7pm</span><i aria-hidden="true"></i></button>
+            <button type="button" class="poll-row" data-t="12:30" aria-pressed="false"><span>12:30pm – 1:30pm</span><i aria-hidden="true"></i></button>
+            <button type="button" class="poll-row" data-t="9am" aria-pressed="false"><span>9am – 11am</span><i aria-hidden="true"></i></button>
           </div>
-          <div class="msg cued t" data-r>locked. 5:30 it is 👍</div>
+          <div class="msg cued t poll-lock" data-r>locked. 5:30 it is 👍</div>
         </div>
       </div>
     </div>
@@ -477,14 +501,20 @@ footer .fmeta{margin-top:10px}
   const mqReduce  = matchMedia('(prefers-reduced-motion: reduce)');
   const isPin = () => mqDesktop.matches && !mqReduce.matches;
 
-  const sections = Array.from(document.querySelectorAll('.sec--pin')).map(sec => ({
-    el: sec,
-    thread: sec.querySelector('.thread'),
-    items: Array.from(sec.querySelectorAll('[data-r]')),
-    hdrs: Array.from(sec.querySelectorAll('.sec-h .hdr')),
-    switchAt: sec.dataset.hdrSwitch ? +sec.dataset.hdrSwitch : Infinity,
-    bottoms: [], total: 0, k: -1,
-  }));
+  const sections = Array.from(document.querySelectorAll('.sec--pin')).map(sec => {
+    const items = Array.from(sec.querySelectorAll('[data-r]'));
+    const poll = sec.querySelector('.poll');
+    return {
+      el: sec,
+      thread: sec.querySelector('.thread'),
+      items,
+      poll,
+      pollIdx: poll ? items.indexOf(poll) : -1,
+      hdrs: Array.from(sec.querySelectorAll('.sec-h .hdr')),
+      switchAt: sec.dataset.hdrSwitch ? +sec.dataset.hdrSwitch : Infinity,
+      bottoms: [], total: 0, k: -1,
+    };
+  });
 
   // Poll width matches the widest Cued bubble in its thread — it hangs under
   // the blue side, so user-bubble widths shouldn't stretch it.
@@ -514,6 +544,9 @@ footer .fmeta{margin-top:10px}
     // so the k-th bubble's bottom sits exactly on the bottom anchor.
     const shift = k > 0 ? s.total - s.bottoms[k - 1] : s.total;
     s.thread.style.transform = 'translateY(' + shift + 'px)';
+    // The story picks its poll option in sync with the reveal AFTER the poll
+    // (the "locked" reply). Scrubbing back deselects — idempotent like reveals.
+    if (s.poll) s.poll.classList.toggle('chosen', k >= s.pollIdx + 2);
     if (s.hdrs.length){
       const idx = (s.hdrs.length > 1 && k >= s.switchAt) ? 1 : 0;
       s.hdrs.forEach((h, i) => h.classList.toggle('on', i === idx));
@@ -548,12 +581,21 @@ footer .fmeta{margin-top:10px}
     sizePolls();
     io = new IntersectionObserver((entries) => {
       entries.forEach(e => {
-        if (e.isIntersecting){ e.target.classList.add('on'); io.unobserve(e.target); }
+        if (e.isIntersecting){
+          e.target.classList.add('on');
+          // Poll: let it settle, then play the story's pick.
+          if (e.target.classList.contains('poll')){
+            setTimeout(() => e.target.classList.add('chosen'), 900);
+          }
+          io.unobserve(e.target);
+        }
       });
     }, {threshold: 0.15});
     document.querySelectorAll('[data-r], .hdr-flow').forEach(el => {
-      if (mqReduce.matches) el.classList.add('on');
-      else io.observe(el);
+      if (mqReduce.matches){
+        el.classList.add('on');
+        if (el.classList.contains('poll')) el.classList.add('chosen');
+      } else io.observe(el);
     });
   }
 
@@ -578,6 +620,24 @@ footer .fmeta{margin-top:10px}
   // images load.
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (isPin()){ measure(); sections.forEach(s => { s.k = -1; }); update(); } });
   window.addEventListener('load', () => { if (isPin()){ measure(); sections.forEach(s => { s.k = -1; }); update(); } });
+
+  // Poll rows are clickable: the highlight moves to the clicked option and the
+  // "locked" reply rewrites to match, so the conversation stays coherent.
+  document.querySelectorAll('.poll').forEach(poll => {
+    const rows = Array.from(poll.querySelectorAll('.poll-row'));
+    const lock = poll.parentElement.querySelector('.poll-lock');
+    rows.forEach(row => row.addEventListener('click', () => {
+      rows.forEach(r => {
+        r.classList.toggle('pick', r === row);
+        r.setAttribute('aria-pressed', r === row ? 'true' : 'false');
+      });
+      poll.classList.add('chosen');
+      if (lock) lock.textContent = 'locked. ' + row.dataset.t + ' it is 👍';
+      // The rewritten reply can change the bubble's size — refresh the cached
+      // offsets so the thread shift stays exact.
+      if (isPin()){ measure(); sections.forEach(s => { s.k = -1; }); update(); }
+    }));
+  });
 
   // Nav wordmark: hidden while the hero is on screen, fades in after.
   const brand = document.querySelector('nav .brand');
