@@ -256,6 +256,26 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
   transition:background .15s;
 }
 .cta:hover{background:var(--blue-deep)}
+/* ===== FAQ (ported from the previous live site) ===== */
+.faq{padding:110px 24px 0}
+.faq-wrap{max-width:840px;margin:0 auto}
+.faq-head{text-align:center;margin-bottom:36px}
+.faq-head h2{font-family:var(--f-header);font-weight:400;font-size:clamp(1.9rem,3vw,2.6rem);letter-spacing:-.5px;color:var(--ink);margin-bottom:8px}
+.faq-head p{font-size:16px;color:#4A5A6E}
+.faq-list details{border-top:1px solid #E5EAF2}
+.faq-list details:last-child{border-bottom:1px solid #E5EAF2}
+.faq-list summary{
+  list-style:none;cursor:pointer;padding:20px 0;
+  display:flex;justify-content:space-between;align-items:center;gap:20px;
+  font-size:16.5px;font-weight:500;color:var(--ink);letter-spacing:-.1px;
+}
+.faq-list summary::-webkit-details-marker{display:none}
+.faq-list summary::after{content:'+';font-size:22px;font-weight:300;color:#8A95A5;transition:color .15s;flex-shrink:0}
+.faq-list details[open] summary::after{content:'–';color:var(--blue)}
+.faq-list details[open] summary{color:var(--blue)}
+.faq-body{padding:0 0 20px;color:#4A5A6E;font-size:15px;line-height:1.65;max-width:680px}
+@media(max-width:600px){.faq{padding-top:72px}}
+
 footer{padding:28px 20px 32px;text-align:center;font-size:13px;color:#8A95A5}
 footer a{margin:0 10px;color:#4A5A6E}
 footer a:hover{color:var(--ink)}
@@ -520,6 +540,58 @@ footer .fmeta{margin-top:10px}
       </div>
       <div class="close-cta" data-io>
         <button type="button" class="cta" id="closeCta">Join the waitlist →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ — ported from the previous live site, restyled to the thread design. ===== -->
+  <section class="sec faq" id="faq">
+    <div class="faq-wrap">
+      <div class="faq-head" data-io>
+        <h2>FAQs</h2>
+        <p>The stuff people ask before they sign up.</p>
+      </div>
+      <div class="faq-list" data-io>
+        <details>
+          <summary>Do I need to download an app?</summary>
+          <div class="faq-body">Nope. Cued lives entirely in your text messages. iMessage, SMS, whatever you already use. No app, no login, no new account to manage.</div>
+        </details>
+        <details>
+          <summary>How much does it cost?</summary>
+          <div class="faq-body">Free during the open beta. When we move out of beta, early users will get founding-member pricing locked in — details to come.</div>
+        </details>
+        <details>
+          <summary>What data does Cued use?</summary>
+          <div class="faq-body">Only what you connect: your wearable (sleep, HRV, heart rate), your calendar (for scheduling), and the goals/preferences you share over text. Nothing more, nothing sold.</div>
+        </details>
+        <details>
+          <summary>Do I need a wearable?</summary>
+          <div class="faq-body">Nope. Cued works without one — you just tell it how you slept, how you're feeling, and what's coming up, and it builds your week from there. If you do have an Apple Watch, Whoop, Oura, or Garmin, connecting it lets Cued read your data passively so you don't have to report in every morning. Better with one, totally usable without.</div>
+        </details>
+        <details>
+          <summary>How does the wearable connect?</summary>
+          <div class="faq-body">A one-time link via Apple Health, Whoop, Oura, Garmin, or Strava. Takes about 30 seconds. After that, Cued reads passively — you don't have to do anything.</div>
+        </details>
+        <details>
+          <summary>Is this actually a coach or just a chatbot?</summary>
+          <div class="faq-body">Cued is an AI built around real coaching principles — progressive overload, recovery-aware programming, autoregulation. It's not a generic chatbot; every plan is personalized to your data and revised continuously.</div>
+        </details>
+        <details>
+          <summary>What about privacy?</summary>
+          <div class="faq-body">Your conversations and health data are encrypted in transit and at rest. We never sell data and never share it with third parties. You can delete everything any time by texting "delete me".</div>
+        </details>
+        <details>
+          <summary>Can I cancel any time?</summary>
+          <div class="faq-body">Reply "stop" and Cued stops texting immediately. No retention dance, no exit survey. Come back whenever.</div>
+        </details>
+        <details>
+          <summary>Who is Cued for?</summary>
+          <div class="faq-body">We built Cued for college students — that's the rhythm we know. Class schedules that shift every semester, dorm gyms and the RSF, dining hall food, weeks where midterms eat your sleep. If that sounds familiar, you're who we built this for. (Post-grads and anyone juggling a busy life are welcome too — the patterns hold.)</div>
+        </details>
+        <details>
+          <summary>Who's behind Cued?</summary>
+          <div class="faq-body">A Berkeley student who got tired of switching between four apps just to keep a workout streak going. Still a student; still figuring it out alongside you.</div>
+        </details>
       </div>
     </div>
     <footer>
