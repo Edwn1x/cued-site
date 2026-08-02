@@ -175,12 +175,12 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
 }
 .poll-row{
   display:flex;align-items:center;justify-content:space-between;gap:1em;
-  background:var(--poll-fill);border-radius:999px;padding:.5em .8em .5em 1.25em;
+  background:var(--poll-fill);border-radius:999px;padding:.8em 1em .8em 1.35em;
   font:inherit;color:inherit;border:none;text-align:left;cursor:pointer;width:100%;
   transition:background .25s ease;
 }
 .poll-row i{
-  flex:none;width:1.3em;height:1.3em;border:2px solid var(--poll-ink);border-radius:50%;
+  flex:none;width:1.5em;height:1.5em;border:2px solid var(--poll-ink);border-radius:50%;
   display:inline-flex;align-items:center;justify-content:center;
   transition:background .25s ease;
 }
@@ -516,15 +516,15 @@ footer .fmeta{margin-top:10px}
     };
   });
 
-  // Poll width matches the widest Cued bubble in its thread — it hangs under
-  // the blue side, so user-bubble widths shouldn't stretch it.
+  // Poll sizing: ~70% of the widest Cued bubble in its thread — it hangs under
+  // the blue side but shouldn't span the bubble's full width.
   function sizePolls(){
     document.querySelectorAll('.thread').forEach(t => {
       const poll = t.querySelector('.poll');
       if (!poll) return;
       let w = 0;
       t.querySelectorAll('.msg.cued').forEach(m => { w = Math.max(w, m.offsetWidth); });
-      if (w) poll.style.width = w + 'px';
+      if (w) poll.style.width = Math.round(w * 0.7) + 'px';
     });
   }
 
