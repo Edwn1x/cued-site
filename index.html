@@ -90,6 +90,27 @@ nav .brand.show{opacity:1;pointer-events:auto}
 .nav-cta{background:none;border:none;cursor:pointer;font-family:var(--f-msg);font-size:15px;font-weight:500;color:var(--ink);padding:6px 2px}
 .nav-cta:hover{color:var(--blue)}
 
+/* ===== FLOATING WAITLIST CTA ===== */
+/* Ported from the previous live site: fixed bottom-center pill, visible on
+   the tour sections, hidden on the hero and once the close CTA is in view. */
+.float-cta{
+  position:fixed;left:50%;bottom:28px;transform:translate(-50%,12px);
+  display:inline-flex;align-items:center;gap:6px;
+  padding:10px 19px;border-radius:999px;
+  background:var(--blue);color:#fff;
+  border:1px solid var(--blue);cursor:pointer;
+  font-family:var(--f-msg);font-size:13.5px;font-weight:600;letter-spacing:-.1px;
+  box-shadow:0 8px 22px rgba(0,122,255,.28);
+  opacity:0;pointer-events:none;
+  transition:opacity .35s ease,transform .35s ease,background .2s,border-color .2s,color .2s,box-shadow .2s;
+  z-index:45;
+}
+.float-cta.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.float-cta:hover{background:#fff;border-color:rgba(0,122,255,.35);color:var(--blue);box-shadow:0 4px 14px rgba(10,22,40,.08)}
+.float-cta .arrow{display:inline-block;transition:transform .2s ease}
+.float-cta:hover .arrow{transform:translateX(3px)}
+@media(max-width:600px){.float-cta{bottom:18px;font-size:12.5px;padding:9px 17px}}
+
 /* ===== SECTIONS / STICKY STAGE ===== */
 .sec{position:relative}
 /* height = 100vh + (reveals − 1) × step; --n set inline per section */
@@ -298,6 +319,10 @@ footer .fmeta{margin-top:10px}
   <a href="#" class="brand">cued</a>
   <button type="button" class="nav-cta" id="navCta">get started</button>
 </nav>
+
+<button type="button" class="float-cta" id="floatCta" aria-label="Join the waitlist">
+  Join the waitlist <span class="arrow" aria-hidden="true">→</span>
+</button>
 
 <main>
 
@@ -641,17 +666,25 @@ footer .fmeta{margin-top:10px}
     }));
   });
 
-  // Nav wordmark: hidden while the hero is on screen, fades in after.
+  // Scroll-linked chrome: the nav wordmark and the floating waitlist pill are
+  // hidden on the hero; the pill also yields once the close CTA is in view.
   const brand = document.querySelector('nav .brand');
   const hero = document.getElementById('hero');
-  if (brand && hero){
+  const floatCta = document.getElementById('floatCta');
+  const closeSec = document.getElementById('signup');
+  if (hero){
     let bt = false;
-    const brandChk = () => {
+    const chromeChk = () => {
       bt = false;
-      brand.classList.toggle('show', hero.getBoundingClientRect().bottom < window.innerHeight * 0.25);
+      const pastHero = hero.getBoundingClientRect().bottom < window.innerHeight * 0.25;
+      if (brand) brand.classList.toggle('show', pastHero);
+      if (floatCta){
+        const closeNear = closeSec && closeSec.getBoundingClientRect().top < window.innerHeight * 0.85;
+        floatCta.classList.toggle('show', pastHero && !closeNear);
+      }
     };
-    window.addEventListener('scroll', () => { if (!bt){ bt = true; requestAnimationFrame(brandChk); } }, {passive: true});
-    brandChk();
+    window.addEventListener('scroll', () => { if (!bt){ bt = true; requestAnimationFrame(chromeChk); } }, {passive: true});
+    chromeChk();
   }
 
   // Close section (+ its CTA) fades in in both modes.
@@ -709,8 +742,10 @@ footer .fmeta{margin-top:10px}
 
   const navCta = document.getElementById('navCta');
   const closeCta = document.getElementById('closeCta');
+  const floatCta = document.getElementById('floatCta');
   navCta && navCta.addEventListener('click', () => open('nav'));
   closeCta && closeCta.addEventListener('click', () => open('close'));
+  floatCta && floatCta.addEventListener('click', () => open('floating'));
 
   closeBtn && closeBtn.addEventListener('click', close);
   overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
