@@ -156,12 +156,11 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
 /* ===== HERO ART — the live site's Campanile drawing ===== */
 /* images/hero-drawing.png is the-one.png with the paper-gray background keyed
    to transparency and the ink recolored to the brand blue. In pin mode the
-   drawing is "traced" in as you scroll: the SVG mask strokes (rough zigzag
-   brush passes over the artwork, in drawing order — tower, building, left
-   foreground, horizon) reveal via stroke-dashoffset, a pure function of the
-   hero's scroll progress like every other reveal. Flow mode shows it fully
-   drawn; hidden on mobile, where the plain vertical thread leaves no room
-   for a panorama. */
+   drawing is "traced" in as you scroll: short brush strokes over the artwork
+   reveal via stroke-dashoffset in a pseudo-random sketch order, a pure
+   function of the hero's scroll progress like every other reveal. Flow mode
+   shows it fully drawn; hidden on mobile, where the plain vertical thread
+   leaves no room for a panorama. */
 .hero-art{position:absolute;left:0;right:0;bottom:0;pointer-events:none}
 .hero-art svg{display:block;width:100%;max-height:62vh}
 .hero-art .trace{fill:none;stroke:#fff;stroke-width:64;stroke-linecap:round;stroke-linejoin:round}
@@ -348,13 +347,35 @@ footer .fmeta{margin-top:10px}
       <div class="hero-art" aria-hidden="true">
         <svg viewBox="0 0 1920 650" preserveAspectRatio="xMinYMax meet">
           <defs>
-            <!-- Mask stroke order = drawing order. Without JS the strokes have
-                 no dash, so the mask is fully open and the art shows complete. -->
+            <!-- Short independent strokes in a pseudo-random sketch order (a
+                 seeded shuffle, baked in — deterministic, so scrubbing stays
+                 idempotent and every visitor sees the same order). The pen
+                 darts around the artwork adding patches instead of sweeping
+                 top to bottom. Without JS the strokes have no dash, so the
+                 mask is fully open and the art shows complete. -->
             <mask id="heroTrace" maskUnits="userSpaceOnUse">
-              <path class="trace" d="M246 26 L310 26 L322 74 L236 82 L202 123 L342 137 L348 175 L202 189 L194 228 L354 240 L348 284 L194 288 L190 339 L350 337 L404 395 L176 385"/>
-              <path class="trace" d="M176 393 L568 379 L568 445 L124 431 L124 495 L566 485 L598 543 L124 541 L124 592 L684 596 L626 640 L328 652"/>
-              <path class="trace" d="M0 443 L176 429 L176 492 L0 484 L0 540 L176 540 L176 588 L0 596"/>
-              <path class="trace" d="M540 564 L1124 568 L1500 615 L558 601 L576 650 L620 650"/>
+              <path class="trace" d="M194 279 L271 290 L348 279"/>
+              <path class="trace" d="M0 585 L88 588 L176 593"/>
+              <path class="trace" d="M1500 603 L1249 609 L999 605"/>
+              <path class="trace" d="M176 486 L88 491 L0 483"/>
+              <path class="trace" d="M176 384 L290 383 L404 388"/>
+              <path class="trace" d="M176 441 L88 438 L0 442"/>
+              <path class="trace" d="M576 656 L598 653 L620 651"/>
+              <path class="trace" d="M1059 605 L808 607 L558 602"/>
+              <path class="trace" d="M190 346 L270 345 L350 340"/>
+              <path class="trace" d="M540 567 L832 560 L1124 561"/>
+              <path class="trace" d="M328 643 L477 648 L626 642"/>
+              <path class="trace" d="M0 545 L88 533 L176 534"/>
+              <path class="trace" d="M176 388 L372 388 L568 389"/>
+              <path class="trace" d="M246 32 L278 20 L310 20"/>
+              <path class="trace" d="M124 445 L346 432 L568 431"/>
+              <path class="trace" d="M124 543 L361 548 L598 543"/>
+              <path class="trace" d="M202 185 L275 174 L348 188"/>
+              <path class="trace" d="M342 125 L272 137 L202 123"/>
+              <path class="trace" d="M322 79 L279 74 L236 77"/>
+              <path class="trace" d="M684 601 L404 588 L124 591"/>
+              <path class="trace" d="M354 234 L274 230 L194 239"/>
+              <path class="trace" d="M124 490 L345 495 L566 493"/>
             </mask>
           </defs>
           <image href="images/hero-drawing.png" width="1920" height="650" mask="url(#heroTrace)"/>
