@@ -61,7 +61,7 @@
   --f-brand:'Outfit', -apple-system, sans-serif;   /* wordmark only */
 
   /* Layout */
-  --shell:min(1240px, 100vw - 96px);
+  --shell:min(1520px, 100vw - 96px);   /* near-full width; capped on huge displays */
   --reveal-step:45vh;    /* scroll budget per reveal; drop to 35vh if it drags */
   --msg-size:clamp(26px, 2.5vw, 40px);
 
@@ -112,9 +112,11 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
 /* ===== THREAD ===== */
 /* Anchored to the stage bottom; bubbles stack upward. JS translates the whole
    column down by the height of the not-yet-revealed bubbles, so each reveal
-   pushes the existing thread up simultaneously (real Messages behavior). */
+   pushes the existing thread up simultaneously (real Messages behavior).
+   Spans the full shell: user bubbles hug the left edge, Cued the right, so the
+   conversation reads across the whole screen. */
 .thread{
-  position:absolute;bottom:12vh;right:0;width:62%;
+  position:absolute;bottom:12vh;left:0;right:0;
   display:flex;flex-direction:column;
   font-size:var(--msg-size);
   will-change:transform;
@@ -123,7 +125,7 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
 
 /* ===== BUBBLES ===== */
 .msg{
-  position:relative;max-width:62%;
+  position:relative;max-width:46%;
   padding:.52em .82em;border-radius:1.05em;
   font-weight:400;line-height:1.28;
   margin-top:.3em;               /* gap, same sender */
@@ -147,7 +149,7 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
 
 /* Photo attachment — user-sent, rendered as a rounded image, no bubble fill
    (matches real Messages photo behavior). */
-.msg.photo{background:none;padding:0;max-width:46%;border-radius:1.05em;overflow:hidden;line-height:0}
+.msg.photo{background:none;padding:0;max-width:34%;border-radius:1.05em;overflow:hidden;line-height:0}
 .msg.photo svg,.msg.photo img{display:block;width:100%;height:auto;border-radius:1.05em}
 
 /* App-icon grid — a single gray user bubble holding a horizontal icon row.
@@ -180,8 +182,8 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
 /* ===== CLOSE (static, no pin) ===== */
 .close{min-height:100vh;display:flex;flex-direction:column}
 .close .shell{flex:1;display:flex;flex-direction:column;justify-content:center;height:auto;min-height:0;padding:96px 0 48px}
-.close .thread{position:static;width:62%;margin-left:auto;transform:none}
-.close-cta{width:62%;margin-left:auto;text-align:center;margin-top:56px}
+.close .thread{position:static;width:100%;transform:none}
+.close-cta{width:100%;text-align:center;margin-top:56px}
 .cta{
   display:inline-flex;align-items:center;gap:8px;
   padding:16px 30px;border:none;border-radius:999px;cursor:pointer;
@@ -479,13 +481,14 @@ footer .fmeta{margin-top:10px}
     bottoms: [], total: 0, k: -1,
   }));
 
-  // Poll width matches the widest sibling bubble in its thread (spec §3).
+  // Poll width matches the widest Cued bubble in its thread — it hangs under
+  // the blue side, so user-bubble widths shouldn't stretch it.
   function sizePolls(){
     document.querySelectorAll('.thread').forEach(t => {
       const poll = t.querySelector('.poll');
       if (!poll) return;
       let w = 0;
-      t.querySelectorAll('.msg').forEach(m => { w = Math.max(w, m.offsetWidth); });
+      t.querySelectorAll('.msg.cued').forEach(m => { w = Math.max(w, m.offsetWidth); });
       if (w) poll.style.width = w + 'px';
     });
   }
