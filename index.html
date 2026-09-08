@@ -342,28 +342,21 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
 .hero-art{position:absolute;left:0;right:0;bottom:0;pointer-events:none}
 .hero-art svg{display:block;width:100%;max-height:62vh}
 .hero-art .trace{fill:none;stroke:#fff;stroke-width:64;stroke-linecap:round;stroke-linejoin:round}
-/* Mobile hero copy block — hidden on desktop, where the bubbles are the
-   headline. Styled inside the <768px block below. */
+/* Mobile hero CTA block — hidden on desktop, where the floating pill is the
+   hero CTA. Styled inside the <768px block below. */
 .hero-mobile{display:none}
-/* Mobile hero — ported from the live site's mobile load. The panoramic band
-   would shrink the Campanile into a sliver, so blow the image up well past
-   the viewport and shift it right so the tower (~14% across the source, same
-   as the live the-one.png) sits centered and dominant; overflow:hidden clips
-   the oversized edges. Below it: serif headline → subhead → full-width CTA →
-   quiet FAQs link, stacked (no scrim needed — nothing overlaps the art).
-   The desktop bubble intro is hidden here; the headline carries the claim. */
+/* Mobile hero — the drawing treatment is ported from the live site's mobile
+   load. The panoramic band would shrink the Campanile into a sliver, so blow
+   the image up well past the viewport and shift it right so the tower (~14%
+   across the source, same as the live the-one.png) sits centered and
+   dominant; overflow:hidden clips the oversized edges. The intro bubbles
+   start right under it — the bubbles are the headline, same as desktop —
+   then a full-width waitlist CTA and a quiet FAQs link. */
 @media(max-width:767.98px){
   .hero-art{position:relative;overflow:hidden}
   .hero-art svg{width:250vw;height:auto;max-height:none;aspect-ratio:1920/650;margin-left:14.5vw}
-  #hero .shell{display:none}
-  .hero-mobile{display:block;padding:14px 22px 8px}
-  .hero-mobile h1{
-    font-family:var(--f-header);font-weight:400;
-    font-size:clamp(2.2rem,10.5vw,2.8rem);line-height:1.06;letter-spacing:-1px;
-    color:var(--ink);margin:0 0 16px;max-width:14ch;
-  }
-  .hero-mobile h1 span{color:var(--blue)}
-  .hero-mobile p{font-size:15.5px;line-height:1.55;color:var(--ink-2);margin:0 0 26px;max-width:32ch}
+  #hero .thread{margin-top:18px}
+  .hero-mobile{display:block;padding:28px 22px 8px}
   .cta.hm-cta{width:100%;justify-content:center;padding:17px 24px;font-size:16px;border-radius:14px}
   .hm-faq{display:block;width:max-content;margin:16px auto 0;padding:6px 10px;color:var(--ink-3);font-size:14px;font-weight:500}
   .scroll-cue{display:none}  /* the FAQs link is the "more below" cue here */
@@ -684,11 +677,9 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
           <div class="msg cued t" data-r>ready to make fitness easy?</div>
         </div>
       </div>
-      <!-- Mobile-only hero copy (see .hero-mobile) — the live site's mobile
-           load: headline + subhead + full-width CTA under the drawing. -->
+      <!-- Mobile-only hero CTA (see .hero-mobile) — full-width waitlist
+           button + quiet FAQs link under the intro bubbles. -->
       <div class="hero-mobile">
-        <h1>Meet <span>cued</span>.<br>made for your college life.</h1>
-        <p>Your personal fitness coach.<br>No app — just texts.</p>
         <button type="button" class="cta hm-cta" id="heroCta">Join the waitlist <span aria-hidden="true">→</span></button>
         <a class="hm-faq" href="#faq">FAQs ↓</a>
       </div>
@@ -1223,10 +1214,10 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   // already on screen. The rest pop in on their own — the thread pushing up
   // like real Messages — at the reader's first scroll gesture, or after a
   // ~2s idle beat if they don't scroll, while the hero's sticky stage keeps
-  // the page from scrolling out from under them. Mobile flow mode hides the
-  // hero thread entirely (.hero-mobile replaces it), but the timeline still
-  // runs on hidden elements so a resize into pin mode lands on a settled
-  // hero. Reduced motion: CSS already shows every bubble.
+  // the page from scrolling out from under them. Mobile flow mode keeps the
+  // thread under the blown-up drawing; the follow-ups pop shortly after load
+  // (the transform is overridden by CSS, so it's just the staggered pop-in).
+  // Reduced motion: CSS already shows every bubble.
   const heroEl = document.getElementById('hero');
   const heroItems = heroEl ? Array.from(heroEl.querySelectorAll('[data-r]')) : [];
   const heroThread = heroEl ? heroEl.querySelector('.thread') : null;
@@ -1268,7 +1259,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       window.addEventListener('scroll', onScroll, {passive: true});
       idleT = setTimeout(() => start(0), HERO_IDLE);   // no scroll? play anyway
     } else {
-      start(500);   // thread is hidden here — runs only to keep state settled
+      start(500);   // flow mode: pop the intro in shortly after load
     }
   }
 
