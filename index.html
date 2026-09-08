@@ -353,9 +353,17 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
    start right under it — the bubbles are the headline, same as desktop —
    then a full-width waitlist CTA and a quiet FAQs link. */
 @media(max-width:767.98px){
-  .hero-art{position:relative;overflow:hidden}
+  /* Crop the band further: the svg's natural height is ~85vw, the container
+     clips it to 64vw and a mask fades the cut edge out so the line art
+     dissolves instead of slicing — buys the thread ~80px of first-screen
+     room. */
+  .hero-art{
+    position:relative;overflow:hidden;height:64vw;
+    -webkit-mask-image:linear-gradient(to bottom,#000 70%,transparent 100%);
+    mask-image:linear-gradient(to bottom,#000 70%,transparent 100%);
+  }
   .hero-art svg{width:250vw;height:auto;max-height:none;aspect-ratio:1920/650;margin-left:14.5vw}
-  #hero .thread{margin-top:18px}
+  #hero .thread{margin-top:10px}
   .hero-mobile{display:block;padding:28px 22px 8px}
   .cta.hm-cta{width:100%;justify-content:center;padding:17px 24px;font-size:16px;border-radius:14px}
   .hm-faq{display:block;width:max-content;margin:16px auto 0;padding:6px 10px;color:var(--ink-3);font-size:14px;font-weight:500}
