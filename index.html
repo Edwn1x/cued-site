@@ -6,15 +6,18 @@
   side of the screen: Cued is blue and RIGHT-aligned, the user is gray and
   LEFT-aligned. No phone mockup, no device chrome — the page is the interface.
 
-  Desktop (≥768px, motion OK): each section has a sticky 100vh stage with a
+  Motion OK (any width): each tour section has a sticky 100vh stage with a
   short hold budget. Scroll brings a section on stage; its choreography then
   auto-plays one-shot on a timeline — blank stage with the header centered,
   header glides up to top:10vh, then bubbles pop in sequence, the thread
-  translating up to make room like real Messages.
+  translating up to make room like real Messages. Mobile (<768px) differs
+  only in the hero — a static block (blown-up Campanile crop, intro bubbles,
+  full-width CTA that pops once the sequence settles) plus an iOS-style
+  notification banner — and in sizing (17px bubbles, tighter shell).
 
-  Mobile (<768px) and prefers-reduced-motion: no pinning at all — a plain
-  vertical thread with inline section headers; bubbles fade in via
-  IntersectionObserver. Genuinely separate layout path, not a degraded pin.
+  prefers-reduced-motion: no pinning at all — a plain vertical thread with
+  inline section headers; bubbles fade in via IntersectionObserver.
+  Genuinely separate layout path, not a degraded pin.
 
   Vanilla HTML/CSS/JS, no build step. Deploys via GitHub Pages from /main.
 -->
@@ -70,6 +73,7 @@
   --poll-fill:#FCEBD0;   /* iOS 26 Messages poll pill */
   --poll-ink:#E9902E;
   --poll-pick:#FADFB8;
+  --notif-bg:rgba(246,246,248,.9);   /* iOS notification banner glass */
 
   --f-header:'Hedvig Letters Serif', Georgia, 'Times New Roman', serif;
   --f-msg:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -109,6 +113,7 @@ html.dark{
   --poll-fill:#48351A;
   --poll-ink:#F5A93B;
   --poll-pick:#6B4E22;
+  --notif-bg:rgba(38,38,42,.92);
 }
 
 *{margin:0;padding:0;box-sizing:border-box}
@@ -219,6 +224,34 @@ nav .brand.compact span{opacity:0;transition:opacity .2s ease .1s}
 @media(max-width:600px){.scroll-cue{bottom:0;width:18px;height:18px}}
 @media(max-width:600px){.float-cta{bottom:calc(20px + env(safe-area-inset-bottom,0px));font-size:12.5px;padding:9px 17px}}
 
+/* ===== NOTIFICATION BANNER (mobile) ===== */
+/* iOS-style push-notification card that drops from the top shortly after
+   load — Cued texts first, literally. Overlays the nav like a real
+   notification; tap scrolls to the first tour section (opening the thread).
+   Mobile-only for now; desktop has its own hero choreography. */
+.notif{
+  position:fixed;top:10px;left:10px;right:10px;z-index:60;
+  display:flex;gap:11px;align-items:flex-start;
+  max-width:430px;margin:0 auto;padding:12px 14px;
+  background:var(--notif-bg);
+  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+  border-radius:22px;box-shadow:0 10px 34px rgba(10,22,40,.22);
+  font-family:var(--f-msg);cursor:pointer;
+  transform:translateY(calc(-100% - 16px));transition:transform .55s var(--ease);
+}
+.notif.in{transform:none}
+.notif img{width:38px;height:38px;flex:none}
+/* Theme-matched mark, same pattern as the nav brand. */
+.notif .logo-dark{display:none}
+html.dark .notif .logo-light{display:none}
+html.dark .notif .logo-dark{display:block}
+.notif-body{flex:1;min-width:0}
+.notif-top{display:flex;justify-content:space-between;align-items:baseline}
+.notif-app{font-size:15px;font-weight:600;color:var(--ink)}
+.notif-time{font-size:13px;color:var(--ink-3)}
+.notif-text{font-size:15px;line-height:1.35;color:var(--ink);margin-top:1px}
+@media(min-width:768px){.notif{display:none}}
+
 /* ===== PROGRESS RAIL (left) ===== */
 /* Descended from the live site's right-rail page indicators, mirrored to
    the left edge and quieted down to dots: one 5px dot per [data-label]
@@ -251,7 +284,7 @@ nav .brand.compact span{opacity:0;transition:opacity .2s ease .1s}
    through its hold budget, so wheel ticks inside a section rest freely; once
    its stage unpins, the scroller snaps onto the next section. Pin mode only —
    the flow layout is a plain document and must scroll freely. */
-@media (min-width:768px) and (prefers-reduced-motion: no-preference){
+@media (prefers-reduced-motion: no-preference){
   html{scroll-snap-type:y mandatory}
   .sec{scroll-snap-align:start;scroll-snap-stop:always}
 }
@@ -353,6 +386,20 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
    start right under it — the bubbles are the headline, same as desktop —
    then a full-width waitlist CTA and a quiet FAQs link. */
 @media(max-width:767.98px){
+  /* The nav is just the wordmark's landing spot on mobile — no dark-mode
+     toggle, no "get started" (the hero CTA and floating pill carry signup). */
+  .nav-right{display:none}
+  /* The hero alone stays a static flow block on mobile — the tour sections
+     below it pin like desktop (their mobile sizing lives in the width block
+     near the end of the sheet). */
+  #hero{height:auto;padding-top:84px}
+  #hero .stage{position:static;height:auto;overflow:visible}
+  #hero .stage::before{content:none}
+  #hero .shell{position:static;width:auto;height:auto;padding:0 20px}
+  #hero .thread{
+    position:static;width:100%;max-width:640px;margin:10px auto 0;
+    transform:none!important;transition:none;font-size:17px;
+  }
   /* Crop the band further: the svg's natural height is ~85vw, the container
      clips it to 64vw and a mask fades the cut edge out so the line art
      dissolves instead of slicing — buys the thread ~80px of first-screen
@@ -363,8 +410,14 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
     mask-image:linear-gradient(to bottom,#000 70%,transparent 100%);
   }
   .hero-art svg{width:250vw;height:auto;max-height:none;aspect-ratio:1920/650;margin-left:14.5vw}
-  #hero .thread{margin-top:10px}
   .hero-mobile{display:block;padding:28px 22px 8px}
+  /* The CTA block pops in only after the intro bubbles settle (heroDone),
+     same reveal grammar as the bubbles. JS-less loads render it visible. */
+  .js .hero-mobile{
+    opacity:0;transform:translateY(10px) scale(.97);
+    transition:opacity 380ms var(--ease),transform 380ms var(--ease);
+  }
+  .js .hero-mobile.on{opacity:1;transform:none}
   .cta.hm-cta{width:100%;justify-content:center;padding:17px 24px;font-size:16px;border-radius:14px}
   .hm-faq{display:block;width:max-content;margin:16px auto 0;padding:6px 10px;color:var(--ink-3);font-size:14px;font-weight:500}
   .scroll-cue{display:none}  /* the FAQs link is the "more below" cue here */
@@ -551,10 +604,32 @@ footer .fmeta{margin-top:10px}
 .wl-success p{font-size:15px;color:var(--ink-2);line-height:1.55;max-width:320px;margin:0 auto}
 .wl-form.hidden{display:none}
 
-/* ===== MOBILE / FLOW LAYOUT (<768px, and any width with reduced motion) =====
+/* ===== MOBILE SIZING (<768px, all modes) =====
+   The tour pins on mobile too — same machinery as desktop. These are size
+   adaptations, not a layout fork: dvh-measured stages (iOS's dynamic
+   toolbar), a tight shell, real-Messages 17px bubbles, smaller pinned
+   headers, compact close section. The hero's mobile layout lives in the
+   width block up by the hero styles. */
+@media (max-width:767.98px){
+  .sec--pin{height:calc(100dvh + 2 * var(--reveal-step))}
+  .stage{height:100dvh}
+  .shell{width:auto;margin:0 20px}
+  .thread{font-size:17px}
+  .msg{max-width:78%}
+  .msg.photo{max-width:62%}
+  .msg.photo.tall{max-width:46%}
+  .sec-h .hdr{font-size:24px}
+  .close{min-height:0}
+  .close .shell{width:auto;margin:0;padding:24px 20px 32px}
+  .close .thread,.close-cta{width:100%;max-width:640px;margin-left:auto;margin-right:auto}
+  .close-cta{margin-top:36px}
+  .cta{width:100%;justify-content:center}
+}
+
+/* ===== FLOW LAYOUT (prefers-reduced-motion, any width) =====
    No pinning, no sticky, no push-up. A plain vertical thread; headers become
    inline dividers; bubbles fade in on IntersectionObserver. */
-@media (max-width:767.98px), (prefers-reduced-motion: reduce){
+@media (prefers-reduced-motion: reduce){
   .sec--pin{height:auto}
   .stage{position:static;height:auto;overflow:visible}
   .stage::before{content:none}   /* scrim is a pin-mode device */
@@ -583,7 +658,7 @@ footer .fmeta{margin-top:10px}
   .cta{width:100%;justify-content:center}
 }
 @media (prefers-reduced-motion: reduce){
-  [data-r],[data-io],.hdr-flow{opacity:1!important;transform:none!important;transition:none!important}
+  [data-r],[data-io],.hdr-flow,.hero-mobile{opacity:1!important;transform:none!important;transition:none!important}
   .thread{transition:none!important}
   .sec-h{transition:none!important}
   .sec-h .hdr{transition:none!important}
@@ -615,6 +690,18 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     <button type="button" class="nav-cta" id="navCta">get started</button>
   </div>
 </nav>
+
+<!-- iOS-style notification banner (mobile) — drops in shortly after load,
+     previewing the first tour message; tap scrolls to that section. Decorative
+     and aria-hidden: the same text lives in "i text first" below. -->
+<div class="notif" id="notif" aria-hidden="true">
+  <img class="logo-light" src="images/cued-logo.svg" alt="">
+  <img class="logo-dark" src="images/cued-logo-reversed.svg" alt="">
+  <div class="notif-body">
+    <div class="notif-top"><span class="notif-app">cued</span><span class="notif-time">now</span></div>
+    <div class="notif-text">gym's dead right now and you're out of class till 3.</div>
+  </div>
+</div>
 
 <button type="button" class="float-cta" id="floatCta" aria-label="Join the waitlist">
   Join the waitlist
@@ -1069,7 +1156,9 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 (function(){
   const mqDesktop = matchMedia('(min-width: 768px)');
   const mqReduce  = matchMedia('(prefers-reduced-motion: reduce)');
-  const isPin = () => mqDesktop.matches && !mqReduce.matches;
+  // The tour pins at every width — only reduced motion gets the flow layout.
+  // mqDesktop still distinguishes width-specific chrome (hero CTA vs pill).
+  const isPin = () => !mqReduce.matches;
 
   const sections = Array.from(document.querySelectorAll('.sec--pin')).map(sec => {
     const items = Array.from(sec.querySelectorAll('[data-r]'));
@@ -1221,11 +1310,11 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   // The hero opens with the Campanile fully drawn and the first bubble
   // already on screen. The rest pop in on their own — the thread pushing up
   // like real Messages — at the reader's first scroll gesture, or after a
-  // ~2s idle beat if they don't scroll, while the hero's sticky stage keeps
-  // the page from scrolling out from under them. Mobile flow mode keeps the
-  // thread under the blown-up drawing; the follow-ups pop shortly after load
-  // (the transform is overridden by CSS, so it's just the staggered pop-in).
-  // Reduced motion: CSS already shows every bubble.
+  // ~2s idle beat if they don't scroll. Desktop: the sticky stage keeps the
+  // page from scrolling out from under them. Mobile: the thread sits under
+  // the blown-up drawing (transform overridden by CSS — just the staggered
+  // pop-in) and the .hero-mobile CTA block pops once the sequence settles.
+  // Reduced motion: CSS already shows every bubble and the CTA.
   const heroEl = document.getElementById('hero');
   const heroItems = heroEl ? Array.from(heroEl.querySelectorAll('[data-r]')) : [];
   const heroThread = heroEl ? heroEl.querySelector('.thread') : null;
@@ -1245,10 +1334,15 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   // after the last hero bubble settles. heroDone gates it; chromeRefresh is
   // assigned by the scroll-chrome block below so the timeout can re-check.
   let heroDone = false, chromeRefresh = null;
+  const heroMobile = heroEl ? heroEl.querySelector('.hero-mobile') : null;
   function playHero(){
     if (!heroItems.length) return;
     setTrace(1);   // drawing complete from the first frame
-    if (mqReduce.matches){ heroDone = true; return; }
+    if (mqReduce.matches){
+      heroDone = true;
+      if (heroMobile) heroMobile.classList.add('on');
+      return;
+    }
     heroApply(1);  // first bubble is on screen from load
     let played = false, idleT = 0;
     const start = (t0) => {
@@ -1259,16 +1353,15 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       for (let i = 1; i < heroItems.length; i++){
         setTimeout(() => heroApply(i + 1), t0 + (i - 1) * HERO_STEP);
       }
-      setTimeout(() => { heroDone = true; if (chromeRefresh) chromeRefresh(); },
-        t0 + (heroItems.length - 2) * HERO_STEP + HERO_SETTLE);
+      setTimeout(() => {
+        heroDone = true;
+        if (heroMobile) heroMobile.classList.add('on');   // mobile hero CTA beat
+        if (chromeRefresh) chromeRefresh();
+      }, t0 + (heroItems.length - 2) * HERO_STEP + HERO_SETTLE);
     };
     const onScroll = () => start(150);
-    if (isPin()){
-      window.addEventListener('scroll', onScroll, {passive: true});
-      idleT = setTimeout(() => start(0), HERO_IDLE);   // no scroll? play anyway
-    } else {
-      start(500);   // flow mode: pop the intro in shortly after load
-    }
+    window.addEventListener('scroll', onScroll, {passive: true});
+    idleT = setTimeout(() => start(0), HERO_IDLE);   // no scroll? play anyway
   }
 
   function update(){
@@ -1415,11 +1508,11 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       if (railEl) railEl.classList.toggle('show', pastHero);
       if (floatCta){
         const closeNear = closeSec && closeSec.getBoundingClientRect().top < window.innerHeight * 0.85;
-        // Pin mode: on the hero the pill waits for the bubble sequence to
-        // settle (heroDone); past the hero it shows regardless. Flow mode:
-        // the mobile hero has its own full-width CTA, so the pill only
-        // surfaces once the hero is scrolled past.
-        const showPill = (isPin() ? (pastHero || heroDone) : pastHero) && !closeNear;
+        // Desktop: on the hero the pill waits for the bubble sequence to
+        // settle (heroDone); past the hero it shows regardless. Mobile: the
+        // hero has its own full-width CTA, so the pill only surfaces once
+        // the hero is scrolled past.
+        const showPill = (mqDesktop.matches ? (pastHero || heroDone) : pastHero) && !closeNear;
         // First appearance only: a couple of small hops to catch the eye.
         if (showPill && !floatCta.classList.contains('show') && !floatCta.dataset.nudged){
           floatCta.dataset.nudged = '1';
@@ -1434,6 +1527,22 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     chromeRefresh = chromeChk;
     window.addEventListener('scroll', () => { if (!bt){ bt = true; requestAnimationFrame(chromeChk); } }, {passive: true});
     chromeChk();
+  }
+
+  // === Notification banner (mobile) ===
+  // Drops in ~1.2s after load — the "Cued texts first" beat, landing before
+  // the intro bubbles start popping — then auto-dismisses. Tapping it scrolls
+  // to the first tour section, like opening the message.
+  const notif = document.getElementById('notif');
+  if (notif && !mqDesktop.matches && !mqReduce.matches){
+    setTimeout(() => notif.classList.add('in'), 1200);
+    const notifOut = setTimeout(() => notif.classList.remove('in'), 7600);
+    notif.addEventListener('click', () => {
+      clearTimeout(notifOut);
+      notif.classList.remove('in');
+      const first = document.querySelector('.sec--pin');
+      if (first) first.scrollIntoView({behavior: 'smooth'});
+    });
   }
 
   // Close section (+ its CTA) fades in in both modes.
