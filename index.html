@@ -217,7 +217,7 @@ nav .brand.compact span{opacity:0;transition:opacity .2s ease .1s}
 .scroll-cue svg{display:block;width:100%;height:100%;animation:cueBob 1.6s ease-in-out infinite}
 @keyframes cueBob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
 @media(max-width:600px){.scroll-cue{bottom:0;width:18px;height:18px}}
-@media(max-width:600px){.float-cta{bottom:18px;font-size:12.5px;padding:9px 17px}}
+@media(max-width:600px){.float-cta{bottom:calc(20px + env(safe-area-inset-bottom,0px));font-size:12.5px;padding:9px 17px}}
 
 /* ===== PROGRESS RAIL (left) ===== */
 /* Descended from the live site's right-rail page indicators, mirrored to
@@ -342,7 +342,32 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
 .hero-art{position:absolute;left:0;right:0;bottom:0;pointer-events:none}
 .hero-art svg{display:block;width:100%;max-height:62vh}
 .hero-art .trace{fill:none;stroke:#fff;stroke-width:64;stroke-linecap:round;stroke-linejoin:round}
-@media(max-width:767px){.hero-art{display:none}}
+/* Mobile hero copy block — hidden on desktop, where the bubbles are the
+   headline. Styled inside the <768px block below. */
+.hero-mobile{display:none}
+/* Mobile hero — ported from the live site's mobile load. The panoramic band
+   would shrink the Campanile into a sliver, so blow the image up well past
+   the viewport and shift it right so the tower (~14% across the source, same
+   as the live the-one.png) sits centered and dominant; overflow:hidden clips
+   the oversized edges. Below it: serif headline → subhead → full-width CTA →
+   quiet FAQs link, stacked (no scrim needed — nothing overlaps the art).
+   The desktop bubble intro is hidden here; the headline carries the claim. */
+@media(max-width:767.98px){
+  .hero-art{position:relative;overflow:hidden}
+  .hero-art svg{width:250vw;height:auto;max-height:none;aspect-ratio:1920/650;margin-left:14.5vw}
+  #hero .shell{display:none}
+  .hero-mobile{display:block;padding:14px 22px 8px}
+  .hero-mobile h1{
+    font-family:var(--f-header);font-weight:400;
+    font-size:clamp(2.2rem,10.5vw,2.8rem);line-height:1.06;letter-spacing:-1px;
+    color:var(--ink);margin:0 0 16px;max-width:14ch;
+  }
+  .hero-mobile h1 span{color:var(--blue)}
+  .hero-mobile p{font-size:15.5px;line-height:1.55;color:var(--ink-2);margin:0 0 26px;max-width:32ch}
+  .cta.hm-cta{width:100%;justify-content:center;padding:17px 24px;font-size:16px;border-radius:14px}
+  .hm-faq{display:block;width:max-content;margin:16px auto 0;padding:6px 10px;color:var(--ink-3);font-size:14px;font-weight:500}
+  .scroll-cue{display:none}  /* the FAQs link is the "more below" cue here */
+}
 
 /* ===== BUBBLES ===== */
 .msg{
@@ -536,8 +561,8 @@ footer .fmeta{margin-top:10px}
   .sec-h{display:none}
   .hdr-flow{
     display:block;font-family:var(--f-header);font-weight:400;
-    font-size:20px;line-height:1.2;color:var(--ink);text-align:center;
-    margin:3rem auto 1.5rem;max-width:640px;
+    font-size:27px;line-height:1.15;color:var(--ink);text-align:center;
+    margin:4rem auto 1.75rem;max-width:640px;
   }
   .thread{
     position:static;width:100%;max-width:640px;margin:0 auto;
@@ -658,6 +683,14 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
           <div class="msg cued" data-r>food log, workout tracker, wearables, class schedule, i handle it all. all in your messages. </div>
           <div class="msg cued t" data-r>ready to make fitness easy?</div>
         </div>
+      </div>
+      <!-- Mobile-only hero copy (see .hero-mobile) — the live site's mobile
+           load: headline + subhead + full-width CTA under the drawing. -->
+      <div class="hero-mobile">
+        <h1>Meet <span>cued</span>.<br>made for your college life.</h1>
+        <p>Your personal fitness coach.<br>No app — just texts.</p>
+        <button type="button" class="cta hm-cta" id="heroCta">Join the waitlist <span aria-hidden="true">→</span></button>
+        <a class="hm-faq" href="#faq">FAQs ↓</a>
       </div>
     </div>
   </section>
@@ -1190,10 +1223,10 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   // already on screen. The rest pop in on their own — the thread pushing up
   // like real Messages — at the reader's first scroll gesture, or after a
   // ~2s idle beat if they don't scroll, while the hero's sticky stage keeps
-  // the page from scrolling out from under them. Mobile flow mode has no
-  // drawing (hidden <768px), so there the follow-ups pop shortly after load
-  // (the transform is overridden by CSS, so it's just the staggered pop-in).
-  // Reduced motion: CSS already shows every bubble.
+  // the page from scrolling out from under them. Mobile flow mode hides the
+  // hero thread entirely (.hero-mobile replaces it), but the timeline still
+  // runs on hidden elements so a resize into pin mode lands on a settled
+  // hero. Reduced motion: CSS already shows every bubble.
   const heroEl = document.getElementById('hero');
   const heroItems = heroEl ? Array.from(heroEl.querySelectorAll('[data-r]')) : [];
   const heroThread = heroEl ? heroEl.querySelector('.thread') : null;
@@ -1235,7 +1268,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       window.addEventListener('scroll', onScroll, {passive: true});
       idleT = setTimeout(() => start(0), HERO_IDLE);   // no scroll? play anyway
     } else {
-      start(500);   // no drawing on mobile — don't open on an empty page
+      start(500);   // thread is hidden here — runs only to keep state settled
     }
   }
 
@@ -1383,9 +1416,11 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       if (railEl) railEl.classList.toggle('show', pastHero);
       if (floatCta){
         const closeNear = closeSec && closeSec.getBoundingClientRect().top < window.innerHeight * 0.85;
-        // On the hero the pill waits for the bubble sequence to settle
-        // (heroDone); past the hero it shows regardless.
-        const showPill = (pastHero || heroDone) && !closeNear;
+        // Pin mode: on the hero the pill waits for the bubble sequence to
+        // settle (heroDone); past the hero it shows regardless. Flow mode:
+        // the mobile hero has its own full-width CTA, so the pill only
+        // surfaces once the hero is scrolled past.
+        const showPill = (isPin() ? (pastHero || heroDone) : pastHero) && !closeNear;
         // First appearance only: a couple of small hops to catch the eye.
         if (showPill && !floatCta.classList.contains('show') && !floatCta.dataset.nudged){
           floatCta.dataset.nudged = '1';
@@ -1511,7 +1546,9 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   const navCta = document.getElementById('navCta');
   const closeCta = document.getElementById('closeCta');
   const floatCta = document.getElementById('floatCta');
+  const heroCta = document.getElementById('heroCta');
   navCta && navCta.addEventListener('click', () => open('nav'));
+  heroCta && heroCta.addEventListener('click', () => open('hero'));
   closeCta && closeCta.addEventListener('click', () => open('close'));
   floatCta && floatCta.addEventListener('click', () => open('floating'));
 
