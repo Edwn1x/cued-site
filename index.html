@@ -6,10 +6,11 @@
   side of the screen: Cued is blue and RIGHT-aligned, the user is gray and
   LEFT-aligned. No phone mockup, no device chrome — the page is the interface.
 
-  Desktop (≥768px, motion OK): each section is a tall scroll container with a
-  sticky 100vh stage. Bubbles reveal on scroll progress (idempotent — scrubbing
-  backward un-reveals). New bubbles enter at the bottom; the thread translates
-  up to make room, like real Messages. Section header is pinned at top:10vh.
+  Desktop (≥768px, motion OK): each section has a sticky 100vh stage with a
+  short hold budget. Scroll brings a section on stage; its choreography then
+  auto-plays one-shot on a timeline — blank stage with the header centered,
+  header glides up to top:10vh, then bubbles pop in sequence, the thread
+  translating up to make room like real Messages.
 
   Mobile (<768px) and prefers-reduced-motion: no pinning at all — a plain
   vertical thread with inline section headers; bubbles fade in via
@@ -44,6 +45,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Hedvig+Letters+Serif:opsz@12..24&family=Inter:wght@400;500&family=Outfit:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
+  color-scheme:light;
   /* Color — flat white page; the bubbles are the only color. */
   --blue:#007AFF;        /* Apple iMessage system blue — brand blue globally */
   --blue-deep:#0062CC;   /* hover / pressed */
@@ -53,8 +55,21 @@
   --gray-ink:#000000;
   --bg:#FFFFFF;
   --ink:#0A1628;
+  --ink-2:#4A5A6E;       /* secondary text */
+  --ink-3:#8A95A5;       /* muted text / glyphs */
+  --line:#E5EAF2;        /* hairlines */
+  --fill:#F2F3F5;        /* subtle hover fills */
+  --card:#FFFFFF;        /* elevated surfaces (modal, float-cta hover) */
+  --field:#FFFFFF;       /* form inputs */
+  --dot:#DADFE7;         /* progress rail */
+  --dot-hover:#8A97A8;
+  --overlay:rgba(10,22,40,.5);
+  --error:#C03030;
+  --scrim-a:rgba(255,255,255,.78);   /* header scrim ramp stops */
+  --scrim-b:rgba(255,255,255,.35);
   --poll-fill:#FCEBD0;   /* iOS 26 Messages poll pill */
   --poll-ink:#E9902E;
+  --poll-pick:#FADFB8;
 
   --f-header:'Hedvig Letters Serif', Georgia, 'Times New Roman', serif;
   --f-msg:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -62,11 +77,40 @@
 
   /* Layout */
   --shell:min(1520px, 100vw - 96px);   /* near-full width; capped on huge displays */
-  --reveal-step:45vh;    /* scroll budget per reveal; drop to 35vh if it drags */
-  --msg-size:clamp(26px, 2.5vw, 40px);
+  --reveal-step:45vh;    /* hold-budget unit — pinned sections hold 2 steps */
+  --msg-size:clamp(23px, 2.2vw, 34px);   /* trimmed ~15% — air over bulk */
 
   --ease:cubic-bezier(.22,1,.36,1);
 }
+/* Dark mode — real Messages dark: true-black page, #3B3B3D received bubbles,
+   iOS dark-system-blue sent bubbles. Toggled by the nav switch (html.dark),
+   persisted in localStorage, applied pre-paint by the head script. */
+html.dark{
+  color-scheme:dark;
+  --blue:#0A84FF;        /* iOS dark-mode system blue */
+  --blue-deep:#3395FF;   /* hover lightens on dark */
+  --blue-soft:#123A63;
+  --gray:#3B3B3D;        /* received bubble, iMessage dark mode */
+  --gray-ink:#FFFFFF;
+  --bg:#000000;
+  --ink:#F5F5F7;
+  --ink-2:#A8B3C2;
+  --ink-3:#6E7A8A;
+  --line:#26262A;
+  --fill:#1C1C1E;
+  --card:#1C1C1E;
+  --field:#2C2C2E;
+  --dot:#3A3A3F;
+  --dot-hover:#6E7A8A;
+  --overlay:rgba(0,0,0,.6);
+  --error:#FF7369;
+  --scrim-a:rgba(0,0,0,.78);
+  --scrim-b:rgba(0,0,0,.35);
+  --poll-fill:#48351A;
+  --poll-ink:#F5A93B;
+  --poll-pick:#6B4E22;
+}
+
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:var(--f-msg);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
@@ -82,17 +126,57 @@ nav{
   padding:20px clamp(32px,5vw,84px);
   background:var(--bg);   /* solid — bubbles scroll under it cleanly */
 }
-.brand{font-family:var(--f-brand);font-size:22px;font-weight:400;letter-spacing:-.2px;color:var(--ink)}
+.brand{
+  display:flex;align-items:center;gap:9px;
+  font-family:var(--f-brand);font-size:22px;font-weight:400;letter-spacing:-.2px;color:var(--blue);
+}
+.brand img{display:block;width:28px;height:28px}
+/* Theme-matched mark: blue-on-white in light mode, reversed in dark. */
+.brand .logo-dark{display:none}
+html.dark .brand .logo-light{display:none}
+html.dark .brand .logo-dark{display:block}
 /* Wordmark stays hidden while the hero is on screen — the hero is just the
    bubble and the CTA. Fades in once the reader scrolls past. */
 nav .brand{opacity:0;pointer-events:none;transition:opacity .35s ease}
 nav .brand.show{opacity:1;pointer-events:auto}
+/* Cue-ball roll-in: the ball starts where the wordmark sits and rolls right
+   to its spot as the brand fades in. Rotation is matched to the travel so it
+   reads as rolling, not sliding: 64px ÷ (π × 28px) × 360° ≈ 262°. The word
+   holds until the roll settles, then fades in. Un-showing snaps both back
+   (no transition off .show), so the roll replays on every re-entry. */
+nav .brand img{transform:translateX(-64px) rotate(-262deg)}
+nav .brand.show img{transform:none;transition:transform .65s var(--ease)}
+nav .brand span{opacity:0}
+nav .brand.show span{opacity:1;transition:opacity .35s ease .5s}
+/* Compact: from the "and i act on it" beat onward the ball rolls back over
+   the word and parks in its place — the nav keeps just the cue ball. Placed
+   after the .show rules so it wins when both classes are set; scrubbing back
+   above the beat replays the roll-in. */
+nav .brand.compact img{transform:translateX(-64px) rotate(-262deg);transition:transform .65s var(--ease)}
+nav .brand.compact span{opacity:0;transition:opacity .2s ease .1s}
 .nav-cta{background:none;border:none;cursor:pointer;font-family:var(--f-msg);font-size:15px;font-weight:500;color:var(--ink);padding:6px 2px}
 .nav-cta:hover{color:var(--blue)}
+.nav-right{display:flex;align-items:center;gap:20px}
+
+/* Dark-mode flip switch — iOS-style pill. Track color rides --gray, so it
+   matches the user-bubble gray in both themes; knob slides on toggle. */
+.mode-switch{
+  position:relative;flex:none;width:40px;height:24px;border-radius:999px;
+  background:var(--gray);border:none;cursor:pointer;padding:0;
+  transition:background .25s ease;
+}
+.mode-switch .ms-knob{
+  position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);
+  transition:transform .25s var(--ease);
+}
+.mode-switch[aria-checked="true"] .ms-knob{transform:translateX(16px)}
 
 /* ===== FLOATING WAITLIST CTA ===== */
-/* Ported from the previous live site: fixed bottom-center pill, visible on
-   the tour sections, hidden on the hero and once the close CTA is in view. */
+/* Ported from the previous live site: fixed bottom-center pill. Hidden on
+   the hero until the bubble sequence settles (it pops in a beat later as the
+   hero's CTA), visible through the tour, hidden once the close CTA is in
+   view. */
 .float-cta{
   position:fixed;left:50%;bottom:28px;transform:translate(-50%,12px);
   display:inline-flex;align-items:center;gap:6px;
@@ -106,21 +190,115 @@ nav .brand.show{opacity:1;pointer-events:auto}
   z-index:45;
 }
 .float-cta.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
-.float-cta:hover{background:#fff;border-color:rgba(0,122,255,.35);color:var(--blue);box-shadow:0 4px 14px rgba(10,22,40,.08)}
+.float-cta:hover{background:var(--card);border-color:rgba(0,122,255,.35);color:var(--blue);box-shadow:0 4px 14px rgba(10,22,40,.08)}
 .float-cta .arrow{display:inline-block;transition:transform .2s ease}
 .float-cta:hover .arrow{transform:translateX(3px)}
+/* Attention nudge — the first time the pill surfaces it hops twice once the
+   rise-in settles, then sits still for good. Keyframes carry the pill's own
+   centering translate so the hop composes with it. */
+.float-cta.nudge{animation:ctaNudge 1.1s var(--ease) .5s}
+@keyframes ctaNudge{
+  0%,60%,100%{transform:translate(-50%,0)}
+  16%{transform:translate(-50%,-9px) rotate(-2deg)}
+  34%{transform:translate(-50%,0)}
+  46%{transform:translate(-50%,-5px) rotate(1.5deg)}
+}
+
+/* ===== SCROLL CUE ===== */
+/* A small bobbing chevron under the waitlist pill, hero only: it surfaces
+   with the pill once the hero settles ("there's more below"), and leaves as
+   soon as the reader starts scrolling. */
+.scroll-cue{
+  position:fixed;left:50%;bottom:5px;transform:translateX(-50%);
+  width:20px;height:20px;color:var(--ink-3);
+  opacity:0;pointer-events:none;transition:opacity .35s ease;z-index:45;
+}
+.scroll-cue.show{opacity:1}
+.scroll-cue svg{display:block;width:100%;height:100%;animation:cueBob 1.6s ease-in-out infinite}
+@keyframes cueBob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+@media(max-width:600px){.scroll-cue{bottom:0;width:18px;height:18px}}
 @media(max-width:600px){.float-cta{bottom:18px;font-size:12.5px;padding:9px 17px}}
+
+/* ===== PROGRESS RAIL (left) ===== */
+/* Descended from the live site's right-rail page indicators, mirrored to
+   the left edge and quieted down to dots: one 5px dot per [data-label]
+   section; the active one inks and grows slightly (transform only — no
+   layout shift). Hidden on the hero (like the wordmark and floating CTA),
+   fading in once the tour starts — so the hero has no dot of its own. */
+.rail{
+  position:fixed;left:22px;top:50%;transform:translateY(-50%);
+  z-index:40;display:none;flex-direction:column;gap:6px;
+  opacity:0;pointer-events:none;transition:opacity .35s ease;
+}
+.rail.show{opacity:1;pointer-events:auto}
+@media(min-width:900px){.rail{display:flex}}
+.rail button{
+  display:flex;align-items:center;justify-content:center;
+  width:18px;height:18px;padding:0;background:transparent;border:none;cursor:pointer;
+}
+.rail button .dot{
+  display:block;width:5px;height:5px;border-radius:50%;background:var(--dot);
+  transition:transform .25s ease,background .25s ease;
+}
+.rail button[aria-current="true"] .dot{background:var(--ink);transform:scale(1.4)}
+.rail button:hover .dot{background:var(--dot-hover)}
+.rail button[aria-current="true"]:hover .dot{background:var(--ink)}
 
 /* ===== SECTIONS / STICKY STAGE ===== */
 .sec{position:relative}
-/* height = 100vh + (reveals − 1) × step; --n set inline per section */
-.sec--pin{height:calc(100vh + (var(--n) - 1) * var(--reveal-step))}
+/* Section snap — the page always comes to rest locked on a section, never in
+   the seam between two. A section taller than the viewport "covers" it
+   through its hold budget, so wheel ticks inside a section rest freely; once
+   its stage unpins, the scroller snaps onto the next section. Pin mode only —
+   the flow layout is a plain document and must scroll freely. */
+@media (min-width:768px) and (prefers-reduced-motion: no-preference){
+  html{scroll-snap-type:y mandatory}
+  .sec{scroll-snap-align:start;scroll-snap-stop:always}
+}
+/* Auto-play sections: once the pin engages, the choreography (centered
+   header → header rises → bubbles) runs on a timeline, so height no longer
+   scales with reveal count — every section gets the same hold budget as the
+   hero, just enough to keep the stage pinned while the reader lingers. */
+.sec--pin{height:calc(100vh + 2 * var(--reveal-step))}
+/* Hero pins like the tour sections (its .stage rides the same sticky rule),
+   but its reveals are time-driven, not scrubbed: the first scroll starts the
+   bubble pop-in while the stage holds still, so reading never races the
+   scroll. 90vh of budget covers the play-and-read beat before the tour
+   engages. Not .sec--pin — the scroll machinery must not scrub it. */
+#hero{height:calc(100vh + 2 * var(--reveal-step))}
 .stage{position:sticky;top:0;height:100vh;overflow:hidden}
 .shell{position:relative;width:var(--shell);height:100%;margin:0 auto}
 
+/* Scrim — as the thread pushes up, its oldest bubbles fade into the page
+   white just under the pinned header instead of painting over it (messages
+   scrolling off the top of a real thread). Stage-space overlay: solid across
+   the header band, dissolving over the next 90px. Pin mode only — the flow
+   layout has inline headers and nothing pinned (disabled in the flow media
+   block below). */
+.stage::before{
+  content:'';position:absolute;top:0;left:0;right:0;z-index:2;
+  height:calc(10vh + 92px);
+  /* Solid only through the header band, then a short eased ramp — bubbles
+     stay fully visible until just under the header instead of getting
+     veiled a whole bubble-height early. */
+  background:linear-gradient(to bottom,
+    var(--bg) calc(100% - 62px),
+    var(--scrim-a) calc(100% - 40px),
+    var(--scrim-b) calc(100% - 18px),
+    transparent);
+  pointer-events:none;
+}
+
 /* Header — nailed at top:10vh, centered on the shell (not the thread column).
-   Crossfades in place (240ms) on a beat change; position never drifts. */
-.sec-h{position:absolute;top:10vh;left:0;right:0;text-align:center;pointer-events:none}
+   Crossfades in place (240ms) on a beat change; position never drifts.
+   z-index lifts it above the scrim. */
+.sec-h{position:absolute;top:10vh;left:0;right:0;text-align:center;pointer-events:none;z-index:3}
+/* Section intro beat — while nothing is revealed (k=0) the stage is blank
+   and the header waits center-screen; on the first reveal it glides up to
+   its pinned spot. Transition gated on .anim so a mid-page load doesn't
+   animate it into place. */
+.sec-h.mid{transform:translateY(40vh)}
+.anim .sec-h{transition:transform .6s var(--ease)}
 .sec-h .hdr{
   position:absolute;left:0;right:0;top:0;
   font-family:var(--f-header);font-weight:400;
@@ -148,19 +326,19 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
 }
 .anim .thread{transition:transform 380ms var(--ease)}
 /* Hero: lift the thread off the bottom corner, but keep the anchor low enough
-   that the full three-bubble stack still fits under the nav — anchoring near
+   that the full four-bubble stack still fits under the nav — anchoring near
    center clips the first bubble off the top of the stage once the follow-ups
    push it up. */
-#hero .thread{bottom:18vh}
+#hero .thread{bottom:12vh}
 
 /* ===== HERO ART — the live site's Campanile drawing ===== */
 /* images/hero-drawing.png is the-one.png with the paper-gray background keyed
-   to transparency and the ink recolored to the brand blue. In pin mode the
-   drawing is "traced" in as you scroll: short brush strokes over the artwork
-   reveal via stroke-dashoffset in a pseudo-random sketch order, a pure
-   function of the hero's scroll progress like every other reveal. Flow mode
-   shows it fully drawn; hidden on mobile, where the plain vertical thread
-   leaves no room for a panorama. */
+   to transparency and the ink recolored to the brand blue. Shown fully drawn
+   from the first frame — the hero opens as a still page. The stroke-mask
+   trace machinery (short brush strokes revealed via stroke-dashoffset in a
+   pseudo-random sketch order) is kept but set complete at load, in case the
+   traced-in opening comes back. Hidden on mobile, where the plain vertical
+   thread leaves no room for a panorama. */
 .hero-art{position:absolute;left:0;right:0;bottom:0;pointer-events:none}
 .hero-art svg{display:block;width:100%;max-height:62vh}
 .hero-art .trace{fill:none;stroke:#fff;stroke-width:64;stroke-linecap:round;stroke-linejoin:round}
@@ -168,7 +346,7 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
 
 /* ===== BUBBLES ===== */
 .msg{
-  position:relative;max-width:46%;
+  position:relative;max-width:40%;
   padding:.52em .82em;border-radius:1.05em;
   font-weight:400;line-height:1.28;
   margin-top:.3em;               /* gap, same sender */
@@ -192,8 +370,18 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
 
 /* Photo attachment — user-sent, rendered as a rounded image, no bubble fill
    (matches real Messages photo behavior). */
-.msg.photo{background:none;padding:0;max-width:34%;border-radius:1.05em;overflow:hidden;line-height:0}
+.msg.photo{background:none;padding:0;max-width:24%;border-radius:1.05em;overflow:hidden;line-height:0}
 .msg.photo svg,.msg.photo img{display:block;width:100%;height:auto;border-radius:1.05em}
+/* Portrait photos (the receipt) run narrower so their height stays in the
+   same band as the landscape shots. */
+.msg.photo.tall{max-width:20%}
+
+/* Chart bubble — weekly-volume bars inside a standard Cued bubble; reads as
+   an attachment, not a dashboard. One inline SVG (bars + day initials, both
+   currentColor = bubble ink, so they stay white on the blue fill in both
+   themes), sized in em so it rides the thread scale. Bar area ≈ 1.6× the
+   bubble line-height; initials land at ≈0.42em of bubble text. */
+.msg.chart svg{display:block;width:9em;max-width:100%;height:auto;margin:.15em 0 .05em}
 
 /* App-icon grid — a single gray user bubble holding a horizontal icon row.
    No labels, no strikethroughs. */
@@ -226,7 +414,7 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
   transform:scale(0);transition:transform .28s var(--ease);
 }
 /* Selected state — ring fills, pill deepens, one quick pulse */
-.poll.chosen .poll-row.pick{background:#FADFB8}
+.poll.chosen .poll-row.pick{background:var(--poll-pick)}
 .poll.chosen .poll-row.pick i{background:var(--poll-ink)}
 .poll.chosen .poll-row.pick i::after{transform:scale(1)}
 .anim .poll.chosen .poll-row.pick{animation:pollPick .45s var(--ease)}
@@ -234,6 +422,35 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
   0%{transform:scale(1)}
   35%{transform:scale(1.04)}
   100%{transform:scale(1)}
+}
+
+/* ===== CHECKLIST (i log your sets) ===== */
+/* The planned session sent as a tappable list — one row per set, target
+   pre-filled. Same pill family and row anatomy as the schedule picker above
+   (width matched to the widest Cued bubble by the same JS), but any number
+   of rows can be done: .done = set logged. Tapping a row logs it manually;
+   the story logs rows itself as it plays and skips ones already tapped. */
+.checklist{
+  align-self:flex-end;display:flex;flex-direction:column;gap:.4em;
+  margin-top:.48em;              /* ≈ .3em at bubble scale (this box is .62em) */
+  font-size:.62em;font-weight:600;color:var(--poll-ink);
+}
+.poll-row.done{background:var(--poll-pick)}
+.poll-row.done i{background:var(--poll-ink)}
+.poll-row.done i::after{transform:scale(1)}
+.anim .poll-row.done{animation:pollPick .45s var(--ease)}
+
+/* ===== WORKOUT CARD ===== */
+/* Session summary inside a standard Cued bubble — reads as an attachment,
+   like the chart. All type rides the bubble ink (constant white on blue in
+   both themes); em-sized so it scales with the thread. Only the PR set is
+   emphasized — weight, not color. */
+.msg.card .wc-head{font-size:.62em;font-weight:600;opacity:.85;margin-bottom:.45em}
+.msg.card .wc-row{font-size:.58em;line-height:1.6;opacity:.92;white-space:nowrap}
+.msg.card .wc-pr{font-weight:700;opacity:1}
+.msg.card .wc-foot{
+  font-size:.58em;font-weight:600;margin-top:.5em;padding-top:.5em;
+  border-top:1px solid color-mix(in srgb, currentColor 30%, transparent);
 }
 
 /* ===== REVEAL STATES ===== */
@@ -261,51 +478,51 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
 .faq-wrap{max-width:840px;margin:0 auto}
 .faq-head{text-align:center;margin-bottom:36px}
 .faq-head h2{font-family:var(--f-header);font-weight:400;font-size:clamp(1.9rem,3vw,2.6rem);letter-spacing:-.5px;color:var(--ink);margin-bottom:8px}
-.faq-head p{font-size:16px;color:#4A5A6E}
-.faq-list details{border-top:1px solid #E5EAF2}
-.faq-list details:last-child{border-bottom:1px solid #E5EAF2}
+.faq-head p{font-size:16px;color:var(--ink-2)}
+.faq-list details{border-top:1px solid var(--line)}
+.faq-list details:last-child{border-bottom:1px solid var(--line)}
 .faq-list summary{
   list-style:none;cursor:pointer;padding:20px 0;
   display:flex;justify-content:space-between;align-items:center;gap:20px;
   font-size:16.5px;font-weight:500;color:var(--ink);letter-spacing:-.1px;
 }
 .faq-list summary::-webkit-details-marker{display:none}
-.faq-list summary::after{content:'+';font-size:22px;font-weight:300;color:#8A95A5;transition:color .15s;flex-shrink:0}
+.faq-list summary::after{content:'+';font-size:22px;font-weight:300;color:var(--ink-3);transition:color .15s;flex-shrink:0}
 .faq-list details[open] summary::after{content:'–';color:var(--blue)}
 .faq-list details[open] summary{color:var(--blue)}
-.faq-body{padding:0 0 20px;color:#4A5A6E;font-size:15px;line-height:1.65;max-width:680px}
+.faq-body{padding:0 0 20px;color:var(--ink-2);font-size:15px;line-height:1.65;max-width:680px}
 @media(max-width:600px){.faq{padding-top:72px}}
 
-footer{padding:28px 20px 32px;text-align:center;font-size:13px;color:#8A95A5}
-footer a{margin:0 10px;color:#4A5A6E}
+footer{padding:28px 20px 32px;text-align:center;font-size:13px;color:var(--ink-3)}
+footer a{margin:0 10px;color:var(--ink-2)}
 footer a:hover{color:var(--ink)}
 footer .fmeta{margin-top:10px}
 
 /* ===== WAITLIST MODAL ===== */
-.wl-overlay{position:fixed;inset:0;background:rgba(10,22,40,.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:100;display:none;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .25s ease}
+.wl-overlay{position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:100;display:none;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .25s ease}
 .wl-overlay.open{display:flex}
 .wl-overlay.show{opacity:1}
-.wl-modal{background:var(--bg);border-radius:24px;padding:36px clamp(28px,4vw,40px);width:100%;max-width:440px;box-shadow:0 24px 80px rgba(10,22,40,.28);position:relative;transform:translateY(12px);transition:transform .3s var(--ease)}
+.wl-modal{background:var(--card);border-radius:24px;padding:36px clamp(28px,4vw,40px);width:100%;max-width:440px;box-shadow:0 24px 80px rgba(10,22,40,.28);position:relative;transform:translateY(12px);transition:transform .3s var(--ease)}
 .wl-overlay.show .wl-modal{transform:translateY(0)}
-.wl-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:transparent;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:#8A95A5;font-size:18px;transition:color .15s,background .15s}
-.wl-close:hover{color:var(--ink);background:#F2F3F5}
+.wl-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:transparent;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--ink-3);font-size:18px;transition:color .15s,background .15s}
+.wl-close:hover{color:var(--ink);background:var(--fill)}
 .wl-h{font-family:var(--f-header);font-weight:400;font-size:clamp(1.5rem,2.2vw,1.9rem);letter-spacing:-.4px;line-height:1.1;color:var(--ink);margin-bottom:8px}
-.wl-sub{font-size:14.5px;color:#4A5A6E;line-height:1.55;margin-bottom:24px}
+.wl-sub{font-size:14.5px;color:var(--ink-2);line-height:1.55;margin-bottom:24px}
 .wl-form{display:flex;flex-direction:column;gap:12px}
 .wl-field{display:flex;flex-direction:column;gap:6px}
-.wl-field label{font-size:12px;font-weight:500;letter-spacing:1.2px;text-transform:uppercase;color:#8A95A5}
+.wl-field label{font-size:12px;font-weight:500;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-3)}
 .wl-field label .opt{text-transform:none;letter-spacing:.2px;font-weight:400;margin-left:4px}
-.wl-field input{font-family:var(--f-msg);font-size:15px;padding:12px 14px;border:1px solid #E5EAF2;border-radius:12px;background:#fff;color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s;width:100%}
+.wl-field input{font-family:var(--f-msg);font-size:15px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--field);color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s;width:100%}
 .wl-field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
 .wl-submit{margin-top:8px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 22px;background:var(--blue);color:#fff;font-size:15px;font-weight:500;border-radius:999px;border:none;cursor:pointer;transition:background .15s}
 .wl-submit:hover:not(:disabled){background:var(--blue-deep)}
 .wl-submit:disabled{opacity:.55;cursor:not-allowed}
-.wl-error{font-size:13px;color:#C03030;margin-top:4px;min-height:18px}
+.wl-error{font-size:13px;color:var(--error);margin-top:4px;min-height:18px}
 .wl-success{text-align:center;display:none}
 .wl-success.show{display:block}
 .wl-success-icon{font-size:38px;margin-bottom:10px}
 .wl-success h3{font-family:var(--f-header);font-weight:400;font-size:clamp(1.5rem,2.2vw,1.9rem);color:var(--ink);margin-bottom:10px}
-.wl-success p{font-size:15px;color:#4A5A6E;line-height:1.55;max-width:320px;margin:0 auto}
+.wl-success p{font-size:15px;color:var(--ink-2);line-height:1.55;max-width:320px;margin:0 auto}
 .wl-form.hidden{display:none}
 
 /* ===== MOBILE / FLOW LAYOUT (<768px, and any width with reduced motion) =====
@@ -314,6 +531,7 @@ footer .fmeta{margin-top:10px}
 @media (max-width:767.98px), (prefers-reduced-motion: reduce){
   .sec--pin{height:auto}
   .stage{position:static;height:auto;overflow:visible}
+  .stage::before{content:none}   /* scrim is a pin-mode device */
   .shell{width:auto;height:auto;padding:0 20px}
   .sec-h{display:none}
   .hdr-flow{
@@ -328,7 +546,8 @@ footer .fmeta{margin-top:10px}
   }
   .msg{max-width:78%}
   .msg.photo{max-width:62%}
-  #hero{padding-top:84px}
+  .msg.photo.tall{max-width:46%}
+  #hero{height:auto;padding-top:84px}
   .close{min-height:0}
   /* .close .shell is a flex item: auto margins + width:auto would shrink it
      to fit-content, so stretch it explicitly. */
@@ -340,29 +559,60 @@ footer .fmeta{margin-top:10px}
 @media (prefers-reduced-motion: reduce){
   [data-r],[data-io],.hdr-flow{opacity:1!important;transform:none!important;transition:none!important}
   .thread{transition:none!important}
+  .sec-h{transition:none!important}
   .sec-h .hdr{transition:none!important}
   .poll-row,.poll-row i{transition:none!important;animation:none!important}
   .poll-row i::after{transition:none!important}
+  .rail button .dot{transition:none!important}
+  .float-cta.nudge{animation:none!important}
+  .scroll-cue svg{animation:none!important}
+  .mode-switch,.mode-switch .ms-knob{transition:none!important}
+  nav .brand img{transform:none!important;transition:none!important}
+  nav .brand span{transition:none!important}
 }
 </style>
-<!-- Gate reveal-hiding synchronously so a JS-less load renders fully visible. -->
-<script>document.documentElement.classList.add('js');</script>
+<!-- Gate reveal-hiding synchronously so a JS-less load renders fully visible.
+     Also apply the saved theme pre-paint so dark mode doesn't flash white. -->
+<script>
+document.documentElement.classList.add('js');
+try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}
+</script>
 </head>
 <body>
 
 <nav>
-  <a href="#" class="brand">cued</a>
-  <button type="button" class="nav-cta" id="navCta">get started</button>
+  <a href="#" class="brand"><span>cued</span><img class="logo-light" src="images/cued-logo.svg" alt=""><img class="logo-dark" src="images/cued-logo-reversed.svg" alt=""></a>
+  <div class="nav-right">
+    <button type="button" class="mode-switch" id="modeSwitch" role="switch" aria-checked="false" aria-label="Dark mode" title="Dark mode">
+      <span class="ms-knob" aria-hidden="true"></span>
+    </button>
+    <button type="button" class="nav-cta" id="navCta">get started</button>
+  </div>
 </nav>
 
 <button type="button" class="float-cta" id="floatCta" aria-label="Join the waitlist">
   Join the waitlist
 </button>
 
+<!-- Scroll cue — decorative; the rail and nav carry the real navigation. -->
+<div class="scroll-cue" id="scrollCue" aria-hidden="true">
+  <svg viewBox="0 0 24 24"><path d="M5 9.5l7 6.5 7-6.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</div>
+
+<!-- ===== LEFT-RAIL PROGRESS — ported from the live site's right-rail
+     indicators, mirrored. Dots injected by JS from [data-label] sections. -->
+<div class="rail" id="rail" aria-label="Page progress"></div>
+
 <main>
 
-  <!-- ===== HERO — 3 reveals, nothing else on screen. Sentence case: it's an introduction. ===== -->
-  <section class="sec sec--pin" id="hero" style="--n:3">
+  <!-- ===== HERO — the drawing renders complete at load with the first bubble
+       already on screen; the rest pop in on a timeline at the first scroll
+       gesture, or on their own after ~2s if the reader doesn't scroll. The
+       floating waitlist pill surfaces bottom-center about a second after the
+       last bubble settles — the hero's CTA beat. Nothing else on screen — no
+       headline, no wordmark; the bubbles are the headline, and the
+       replacement claim lands before any proof. ===== -->
+  <section class="sec" id="hero">
     <div class="stage">
       <div class="hero-art" aria-hidden="true">
         <svg viewBox="0 0 1920 650" preserveAspectRatio="xMinYMax meet">
@@ -404,32 +654,38 @@ footer .fmeta{margin-top:10px}
       </div>
       <div class="shell">
         <div class="thread">
-          <div class="msg cued" data-r>Hi! 👋 I'm Cued. Your personal fitness coach.</div>
-          <div class="msg cued" data-r>Made specifically with college students in mind.</div>
-          <div class="msg cued t" data-r>Let me give you a tour of what i can do for you.</div>
+          <div class="msg cued" data-r>hey 👋 i'm cued. the personal fitness coach for college students</div>
+          <div class="msg cued" data-r>food log, workout tracker, wearables, class schedule, i handle it all. all in your messages. </div>
+          <div class="msg cued t" data-r>ready to make fitness easy?</div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ===== 1 · i text first — 2 reveals, Cued only.
-       The empty left side is the argument — do not fill it. ===== -->
-  <section class="sec sec--pin" style="--n:2">
+       The empty left side is the argument — do not fill it. Bubble 1 proves
+       Cued is reading the user's life (class schedule), not just gym traffic. ===== -->
+  <section class="sec sec--pin" style="--n:2" data-label="i text first">
     <div class="stage">
       <div class="shell">
         <div class="sec-h"><h2 class="hdr">i text first</h2></div>
         <div class="thread">
           <h2 class="hdr-flow">i text first</h2>
-          <div class="msg cued" data-r>gym's dead right now btw. 6:15, everyone's still at dinner</div>
-          <div class="msg cued t" data-r>25 min upper push. in and out before the rush 💪</div>
+          <div class="msg cued" data-r>gym's dead right now and you're out of class till 3.</div>
+          <div class="msg cued t" data-r>quick upper push? in and out before the rush 💪</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ===== 2 · i know your week → and i act on it — 5 reveals, 2 headers.
-       Header B crossfades in at reveal 3. ===== -->
-  <section class="sec sec--pin" style="--n:5" data-hdr-switch="3">
+  <!-- ===== 2 · i know your week → and i act on it — 7 reveals, 2 headers.
+       The Berkeley-specific proof lives here: calendar (ochem midterm — §5
+       "i remember" calls back to it), location (Moffitt → RSF), and the RSF
+       virtual queue, each stated as something Cued did. Header B crossfades
+       in at reveal 5, one beat before the poll payoff. Page timeline: midterm
+       Tuesday, the moved session lands Wednesday (§3's workout, §5's tall
+       Wednesday bar). ===== -->
+  <section class="sec sec--pin" style="--n:7" data-hdr-switch="5" data-label="i know your week">
     <div class="stage">
       <div class="shell">
         <div class="sec-h">
@@ -438,10 +694,12 @@ footer .fmeta{margin-top:10px}
         </div>
         <div class="thread">
           <h2 class="hdr-flow">i know your week</h2>
-          <div class="msg cued t" data-r>you have midterm on monday, we're gonna have to move your workouts around</div>
-          <div class="msg user t turn" data-r>alr bet lmk. i'll probably be studying at doe most of the weekend. ima head to crossroads tho</div>
+          <div class="msg cued t" data-r>saw the ochem midterm on your calendar tues. moving leg day to wednesday.</div>
+          <div class="msg cued turn" data-r>you're at moffitt. rsf is 6 min away and half empty.</div>
+          <div class="msg cued t" data-r>line at rsf is 25 min. put you in the virtual queue — you're up at 5:32, leave by 5:20.</div>
+          <div class="msg user t turn" data-r>alr bet lmk. i'll probably be studying at doe most of the weekend.</div>
           <h2 class="hdr-flow">and i act on it</h2>
-          <div class="msg cued t turn" data-r>i looked at your schedule today, it seems like you have class from 2-5. which of these do you prefer?</div>
+          <div class="msg cued t turn" data-r>i looked at your schedule today, it seems like you have class from 2-5. which of these do you prefer? lmk</div>
           <div class="poll" data-r aria-label="Poll: pick a workout time">
             <button type="button" class="poll-row pick" data-t="5:30" aria-pressed="true"><span>5:30pm – 7pm</span><i aria-hidden="true"></i></button>
             <button type="button" class="poll-row" data-t="12:30" aria-pressed="false"><span>12:30pm – 1:30pm</span><i aria-hidden="true"></i></button>
@@ -453,65 +711,184 @@ footer .fmeta{margin-top:10px}
     </div>
   </section>
 
-  <!-- ===== 3 · i know what's for dinner — 5 reveals, two-sided. ===== -->
-  <section class="sec sec--pin" style="--n:5">
+  <!-- ===== 3 · i log your sets → and i know when you're stronger — 7 reveals,
+       2 headers. The Wednesday session §2 set up. Cued already knows the
+       plan, so it sends the sets as a tappable checklist — one row per set,
+       target pre-filled; a tap means "did it as planned", and the reader only
+       sees one gray text ("190 x4") for the set that went differently. The
+       story checks rows off as it plays (skipping any the reader tapped
+       first), the PR reply carries the header crossfade at reveal 5, and the
+       workout card sums the session inside a normal blue bubble, like the
+       chart in "i remember". ===== -->
+  <section class="sec sec--pin" style="--n:7" data-hdr-switch="5" data-label="i log your sets">
+    <div class="stage">
+      <div class="shell">
+        <div class="sec-h">
+          <h2 class="hdr">i log your sets</h2>
+          <h2 class="hdr">and i know when you're stronger</h2>
+        </div>
+        <div class="thread">
+          <h2 class="hdr-flow">i log your sets</h2>
+          <div class="msg cued t" data-r>push day. 4 sets bench, then the usual. tap as you go — text me if a set goes different.</div>
+          <div class="checklist" data-r aria-label="Today's sets — tap a set when it's done">
+            <button type="button" class="poll-row" aria-pressed="false"><span>bench 185 × 5</span><i aria-hidden="true"></i></button>
+            <button type="button" class="poll-row" aria-pressed="false"><span>bench 185 × 5</span><i aria-hidden="true"></i></button>
+            <button type="button" class="poll-row" aria-pressed="false"><span>bench 185 × 5</span><i aria-hidden="true"></i></button>
+            <button type="button" class="poll-row" aria-pressed="false"><span>bench 185 × 5</span><i aria-hidden="true"></i></button>
+          </div>
+          <div class="msg user t turn" data-r>190 x4</div>
+          <div class="msg cued t turn cl-swap" data-r>swapped it in.</div>
+          <h2 class="hdr-flow">and i know when you're stronger</h2>
+          <div class="msg cued turn" data-r>190 × 4 is a PR 🎉 last time was 185 × 3.</div>
+          <div class="msg cued card" data-r>
+            <div class="wc-head">push · wed · 48 min</div>
+            <div class="wc-row">bench press — 185×5 · 185×5 · <b class="wc-pr">190×4</b> · 185×5</div>
+            <div class="wc-row">incline db press — 65×10 · 65×9 · 65×8</div>
+            <div class="wc-row">cable fly — 30×12 · 30×12 · 30×11</div>
+            <div class="wc-row">tricep pushdown — 50×12 · 50×12 · 50×10</div>
+            <div class="wc-foot">9,240 lb total · 1 PR</div>
+          </div>
+          <div class="msg cued t" data-r>three taps and one text. that's the whole log — no app opened.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 4 · i know what's for dinner — 5 reveals, two-sided. The plate
+       photo beat: Cued reads a meal from a picture. The receipt beat lives
+       in its own section right after — together they were pushing this
+       thread far past the stage height, retiring the opening bubbles under
+       the header scrim before the section finished. ===== -->
+  <section class="sec sec--pin" style="--n:5" data-label="what's for dinner">
     <div class="stage">
       <div class="shell">
         <div class="sec-h"><h2 class="hdr">i know what's for dinner</h2></div>
         <div class="thread">
           <h2 class="hdr-flow">i know what's for dinner</h2>
           <div class="msg user t" data-r>what's good at crossroads rn</div>
-          <div class="msg cued turn" data-r>rosemary chicken tonight. two pieces, brown rice, pile the veg</div>
+          <div class="msg cued turn" data-r>chimichurri tri-tip tonight. grab the roasted sweet potatoes, pile on the veg</div>
           <div class="msg cued t" data-r>that's ~45g protein. you're at 80 for the day</div>
-          <!-- Photo attachment — placeholder illustration; swap for a real
-               plate photo when we have one. -->
+          <!-- Photo attachment — real plate photo. -->
           <div class="msg user photo turn" data-r>
-            <svg viewBox="0 0 400 300" role="img" aria-label="Photo of a dinner plate: chicken, brown rice, vegetables, and a fried egg">
-              <rect width="400" height="300" fill="#EFE6D8"/>
-              <ellipse cx="200" cy="158" rx="158" ry="102" fill="#FFFFFF"/>
-              <ellipse cx="200" cy="158" rx="128" ry="80" fill="none" stroke="#EDEAE3" stroke-width="3"/>
-              <!-- brown rice -->
-              <path d="M118 168c-6-22 10-42 38-44 26-2 44 12 44 32 0 18-16 30-42 30-22 0-36-6-40-18z" fill="#E3D3AC"/>
-              <path d="M132 150c4-3 10-4 16-3m-10 14c5-4 13-5 20-3m-28-22c6-4 14-5 22-3" stroke="#CDB988" stroke-width="3" stroke-linecap="round" fill="none"/>
-              <!-- rosemary chicken -->
-              <path d="M212 118c30-10 62 0 70 20 8 18-6 36-34 40-26 4-50-6-56-24-5-16 4-30 20-36z" fill="#C98850"/>
-              <path d="M222 132c14-6 34-4 44 4m-46 12c12-5 30-4 40 2" stroke="#A96A38" stroke-width="4" stroke-linecap="round" fill="none"/>
-              <path d="M236 122l8-6m18 4l7-7m-2 22l9-4" stroke="#5C7A45" stroke-width="3" stroke-linecap="round"/>
-              <!-- greens -->
-              <circle cx="160" cy="200" r="13" fill="#6FA55C"/>
-              <circle cx="184" cy="208" r="11" fill="#5B8C4A"/>
-              <circle cx="206" cy="200" r="12" fill="#6FA55C"/>
-              <!-- fried egg -->
-              <path d="M244 190c20-8 44-2 48 12 4 12-10 24-30 24s-38-10-36-22c1-7 8-11 18-14z" fill="#FFFDF6" stroke="#F0EAD8" stroke-width="2"/>
-              <circle cx="262" cy="206" r="11" fill="#F2B705"/>
-            </svg>
+            <img src="images/dinner-plate.jpg" width="1000" height="855" loading="lazy"
+                 alt="Photo of a dinner plate: sliced tri-tip with chimichurri, roasted sweet potatoes, broccoli, and cauliflower">
           </div>
-          <div class="msg cued t turn" data-r>logged. that's closer to 55 with the egg — nice</div>
+          <div class="msg cued t turn" data-r>logged. you went heavy on the steak — closer to 55. nice</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ===== 4 · i remember — 4 reveals. Cued opens cold, unprompted; the time
-       jump lives entirely in Cued speaking first and calling back to §2. ===== -->
-  <section class="sec sec--pin" style="--n:4">
+  <!-- ===== 5 · i read receipts — 2 reveals. The groceries beat on its own
+       stage: snap the Trader Joe's receipt (a real one — 1885 University
+       Ave) and Cued logs it; the yogurt/eggs/chicken in the reply are items
+       actually on it. ===== -->
+  <section class="sec sec--pin" style="--n:2" data-label="i read receipts">
+    <div class="stage">
+      <div class="shell">
+        <div class="sec-h"><h2 class="hdr">groceries? got it.</h2></div>
+        <div class="thread">
+          <h2 class="hdr-flow">groceries? got it. </h2>
+          <div class="msg user photo tall" data-r>
+            <img src="images/tj-receipt.jpg" width="972" height="1200" loading="lazy"
+                 alt="Photo of a Trader Joe's receipt from Berkeley listing chicken, ribeye steak, salmon, ground beef, greek yogurt, eggs, and produce">
+          </div>
+          <div class="msg cued t turn" data-r>got your trader joe's receipt. logged the yogurt, eggs, and chicken — you're stocked through thursday.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 6 · i remember — 6 reveals. Cued opens cold, unprompted; the time
+       jump lives entirely in Cued speaking first and calling back to §2's
+       ochem midterm. The chart bubble is memory made visible — it answers a
+       question about the past, and its bars follow the page timeline: short
+       Mon–Tue around the Tuesday midterm, tallest on Wednesday, the moved
+       session from §3. ===== -->
+  <section class="sec sec--pin" style="--n:6" data-label="i remember">
     <div class="stage">
       <div class="shell">
         <div class="sec-h"><h2 class="hdr">i remember</h2></div>
         <div class="thread">
           <h2 class="hdr-flow">i remember</h2>
           <div class="msg cued t" data-r>how'd the ochem midterm go</div>
-          <div class="msg user t turn" data-r>brutal but done</div>
-          <div class="msg cued turn" data-r>ok. you're back on normal sched now — pull day tonight, the one we pushed from last week</div>
-          <div class="msg cued t" data-r>and you've had the rosemary chicken four times 😭 there's salmon at foothill</div>
+          <div class="msg user turn" data-r>brutal but done</div>
+          <div class="msg user t" data-r>how'd my week go</div>
+          <div class="msg cued chart turn" data-r>
+            <svg viewBox="0 0 900 265" role="img" aria-label="Chart: workout volume by day, Monday to Sunday — low on Monday and Tuesday around the midterm, peaking Wednesday">
+              <g fill="currentColor" opacity=".9">
+                <rect x="24"  y="145" width="80" height="60"  rx="20"/>
+                <rect x="153" y="157" width="80" height="48"  rx="20"/>
+                <rect x="281" y="0"   width="80" height="205" rx="20"/>
+                <rect x="410" y="20"  width="80" height="185" rx="20"/>
+                <rect x="539" y="77"  width="80" height="128" rx="20"/>
+                <rect x="667" y="55"  width="80" height="150" rx="20"/>
+                <rect x="796" y="110" width="80" height="95"  rx="20"/>
+              </g>
+              <g fill="currentColor" opacity=".6" font-size="42" font-weight="500" text-anchor="middle">
+                <text x="64"  y="258">M</text>
+                <text x="193" y="258">T</text>
+                <text x="321" y="258">W</text>
+                <text x="450" y="258">T</text>
+                <text x="579" y="258">F</text>
+                <text x="707" y="258">S</text>
+                <text x="836" y="258">S</text>
+              </g>
+            </svg>
+          </div>
+          <div class="msg cued" data-r>ok. you're back on normal sched now — pull day tonight, the one we pushed from last week</div>
+          <div class="msg cued t" data-r>and you've had the tri-tip four times 😭 there's salmon at foothill</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ===== 5 · so you can delete these — 3 reveals. Gray = user-sent: the
-       reader showing Cued their homescreen, which sets up the arrow. ===== -->
-  <section class="sec sec--pin" style="--n:3">
+  <!-- ===== 7 · i read your watch — 5 reveals. Strava beat first: the run is
+       Wednesday morning, same day as §3's push session — cardio's covered, so
+       the evening stays push, and "keep strava. i read it." plants the one
+       app that deliberately never appears in the "delete these" icon row.
+       Then the sleep beat. ===== -->
+  <section class="sec sec--pin" style="--n:5" data-label="i read your watch">
+    <div class="stage">
+      <div class="shell">
+        <div class="sec-h"><h2 class="hdr">i read your watch</h2></div>
+        <div class="thread">
+          <h2 class="hdr-flow">i read your watch</h2>
+          <div class="msg cued" data-r>saw the run on strava — 4.2 mi, 8:40 pace, before your 9am. nice.</div>
+          <div class="msg cued t" data-r>keep strava. i read it. cardio's covered, so tonight stays push.</div>
+          <div class="msg cued t turn" data-r>your watch says you slept 4 hours 💀 today is not the day for heavy squats</div>
+          <div class="msg user t turn" data-r>yeah… rough night lol</div>
+          <div class="msg cued t turn" data-r>moved leg day to thursday. tonight: walk, protein, early bed</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 8 · no watch? no problem — 3 reveals. Split out of the watch
+       section so the claim gets the full centered-header intro beat of its
+       own (as an in-place crossfade it read as no change at all). A plain
+       gray text is enough, and Cued does the identical thing. Device list
+       matches the FAQ (Apple Watch, Whoop, Oura, Garmin). ===== -->
+  <section class="sec sec--pin" style="--n:3" data-label="no watch? no problem">
+    <div class="stage">
+      <div class="shell">
+        <div class="sec-h"><h2 class="hdr">no watch? no problem</h2></div>
+        <div class="thread">
+          <h2 class="hdr-flow">no watch? no problem</h2>
+          <div class="msg user t" data-r>slept like garbage</div>
+          <div class="msg cued turn" data-r>that works too. no watch needed — pushing legs a day, easy pull today.</div>
+          <div class="msg cued t" data-r>apple watch, whoop, oura, garmin — great if you have one, never required</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 9 · so you can delete these — 4 reveals. Gray = user-sent: the
+       reader showing Cued their homescreen, which sets up the closing
+       argument. Strava is deliberately absent from the icon row (§7 said
+       "keep strava" — the aside in reveal 2 closes that loop). Reveal 4 is
+       the page's one "no app. no login." refrain — keep the wording exact. ===== -->
+  <section class="sec sec--pin" style="--n:4" data-label="delete your apps">
     <div class="stage">
       <div class="shell">
         <div class="sec-h"><h2 class="hdr">so you can delete these</h2></div>
@@ -530,21 +907,22 @@ footer .fmeta{margin-top:10px}
             <img src="images/app-icons/notes.png" alt="Notes">
             <img src="images/app-icons/pen_paper.png" alt="Pen and paper">
           </div>
-          <div class="msg cued turn" data-r>all of that → one number</div>
-          <div class="msg cued t" data-r>no app. no login. no $200/mo coach</div>
+          <div class="msg cued turn" data-r>that's six apps, a notes file, and a coach you're paying for — all doing pieces of one job. (strava stays. i like strava.)</div>
+          <div class="msg cued" data-r>i'm all of them. one thread. one number.</div>
+          <div class="msg cued t" data-r>no app. no login. no $200/mo coach.</div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ===== CLOSE — static, no pin. ===== -->
-  <section class="sec close" id="signup">
+  <section class="sec close" id="signup" data-label="join the waitlist">
     <div class="shell">
       <div class="thread">
-        <div class="msg cued t" data-io>ready when you are</div>
+        <div class="msg cued t" data-io>ready when you are. nothing to download.</div>
       </div>
       <div class="close-cta" data-io>
-        <button type="button" class="cta" id="closeCta">Join the waitlist →</button>
+        <button type="button" class="cta" id="closeCta">Join the waitlist</button>
       </div>
     </div>
   </section>
@@ -558,8 +936,8 @@ footer .fmeta{margin-top:10px}
       </div>
       <div class="faq-list" data-io>
         <details>
-          <summary>Do I need to download an app?</summary>
-          <div class="faq-body">Nope. Cued lives entirely in your text messages. iMessage, SMS, whatever you already use. No app, no login, no new account to manage.</div>
+          <summary>Is this an app?</summary>
+          <div class="faq-body">no. it's a number. you text it like you text anyone.</div>
         </details>
         <details>
           <summary>How much does it cost?</summary>
@@ -571,7 +949,7 @@ footer .fmeta{margin-top:10px}
         </details>
         <details>
           <summary>Do I need a wearable?</summary>
-          <div class="faq-body">Nope. Cued works without one — you just tell it how you slept, how you're feeling, and what's coming up, and it builds your week from there. If you do have an Apple Watch, Whoop, Oura, or Garmin, connecting it lets Cued read your data passively so you don't have to report in every morning. Better with one, totally usable without.</div>
+          <div class="faq-body">Nope. Cued works without one — you just tell it how you slept, how you're feeling, and what's coming up, and it builds your week from there. If you do have an Apple Watch, Whoop, Oura, or Garmin, connecting it lets Cued read your data passively so you don't have to report in every morning — plus Strava, if you run. Better with one, totally usable without.</div>
         </details>
         <details>
           <summary>How does the wearable connect?</summary>
@@ -645,12 +1023,15 @@ footer .fmeta{margin-top:10px}
 </div>
 
 <script>
-// === Scroll-driven thread reveals ===
+// === Thread reveals ===
 // Two layout modes, switched live on media-query change:
-//  pin  — desktop + motion OK. Reveals are a pure function of scroll progress
-//         within each section (idempotent; scrubbing backward un-reveals).
-//         The thread is translated down by the height of the unrevealed
-//         bubbles; each reveal shrinks that shift, pushing the thread up.
+//  pin  — desktop + motion OK. Scroll only brings a section on stage; once
+//         its pin engages, the section auto-plays on a timeline, one-shot,
+//         like the hero: centered header → header rises → one bubble per
+//         beat. The thread is translated down by the height of the
+//         unrevealed bubbles; each beat shrinks that shift, pushing the
+//         thread up like real Messages. Scrolling back leaves played
+//         threads in place.
 //  flow — mobile or reduced motion. No pinning; IntersectionObserver fades
 //         bubbles and inline headers in as they scroll into view.
 (function(){
@@ -661,28 +1042,63 @@ footer .fmeta{margin-top:10px}
   const sections = Array.from(document.querySelectorAll('.sec--pin')).map(sec => {
     const items = Array.from(sec.querySelectorAll('[data-r]'));
     const poll = sec.querySelector('.poll');
+    const list = sec.querySelector('.checklist');
     return {
       el: sec,
       thread: sec.querySelector('.thread'),
       items,
       poll,
       pollIdx: poll ? items.indexOf(poll) : -1,
+      list,
+      listIdx: list ? items.indexOf(list) : -1,
+      hdrWrap: sec.querySelector('.sec-h'),
       hdrs: Array.from(sec.querySelectorAll('.sec-h .hdr')),
       switchAt: sec.dataset.hdrSwitch ? +sec.dataset.hdrSwitch : Infinity,
-      bottoms: [], total: 0, k: -1,
+      bottoms: [], total: 0, k: -1, played: false,
     };
   });
+  // The cue-ball compact beat rides the FIRST header-switch section
+  // ("and i act on it") — apply() toggles it when that switch fires.
+  const swFirstEl = document.querySelector('[data-hdr-switch]');
 
-  // Poll sizing: ~70% of the widest Cued bubble in its thread — it hangs under
-  // the blue side but shouldn't span the bubble's full width.
+  // Pill-box sizing (poll + checklist): ~70% of the widest Cued bubble in the
+  // thread — they hang under the blue side but shouldn't span the bubble's
+  // full width.
   function sizePolls(){
     document.querySelectorAll('.thread').forEach(t => {
-      const poll = t.querySelector('.poll');
-      if (!poll) return;
+      const pills = t.querySelectorAll('.poll, .checklist');
+      if (!pills.length) return;
       let w = 0;
       t.querySelectorAll('.msg.cued').forEach(m => { w = Math.max(w, m.offsetWidth); });
-      if (w) poll.style.width = Math.round(w * 0.7) + 'px';
+      if (w) pills.forEach(p => { p.style.width = Math.round(w * 0.7) + 'px'; });
     });
+  }
+
+  // === Checklist choreography (i log your sets) ===
+  // Stage 1 (checklist lands): rows 1–2 log themselves, staggered. Stage 2
+  // ("swapped it in." lands): row 3 rewrites to the user's set and logs, row
+  // 4 a beat later. Reader clicks are respected — rows already done are
+  // skipped, and re-running a stage is a no-op.
+  function clCheck(row, delay){
+    if (!row || row.classList.contains('done')) return;
+    setTimeout(() => { row.classList.add('done'); row.setAttribute('aria-pressed', 'true'); }, delay);
+  }
+  function clStage1(list){
+    const rows = list.querySelectorAll('.poll-row');
+    clCheck(rows[0], 0); clCheck(rows[1], 600);
+  }
+  function clStage2(list){
+    const rows = list.querySelectorAll('.poll-row');
+    const sp = rows[2] && rows[2].querySelector('span');
+    if (sp) sp.textContent = 'bench 190 × 4';
+    clCheck(rows[2], 0); clCheck(rows[3], 600);
+  }
+
+  // Shift the whole column down by the height of everything not yet revealed,
+  // so the k-th bubble's bottom sits exactly on the bottom anchor.
+  function shiftThread(s, k){
+    const shift = k > 0 ? s.total - s.bottoms[k - 1] : s.total;
+    s.thread.style.transform = 'translateY(' + shift + 'px)';
   }
 
   function measure(){
@@ -690,31 +1106,60 @@ footer .fmeta{margin-top:10px}
     sections.forEach(s => {
       s.bottoms = s.items.map(it => it.offsetTop + it.offsetHeight);
       s.total = s.thread.scrollHeight;
+      // Re-anchor mid-play/played threads with the fresh metrics (font
+      // swaps, resizes, poll rewrites).
+      if (s.k >= 0) shiftThread(s, Math.max(0, s.k - 1));
     });
   }
 
-  function apply(s, k){
-    if (k === s.k) return;
-    s.k = k;
+  function apply(s, beat){
+    if (beat === s.k) return;
+    s.k = beat;
+    // Beat 0: header centered, stage blank. Beat 1: header up, stage still
+    // blank. Bubbles only start on beat 2 — the header always finishes its
+    // rise before the first message lands.
+    const k = Math.max(0, beat - 1);   // revealed bubble count
     s.items.forEach((it, i) => it.classList.toggle('on', i < k));
-    // Shift the whole column down by the height of everything not yet revealed,
-    // so the k-th bubble's bottom sits exactly on the bottom anchor.
-    const shift = k > 0 ? s.total - s.bottoms[k - 1] : s.total;
-    s.thread.style.transform = 'translateY(' + shift + 'px)';
+    shiftThread(s, k);
     // The story picks its poll option in sync with the reveal AFTER the poll
-    // (the "locked" reply). Scrubbing back deselects — idempotent like reveals.
+    // (the "locked" reply).
     if (s.poll) s.poll.classList.toggle('chosen', k >= s.pollIdx + 2);
+    // Checklist: rows 1–2 log when the list lands; row 3 rewrites + logs (row
+    // 4 a beat later) when "swapped it in." lands two reveals after it.
+    if (s.list){
+      if (k >= s.listIdx + 1) clStage1(s.list);
+      if (k >= s.listIdx + 3) clStage2(s.list);
+    }
+    // Intro beat 0 only: header waits center-screen; it rises on beat 1.
+    if (s.hdrWrap) s.hdrWrap.classList.toggle('mid', beat === 0);
     if (s.hdrs.length){
       const idx = (s.hdrs.length > 1 && k >= s.switchAt) ? 1 : 0;
       s.hdrs.forEach((h, i) => h.classList.toggle('on', i === idx));
+      // The nav cue-ball parks over the wordmark from "and i act on it" on.
+      if (s.el === swFirstEl){
+        const brandEl = document.querySelector('nav .brand');
+        if (brandEl) brandEl.classList.toggle('compact', idx === 1);
+      }
+    }
+  }
+
+  // Section auto-play — the pin engaging is the trigger; from there the
+  // choreography is time-driven, one-shot, like the hero. Beat 0 is already
+  // on stage when the timeline starts (blank stage, centered header).
+  const SEC_T0 = 700, SEC_STEP = 950;
+  function playSection(s){
+    s.played = true;
+    for (let b = 1; b <= s.items.length + 1; b++){
+      setTimeout(() => apply(s, b), SEC_T0 + (b - 1) * SEC_STEP);
     }
   }
 
   // === Hero art trace ===
-  // The Campanile drawing is revealed by scrubbing stroke-dashoffset on the
+  // The Campanile drawing is revealed by setting stroke-dashoffset on the
   // SVG mask strokes, weighted by real path length so the pen moves at a
-  // constant speed. Idempotent like every reveal: scrubbing back un-draws.
-  // The pen dot rides the tip of the active stroke while mid-trace.
+  // constant speed; the pen dot rides the tip of the active stroke mid-trace.
+  // Currently only ever called with t=1 (drawing complete at load) — kept
+  // intact in case the traced-in opening comes back.
   const artStrokes = Array.from(document.querySelectorAll('.hero-art .trace'));
   const artPen = document.querySelector('.hero-art .pen');
   const artLens = artStrokes.map(p => p.getTotalLength());
@@ -740,20 +1185,74 @@ footer .fmeta{margin-top:10px}
     }
   }
 
+  // === Hero auto-play ===
+  // The hero opens with the Campanile fully drawn and the first bubble
+  // already on screen. The rest pop in on their own — the thread pushing up
+  // like real Messages — at the reader's first scroll gesture, or after a
+  // ~2s idle beat if they don't scroll, while the hero's sticky stage keeps
+  // the page from scrolling out from under them. Mobile flow mode has no
+  // drawing (hidden <768px), so there the follow-ups pop shortly after load
+  // (the transform is overridden by CSS, so it's just the staggered pop-in).
+  // Reduced motion: CSS already shows every bubble.
+  const heroEl = document.getElementById('hero');
+  const heroItems = heroEl ? Array.from(heroEl.querySelectorAll('[data-r]')) : [];
+  const heroThread = heroEl ? heroEl.querySelector('.thread') : null;
+  let heroK = 0;
+  function heroApply(k){
+    if (!heroThread) return;
+    heroK = k;
+    heroItems.forEach((it, i) => it.classList.toggle('on', i < k));
+    // Same shift math as apply(): the k-th bubble's bottom lands on the anchor.
+    // Re-measured each call so font swaps and resizes self-correct.
+    const bottoms = heroItems.map(it => it.offsetTop + it.offsetHeight);
+    const total = heroThread.scrollHeight;
+    heroThread.style.transform = 'translateY(' + (k > 0 ? total - bottoms[k - 1] : total) + 'px)';
+  }
+  const HERO_STEP = 950, HERO_IDLE = 2000, HERO_SETTLE = 1200;
+  // The floating waitlist pill is the hero's CTA: it surfaces about a second
+  // after the last hero bubble settles. heroDone gates it; chromeRefresh is
+  // assigned by the scroll-chrome block below so the timeout can re-check.
+  let heroDone = false, chromeRefresh = null;
+  function playHero(){
+    if (!heroItems.length) return;
+    setTrace(1);   // drawing complete from the first frame
+    if (mqReduce.matches){ heroDone = true; return; }
+    heroApply(1);  // first bubble is on screen from load
+    let played = false, idleT = 0;
+    const start = (t0) => {
+      if (played) return;
+      played = true;
+      clearTimeout(idleT);
+      window.removeEventListener('scroll', onScroll);
+      for (let i = 1; i < heroItems.length; i++){
+        setTimeout(() => heroApply(i + 1), t0 + (i - 1) * HERO_STEP);
+      }
+      setTimeout(() => { heroDone = true; if (chromeRefresh) chromeRefresh(); },
+        t0 + (heroItems.length - 2) * HERO_STEP + HERO_SETTLE);
+    };
+    const onScroll = () => start(150);
+    if (isPin()){
+      window.addEventListener('scroll', onScroll, {passive: true});
+      idleT = setTimeout(() => start(0), HERO_IDLE);   // no scroll? play anyway
+    } else {
+      start(500);   // no drawing on mobile — don't open on an empty page
+    }
+  }
+
   function update(){
     const vh = window.innerHeight;
     sections.forEach(s => {
-      const top = s.el.getBoundingClientRect().top;
-      const span = s.el.offsetHeight - vh;
-      const n = s.items.length;
-      const p = span > 0 ? Math.min(1, Math.max(0, -top / span)) : 1;
-      // Reveal i at p ≥ (i−1)/n: the first bubble is up at pin-engage, and the
-      // full thread holds for the last 1/n of the section before unpinning.
-      const k = Math.min(n, 1 + Math.floor(p * n));
-      apply(s, k);
-      // The drawing completes a beat before the hero unpins, so it's never
-      // caught half-finished as the section scrolls away.
-      if (s.el.id === 'hero') setTrace(Math.min(1, p / 0.92));
+      if (s.played) return;
+      const r = s.el.getBoundingClientRect();
+      if (r.bottom <= vh){
+        // Landed past it (deep link, fast restore) — settle instantly.
+        s.played = true;
+        apply(s, s.items.length + 1);
+      } else if (r.top <= vh * 0.25){
+        playSection(s);   // pin (nearly) engaged — run the timeline
+      } else if (s.k < 0){
+        apply(s, 0);      // waiting below: blank stage, header centered
+      }
     });
   }
 
@@ -778,14 +1277,32 @@ footer .fmeta{margin-top:10px}
           if (e.target.classList.contains('poll')){
             setTimeout(() => e.target.classList.add('chosen'), 900);
           }
+          // Checklist: let it settle, then log the first two sets.
+          if (e.target.classList.contains('checklist')){
+            setTimeout(() => clStage1(e.target), 900);
+          }
+          // "swapped it in." arriving = row 3 rewrites + logs, row 4 after.
+          if (e.target.classList.contains('cl-swap')){
+            const list = e.target.parentElement.querySelector('.checklist');
+            if (list) clStage2(list);
+          }
           io.unobserve(e.target);
         }
       });
     }, {threshold: 0.15});
     document.querySelectorAll('[data-r], .hdr-flow').forEach(el => {
+      if (heroEl && heroEl.contains(el)) return;   // hero runs its own timeline
       if (mqReduce.matches){
         el.classList.add('on');
         if (el.classList.contains('poll')) el.classList.add('chosen');
+        if (el.classList.contains('checklist')){
+          const sp = el.querySelectorAll('.poll-row span')[2];
+          if (sp) sp.textContent = 'bench 190 × 4';
+          el.querySelectorAll('.poll-row').forEach(r => {
+            r.classList.add('done');
+            r.setAttribute('aria-pressed', 'true');
+          });
+        }
       } else io.observe(el);
     });
   }
@@ -795,6 +1312,7 @@ footer .fmeta{margin-top:10px}
     document.querySelectorAll('.hdr-flow').forEach(h => h.classList.remove('on'));
     sections.forEach(s => { s.k = -1; });
     measure();
+    sections.forEach(s => { if (s.played) apply(s, s.items.length + 1); });
     update();
     // Enable thread transitions only after the first state is painted, so the
     // initial load doesn't animate from translateY(0).
@@ -803,14 +1321,15 @@ footer .fmeta{margin-top:10px}
 
   function setMode(){ isPin() ? setPin() : setFlow(); }
   setMode();
+  playHero();
   mqDesktop.addEventListener('change', setMode);
   mqReduce.addEventListener('change', setMode);
 
-  window.addEventListener('resize', () => { if (isPin()){ measure(); update(); } else { sizePolls(); } });
+  window.addEventListener('resize', () => { if (isPin()){ measure(); update(); } else { sizePolls(); } heroApply(heroK); });
   // Re-measure once web fonts land (bubble heights depend on them) and after
   // images load.
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (isPin()){ measure(); sections.forEach(s => { s.k = -1; }); update(); } });
-  window.addEventListener('load', () => { if (isPin()){ measure(); sections.forEach(s => { s.k = -1; }); update(); } });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (isPin()){ measure(); update(); } heroApply(heroK); });
+  window.addEventListener('load', () => { if (isPin()){ measure(); update(); } heroApply(heroK); });
 
   // Poll rows are clickable: the highlight moves to the clicked option and the
   // "locked" reply rewrites to match, so the conversation stays coherent.
@@ -825,9 +1344,18 @@ footer .fmeta{margin-top:10px}
       poll.classList.add('chosen');
       if (lock) lock.textContent = 'locked. ' + row.dataset.t + ' it is 👍';
       // The rewritten reply can change the bubble's size — refresh the cached
-      // offsets so the thread shift stays exact.
-      if (isPin()){ measure(); sections.forEach(s => { s.k = -1; }); update(); }
+      // offsets (measure re-anchors the thread with them).
+      if (isPin()) measure();
     }));
+  });
+
+  // Checklist rows are clickable: tapping a set logs it as done — the story's
+  // own logging skips rows the reader already tapped.
+  document.querySelectorAll('.checklist .poll-row').forEach(row => {
+    row.addEventListener('click', () => {
+      row.classList.add('done');
+      row.setAttribute('aria-pressed', 'true');
+    });
   });
 
   // Scroll-linked chrome: the nav wordmark and the floating waitlist pill are
@@ -835,18 +1363,41 @@ footer .fmeta{margin-top:10px}
   const brand = document.querySelector('nav .brand');
   const hero = document.getElementById('hero');
   const floatCta = document.getElementById('floatCta');
+  const scrollCue = document.getElementById('scrollCue');
+  const railEl = document.getElementById('rail');
   const closeSec = document.getElementById('signup');
+  // Brand-compact trigger, flow mode only: the "and i act on it" inline
+  // header crossing mid-viewport. (Pin mode: apply() drives .compact off the
+  // section's header switch as its timeline plays.)
+  const swSec = document.querySelector('[data-hdr-switch]');
+  const swFlowHdr = swSec ? swSec.querySelectorAll('.hdr-flow')[1] : null;
   if (hero){
     let bt = false;
     const chromeChk = () => {
       bt = false;
       const pastHero = hero.getBoundingClientRect().bottom < window.innerHeight * 0.25;
       if (brand) brand.classList.toggle('show', pastHero);
+      if (brand && swFlowHdr && !isPin()){
+        brand.classList.toggle('compact', swFlowHdr.getBoundingClientRect().top < window.innerHeight * 0.5);
+      }
+      if (railEl) railEl.classList.toggle('show', pastHero);
       if (floatCta){
         const closeNear = closeSec && closeSec.getBoundingClientRect().top < window.innerHeight * 0.85;
-        floatCta.classList.toggle('show', pastHero && !closeNear);
+        // On the hero the pill waits for the bubble sequence to settle
+        // (heroDone); past the hero it shows regardless.
+        const showPill = (pastHero || heroDone) && !closeNear;
+        // First appearance only: a couple of small hops to catch the eye.
+        if (showPill && !floatCta.classList.contains('show') && !floatCta.dataset.nudged){
+          floatCta.dataset.nudged = '1';
+          floatCta.classList.add('nudge');
+        }
+        floatCta.classList.toggle('show', showPill);
       }
+      // The cue shows once the hero has settled and only while the page is
+      // still at the top — the first scroll tick answers it.
+      if (scrollCue) scrollCue.classList.toggle('show', heroDone && window.scrollY < 40);
     };
+    chromeRefresh = chromeChk;
     window.addEventListener('scroll', () => { if (!bt){ bt = true; requestAnimationFrame(chromeChk); } }, {passive: true});
     chromeChk();
   }
@@ -858,6 +1409,59 @@ footer .fmeta{margin-top:10px}
     });
   }, {threshold: 0.3});
   document.querySelectorAll('[data-io]').forEach(el => ioClose.observe(el));
+})();
+
+// === Dark-mode switch ===
+// html.dark drives the token overrides; the head script already applied the
+// saved choice pre-paint, so here we only sync the control and handle clicks.
+(function(){
+  const sw = document.getElementById('modeSwitch');
+  if (!sw) return;
+  const root = document.documentElement;
+  const sync = () => sw.setAttribute('aria-checked', root.classList.contains('dark') ? 'true' : 'false');
+  sw.addEventListener('click', () => {
+    root.classList.toggle('dark');
+    try{ localStorage.setItem('cued-theme', root.classList.contains('dark') ? 'dark' : 'light'); }catch(e){}
+    sync();
+  });
+  sync();
+})();
+
+// === Left-rail progress ===
+// Ported from the live site's right-rail page indicators. One dash per
+// [data-label] section; a center-band IntersectionObserver picks the active
+// one (works for both 100vh and tall pinned sections — active is whichever
+// section the viewport's vertical midpoint is inside). Click scrolls to the
+// section start.
+(function(){
+  const rail = document.getElementById('rail');
+  if (!rail) return;
+  const secs = Array.from(document.querySelectorAll('section[data-label]'));
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+
+  const btns = secs.map(sec => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.setAttribute('aria-label', 'Go to: ' + sec.dataset.label);
+    btn.innerHTML = '<span class="dot"></span>';
+    btn.addEventListener('click', () => {
+      sec.scrollIntoView({behavior: reduce.matches ? 'auto' : 'smooth', block: 'start'});
+    });
+    rail.appendChild(btn);
+    return btn;
+  });
+
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const idx = secs.indexOf(e.target);
+      btns.forEach((b, i) => {
+        if (i === idx) b.setAttribute('aria-current', 'true');
+        else b.removeAttribute('aria-current');
+      });
+    });
+  }, {rootMargin: '-50% 0px -50% 0px', threshold: 0});
+  secs.forEach(s => io.observe(s));
 })();
 
 // === Waitlist modal ===

@@ -29,13 +29,15 @@ The site is entirely self-contained vanilla HTML/CSS/JS with no framework or bui
 - **`index2.html`**, **`testing/index.html`**, **`css/funnel.css`**, **`js/funnel.js`** — Legacy artifacts from earlier design generations. Nothing references them; safe to ignore.
 
 **External dependencies loaded via CDN (no local install):**
-- Google Fonts on `index.html`: Hedvig Letters Serif (section headers), Inter 400/500 (bubble text), Outfit (wordmark only)
+- Google Fonts on `index.html`: Hedvig Letters Serif (section headers), Inter 400/500 (bubble text), Outfit (wordmark only). The nav brand is `images/cued-logo.svg` (circle-and-dot mark) plus a blue "cued" wordmark.
 
 ## index.html Design System
 
 **Tokens** — `--blue: #007AFF` (Apple iMessage system blue; the brand blue globally), `--blue-deep` `#0062CC` (hover), `--blue-soft` `#E5F1FF` (tints/focus), `--gray` `#E9E9EB` (user bubbles), flat white `--bg`, `--poll-fill`/`--poll-ink` (iOS 26 Messages poll orange). The bubbles are the only color on the page — no gradients, no drop shadows, no hover states on bubbles, no second accent beyond the poll orange.
 
-**Desktop scrollytelling (≥768px, motion OK)** — each section is a tall scroll container (`height: 100vh + (reveals − 1) × 45vh`) with a sticky 100vh stage. Bubble reveals are a pure function of scroll progress (idempotent — scrubbing backward un-reveals; no one-way flags). The thread is bottom-anchored and translated down by the height of unrevealed bubbles; each reveal shrinks that shift so the thread pushes up like real Messages. Section headers pin at `top: 10vh`, centered on the shell, and crossfade in place on beat changes.
+**Dark mode** — an iOS-style flip switch in the nav toggles `html.dark`, which overrides the tokens to real Messages dark (true-black `--bg`, `#3B3B3D` user bubbles, `#0A84FF` iOS dark system blue, dark poll orange). All theme-dependent colors live in tokens on `:root`/`html.dark` — never hardcode a color in a rule; add a token. The choice persists in `localStorage('cued-theme')` and is applied pre-paint by the head script to avoid a white flash.
+
+**Desktop scrollytelling (≥768px, motion OK)** — the hero opens with the Campanile fully drawn and the first bubble already on screen; the timed (not scrubbed) pops of the remaining bubbles start on the first scroll gesture, or on their own after ~2s idle, while its sticky stage pins through a 90vh budget. The floating waitlist pill doubles as the hero CTA — it surfaces bottom-center ~1s after the last hero bubble settles. Every other section is `height: 100vh + 2 × 45vh` (uniform hold budget) with a sticky 100vh stage. Scroll only brings a section on stage: when its pin engages, the choreography auto-plays one-shot on a timeline — blank stage with the header centered → header glides up to its pinned `top: 10vh` spot → bubbles pop in sequence. Scrolling back leaves played threads in place; deep loads settle passed sections instantly. The thread is bottom-anchored and translated down by the height of unrevealed bubbles; each beat shrinks that shift so the thread pushes up like real Messages. Headers crossfade in place on beat changes (the nav cue-ball compact beat rides the first header switch).
 
 **Mobile (<768px) and `prefers-reduced-motion`** — a genuinely separate layout path, not a degraded pin: no sticky, plain vertical thread, 17px bubble text (real Messages size), inline section headers, IntersectionObserver fade-ins. Mode is switched live on media-query change in JS.
 
@@ -46,7 +48,9 @@ The site is entirely self-contained vanilla HTML/CSS/JS with no framework or bui
 ## Images / Assets
 
 - `images/` — favicon SVG (blue, current brand), OG images, `app-icons/` (used in the "so you can delete these" section).
-- `images/hero-drawing.png` — the `the-one.png` Campanile drawing, cropped to the art band (1920×650), paper-gray background keyed to transparency, ink recolored to the brand blue. Referenced by the `index.html` hero, where it is "traced" in on scroll via SVG mask strokes (see the `.hero-art` comment in `index.html`).
+- `images/hero-drawing.png` — the `the-one.png` Campanile drawing, cropped to the art band (1920×650), paper-gray background keyed to transparency, ink recolored to the brand blue. Referenced by the `index.html` hero, shown fully drawn at load (the SVG stroke-mask trace machinery remains but is set complete — see the `.hero-art` comment in `index.html`).
+- `images/dinner-plate.jpg` — real plate photo (tri-tip, sweet potatoes, broccoli/cauliflower) sent as the user's photo attachment in the "i know what's for dinner" section (1000×855 JPEG).
+- `images/tj-receipt.jpg` — real Trader Joe's receipt photo (Berkeley, 1885 University Ave), the user's photo attachment in the "i read receipts" section (972×1200 JPEG).
 - `images/og-image-cued.png` and `og-image-cued-square.png` still carry the previous design's blue (`#1086FF`) and need regenerating.
 - Assets from previous design generations (hero backgrounds, `the-one.png` source drawing, wearable photo) remain in `images/` but are unreferenced by `index.html`.
 - Git LFS is configured for `videos/*.mp4` (see `.gitattributes`).
