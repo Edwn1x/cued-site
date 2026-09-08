@@ -249,7 +249,7 @@ html.dark .notif .logo-dark{display:block}
 .notif-top{display:flex;justify-content:space-between;align-items:baseline}
 .notif-app{font-size:15px;font-weight:600;color:var(--ink)}
 .notif-time{font-size:13px;color:var(--ink-3)}
-.notif-text{font-size:15px;line-height:1.35;color:var(--ink);margin-top:1px}
+.notif-text{font-size:15px;line-height:1.35;color:var(--ink);margin-top:1px;transition:opacity .25s ease}
 @media(min-width:768px){.notif{display:none}}
 
 /* ===== PROGRESS RAIL (left) ===== */
@@ -1532,11 +1532,32 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   // === Notification banner (mobile) ===
   // Drops in ~1.2s after load — the "Cued texts first" beat, landing before
   // the intro bubbles start popping — then auto-dismisses. Tapping it scrolls
-  // to the first tour section, like opening the message.
+  // to the first tour section, like opening the message. If the reader is
+  // still parked on the hero ~3s after the banner lands and hasn't touched a
+  // waitlist CTA, the preview crossfades into a scroll nudge and the banner
+  // lingers a little longer.
   const notif = document.getElementById('notif');
   if (notif && !mqDesktop.matches && !mqReduce.matches){
+    const notifTxt = notif.querySelector('.notif-text');
+    // Any waitlist CTA press cancels the nudge — they're already converting.
+    let wlTouched = false;
+    ['heroCta', 'floatCta', 'navCta', 'closeCta'].forEach(id => {
+      const b = document.getElementById(id);
+      b && b.addEventListener('click', () => { wlTouched = true; }, {once: true});
+    });
     setTimeout(() => notif.classList.add('in'), 1200);
-    const notifOut = setTimeout(() => notif.classList.remove('in'), 7600);
+    let notifOut = setTimeout(() => notif.classList.remove('in'), 7600);
+    setTimeout(() => {
+      const onHero = window.scrollY < 40;
+      if (!notif.classList.contains('in') || !onHero || wlTouched) return;
+      clearTimeout(notifOut);
+      notifTxt.style.opacity = '0';
+      setTimeout(() => {
+        notifTxt.textContent = 'not yet convinced? scroll to see all i can do for you';
+        notifTxt.style.opacity = '1';
+      }, 260);
+      notifOut = setTimeout(() => notif.classList.remove('in'), 6000);
+    }, 4500);
     notif.addEventListener('click', () => {
       clearTimeout(notifOut);
       notif.classList.remove('in');
