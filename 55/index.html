@@ -1333,7 +1333,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   // The floating waitlist pill is the hero's CTA: it surfaces about a second
   // after the last hero bubble settles. heroDone gates it; chromeRefresh is
   // assigned by the scroll-chrome block below so the timeout can re-check.
-  let heroDone = false, chromeRefresh = null;
+  let heroDone = false, chromeRefresh = null, notifCue = null;
   const heroMobile = heroEl ? heroEl.querySelector('.hero-mobile') : null;
   function playHero(){
     if (!heroItems.length) return;
@@ -1357,6 +1357,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
         heroDone = true;
         if (heroMobile) heroMobile.classList.add('on');   // mobile hero CTA beat
         if (chromeRefresh) chromeRefresh();
+        if (notifCue) notifCue();   // notification banner rides a later beat
       }, t0 + (heroItems.length - 2) * HERO_STEP + HERO_SETTLE);
     };
     const onScroll = () => start(150);
@@ -1530,8 +1531,9 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   }
 
   // === Notification banner (mobile) ===
-  // A single idle nudge: ~4.5s after load — right after the hero CTA beat —
-  // if the reader is still parked on the hero and hasn't touched a waitlist
+  // A single idle nudge, cued off the hero timeline (notifCue fires with the
+  // hero CTA beat): ~2.6s after the "Join the waitlist" button settles, if
+  // the reader is still parked on the hero and hasn't touched a waitlist
   // CTA, the notification drops in asking them to scroll. Tapping it scrolls
   // to the first tour section; otherwise it auto-dismisses.
   const notif = document.getElementById('notif');
@@ -1543,11 +1545,11 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       b && b.addEventListener('click', () => { wlTouched = true; }, {once: true});
     });
     let notifOut = 0;
-    setTimeout(() => {
+    notifCue = () => setTimeout(() => {
       if (window.scrollY > 40 || wlTouched) return;
       notif.classList.add('in');
       notifOut = setTimeout(() => notif.classList.remove('in'), 6400);
-    }, 4500);
+    }, 2600);
     notif.addEventListener('click', () => {
       clearTimeout(notifOut);
       notif.classList.remove('in');
