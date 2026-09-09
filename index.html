@@ -1541,11 +1541,14 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   // === Notification banner ===
   // A single idle nudge, cued off the hero timeline (notifCue fires with the
   // hero CTA beat — the mobile waitlist button / the desktop floating pill):
-  // ~2.6s after that settles, if the reader is still parked on the hero and
-  // hasn't touched a waitlist CTA, the notification slides in asking them to
-  // scroll (iOS-style top banner on mobile, macOS-style top-right card on
-  // desktop). Tapping it scrolls to the first tour section; otherwise it
-  // auto-dismisses.
+  // once the reader has been parked on the hero for ~2.6s straight and hasn't
+  // touched a waitlist CTA, the notification slides in asking them to scroll
+  // (iOS-style top banner on mobile, macOS-style top-right card on desktop).
+  // The dwell is a watcher, not a one-shot: leaving the hero mid-count (a
+  // snap flick onto the tour, say) just resets it, and coming back to the
+  // hero starts it over — so the nudge still lands for readers who explore
+  // first and return. It fires at most once. Tapping it scrolls to the first
+  // tour section; otherwise it auto-dismisses.
   const notif = document.getElementById('notif');
   if (notif && !mqReduce.matches){
     // Any waitlist CTA press cancels the nudge — they're already converting.
@@ -1555,16 +1558,27 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       b && b.addEventListener('click', () => { wlTouched = true; }, {once: true});
     });
     let notifOut = 0;
-    notifCue = () => setTimeout(() => {
-      // "Still on the hero" is position-based, not scroll-strict: a wheel
-      // jiggle inside the hero's hold budget keeps the nudge; only actually
-      // moving on to the tour (or touching a waitlist CTA) cancels it —
-      // they've already done what the nudge asks.
-      const onHero = heroEl && heroEl.getBoundingClientRect().bottom > window.innerHeight * 0.25;
-      if (!onHero || wlTouched) return;
-      notif.classList.add('in');
-      notifOut = setTimeout(() => notif.classList.remove('in'), 6400);
-    }, 2600);
+    notifCue = () => {
+      // "On the hero" is position-based, not scroll-strict: a wheel jiggle
+      // inside the hero's hold budget keeps the dwell counting.
+      const onHero = () => heroEl && heroEl.getBoundingClientRect().bottom > window.innerHeight * 0.25;
+      let dwellT = 0, shown = false;
+      const disarm = () => { if (dwellT){ clearTimeout(dwellT); dwellT = 0; } };
+      const arm = () => {
+        if (shown || wlTouched || dwellT || !onHero()) return;
+        dwellT = setTimeout(() => {
+          dwellT = 0;
+          if (shown || wlTouched || !onHero()) return;
+          shown = true;
+          window.removeEventListener('scroll', watch);
+          notif.classList.add('in');
+          notifOut = setTimeout(() => notif.classList.remove('in'), 6400);
+        }, 2600);
+      };
+      const watch = () => { onHero() ? arm() : disarm(); };
+      window.addEventListener('scroll', watch, {passive: true});
+      arm();
+    };
     notif.addEventListener('click', () => {
       clearTimeout(notifOut);
       notif.classList.remove('in');
