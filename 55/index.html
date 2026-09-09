@@ -249,7 +249,7 @@ html.dark .notif .logo-dark{display:block}
 .notif-top{display:flex;justify-content:space-between;align-items:baseline}
 .notif-app{font-size:15px;font-weight:600;color:var(--ink)}
 .notif-time{font-size:13px;color:var(--ink-3)}
-.notif-text{font-size:15px;line-height:1.35;color:var(--ink);margin-top:1px;transition:opacity .25s ease}
+.notif-text{font-size:15px;line-height:1.35;color:var(--ink);margin-top:1px}
 @media(min-width:768px){.notif{display:none}}
 
 /* ===== PROGRESS RAIL (left) ===== */
@@ -691,15 +691,15 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   </div>
 </nav>
 
-<!-- iOS-style notification banner (mobile) — drops in shortly after load,
-     previewing the first tour message; tap scrolls to that section. Decorative
-     and aria-hidden: the same text lives in "i text first" below. -->
+<!-- iOS-style notification banner (mobile) — an idle nudge that drops in a
+     few seconds after load if the reader is still parked on the hero; tap
+     scrolls to the first tour section. Decorative and aria-hidden. -->
 <div class="notif" id="notif" aria-hidden="true">
   <img class="logo-light" src="images/cued-logo.svg" alt="">
   <img class="logo-dark" src="images/cued-logo-reversed.svg" alt="">
   <div class="notif-body">
     <div class="notif-top"><span class="notif-app">cued</span><span class="notif-time">now</span></div>
-    <div class="notif-text">gym's dead right now and you're out of class till 3.</div>
+    <div class="notif-text">not yet convinced? scroll to see all i can do for you</div>
   </div>
 </div>
 
@@ -1530,33 +1530,23 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   }
 
   // === Notification banner (mobile) ===
-  // Drops in ~1.2s after load — the "Cued texts first" beat, landing before
-  // the intro bubbles start popping — then auto-dismisses. Tapping it scrolls
-  // to the first tour section, like opening the message. If the reader is
-  // still parked on the hero ~3s after the banner lands and hasn't touched a
-  // waitlist CTA, the preview crossfades into a scroll nudge and the banner
-  // lingers a little longer.
+  // A single idle nudge: ~4.5s after load — right after the hero CTA beat —
+  // if the reader is still parked on the hero and hasn't touched a waitlist
+  // CTA, the notification drops in asking them to scroll. Tapping it scrolls
+  // to the first tour section; otherwise it auto-dismisses.
   const notif = document.getElementById('notif');
   if (notif && !mqDesktop.matches && !mqReduce.matches){
-    const notifTxt = notif.querySelector('.notif-text');
     // Any waitlist CTA press cancels the nudge — they're already converting.
     let wlTouched = false;
     ['heroCta', 'floatCta', 'navCta', 'closeCta'].forEach(id => {
       const b = document.getElementById(id);
       b && b.addEventListener('click', () => { wlTouched = true; }, {once: true});
     });
-    setTimeout(() => notif.classList.add('in'), 1200);
-    let notifOut = setTimeout(() => notif.classList.remove('in'), 7600);
+    let notifOut = 0;
     setTimeout(() => {
-      const onHero = window.scrollY < 40;
-      if (!notif.classList.contains('in') || !onHero || wlTouched) return;
-      clearTimeout(notifOut);
-      notifTxt.style.opacity = '0';
-      setTimeout(() => {
-        notifTxt.textContent = 'not yet convinced? scroll to see all i can do for you';
-        notifTxt.style.opacity = '1';
-      }, 260);
-      notifOut = setTimeout(() => notif.classList.remove('in'), 6000);
+      if (window.scrollY > 40 || wlTouched) return;
+      notif.classList.add('in');
+      notifOut = setTimeout(() => notif.classList.remove('in'), 6400);
     }, 4500);
     notif.addEventListener('click', () => {
       clearTimeout(notifOut);
