@@ -224,11 +224,11 @@ nav .brand.compact span{opacity:0;transition:opacity .2s ease .1s}
 @media(max-width:600px){.scroll-cue{bottom:0;width:18px;height:18px}}
 @media(max-width:600px){.float-cta{bottom:calc(20px + env(safe-area-inset-bottom,0px));font-size:12.5px;padding:9px 17px}}
 
-/* ===== NOTIFICATION BANNER (mobile) ===== */
-/* iOS-style push-notification card that drops from the top shortly after
-   load — Cued texts first, literally. Overlays the nav like a real
-   notification; tap scrolls to the first tour section (opening the thread).
-   Mobile-only for now; desktop has its own hero choreography. */
+/* ===== NOTIFICATION BANNER ===== */
+/* Push-notification card — Cued texts first, literally. Overlays the nav
+   like a real notification; tap scrolls to the first tour section (opening
+   the thread). Mobile: iOS-style, full-width at the top-center, dropping
+   down. Desktop: macOS-style, compact card sliding in at the top-right. */
 .notif{
   position:fixed;top:10px;left:10px;right:10px;z-index:60;
   display:flex;gap:11px;align-items:flex-start;
@@ -250,7 +250,14 @@ html.dark .notif .logo-dark{display:block}
 .notif-app{font-size:15px;font-weight:600;color:var(--ink)}
 .notif-time{font-size:13px;color:var(--ink-3)}
 .notif-text{font-size:15px;line-height:1.35;color:var(--ink);margin-top:1px}
-@media(min-width:768px){.notif{display:none}}
+@media(min-width:768px){
+  .notif{
+    left:auto;right:18px;top:18px;margin:0;width:380px;
+    border-radius:18px;
+    transform:translateX(calc(100% + 40px));
+  }
+  .notif.in{transform:none}
+}
 
 /* ===== PROGRESS RAIL (left) ===== */
 /* Descended from the live site's right-rail page indicators, mirrored to
@@ -691,9 +698,10 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   </div>
 </nav>
 
-<!-- iOS-style notification banner (mobile) — an idle nudge that drops in a
-     few seconds after load if the reader is still parked on the hero; tap
-     scrolls to the first tour section. Decorative and aria-hidden. -->
+<!-- Notification banner — an idle nudge that appears a few seconds after
+     the hero settles if the reader is still parked there; tap scrolls to the
+     first tour section. iOS-style top banner on mobile, macOS-style
+     top-right card on desktop. Decorative and aria-hidden. -->
 <div class="notif" id="notif" aria-hidden="true">
   <img class="logo-light" src="images/cued-logo.svg" alt="">
   <img class="logo-dark" src="images/cued-logo-reversed.svg" alt="">
@@ -1530,14 +1538,16 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     chromeChk();
   }
 
-  // === Notification banner (mobile) ===
+  // === Notification banner ===
   // A single idle nudge, cued off the hero timeline (notifCue fires with the
-  // hero CTA beat): ~2.6s after the "Join the waitlist" button settles, if
-  // the reader is still parked on the hero and hasn't touched a waitlist
-  // CTA, the notification drops in asking them to scroll. Tapping it scrolls
-  // to the first tour section; otherwise it auto-dismisses.
+  // hero CTA beat — the mobile waitlist button / the desktop floating pill):
+  // ~2.6s after that settles, if the reader is still parked on the hero and
+  // hasn't touched a waitlist CTA, the notification slides in asking them to
+  // scroll (iOS-style top banner on mobile, macOS-style top-right card on
+  // desktop). Tapping it scrolls to the first tour section; otherwise it
+  // auto-dismisses.
   const notif = document.getElementById('notif');
-  if (notif && !mqDesktop.matches && !mqReduce.matches){
+  if (notif && !mqReduce.matches){
     // Any waitlist CTA press cancels the nudge — they're already converting.
     let wlTouched = false;
     ['heroCta', 'floatCta', 'navCta', 'closeCta'].forEach(id => {
