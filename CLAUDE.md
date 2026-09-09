@@ -45,7 +45,7 @@ The site is entirely self-contained vanilla HTML/CSS/JS with no framework or bui
 
 **Waitlist modal** — every CTA opens a modal that POSTs `{ name, phone, email|null, source, ts, timezone, active: false, status: 'waitlist' }` to the Railway `/waitlist` endpoint. Do not change this contract.
 
-**Bubble anatomy** — tails only on the last bubble of a run, built from two pseudo-elements (color extension + page-white carve); both must be at least as tall as the corner radius or the tail detaches. The poll's width is matched to the widest sibling bubble by JS.
+**Bubble anatomy** — tails only on the last bubble of a run, built from two pseudo-elements (color extension + page-white carve); both must be at least as tall as the corner radius or the tail detaches. The poll's width is matched to the widest sibling bubble by JS. Every auto-play reveal (hero and tour, motion OK) gets a ~500ms three-dot typing lead-in: a JS-injected `.typing` pill per thread, absolutely positioned just under the last revealed bubble on the incoming bubble's side (blue for Cued, gray for the user), lifting the thread by its height while it shows; the arriving bubble replaces it. The hero's first pop after a scroll start skips it (no room before the reveal).
 
 ## Images / Assets
 
