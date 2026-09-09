@@ -1556,7 +1556,12 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     });
     let notifOut = 0;
     notifCue = () => setTimeout(() => {
-      if (window.scrollY > 40 || wlTouched) return;
+      // "Still on the hero" is position-based, not scroll-strict: a wheel
+      // jiggle inside the hero's hold budget keeps the nudge; only actually
+      // moving on to the tour (or touching a waitlist CTA) cancels it —
+      // they've already done what the nudge asks.
+      const onHero = heroEl && heroEl.getBoundingClientRect().bottom > window.innerHeight * 0.25;
+      if (!onHero || wlTouched) return;
       notif.classList.add('in');
       notifOut = setTimeout(() => notif.classList.remove('in'), 6400);
     }, 2600);
