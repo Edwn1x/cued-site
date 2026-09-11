@@ -9,8 +9,10 @@
 
   Data: the ?t= token in the URL is the HMAC link the coach sent (backend
   profile_page.py). The page fetches GET {API}/profile/{token} and renders
-  the JSON — nothing is stored in the browser, and there is no editing here:
-  anything the user wants changed, they text Cued. No token (or the old
+  the JSON into five tabs (today · you · training · food · memory) — nothing is
+  stored in the browser, and there is no editing here: anything the user wants
+  changed, they text Cued. The tab picker is styled like the bubbles (gray =
+  a choice, blue = the one picked) and syncs with the URL hash (#food). No token (or the old
   ?phone= link) shows a "text me for your link" state instead of data.
 
   Vanilla HTML/CSS/JS, no build step. Tokens mirror index.html so light and
@@ -122,8 +124,33 @@ main{max-width:640px;margin:0 auto;padding:112px 20px 48px}
 .msg.user.t::after{left:-1.3em;width:1.3em;background:var(--bg);border-bottom-right-radius:.5em}
 .msg .since{display:block;font-size:.68em;opacity:.7;margin-top:.15em}
 
+/* ===== TABS — a row of pills, styled like the bubbles: gray is a choice,
+   blue is the one picked. Sticky under the nav so a long panel can still
+   switch. Scrolls sideways on narrow screens, no scrollbar. ===== */
+.tabs{
+  position:sticky;top:64px;z-index:40;
+  display:flex;gap:8px;margin:28px -20px 0;padding:12px 20px;
+  background:var(--bg);
+  overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex:none;border:none;cursor:pointer;
+  padding:8px 15px;border-radius:999px;
+  background:var(--gray);color:var(--gray-ink);
+  font-size:15px;font-weight:500;letter-spacing:-.1px;line-height:1.2;
+  transition:background .15s ease,color .15s ease;
+}
+.tab:hover{background:var(--line)}
+.tab[aria-selected="true"]{background:var(--blue);color:var(--blue-ink)}
+.tab[aria-selected="true"]:hover{background:var(--blue-deep)}
+.panel{display:none}
+.panel.active{display:block;animation:panelIn .25s ease}
+@keyframes panelIn{from{opacity:0}to{opacity:1}}
+
 /* ===== SECTIONS ===== */
 section{margin-top:44px}
+.panel > section:first-child{margin-top:20px}
 .hdr{font-family:var(--f-header);font-size:clamp(26px,3.2vw,32px);line-height:1.1;letter-spacing:-.01em;color:var(--ink);margin-bottom:16px}
 .hdr small{display:block;font-family:var(--f-msg);font-size:14px;letter-spacing:0;color:var(--ink-3);margin-top:6px}
 .empty{color:var(--ink-3);font-size:15px;padding:6px 0}
@@ -171,6 +198,8 @@ footer .fmeta{margin-top:10px}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   #profile{transition:none}
+  .panel.active{animation:none}
+  .tab{transition:none}
   .typing i{animation:none;opacity:.7}
   .bar i{transition:none}
 }
@@ -178,6 +207,8 @@ footer .fmeta{margin-top:10px}
 @media (max-width:767px){
   :root{--msg-size:17px}
   main{padding-top:96px}
+  .tabs{top:60px;padding:10px 20px;gap:6px}
+  .tab{padding:7px 12px;font-size:14px}
   .stats{grid-template-columns:1fr 1fr;gap:10px}
   .stat{padding:14px}
   .stat .n{font-size:26px}
@@ -214,7 +245,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   </div>
 
   <div class="state" id="stateError" hidden>
-    <div class="who">hm.</div>
+    <div class="who">hmm...</div>
     <p id="errorText">that link didn’t work. text Cued <b>“send me my profile link”</b> for a fresh one.</p>
     <a class="back" href="index.html">← back to cued.fit</a>
   </div>
@@ -311,6 +342,7 @@ function render(p){
   const tz = p.timezone || 'America/Los_Angeles';
   const todayKey = fmtDate(new Date().toISOString(), tz, {year:'numeric', month:'2-digit', day:'2-digit'});
   const first = esc(p.first_name || p.name || 'there');
+  const tabs = {today: [], you: [], training: [], food: [], memory: []};
   const out = [];
 
   // Intro — Cued opens, like the landing page's hero.
@@ -329,13 +361,13 @@ function render(p){
       + (has(t.protein_g) ? stat(t.protein_g, 'g', `protein target · ${td.protein_g || 0}g so far today`, td.protein_g, t.protein_g) : '')
       + `</div>`;
     body += `<div class="macros"><span>today: <b>${td.meals_logged || 0}</b> ${td.meals_logged === 1 ? 'meal' : 'meals'} logged</span><span><b>${td.carbs_g || 0}g</b> carbs</span><span><b>${td.fat_g || 0}g</b> fat</span></div>`;
-    out.push(section('your targets', body));
+    tabs.today.push(section('your targets', body));
   }
 
   // About you.
   const a = p.about || {};
   const height = a.height ? `${a.height.ft}'${a.height.in}"` : null;
-  out.push(section('about you', rows([
+  tabs.you.push(section('about you', rows([
     row('name', p.name),
     row('phone', p.phone),
     row('age', a.age),
@@ -359,11 +391,11 @@ function render(p){
     row('biggest obstacle', label('obstacle', g.obstacle)),
     row('why', g.motivation, true),
   ]);
-  out.push(section('your goals', goalsBody));
+  tabs.you.push(section('your goals', goalsBody));
 
   // Training.
   const tr = p.training || {};
-  out.push(section('training', rows([
+  tabs.training.push(section('training', rows([
     row('experience', label('experience', tr.experience)),
     row('equipment', label('equipment', tr.equipment)),
     row('gym', label('gym', tr.gym)),
@@ -377,7 +409,7 @@ function render(p){
 
   // Food.
   const n = p.nutrition || {};
-  out.push(section('food', rows([
+  tabs.food.push(section('food', rows([
     row('diet', label('diet', n.diet)),
     row('restrictions', n.restrictions, true),
     row('eating situation', label('cooking', n.cooking_situation)),
@@ -388,7 +420,7 @@ function render(p){
 
   // Routine.
   const r = p.routine || {};
-  out.push(section('your routine', rows([
+  tabs.you.push(section('your routine', rows([
     row('wake up', fmtClock(r.wake_time)),
     row('bedtime', fmtClock(r.sleep_time)),
     row('sleep quality', r.sleep_quality),
@@ -399,14 +431,16 @@ function render(p){
   ])));
 
   // What Cued remembers — in Cued's own words, so Cued's bubbles.
+  // Flask sorts JSON keys, so the category order is the page's call.
   const mem = p.memory || {};
-  const cats = Object.keys(mem).filter(c => mem[c] && mem[c].length);
+  const order = ['identity', 'goals', 'constraints', 'training_preferences', 'communication_preferences', 'schedule', 'food_on_hand'];
+  const cats = order.concat(Object.keys(mem).filter(c => !order.includes(c))).filter(c => mem[c] && mem[c].length);
   let memBody = '';
   for (const c of cats) {
     const items = mem[c].map(e => esc(e.text) + (e.since ? `<span class="since">${esc(dayShort(e.since, tz))}</span>` : ''));
     memBody += `<div class="memcat">${esc(L.memcat[c] || c.replace(/_/g, ' '))}</div><div class="thread">${bubbles(items, 'cued')}</div>`;
   }
-  out.push(section('what i remember', memBody, cats.length ? 'things you’ve told me along the way. i use these to coach you.' : null));
+  tabs.memory.push(section('what i remember', memBody, cats.length ? 'things you’ve told me along the way. i use these to coach you.' : null));
 
   // Recent logs.
   const rc = p.recent || {};
@@ -427,7 +461,14 @@ function render(p){
       `<div class="log"><span class="when">${esc(relDay(x.weighed_at, tz, todayKey))}</span><span class="what">${esc(x.weight_lbs)} lbs${x.notes ? `<small>${esc(x.notes)}</small>` : ''}</span></div>`
     ).join('') + `</div>`;
   }
-  out.push(section('recent logs', logs));
+  tabs.today.push(section('recent logs', logs));
+
+  // Tab picker + panels. The hash picks the opening tab (#food) and follows
+  // the selection so a tab can be linked to.
+  const names = {today: 'today', you: 'you', training: 'training', food: 'food', memory: 'memory'};
+  out.push(`<div class="tabs" role="tablist" aria-label="Profile sections">` + Object.keys(tabs).map(k =>
+    `<button type="button" class="tab" role="tab" id="tab-${k}" aria-controls="panel-${k}" aria-selected="false">${names[k]}</button>`).join('') + `</div>`);
+  for (const k of Object.keys(tabs)) out.push(`<div class="panel" id="panel-${k}" role="tabpanel" aria-labelledby="tab-${k}">${tabs[k].join('')}</div>`);
 
   // Close — the one exchange the page needs to make its point.
   out.push(`<section><div class="thread">${bubbles(['what if something on here is wrong?'], 'user')}${bubbles(['just text me. i’ll update it.'], 'cued').replace('class="msg cued', 'class="msg cued turn')}</div></section>`);
@@ -435,10 +476,49 @@ function render(p){
   const el = document.getElementById('profile');
   el.innerHTML = out.join('');
   el.hidden = false;
+  wireTabs(el, Object.keys(tabs));
   requestAnimationFrame(() => {
     el.classList.add('in');
     el.querySelectorAll('.bar i').forEach(i => { i.style.width = i.dataset.w + '%'; });
   });
+}
+
+function wireTabs(el, keys){
+  const tabsEl = el.querySelector('.tabs');
+  const tabEls = keys.map(k => el.querySelector('#tab-' + k));
+  let current = null;
+  function select(k, {scroll = false, push = true} = {}){
+    if (!keys.includes(k)) k = keys[0];
+    if (k === current) return;
+    current = k;
+    for (const key of keys) {
+      const on = key === k;
+      el.querySelector('#tab-' + key).setAttribute('aria-selected', on ? 'true' : 'false');
+      el.querySelector('#tab-' + key).tabIndex = on ? 0 : -1;
+      el.querySelector('#panel-' + key).classList.toggle('active', on);
+    }
+    if (push) history.replaceState(null, '', '#' + k);
+    // Switching while deep in a long panel: bring the picker back to the top
+    // so the new panel starts in view.
+    if (scroll && tabsEl.getBoundingClientRect().top < 60) {
+      const top = window.scrollY + tabsEl.getBoundingClientRect().top - 64;
+      window.scrollTo({top, behavior: 'auto'});
+    }
+    el.querySelector('#tab-' + k).scrollIntoView({block: 'nearest', inline: 'nearest'});
+  }
+  tabEls.forEach((t, i) => {
+    t.addEventListener('click', () => select(keys[i], {scroll: true}));
+    t.addEventListener('keydown', e => {
+      const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!d) return;
+      e.preventDefault();
+      const n = keys[(i + d + keys.length) % keys.length];
+      select(n, {scroll: true});
+      el.querySelector('#tab-' + n).focus();
+    });
+  });
+  window.addEventListener('hashchange', () => select(location.hash.slice(1) || keys[0], {scroll: true, push: false}));
+  select(location.hash.slice(1) || keys[0], {push: false});
 }
 
 function show(id){
