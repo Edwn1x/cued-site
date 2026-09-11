@@ -175,6 +175,57 @@ section{margin-top:44px}
 .macros{display:flex;gap:18px;font-size:14px;color:var(--ink-2);margin-top:14px;flex-wrap:wrap}
 .macros b{font-weight:600;color:var(--ink)}
 
+.hdr .lead{display:block;font-family:var(--f-msg);font-size:15px;letter-spacing:0;color:var(--ink-2);margin-top:8px;line-height:1.45}
+
+/* ===== CHARTS — one series, the brand blue; everything else recessive.
+   Hairline grid, 2px line, 8px markers with a surface ring, a crosshair that
+   snaps to the nearest session, and the latest value labeled at the end. ===== */
+.picks{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.picks.scroll{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:-20px;margin-right:-20px;padding:2px 20px}
+.picks.scroll::-webkit-scrollbar{display:none}
+.pick{flex:none;border:none;cursor:pointer;padding:6px 12px;border-radius:999px;background:var(--gray);color:var(--gray-ink);font-size:14px;font-weight:500;line-height:1.2;transition:background .15s ease,color .15s ease}
+.pick:hover{background:var(--line)}
+.pick[aria-pressed="true"]{background:var(--blue);color:var(--blue-ink)}
+.pick[aria-pressed="true"]:hover{background:var(--blue-deep)}
+.chart{position:relative;border:1px solid var(--line);border-radius:18px;padding:16px 16px 10px;background:var(--card)}
+.chart .ch-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:6px}
+.chart .ch-title{font-size:14px;color:var(--ink-3)}
+.chart .ch-val{font-size:22px;font-weight:600;letter-spacing:-.02em;color:var(--ink);font-variant-numeric:tabular-nums}
+.chart .ch-val span{font-size:13px;font-weight:500;color:var(--ink-3);margin-left:3px;letter-spacing:0}
+.chart svg{display:block;width:100%;height:auto;overflow:visible;touch-action:pan-y}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.chart .line{fill:none;stroke:var(--blue);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.chart .dot{fill:var(--blue);stroke:var(--card);stroke-width:2}
+.chart .dot.pr{r:5.5}
+.chart .tick{fill:var(--ink-3);font-size:11px;font-family:var(--f-msg)}
+.chart .xhair{stroke:var(--ink-3);stroke-width:1;opacity:0;pointer-events:none}
+.chart .hit{fill:transparent}
+.chart .tip{position:absolute;top:8px;right:12px;font-size:13px;color:var(--ink-2);background:var(--card);padding:2px 0;pointer-events:none;opacity:0;transition:opacity .12s ease;font-variant-numeric:tabular-nums}
+.chart .tip b{color:var(--ink);font-weight:600}
+.chart.hover .tip,.chart.hover .xhair{opacity:1}
+.chart.hover .ch-val{opacity:0}
+.chart .foot{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-3);margin-top:4px;padding:0 2px}
+
+/* Consistency strip — workouts per week, tiny columns, current week in blue. */
+.weeks{margin-top:14px}
+.weeks .wk-title{font-size:13px;color:var(--ink-3);margin-bottom:8px}
+.weeks svg{display:block;width:100%;height:auto;overflow:visible}
+.weeks .col{fill:var(--gray)}
+.weeks .col.now{fill:var(--blue)}
+.weeks .col.empty{fill:var(--fill)}
+.weeks .wlbl{fill:var(--ink-3);font-size:11px;font-family:var(--f-msg)}
+
+/* My workouts — picker of dates, then either the overview or one session. */
+.wo{margin-top:8px}
+.wo-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 0 4px}
+.wo-head .wo-type{font-size:19px;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+.wo-head .wo-date{font-size:14px;color:var(--ink-3)}
+.wo-notes{font-size:15px;color:var(--ink-2);padding:10px 0 2px;line-height:1.45}
+.wo-notes::before{content:'“'}
+.wo-notes::after{content:'”'}
+.wo-row{cursor:pointer}
+.wo-row:hover .what{color:var(--blue)}
+
 .memcat{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:18px 0 8px;text-align:right}
 .memcat:first-child{margin-top:0}
 
@@ -198,6 +249,7 @@ footer .fmeta{margin-top:10px}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   #profile{transition:none}
+  .chart .tip,.pick{transition:none}
   .panel.active{animation:none}
   .tab{transition:none}
   .typing i{animation:none;opacity:.7}
@@ -209,6 +261,7 @@ footer .fmeta{margin-top:10px}
   main{padding-top:96px}
   .tabs{top:60px;padding:10px 20px;gap:6px}
   .tab{padding:7px 12px;font-size:14px}
+  .chart{padding:14px 12px 8px;border-radius:16px}
   .stats{grid-template-columns:1fr 1fr;gap:10px}
   .stat{padding:14px}
   .stat .n{font-size:26px}
@@ -338,9 +391,101 @@ function bubbles(items, side){
   return items.map((t, i) => `<div class="msg ${side}${i === items.length - 1 ? ' t' : ''}">${t}</div>`).join('');
 }
 
+// ── Charts ──────────────────────────────────────────────────────────────────
+// One series, brand blue, recessive everything else. points: [{x: Date, y, ...}]
+function niceTicks(lo, hi, n){
+  if (hi === lo) { lo -= 5; hi += 5; }
+  const span = hi - lo, raw = span / n, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => span / s <= n) || 10 * mag;
+  const start = Math.floor(lo / step) * step, end = Math.ceil(hi / step) * step;
+  const ticks = []; for (let v = start; v <= end + 1e-9; v += step) ticks.push(+v.toFixed(6));
+  return {ticks, lo: start, hi: end};
+}
+function lineChart(id, {title, unit, points, tz, best}){
+  // points oldest→newest; y in `unit`. Returns HTML; wireChart() adds hover.
+  const W = 600, H = 220, padL = 40, padR = 16, padT = 14, padB = 26;
+  const xs = points.map(p => p.x.getTime()), ys = points.map(p => p.y);
+  const {ticks, lo, hi} = niceTicks(Math.min(...ys), Math.max(...ys), 4);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs) || x0 + 1;
+  const X = t => x0 === x1 ? (padL + W - padR) / 2 : padL + (t - x0) / (x1 - x0) * (W - padL - padR);
+  const Y = v => padT + (hi - v) / (hi - lo || 1) * (H - padT - padB);
+  const grid = ticks.map(v => `<line class="grid" x1="${padL}" x2="${W - padR}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}"/><text class="tick" x="${padL - 8}" y="${(Y(v) + 4).toFixed(1)}" text-anchor="end">${v.toLocaleString()}</text>`).join('');
+  const path = points.map((p, i) => `${i ? 'L' : 'M'}${X(p.x.getTime()).toFixed(1)} ${Y(p.y).toFixed(1)}`).join(' ');
+  const dots = points.map((p, i) => `<circle class="dot${best && p.y === best ? ' pr' : ''}" cx="${X(p.x.getTime()).toFixed(1)}" cy="${Y(p.y).toFixed(1)}" r="4" data-i="${i}"/>`).join('');
+  // The latest value lives in the header (top-right), so the line itself
+  // carries no end label — it would collide with the header when the last
+  // point is the max, which for a progressing lift is the usual case.
+  const last = points[points.length - 1];
+  const foot = `<div class="foot"><span>${esc(dayShort(points[0].x.toISOString(), tz))}</span><span>${esc(dayShort(last.x.toISOString(), tz))}</span></div>`;
+  return `<div class="chart" id="${id}" data-tz="${esc(tz)}">
+    <div class="ch-head"><span class="ch-title">${esc(title)}</span><span class="ch-val">${esc(last.y.toLocaleString())}<span>${esc(unit)}</span></span></div>
+    <div class="tip"></div>
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(title)}, ${points.length} points">
+      ${grid}<path class="line" d="${path}"/><line class="xhair" y1="${padT}" y2="${H - padB}" x1="0" x2="0"/>${dots}
+      <rect class="hit" x="${padL}" y="0" width="${W - padL - padR}" height="${H}"/>
+    </svg>${foot}</div>`;
+}
+function wireChart(el, points, tipOf){
+  const svg = el.querySelector('svg'), xhair = el.querySelector('.xhair'), tip = el.querySelector('.tip');
+  const dots = [...el.querySelectorAll('.dot')];
+  const cx = dots.map(d => +d.getAttribute('cx'));
+  const W = 600;
+  function at(clientX){
+    const r = svg.getBoundingClientRect();
+    const x = (clientX - r.left) / r.width * W;
+    let best = 0; for (let i = 1; i < cx.length; i++) if (Math.abs(cx[i] - x) < Math.abs(cx[best] - x)) best = i;
+    xhair.setAttribute('x1', cx[best]); xhair.setAttribute('x2', cx[best]);
+    tip.innerHTML = tipOf(points[best]);
+    el.classList.add('hover');
+  }
+  const off = () => el.classList.remove('hover');
+  svg.addEventListener('pointermove', e => at(e.clientX));
+  svg.addEventListener('pointerdown', e => at(e.clientX));
+  svg.addEventListener('pointerleave', off);
+  document.addEventListener('pointerdown', e => { if (!el.contains(e.target)) off(); });
+}
+function weeksStrip(weeks, tz){
+  const W = 600, H = 64, gap = 6, n = weeks.length, bw = Math.min(24, (W - gap * (n - 1)) / n), slot = (W - bw * n) / (n - 1 || 1) + bw;
+  const max = Math.max(1, ...weeks.map(w => w.workouts));
+  const cols = weeks.map((w, i) => {
+    const h = w.workouts ? Math.max(6, w.workouts / max * (H - 18)) : 3;
+    const x = i * slot, y = H - 18 - h;
+    const cls = 'col' + (i === n - 1 ? ' now' : '') + (w.workouts ? '' : ' empty');
+    return `<rect class="${cls}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="3"><title>${esc(dayShort(w.week_start + 'T12:00:00', tz))}: ${w.workouts} ${w.workouts === 1 ? 'workout' : 'workouts'}</title></rect>`;
+  }).join('');
+  const total = weeks.reduce((a, w) => a + w.workouts, 0);
+  return `<div class="weeks"><div class="wk-title">consistency · <b>${total}</b> ${total === 1 ? 'workout' : 'workouts'} in the last ${n} weeks</div>
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="workouts per week">${cols}
+    <text class="wlbl" x="0" y="${H - 2}">${esc(dayShort(weeks[0].week_start + 'T12:00:00', tz))}</text>
+    <text class="wlbl" x="${W}" y="${H - 2}" text-anchor="end">this week</text></svg></div>`;
+}
+
+function workoutDetail(w, tz, todayISO){
+  const when = w.local_date === todayISO ? 'today' : dayShort(w.date, tz);
+  const rowsHtml = (w.exercises || []).map(e => {
+    const v = [e.sets && e.reps ? `${e.sets} × ${e.reps}` : (e.reps ? `${e.reps} reps` : (e.sets ? `${e.sets} sets` : '')), has(e.weight) ? `${e.weight} lbs` : ''].filter(Boolean).join(' · ');
+    return `<div class="row"><span class="k" style="color:var(--ink)">${esc(e.name || 'exercise')}</span><span class="v" style="color:var(--ink-2)">${esc(v)}</span></div>`;
+  }).join('');
+  return `<div class="wo-head"><span class="wo-type">${esc(w.type && w.type !== 'logged' ? String(w.type).replace(/_/g, ' ') : 'workout')}</span><span class="wo-date">${esc(when)}</span></div>`
+    + (rowsHtml ? `<div class="rows">${rowsHtml}</div>` : `<div class="empty">logged, no exercises listed.</div>`)
+    + (w.notes ? `<div class="wo-notes">${esc(w.notes)}</div>` : '');
+}
+function workoutOverview(ws, tz, todayISO, weekly){
+  const thisWeek = weekly.length ? weekly[weekly.length - 1].workouts : 0;
+  const last30 = ws.filter(w => (Date.now() - new Date(w.date).getTime()) < 30 * 864e5).length;
+  const types = {}; ws.forEach(w => { const t = w.type && w.type !== 'logged' ? w.type : null; if (t) types[t] = (types[t] || 0) + 1; });
+  const fav = Object.keys(types).sort((a, b) => types[b] - types[a])[0];
+  const stats = `<div class="stats"><div class="stat"><div class="n">${thisWeek}</div><div class="l">this week</div></div><div class="stat"><div class="n">${last30}</div><div class="l">last 30 days</div></div></div>`;
+  const list = `<div class="sub">sessions</div><div class="logs">` + ws.slice(0, 20).map(w =>
+    `<div class="log wo-row" data-id="${w.id}"><span class="when">${esc(w.local_date === todayISO ? 'today' : dayShort(w.date, tz))}</span><span class="what">${esc(w.type && w.type !== 'logged' ? String(w.type).replace(/_/g, ' ') : 'workout')}<small>${esc((w.exercises || []).map(e => e.name).filter(Boolean).slice(0, 4).join(' · '))}</small></span><span class="meta">${(w.exercises || []).length ? (w.exercises.length + ' ' + (w.exercises.length === 1 ? 'lift' : 'lifts')) : ''}</span></div>`
+  ).join('') + `</div>`;
+  return stats + (fav ? `<div class="macros" style="margin-top:12px"><span>most logged: <b>${esc(fav.replace(/_/g, ' '))}</b> · ${types[fav]}×</span></div>` : '') + list;
+}
+
 function render(p){
   const tz = p.timezone || 'America/Los_Angeles';
   const todayKey = fmtDate(new Date().toISOString(), tz, {year:'numeric', month:'2-digit', day:'2-digit'});
+  const todayISO = (p.today || {}).local_date || '';   // server's local day, matches workouts' local_date
   const first = esc(p.first_name || p.name || 'there');
   const tabs = {today: [], you: [], training: [], food: [], memory: []};
   const out = [];
@@ -381,6 +526,15 @@ function render(p){
     row('with cued since', p.member_since ? fmtDate(p.member_since, tz, {month:'long', day:'numeric', year:'numeric'}) : null),
   ])));
 
+  // Bodyweight over time — same chart, on the "you" tab.
+  const weights = (((p.recent || {}).weights) || []).filter(x => has(x.weight_lbs)).slice().reverse();
+  if (weights.length >= 2) {
+    const pts = weights.map(x => ({x: new Date(x.weighed_at), y: x.weight_lbs, notes: x.notes}));
+    const delta = +(pts[pts.length - 1].y - pts[0].y).toFixed(1);
+    tabs.you.push(section('bodyweight', lineChart('weightChart', {title: `${weights.length} weigh-ins · ${delta > 0 ? '+' : ''}${delta} lbs`, unit: 'lbs', points: pts, tz}),
+      'from your weigh-ins. one number never tells the story — the trend does.'));
+  }
+
   // Goals.
   const g = p.goals || {};
   let goalsBody = '';
@@ -393,9 +547,36 @@ function render(p){
   ]);
   tabs.you.push(section('your goals', goalsBody));
 
-  // Training.
+  // Training — progress first (people come here to see the line go up), then
+  // my workouts (today's session if there is one, else the overview), then setup.
   const tr = p.training || {};
-  tabs.training.push(section('training', rows([
+  const prog = tr.progress || {lifts: [], weekly: []};
+  const lifts = (prog.lifts || []).filter(l => (l.sessions || []).length >= 2);
+  const wsAll = ((p.recent || {}).workouts || []);
+  {
+    let body = '';
+    if (lifts.length) {
+      body += `<div class="picks" id="liftPicks">` + lifts.map((l, i) => `<button type="button" class="pick" aria-pressed="${i === 0}" data-i="${i}">${esc(l.name)}</button>`).join('') + `</div>`;
+      body += `<div id="liftChart"></div>`;
+    } else if (wsAll.length) {
+      body += `<div class="empty">once a lift shows up in two sessions with a weight, i'll chart it here.</div>`;
+    } else {
+      body += `<div class="empty">no workouts logged yet — text me after your next session.</div>`;
+    }
+    if ((prog.weekly || []).some(w => w.workouts)) body += weeksStrip(prog.weekly, tz);
+    tabs.training.push(section('your progress', body, lifts.length ? 'top set per session. tap a lift to switch.' : null));
+  }
+  {
+    const todays = wsAll.find(w => w.local_date === todayISO);
+    let body = '';
+    if (wsAll.length) {
+      body += `<div class="picks scroll" id="woPicks"><button type="button" class="pick" data-id="all" aria-pressed="${!todays}">overview</button>` + wsAll.slice(0, 30).map(w =>
+        `<button type="button" class="pick" data-id="${w.id}" aria-pressed="${todays && w.id === todays.id}">${esc(w.local_date === todayISO ? 'today' : dayShort(w.date, tz))}</button>`).join('') + `</div>`;
+      body += `<div class="wo" id="woBody"></div>`;
+    }
+    tabs.training.push(section('my workouts', body, wsAll.length ? (todays ? 'here’s today’s session.' : 'nothing logged today — here’s the overview.') : null));
+  }
+  tabs.training.push(section('your setup', rows([
     row('experience', label('experience', tr.experience)),
     row('equipment', label('equipment', tr.equipment)),
     row('gym', label('gym', tr.gym)),
@@ -451,10 +632,9 @@ function render(p){
     ).join('') + `</div>`;
   }
   if (has(rc.workouts)) {
-    logs += `<div class="sub">workouts</div><div class="logs">` + rc.workouts.map(w => {
-      const ex = (w.exercises || []).map(e => [e.name, e.sets && e.reps ? `${e.sets}×${e.reps}` : null, has(e.weight) ? `@ ${e.weight}` : null].filter(Boolean).join(' ')).join(' · ');
-      return `<div class="log"><span class="when">${esc(relDay(w.date, tz, todayKey))}</span><span class="what">${esc(w.type ? String(w.type).replace(/_/g, ' ') : 'workout')}${ex ? `<small>${esc(ex)}</small>` : ''}${w.notes ? `<small>${esc(w.notes)}</small>` : ''}</span></div>`;
-    }).join('') + `</div>`;
+    logs += `<div class="sub">workouts</div><div class="logs">` + rc.workouts.slice(0, 5).map(w =>
+      `<div class="log"><span class="when">${esc(relDay(w.date, tz, todayKey))}</span><span class="what">${esc(w.type && w.type !== 'logged' ? String(w.type).replace(/_/g, ' ') : 'workout')}<small>${esc((w.exercises || []).map(e => e.name).filter(Boolean).slice(0, 4).join(' · '))}</small></span><span class="meta"><a href="#training" style="color:var(--blue)">details</a></span></div>`
+    ).join('') + `</div>`;
   }
   if (has(rc.weights)) {
     logs += `<div class="sub">weigh-ins</div><div class="logs">` + rc.weights.map(x =>
@@ -477,10 +657,45 @@ function render(p){
   el.innerHTML = out.join('');
   el.hidden = false;
   wireTabs(el, Object.keys(tabs));
+  wireTraining(el, lifts, wsAll, prog.weekly || [], tz, todayISO);
+  if (weights.length >= 2) wireChart(el.querySelector('#weightChart'), weights.map(x => ({x: new Date(x.weighed_at), y: x.weight_lbs, notes: x.notes})), q => `<b>${esc(q.y)} lbs</b> · ${esc(dayShort(q.x.toISOString(), tz))}${q.notes ? ' · ' + esc(q.notes) : ''}`);
   requestAnimationFrame(() => {
     el.classList.add('in');
     el.querySelectorAll('.bar i').forEach(i => { i.style.width = i.dataset.w + '%'; });
   });
+}
+
+function wireTraining(el, lifts, ws, weekly, tz, todayISO){
+  // Lift chart + picker.
+  const chartHost = el.querySelector('#liftChart');
+  if (chartHost && lifts.length) {
+    const draw = i => {
+      const l = lifts[i];
+      const pts = l.sessions.map(s => ({x: new Date(s.date + 'T12:00:00'), y: s.top_weight, reps: s.reps, e1rm: s.e1rm}));
+      const best = l.best ? l.best.top_weight : null;
+      const first = pts[0].y, last = pts[pts.length - 1].y, d = +(last - first).toFixed(1);
+      chartHost.innerHTML = lineChart('liftChartSvg', {title: `${l.name} · ${d >= 0 ? '+' : ''}${d} lbs over ${pts.length} sessions`, unit: 'lbs', points: pts, tz, best});
+      wireChart(chartHost.querySelector('.chart'), pts, q => `<b>${esc(q.y)} lbs${q.reps ? ' × ' + esc(q.reps) : ''}</b> · ${esc(dayShort(q.x.toISOString(), tz))}${q.e1rm && q.reps > 1 ? ` · est. 1rm ${esc(Math.round(q.e1rm))}` : ''}${best && q.y === best ? ' · best' : ''}`);
+    };
+    el.querySelectorAll('#liftPicks .pick').forEach(b => b.addEventListener('click', () => {
+      el.querySelectorAll('#liftPicks .pick').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+      draw(+b.dataset.i);
+    }));
+    draw(0);
+  }
+  // My workouts picker.
+  const body = el.querySelector('#woBody');
+  if (body && ws.length) {
+    const show = id => {
+      el.querySelectorAll('#woPicks .pick').forEach(x => x.setAttribute('aria-pressed', x.dataset.id === String(id) ? 'true' : 'false'));
+      const w = ws.find(x => String(x.id) === String(id));
+      body.innerHTML = w ? workoutDetail(w, tz, todayISO) : workoutOverview(ws, tz, todayISO, weekly);
+      body.querySelectorAll('.wo-row').forEach(r => r.addEventListener('click', () => { show(r.dataset.id); el.querySelector('#woPicks .pick[data-id="' + r.dataset.id + '"]')?.scrollIntoView({block: 'nearest', inline: 'center'}); }));
+    };
+    el.querySelectorAll('#woPicks .pick').forEach(b => b.addEventListener('click', () => show(b.dataset.id)));
+    const pressed = el.querySelector('#woPicks .pick[aria-pressed="true"]');
+    show(pressed ? pressed.dataset.id : 'all');
+  }
 }
 
 function wireTabs(el, keys){
