@@ -213,6 +213,7 @@ footer{flex-direction:column;gap:12px;text-align:center}
 }
 </style>
 <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+<link rel="stylesheet" href="css/signup.css">
 </head>
 <body>
 
@@ -222,7 +223,7 @@ footer{flex-direction:column;gap:12px;text-align:center}
     <a href="how-it-works.html">How it works</a>
     <a href="discover.html">Discover</a>
     <a href="index.html#pricing">Pricing</a>
-    <a href="signup.html" class="nv-btn">Get started</a>
+    <a href="index.html#signup" class="nv-btn" data-signup>Get started</a>
   </div>
   <button class="hamburger" id="hamburger" aria-label="Open menu">
     <span></span><span></span><span></span>
@@ -234,7 +235,7 @@ footer{flex-direction:column;gap:12px;text-align:center}
   <a href="how-it-works.html">How it works</a>
   <a href="discover.html">Discover</a>
   <a href="index.html#pricing">Pricing</a>
-  <a href="signup.html" class="mm-cta">Get started</a>
+  <a href="index.html#signup" class="mm-cta" data-signup>Get started</a>
 </div>
 
 <!-- PAGE HERO -->
@@ -544,7 +545,7 @@ footer{flex-direction:column;gap:12px;text-align:center}
   <div class="in">
     <h2 class="rv">Ready to meet your coach?</h2>
     <p class="rv rv-d1">Takes 3 minutes to set up. Your first text arrives tomorrow.</p>
-    <a href="signup.html" class="bp rv rv-d2">Get cued — free beta →</a>
+    <a href="index.html#signup" data-signup class="bp rv rv-d2">Get cued — free beta →</a>
   </div>
 </section>
 </div><!-- /scale-reveal -->
@@ -634,5 +635,6 @@ hamburger.addEventListener('click',openMenu);
 mmClose.addEventListener('click',closeMenu);
 mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));
 </script>
+<script src="js/signup.js"></script>
 </body>
 </html>

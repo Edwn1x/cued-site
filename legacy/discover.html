@@ -130,6 +130,7 @@
     .mm-close:hover{color:var(--text)}
   </style>
 <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+<link rel="stylesheet" href="css/signup.css">
 </head>
 <body>
 
@@ -140,7 +141,7 @@
       <a href="how-it-works.html">How it works</a>
       <a href="discover.html">Discover</a>
       <a href="index.html#pricing">Pricing</a>
-      <a href="signup.html" class="nv-btn">Get started</a>
+      <a href="index.html#signup" class="nv-btn" data-signup>Get started</a>
     </div>
     <button class="hamburger" id="hamburger" aria-label="Open menu">
       <span></span><span></span><span></span>
@@ -152,7 +153,7 @@
     <a href="how-it-works.html">How it works</a>
     <a href="discover.html">Discover</a>
     <a href="index.html#pricing">Pricing</a>
-    <a href="signup.html" class="mm-cta">Get started</a>
+    <a href="index.html#signup" class="mm-cta" data-signup>Get started</a>
   </div>
 
   <!-- Hero -->
@@ -338,7 +339,7 @@
     <p class="rv rv-d1">Read how it works, or just get started.</p>
     <div class="cta-btns rv rv-d2">
       <a href="how-it-works.html" class="btn-secondary">How it works →</a>
-      <a href="signup.html" class="btn-primary">Get cued — free beta →</a>
+      <a href="index.html#signup" class="btn-primary" data-signup>Get cued — free beta →</a>
     </div>
   </section>
   </div><!-- /scale-reveal -->
@@ -395,5 +396,6 @@
     mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));
   </script>
 
+<script src="js/signup.js"></script>
 </body>
 </html>

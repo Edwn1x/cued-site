@@ -50,6 +50,7 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
 @media(max-width:768px){.nv-r{display:none}.hamburger{display:flex}}
 </style>
 <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+<link rel="stylesheet" href="css/signup.css">
 </head>
 <body>
 <nav>
@@ -58,7 +59,7 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
     <a href="how-it-works.html">How it works</a>
     <a href="discover.html">Discover</a>
     <a href="index.html#pricing">Pricing</a>
-    <a href="signup.html" class="nv-btn">Get started</a>
+    <a href="index.html#signup" class="nv-btn" data-signup>Get started</a>
   </div>
   <button class="hamburger" id="hamburger" aria-label="Open menu">
     <span></span><span></span><span></span>
@@ -70,7 +71,7 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
   <a href="how-it-works.html">How it works</a>
   <a href="discover.html">Discover</a>
   <a href="index.html#pricing">Pricing</a>
-  <a href="signup.html" class="mm-cta">Get started</a>
+  <a href="index.html#signup" class="mm-cta" data-signup>Get started</a>
 </div>
 <div class="wrap">
 <p class="page-label">Legal</p>
@@ -159,5 +160,6 @@ hamburger.addEventListener('click',openMenu);
 mmClose.addEventListener('click',closeMenu);
 mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));
 </script>
+<script src="js/signup.js"></script>
 </body>
 </html>
