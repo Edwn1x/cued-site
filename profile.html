@@ -94,7 +94,11 @@ html.dark .brand .logo-dark{display:block}
 .mode-switch[aria-checked="true"] .ms-knob{transform:translateX(16px)}
 
 /* ===== PAGE ===== */
-main{max-width:640px;margin:0 auto;padding:112px 20px 48px}
+/* overflow-x:clip (not hidden — hidden would make main a scroll container
+   and kill the sticky tab bar): the Cued bubble tail's page-color carve
+   reaches 1.3em past the bubble, 2px beyond the 20px gutter on a phone,
+   which otherwise gives iOS Safari a 2px sideways wiggle. */
+main{max-width:640px;margin:0 auto;padding:112px 20px 48px;overflow-x:clip}
 .state{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:64px 0 40px;color:var(--ink-2);font-size:16px;line-height:1.5}
 .state[hidden]{display:none}
 .state p{max-width:36ch}
@@ -468,7 +472,9 @@ function wireChart(el, points, tipOf){
   const off = () => el.classList.remove('hover');
   svg.addEventListener('pointermove', e => at(e.clientX));
   svg.addEventListener('pointerdown', e => at(e.clientX));
-  svg.addEventListener('pointerleave', off);
+  // A finger "leaves" the moment it lifts — on touch the reading stays put
+  // until a tap lands outside the chart (the document listener below).
+  svg.addEventListener('pointerleave', e => { if (e.pointerType !== 'touch') off(); });
   document.addEventListener('pointerdown', e => { if (!el.contains(e.target)) off(); });
 }
 function weeksStrip(weeks, tz){
