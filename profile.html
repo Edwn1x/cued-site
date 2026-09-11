@@ -9,7 +9,7 @@
 
   Data: the ?t= token in the URL is the HMAC link the coach sent (backend
   profile_page.py). The page fetches GET {API}/profile/{token} and renders
-  the JSON into five tabs (today · you · training · food · memory) — nothing is
+  the JSON into five tabs (today · you · training · nutrition · memory) — nothing is
   stored in the browser, and there is no editing here: anything the user wants
   changed, they text Cued. The tab picker is styled like the bubbles (gray =
   a choice, blue = the one picked) and syncs with the URL hash (#food). No token (or the old
@@ -206,6 +206,31 @@ section{margin-top:44px}
 .chart.hover .ch-val{opacity:0}
 .chart .foot{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-3);margin-top:4px;padding:0 2px}
 
+/* Rings — eaten vs. target. Track in the fill gray, progress in blue; over
+   the target the ring is full and the label says by how much. ===== */
+.rings{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ring{border:1px solid var(--line);border-radius:18px;padding:16px 14px 14px;background:var(--card);display:flex;flex-direction:column;align-items:center;gap:10px}
+.ring svg{display:block;width:124px;height:124px}
+.ring .track{fill:none;stroke:var(--fill);stroke-width:10}
+.ring .prog{fill:none;stroke:var(--blue);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .8s var(--ease)}
+.ring .rc-n{font-size:22px;font-weight:600;letter-spacing:-.02em;fill:var(--ink);font-family:var(--f-msg);font-variant-numeric:tabular-nums}
+.ring .rc-u{font-size:11px;fill:var(--ink-3);font-family:var(--f-msg)}
+.ring .rl{font-size:13px;color:var(--ink-3);text-align:center;line-height:1.4}
+.ring .rl b{color:var(--ink);font-weight:600}
+.ring.over .prog{stroke:var(--blue-deep)}
+.side{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+
+/* Day strip — calories per day against the target hairline. */
+.days{margin-top:14px}
+.days .dy-title{font-size:13px;color:var(--ink-3);margin-bottom:8px}
+.days .dy-title b{color:var(--ink);font-weight:600}
+.days svg{display:block;width:100%;height:auto;overflow:visible}
+.days .col{fill:var(--gray)}
+.days .col.now{fill:var(--blue)}
+.days .col.empty{fill:var(--fill)}
+.days .goal{stroke:var(--ink-3);stroke-width:1}
+.days .glbl{fill:var(--ink-3);font-size:11px;font-family:var(--f-msg)}
+
 /* Consistency strip — workouts per week, tiny columns, current week in blue. */
 .weeks{margin-top:14px}
 .weeks .wk-title{font-size:13px;color:var(--ink-3);margin-bottom:8px}
@@ -249,7 +274,7 @@ footer .fmeta{margin-top:10px}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   #profile{transition:none}
-  .chart .tip,.pick{transition:none}
+  .chart .tip,.pick,.ring .prog{transition:none}
   .panel.active{animation:none}
   .tab{transition:none}
   .typing i{animation:none;opacity:.7}
@@ -262,6 +287,8 @@ footer .fmeta{margin-top:10px}
   .tabs{top:60px;padding:10px 20px;gap:6px}
   .tab{padding:7px 12px;font-size:14px}
   .chart{padding:14px 12px 8px;border-radius:16px}
+  .ring svg{width:108px;height:108px}
+  .ring .rc-n{font-size:20px}
   .stats{grid-template-columns:1fr 1fr;gap:10px}
   .stat{padding:14px}
   .stat .n{font-size:26px}
@@ -460,6 +487,62 @@ function weeksStrip(weeks, tz){
     <text class="wlbl" x="${W}" y="${H - 2}" text-anchor="end">this week</text></svg></div>`;
 }
 
+function ring(id, {label, value, target, unit}){
+  // A 120-box ring, r=50 → circumference ≈ 314.16. Over target = full ring.
+  const C = 2 * Math.PI * 50;
+  const pct = target ? value / target : 0;
+  const fill = Math.min(1, pct);
+  const over = target && value > target;
+  const summary = target
+    ? (over ? `<b>${(value - target).toLocaleString()}${unit === 'cal' ? '' : 'g'}</b> over` : `<b>${Math.round(pct * 100)}%</b> of ${target.toLocaleString()}${unit === 'cal' ? '' : 'g'}`)
+    : 'no target yet';
+  return `<div class="ring${over ? ' over' : ''}" id="${id}">
+    <svg viewBox="0 0 120 120" role="img" aria-label="${esc(label)}: ${value.toLocaleString()} of ${target ? target.toLocaleString() : 'no target'}">
+      <circle class="track" cx="60" cy="60" r="50"/>
+      <circle class="prog" cx="60" cy="60" r="50" stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${C.toFixed(2)}" data-off="${(C * (1 - fill)).toFixed(2)}" transform="rotate(-90 60 60)"/>
+      <text class="rc-n" x="60" y="60" text-anchor="middle" dominant-baseline="central">${esc(value.toLocaleString())}</text>
+      <text class="rc-u" x="60" y="80" text-anchor="middle">${esc(unit)}</text>
+    </svg>
+    <div class="rl">${esc(label)}<br>${summary}</div></div>`;
+}
+function dayStrip(days, target, tz, todayISO){
+  const W = 600, H = 96, n = days.length, gap = 6, bw = Math.min(28, (W - gap * (n - 1)) / n), slot = (W - bw * n) / (n - 1 || 1) + bw;
+  const max = Math.max(target || 0, ...days.map(d => d.calories)) || 1;
+  const padT = 16, plotH = H - 18;   // padT keeps the target line + its label inside the box
+  const yOf = v => padT + (plotH - padT) - v / max * (plotH - padT);
+  const cols = days.map((d, i) => {
+    const h = d.calories ? Math.max(4, plotH - yOf(d.calories)) : 3;
+    const x = i * slot, y = plotH - h;
+    const cls = 'col' + (d.date === todayISO ? ' now' : '') + (d.calories ? '' : ' empty');
+    return `<rect class="${cls}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="3"><title>${esc(dayShort(d.date + 'T12:00:00', tz))}: ${d.calories.toLocaleString()} cal · ${d.protein_g}g protein · ${d.meals} ${d.meals === 1 ? 'meal' : 'meals'}</title></rect>`;
+  }).join('');
+  const goal = target ? `<line class="goal" x1="0" x2="${W}" y1="${yOf(target).toFixed(1)}" y2="${yOf(target).toFixed(1)}"/><text class="glbl" x="${W}" y="${(yOf(target) - 4).toFixed(1)}" text-anchor="end">target ${target.toLocaleString()}</text>` : '';
+  const logged = days.filter(d => d.meals);
+  const avg = logged.length ? Math.round(logged.reduce((a, d) => a + d.calories, 0) / logged.length) : 0;
+  return `<div class="days"><div class="dy-title">last ${n} days · avg <b>${avg.toLocaleString()} cal</b> on the ${logged.length} ${logged.length === 1 ? 'day' : 'days'} you logged</div>
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="calories per day">${cols}${goal}
+    <text class="glbl" x="0" y="${H - 2}">${esc(dayShort(days[0].date + 'T12:00:00', tz))}</text>
+    <text class="glbl" x="${W}" y="${H - 2}" text-anchor="end">today</text></svg></div>`;
+}
+function mealsDay(ms, day, tz, todayISO, targets){
+  const list = ms.filter(m => m.local_date === day).slice().sort((a, b) => new Date(a.eaten_at) - new Date(b.eaten_at));
+  const tot = list.reduce((a, m) => ({c: a.c + (m.calories || 0), p: a.p + (m.protein_g || 0), cb: a.cb + (m.carbs_g || 0), f: a.f + (m.fat_g || 0)}), {c: 0, p: 0, cb: 0, f: 0});
+  const when = day === todayISO ? 'today' : dayShort(day + 'T12:00:00', tz);
+  const rowsHtml = list.map(m => `<div class="log"><span class="when">${esc(fmtDate(m.eaten_at, tz, {hour: 'numeric', minute: '2-digit'}).toLowerCase())}</span><span class="what">${esc(m.description)}</span><span class="meta">${has(m.calories) ? esc(m.calories.toLocaleString()) + ' cal' : ''}${has(m.protein_g) ? ` · ${esc(m.protein_g)}g p` : ''}</span></div>`).join('');
+  return `<div class="wo-head"><span class="wo-type">${esc(when)}</span><span class="wo-date">${list.length} ${list.length === 1 ? 'meal' : 'meals'}</span></div>`
+    + `<div class="logs">${rowsHtml}</div>`
+    + `<div class="macros"><span><b>${tot.c.toLocaleString()}</b> cal${targets.calories ? ` of ${targets.calories.toLocaleString()}` : ''}</span><span><b>${tot.p}g</b> protein${targets.protein_g ? ` of ${targets.protein_g}g` : ''}</span><span><b>${tot.cb}g</b> carbs</span><span><b>${tot.f}g</b> fat</span></div>`;
+}
+function mealsOverview(days, ms, tz, todayISO){
+  const byDay = {}; ms.forEach(m => { if (m.local_date) (byDay[m.local_date] = byDay[m.local_date] || []).push(m); });
+  const dayKeys = Object.keys(byDay).sort().reverse();
+  const list = `<div class="sub">days</div><div class="logs">` + dayKeys.slice(0, 20).map(d => {
+    const l = byDay[d], c = l.reduce((a, m) => a + (m.calories || 0), 0), pr = l.reduce((a, m) => a + (m.protein_g || 0), 0);
+    return `<div class="log wo-row" data-id="${esc(d)}"><span class="when">${esc(d === todayISO ? 'today' : dayShort(d + 'T12:00:00', tz))}</span><span class="what">${l.length} ${l.length === 1 ? 'meal' : 'meals'}<small>${esc(l.map(m => m.description).slice(0, 3).join(' · '))}</small></span><span class="meta">${c.toLocaleString()} cal · ${pr}g p</span></div>`;
+  }).join('') + `</div>`;
+  return list;
+}
+
 function workoutDetail(w, tz, todayISO){
   const when = w.local_date === todayISO ? 'today' : dayShort(w.date, tz);
   const rowsHtml = (w.exercises || []).map(e => {
@@ -487,7 +570,7 @@ function render(p){
   const todayKey = fmtDate(new Date().toISOString(), tz, {year:'numeric', month:'2-digit', day:'2-digit'});
   const todayISO = (p.today || {}).local_date || '';   // server's local day, matches workouts' local_date
   const first = esc(p.first_name || p.name || 'there');
-  const tabs = {today: [], you: [], training: [], food: [], memory: []};
+  const tabs = {today: [], you: [], training: [], food: [], memory: []};   // 'food' is the nutrition tab's key (#food links stay valid)
   const out = [];
 
   // Intro — Cued opens, like the landing page's hero.
@@ -588,9 +671,29 @@ function render(p){
     row('injuries / limits', tr.injuries, true),
   ]), p.coaching_branch === 'nutrition_only' ? 'we’re focused on nutrition for now.' : null));
 
-  // Food.
+  // Nutrition — today's rings first, then the two-week strip and my meals, then the setup rows.
   const n = p.nutrition || {};
-  tabs.food.push(section('food', rows([
+  const msAll = ((p.recent || {}).meals || []);
+  {
+    let body = `<div class="rings">` + ring('ringCal', {label: 'calories', value: td.calories || 0, target: t.calories || 0, unit: 'cal'})
+      + ring('ringPro', {label: 'protein', value: td.protein_g || 0, target: t.protein_g || 0, unit: 'g'}) + `</div>`;
+    body += `<div class="side"><div class="stat"><div class="n">${(td.carbs_g || 0)}<span>g</span></div><div class="l">carbs today</div></div><div class="stat"><div class="n">${(td.fat_g || 0)}<span>g</span></div><div class="l">fat today</div></div></div>`;
+    if ((n.daily || []).some(d => d.meals)) body += dayStrip(n.daily, t.calories || 0, tz, todayISO);
+    const lead = !(t.calories || t.protein_g) ? 'targets show up here once your plan is set.' : (td.meals_logged ? `${td.meals_logged} ${td.meals_logged === 1 ? 'meal' : 'meals'} logged today.` : 'nothing logged yet today — text me what you eat.');
+    tabs.food.push(section('today', body, lead));
+  }
+  {
+    const todayMeals = msAll.some(m => m.local_date === todayISO);
+    const dayKeys = [...new Set(msAll.map(m => m.local_date).filter(Boolean))].sort().reverse();
+    let body = '';
+    if (msAll.length) {
+      body += `<div class="picks scroll" id="mealPicks"><button type="button" class="pick" data-id="all" aria-pressed="${!todayMeals}">overview</button>` + dayKeys.slice(0, 30).map(d =>
+        `<button type="button" class="pick" data-id="${esc(d)}" aria-pressed="${todayMeals && d === todayISO}">${esc(d === todayISO ? 'today' : dayShort(d + 'T12:00:00', tz))}</button>`).join('') + `</div>`;
+      body += `<div class="wo" id="mealBody"></div>`;
+    }
+    tabs.food.push(section('my meals', body, msAll.length ? (todayMeals ? 'here’s what you’ve had today.' : 'nothing logged today — here’s the overview.') : null));
+  }
+  tabs.food.push(section('your setup', rows([
     row('diet', label('diet', n.diet)),
     row('restrictions', n.restrictions, true),
     row('eating situation', label('cooking', n.cooking_situation)),
@@ -645,7 +748,7 @@ function render(p){
 
   // Tab picker + panels. The hash picks the opening tab (#food) and follows
   // the selection so a tab can be linked to.
-  const names = {today: 'today', you: 'you', training: 'training', food: 'food', memory: 'memory'};
+  const names = {today: 'today', you: 'you', training: 'training', food: 'nutrition', memory: 'memory'};
   out.push(`<div class="tabs" role="tablist" aria-label="Profile sections">` + Object.keys(tabs).map(k =>
     `<button type="button" class="tab" role="tab" id="tab-${k}" aria-controls="panel-${k}" aria-selected="false">${names[k]}</button>`).join('') + `</div>`);
   for (const k of Object.keys(tabs)) out.push(`<div class="panel" id="panel-${k}" role="tabpanel" aria-labelledby="tab-${k}">${tabs[k].join('')}</div>`);
@@ -658,11 +761,26 @@ function render(p){
   el.hidden = false;
   wireTabs(el, Object.keys(tabs));
   wireTraining(el, lifts, wsAll, prog.weekly || [], tz, todayISO);
+  wireNutrition(el, msAll, n.daily || [], tz, todayISO, t);
   if (weights.length >= 2) wireChart(el.querySelector('#weightChart'), weights.map(x => ({x: new Date(x.weighed_at), y: x.weight_lbs, notes: x.notes})), q => `<b>${esc(q.y)} lbs</b> · ${esc(dayShort(q.x.toISOString(), tz))}${q.notes ? ' · ' + esc(q.notes) : ''}`);
   requestAnimationFrame(() => {
     el.classList.add('in');
     el.querySelectorAll('.bar i').forEach(i => { i.style.width = i.dataset.w + '%'; });
+    el.querySelectorAll('.ring .prog').forEach(c => { c.setAttribute('stroke-dashoffset', c.dataset.off); });
   });
+}
+
+function wireNutrition(el, ms, daily, tz, todayISO, targets){
+  const body = el.querySelector('#mealBody');
+  if (!body || !ms.length) return;
+  const show = id => {
+    el.querySelectorAll('#mealPicks .pick').forEach(x => x.setAttribute('aria-pressed', x.dataset.id === String(id) ? 'true' : 'false'));
+    body.innerHTML = id === 'all' ? mealsOverview(daily, ms, tz, todayISO) : mealsDay(ms, id, tz, todayISO, targets);
+    body.querySelectorAll('.wo-row').forEach(r => r.addEventListener('click', () => { show(r.dataset.id); el.querySelector('#mealPicks .pick[data-id="' + r.dataset.id + '"]')?.scrollIntoView({block: 'nearest', inline: 'center'}); }));
+  };
+  el.querySelectorAll('#mealPicks .pick').forEach(b => b.addEventListener('click', () => show(b.dataset.id)));
+  const pressed = el.querySelector('#mealPicks .pick[aria-pressed="true"]');
+  show(pressed ? pressed.dataset.id : 'all');
 }
 
 function wireTraining(el, lifts, ws, weekly, tz, todayISO){
