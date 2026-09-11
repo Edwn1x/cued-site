@@ -286,15 +286,15 @@ html.dark .notif .logo-dark{display:block}
 
 /* ===== SECTIONS / STICKY STAGE ===== */
 .sec{position:relative}
-/* Section snap — the page always comes to rest locked on a section, never in
-   the seam between two. A section taller than the viewport "covers" it
-   through its hold budget, so wheel ticks inside a section rest freely; once
-   its stage unpins, the scroller snaps onto the next section. Pin mode only —
-   the flow layout is a plain document and must scroll freely. */
-@media (prefers-reduced-motion: no-preference){
-  html{scroll-snap-type:y mandatory}
-  .sec{scroll-snap-align:start;scroll-snap-stop:always}
-}
+/* No scroll snap — deliberately. A mandatory section snap was tried here
+   and it traps mouse-wheel readers (i.e. nearly every Windows visitor): a
+   section taller than the viewport "covers" it through its hold budget, so
+   the legal rest positions are that budget plus the next section's top,
+   with a ~45vh seam between them. A ~100px wheel notch lands in the seam
+   and the browser snaps it back to the budget's end, so the page never
+   advances past the hero. Trackpad flings carry across the seam, which is
+   why it looked fine on Macs. The tour auto-plays once a pin engages, so
+   snapping was only ever a rest-position nicety. */
 /* Auto-play sections: once the pin engages, the choreography (centered
    header → header rises → bubbles) runs on a timeline, so height no longer
    scales with reveal count — every section gets the same hold budget as the
@@ -663,26 +663,26 @@ footer .fmeta{margin-top:10px}
 
 /* ===== FLOW LAYOUT (prefers-reduced-motion, any width) =====
    No pinning, no sticky, no push-up. A plain vertical thread; headers become
-   inline dividers; bubbles fade in on IntersectionObserver. */
+   inline dividers; bubbles fade in on IntersectionObserver. Sizing stays
+   width-driven: the desktop shell and desktop bubble scale above 768px, the
+   mobile sizing block below it — reduced motion changes how the page moves,
+   never how wide it is. (Windows "Animation effects: off" reports this
+   media query, so a real share of desktop visitors land here.) */
 @media (prefers-reduced-motion: reduce){
   .sec--pin{height:auto}
   .stage{position:static;height:auto;overflow:visible}
   .stage::before{content:none}   /* scrim is a pin-mode device */
-  .shell{width:auto;height:auto;padding:0 20px}
+  .shell{height:auto}
   .sec-h{display:none}
   .hdr-flow{
     display:block;font-family:var(--f-header);font-weight:400;
-    font-size:27px;line-height:1.15;color:var(--ink);text-align:center;
-    margin:4rem auto 1.75rem;max-width:640px;
+    font-size:clamp(27px,2.2vw,32px);line-height:1.15;color:var(--ink);text-align:center;
+    margin:7rem auto 2rem;max-width:720px;
   }
   .thread{
-    position:static;width:100%;max-width:640px;margin:0 auto;
+    position:static;width:100%;
     transform:none!important;transition:none;
-    font-size:17px;             /* real Messages size — do not scale up */
   }
-  .msg{max-width:78%}
-  .msg.photo{max-width:62%}
-  .msg.photo.tall{max-width:46%}
   #hero{height:auto;padding-top:84px}
   .close{min-height:0}
   /* .close .shell is a flex item: auto margins + width:auto would shrink it
@@ -691,6 +691,18 @@ footer .fmeta{margin-top:10px}
   .close .thread,.close-cta{width:100%;max-width:640px;margin-left:auto;margin-right:auto}
   .close-cta{margin-top:36px}
   .cta{width:100%;justify-content:center}
+}
+/* Desktop flow hero: no stage to hang the art from, so the drawing becomes
+   an in-flow band above the intro bubbles (the mobile block already does
+   its own cropped treatment). */
+@media (prefers-reduced-motion: reduce) and (min-width:768px){
+  .hero-art{position:static;margin-top:1rem}
+  .hero-art svg{max-height:52vh}
+}
+/* Phone-width flow headers: tighter rhythm to match the 17px bubbles. Sits
+   after the flow block so it wins the cascade at equal specificity. */
+@media (prefers-reduced-motion: reduce) and (max-width:767.98px){
+  .hdr-flow{font-size:27px;margin:4rem auto 1.75rem}
 }
 @media (prefers-reduced-motion: reduce){
   [data-r],[data-io],.hdr-flow,.hero-mobile{opacity:1!important;transform:none!important;transition:none!important}
