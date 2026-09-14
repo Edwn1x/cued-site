@@ -38,8 +38,9 @@ button{font:inherit}
 .hdr h1{font-family:var(--f-header);font-weight:400;font-size:30px;line-height:1.05;letter-spacing:-.01em;margin:0;text-transform:lowercase}
 .hdr .prog{font-size:14px;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
 .lead{font-size:15px;color:var(--ink-2);line-height:1.45;margin:0 0 14px}
-.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 84px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
-.toast.show{opacity:1}
+/* top of the sheet (under the grabber): the two-row footer covered a bottom toast */
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 18px);transform:translate(-50%,-8px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;max-width:calc(100% - 36px);text-align:center;opacity:0;pointer-events:none;box-shadow:0 4px 18px rgba(0,0,0,.25);transition:opacity .2s,transform .2s var(--ease);z-index:5}
+.toast.show{opacity:1;transform:translate(-50%,0)}
 .ex{margin-top:18px}
 .ex .name{font-size:13px;font-weight:500;letter-spacing:.02em;color:var(--ink-3);text-transform:lowercase;padding:0 2px 6px}
 .row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;min-height:52px;padding:0 2px;border-top:1px solid var(--line);font-size:17px;line-height:1.3;cursor:pointer}
@@ -55,7 +56,7 @@ button{font:inherit}
 .ex.ghost{opacity:.55}
 .row.done .nums{color:var(--ink-2)}
 /* PR medal (Strava-style): a gold disc with "PR" beside the numbers; tap it for the "last time" line */
-.medal{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#E0A81C;color:#1a1200;font-size:10px;font-weight:700;letter-spacing:.02em;box-shadow:0 0 0 2px rgba(224,168,28,.25);flex:none;cursor:pointer;animation:pop .35s var(--ease)}
+.medal{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#E0A81C;color:#1a1200;font-size:10px;font-weight:700;letter-spacing:.02em;text-transform:none;box-shadow:0 0 0 2px rgba(224,168,28,.25);flex:none;cursor:pointer;animation:pop .35s var(--ease)}
 @keyframes pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
 .ex .name .medal{width:20px;height:20px;font-size:9px;margin-left:8px}
 .edit{flex-basis:100%;order:9;display:flex;flex-direction:column;gap:10px;padding:4px 0 14px}
