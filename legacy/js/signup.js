@@ -263,24 +263,46 @@
           msgs.innerHTML='';
           const s=document.createElement('div');
           s.className='co-success';
-          s.innerHTML=`<div class="co-success-icon">🎉</div><h3>You're in, ${sdata.name}!</h3><p>Your first coaching text is on its way. Keep an eye on your messages — your coach is getting your plan ready.</p>`;
-          // iMessage opt-in (Photon shared pool): Cued can't text a new number in
-          // blue until that number texts Cued's line once. The backend returns
-          // the per-user deep link (opens Messages pre-addressed, with a "hey"
-          // typed in); one tap = opted in. No link → they're on SMS, nothing shown.
-          if(data.imessage_link&&/^https:\/\//.test(data.imessage_link)){
+          inputArea.innerHTML='';
+          // iMessage-first (Photon shared pool): Cued can't text a new number in
+          // blue until that number texts Cued's line once, so when the backend
+          // returns the per-user deep link the hook WAITS for a choice here:
+          //   primary   "Text me on iMessage"  → opens Messages pre-addressed, "hey cued"
+          //                                     typed in; their send triggers the hook, blue
+          //   secondary "I don't have an iPhone" → POST /signup/channel → hook by SMS
+          // No link (Photon off / full) → the SMS copy, hook already on its way.
+          const link=data.imessage_link;
+          if(link&&/^https:\/\//.test(link)){
+            s.innerHTML=`<div class="co-success-icon">🎉</div><h3>You're in, ${sdata.name}!</h3><p>Last step: text me once so I can reach you on iMessage. Send it from the number you just signed up with.</p>`;
             const a=document.createElement('a');
             a.className='co-confirm co-imsg';
-            a.href=data.imessage_link;
+            a.href=link;
             a.textContent='Text me on iMessage';
-            const note=document.createElement('p');
-            note.className='co-imsg-note';
-            note.textContent='On an iPhone? One tap sends me a quick hey and everything after that shows up in blue. Skip it and I\'ll text you by SMS.';
+            const alt=document.createElement('button');
+            alt.type='button';
+            alt.className='co-alt';
+            alt.textContent="I don't have an iPhone";
+            alt.addEventListener('click',async()=>{
+              alt.disabled=true;
+              alt.textContent='One sec…';
+              try{
+                const r=await fetch(BACKEND+'/channel',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:sdata.phone,channel:'sms'})});
+                const d=await r.json().catch(()=>({}));
+                if(r.ok&&d.status==='ok'){
+                  a.remove(); alt.remove();
+                  const note=document.createElement('p');
+                  note.className='co-imsg-note';
+                  note.textContent="Got it — your first text is on its way by SMS.";
+                  s.appendChild(note);
+                } else { alt.disabled=false; alt.textContent="I don't have an iPhone"; }
+              }catch{ alt.disabled=false; alt.textContent="I don't have an iPhone"; }
+            });
             s.appendChild(a);
-            s.appendChild(note);
+            s.appendChild(alt);
+          } else {
+            s.innerHTML=`<div class="co-success-icon">🎉</div><h3>You're in, ${sdata.name}!</h3><p>Your first coaching text is on its way. Keep an eye on your messages — your coach is getting your plan ready.</p>`;
           }
           msgs.appendChild(s);
-          inputArea.innerHTML='';
         } else {
           await coachSay((data&&data.message)||"Hmm, something went wrong. Try again?",400);
           showRetry();
