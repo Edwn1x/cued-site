@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex">
+<title>cued — workout</title>
+<meta property="og:title" content="cued — workout">
+<meta property="og:description" content="tap as you go. text me if a set goes different.">
+<!--
+  The workout logger card. Opened from the iMessage bubble (Spectrum extension
+  sheet) or any browser. No login: ?t=<signed token> names (user, session);
+  the page talks to the backend's /card/api/* with it. Design tokens shared
+  with profile.html (Inter body, Hedvig header, iMessage blue, dark mode).
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hedvig+Letters+Serif:opsz@12..24&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:light dark;
+  --blue:#007AFF; --blue-deep:#0062CC; --blue-soft:#E5F1FF;
+  --bg:#FFFFFF; --ink:#0A1628; --ink-2:#4A5A6E; --ink-3:#8A95A5; --line:#E5EAF2; --fill:#F2F3F5; --card:#FFFFFF; --error:#C03030;
+  --f-header:'Hedvig Letters Serif', Georgia, 'Times New Roman', serif;
+  --f-msg:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+@media (prefers-color-scheme:dark){
+  :root{ --blue:#0A84FF; --blue-deep:#3395FF; --blue-soft:#123A63; --bg:#000000; --ink:#F5F5F7; --ink-2:#A9B0BC; --ink-3:#7C8494; --line:#26262A; --fill:#1C1C1E; --card:#1C1C1E; --error:#FF7369; }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:var(--f-msg);-webkit-font-smoothing:antialiased;min-height:100dvh;padding:calc(env(safe-area-inset-top) + 14px) 18px calc(env(safe-area-inset-bottom) + 96px);-webkit-user-select:none;user-select:none}
+button{font:inherit}
+.hdr{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:2px 0 6px}
+.hdr h1{font-family:var(--f-header);font-weight:400;font-size:30px;line-height:1.05;letter-spacing:-.01em;margin:0;text-transform:lowercase}
+.hdr .prog{font-size:14px;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
+.lead{font-size:15px;color:var(--ink-2);line-height:1.45;margin:0 0 14px}
+.ex{margin-top:18px}
+.ex .name{font-size:13px;font-weight:500;letter-spacing:.02em;color:var(--ink-3);text-transform:lowercase;padding:0 2px 6px}
+.row{display:flex;align-items:center;justify-content:space-between;min-height:52px;padding:0 2px;border-top:1px solid var(--line);font-size:17px;line-height:1.3;cursor:pointer}
+.row:first-of-type{border-top:0}
+.row.editing{flex-wrap:wrap;cursor:default}
+.nums{font-variant-numeric:tabular-nums;color:var(--ink);display:inline-flex;align-items:center;gap:8px}
+.nums .dot{width:6px;height:6px;border-radius:50%;background:var(--blue);display:none}
+.nums.edited .dot{display:inline-block}
+.circle{width:28px;height:28px;border-radius:50%;border:2px solid var(--ink-3);flex:none;transition:background .18s var(--ease),border-color .18s var(--ease),transform .18s var(--ease)}
+.row.done .circle{background:var(--blue);border-color:var(--blue);transform:scale(1.04)}
+.row.done .nums{color:var(--ink-2)}
+.pr{flex-basis:100%;font-size:14px;color:var(--blue);padding:0 0 10px;line-height:1.35}
+.edit{flex-basis:100%;display:flex;gap:10px;align-items:center;padding:6px 0 12px}
+.edit label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-3)}
+.edit input{width:88px;min-height:44px;font:inherit;font-size:18px;text-align:center;border:1px solid var(--line);border-radius:12px;background:var(--fill);color:var(--ink)}
+.edit input:focus{outline:2px solid var(--blue);outline-offset:2px}
+.btn{min-height:44px;padding:0 18px;border:0;border-radius:999px;background:var(--blue);color:#fff;font-size:15px;font-weight:600;cursor:pointer}
+.btn:active{background:var(--blue-deep)}
+.btn.ghost{background:var(--fill);color:var(--ink-2)}
+.footer{position:fixed;left:0;right:0;bottom:0;padding:12px 18px calc(env(safe-area-inset-bottom) + 12px);background:var(--bg);border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.footer .vol{font-size:15px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.footer .vol b{color:var(--ink);font-weight:600}
+.finish{display:none}.finish.show{display:inline-block}
+.state{padding:40px 0;text-align:center;color:var(--ink-3);font-size:15px}
+.state h2{font-family:var(--f-header);font-weight:400;font-size:26px;color:var(--ink);margin:0 0 8px}
+.doneline{margin-top:22px;padding:16px;border-radius:16px;background:var(--fill);font-size:15px;color:var(--ink-2);line-height:1.5}
+.doneline b{color:var(--ink);font-weight:600}
+</style>
+</head>
+<body>
+<div id="app"><div class="state">loading…</div></div>
+<div class="footer" id="footer" hidden><span class="vol" id="vol"></span><button class="btn finish" id="finish" type="button">finish</button></div>
+<script>
+(function(){
+  // Same API rule as profile.html: the backend on Railway, localhost when previewing locally.
+  const API = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? 'http://localhost:8099' : 'https://web-production-90171c.up.railway.app';
+  const TOKEN = new URLSearchParams(location.search).get('t') || '';
+  const H = { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' };
+  const $ = (id) => document.getElementById(id);
+  const app = $('app');
+  let state = null, editing = null;
+  const fmt = (w) => (w === null || w === undefined) ? '' : String(Number(w));
+  const words = ['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty'];
+
+  function fail(msg){
+    app.innerHTML = '<div class="state"><h2>hmm…</h2>' + msg + '</div>';
+    $('footer').hidden = true;
+  }
+
+  function render(){
+    if (!state) return;
+    const s = state.session;
+    app.innerHTML = '';
+    const hdr = document.createElement('div'); hdr.className = 'hdr';
+    const h1 = document.createElement('h1'); h1.textContent = s.template_key.replace('_',' ') + ' · ' + s.weekday;
+    const prog = document.createElement('div'); prog.className = 'prog'; prog.textContent = state.done_count + ' / ' + state.set_count + ' sets';
+    hdr.appendChild(h1); hdr.appendChild(prog); app.appendChild(hdr);
+    if (s.status !== 'done'){
+      const lead = document.createElement('p'); lead.className = 'lead';
+      lead.textContent = 'tap a set when you did it as planned. tap the numbers if it went different — or just text me.';
+      app.appendChild(lead);
+    }
+    for (const ex of state.exercises){
+      const box = document.createElement('div'); box.className = 'ex';
+      const name = document.createElement('div'); name.className = 'name'; name.textContent = ex.label; box.appendChild(name);
+      for (const st of ex.sets){
+        const row = document.createElement('div'); row.className = 'row' + (st.done ? ' done' : '') + (editing === st.id ? ' editing' : '');
+        const nums = document.createElement('span'); nums.className = 'nums' + (st.edited ? ' edited' : '');
+        const w = st.done ? st.actual_weight : st.planned_weight, r = st.done ? st.actual_reps : st.planned_reps;
+        nums.innerHTML = '<span></span><span class="dot"></span>';
+        nums.firstChild.textContent = fmt(w) + ' × ' + fmt(r);
+        const circle = document.createElement('span'); circle.className = 'circle';
+        row.appendChild(nums); row.appendChild(circle);
+        if (st.pr && st.done){ const p = document.createElement('div'); p.className = 'pr'; p.textContent = st.pr; row.appendChild(p); }
+        if (editing === st.id){
+          const ed = document.createElement('div'); ed.className = 'edit';
+          const lw = document.createElement('label'); lw.textContent = 'lb';
+          const iw = document.createElement('input'); iw.type = 'number'; iw.inputMode = 'decimal'; iw.value = fmt(st.actual_weight ?? st.planned_weight); lw.appendChild(iw);
+          const lr = document.createElement('label'); lr.textContent = 'reps';
+          const ir = document.createElement('input'); ir.type = 'number'; ir.inputMode = 'numeric'; ir.value = fmt(st.actual_reps ?? st.planned_reps); lr.appendChild(ir);
+          const ok = document.createElement('button'); ok.type = 'button'; ok.className = 'btn'; ok.textContent = 'done';
+          ok.addEventListener('click', (e) => { e.stopPropagation(); editing = null; post(st.id, { done: true, actual_weight: iw.value, actual_reps: ir.value }); });
+          const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'btn ghost'; cancel.textContent = 'cancel';
+          cancel.addEventListener('click', (e) => { e.stopPropagation(); editing = null; render(); });
+          ed.appendChild(lw); ed.appendChild(lr); ed.appendChild(ok); ed.appendChild(cancel); row.appendChild(ed);
+          setTimeout(() => { iw.focus(); iw.select(); }, 0);
+        }
+        if (s.status !== 'done'){
+          nums.addEventListener('click', (e) => { e.stopPropagation(); if (editing === st.id) return; editing = st.id; render(); });
+          row.addEventListener('click', (e) => { if (editing === st.id || e.target.closest('.edit')) return; post(st.id, { done: !st.done }); });
+        }
+        box.appendChild(row);
+      }
+      app.appendChild(box);
+    }
+    const any = state.done_count > 0;
+    $('footer').hidden = false;
+    if (s.status === 'done'){
+      $('vol').innerHTML = '<b>' + state.volume_lb.toLocaleString() + ' lb</b> · done';
+      $('finish').classList.remove('show');
+      const line = document.createElement('div'); line.className = 'doneline';
+      line.innerHTML = 'logged. the summary’s in your thread.';
+      app.appendChild(line);
+    } else {
+      $('vol').innerHTML = any ? ('<b>' + state.volume_lb.toLocaleString() + ' lb</b> so far') : 'nothing logged yet';
+      $('finish').classList.toggle('show', any);
+    }
+  }
+
+  async function load(){
+    try {
+      const res = await fetch(API + '/card/api/session', { headers: H, cache: 'no-store' });
+      if (res.status === 401) return fail('that link has expired. text me and i’ll send a fresh one.');
+      const data = await res.json();
+      if (!data || !data.ok) return fail('couldn’t load your session right now.');
+      state = data; render();
+    } catch (e) { fail('couldn’t reach cued. check your connection and try again.'); }
+  }
+
+  async function post(setId, body){
+    try {
+      const res = await fetch(API + '/card/api/set/' + setId, { method: 'POST', headers: H, body: JSON.stringify(body) });
+      const data = await res.json();
+      if (data && data.ok){ state = data; render(); }
+    } catch (e) { /* the next poll reconciles */ }
+  }
+
+  async function poll(){
+    if (!state || document.visibilityState !== 'visible' || editing !== null) return;
+    try {
+      const res = await fetch(API + '/card/api/session', { headers: H, cache: 'no-store' });
+      const data = await res.json();
+      if (data && data.ok && data.updated_at !== state.updated_at){ state = data; render(); }
+    } catch (e) {}
+  }
+
+  $('finish').addEventListener('click', async () => {
+    const b = $('finish'); b.disabled = true; b.textContent = 'finishing…';
+    try {
+      const res = await fetch(API + '/card/api/finish', { method: 'POST', headers: H, body: '{}' });
+      const data = await res.json();
+      if (data && data.ok){ state = data; render(); }
+    } catch (e) {} finally { b.disabled = false; b.textContent = 'finish'; }
+  });
+
+  if (!TOKEN) fail('no session in this link.'); else load();
+  setInterval(poll, 5000);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') poll(); });
+})();
+</script>
+</body>
+</html>
