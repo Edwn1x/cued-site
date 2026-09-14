@@ -264,6 +264,21 @@
           const s=document.createElement('div');
           s.className='co-success';
           s.innerHTML=`<div class="co-success-icon">🎉</div><h3>You're in, ${sdata.name}!</h3><p>Your first coaching text is on its way. Keep an eye on your messages — your coach is getting your plan ready.</p>`;
+          // iMessage opt-in (Photon shared pool): Cued can't text a new number in
+          // blue until that number texts Cued's line once. The backend returns
+          // the per-user deep link (opens Messages pre-addressed, with a "hey"
+          // typed in); one tap = opted in. No link → they're on SMS, nothing shown.
+          if(data.imessage_link&&/^https:\/\//.test(data.imessage_link)){
+            const a=document.createElement('a');
+            a.className='co-confirm co-imsg';
+            a.href=data.imessage_link;
+            a.textContent='Text me on iMessage';
+            const note=document.createElement('p');
+            note.className='co-imsg-note';
+            note.textContent='On an iPhone? One tap sends me a quick hey and everything after that shows up in blue. Skip it and I\'ll text you by SMS.';
+            s.appendChild(a);
+            s.appendChild(note);
+          }
           msgs.appendChild(s);
           inputArea.innerHTML='';
         } else {
