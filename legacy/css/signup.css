@@ -112,6 +112,9 @@ html.dark .co-bg{
 .co-success-icon{font-size:38px;margin-bottom:2px}
 .co-success h3{font-family:var(--co-f-header);font-weight:400;font-size:clamp(1.5rem,2.2vw,1.9rem);letter-spacing:-.4px;line-height:1.1;color:var(--co-ink)}
 .co-success p{font-size:15px;color:var(--co-ink-2);line-height:1.55;max-width:300px}
+/* iMessage opt-in button + note (shown only when the backend returned a link) */
+.co-success .co-imsg{width:auto;min-width:220px;margin-top:8px;text-decoration:none}
+.co-success .co-imsg-note{font-size:13px;color:var(--co-ink-3);max-width:300px}
 
 /* Mobile: bottom sheet so the keyboard doesn't fight a centered card */
 @media(max-width:600px){
