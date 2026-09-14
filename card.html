@@ -30,6 +30,7 @@
   :root{ --blue:#0A84FF; --blue-deep:#3395FF; --blue-soft:#123A63; --bg:#000000; --ink:#F5F5F7; --ink-2:#A9B0BC; --ink-3:#7C8494; --line:#26262A; --fill:#1C1C1E; --card:#1C1C1E; --error:#FF7369; }
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+.row,.btn,.stepper button,.addset,.addex .open,.rmx,.medal{touch-action:manipulation}
 html,body{margin:0;background:var(--bg);color:var(--ink)}
 body{font-family:var(--f-msg);-webkit-font-smoothing:antialiased;min-height:100dvh;padding:calc(env(safe-area-inset-top) + 14px) 18px calc(env(safe-area-inset-bottom) + 96px);-webkit-user-select:none;user-select:none}
 button{font:inherit}
@@ -45,13 +46,18 @@ button{font:inherit}
 .row:first-of-type{border-top:0}
 .row.editing{cursor:default}
 .row.pending .circle{opacity:.55}
-.nums{font-variant-numeric:tabular-nums;color:var(--ink);display:inline-flex;align-items:center;gap:8px}
+.nums{font-variant-numeric:tabular-nums;color:var(--ink);display:inline-flex;align-items:center;gap:10px}
 .nums .dot{width:6px;height:6px;border-radius:50%;background:var(--blue);display:none}
 .nums.edited .dot{display:inline-block}
 .circle{width:28px;height:28px;border-radius:50%;border:2px solid var(--ink-3);flex:none;transition:background .18s var(--ease),border-color .18s var(--ease),transform .18s var(--ease)}
 .row.done .circle{background:var(--blue);border-color:var(--blue);transform:scale(1.04)}
+.row:active .circle{transform:scale(.92)}
+.ex.ghost{opacity:.55}
 .row.done .nums{color:var(--ink-2)}
-.pr{flex-basis:100%;order:9;font-size:14px;color:var(--blue);padding:0 0 10px;line-height:1.35}
+/* PR medal (Strava-style): a gold disc with "PR" beside the numbers; tap it for the "last time" line */
+.medal{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#E0A81C;color:#1a1200;font-size:10px;font-weight:700;letter-spacing:.02em;box-shadow:0 0 0 2px rgba(224,168,28,.25);flex:none;cursor:pointer;animation:pop .35s var(--ease)}
+@keyframes pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+.ex .name .medal{width:20px;height:20px;font-size:9px;margin-left:8px}
 .edit{flex-basis:100%;order:9;display:flex;flex-direction:column;gap:10px;padding:4px 0 14px}
 .stepper{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .stepper .lbl{font-size:12px;color:var(--ink-3);width:38px}
@@ -99,20 +105,19 @@ button{font:inherit}
   const H = { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' };
   const $ = (id) => document.getElementById(id);
   const app = $('app');
-  let state = null, editing = null, adding = false, inflight = 0;
+  let state = null, editing = null, adding = false, inflight = 0, tmpId = -1;
   const fmt = (w) => (w === null || w === undefined) ? '' : String(Number(w));
   const KNOWN = ['bench press','incline db press','cable fly','tricep pushdown','deadlift','barbell row','lat pulldown','face pull','barbell curl','squat','romanian deadlift','leg press','leg curl','calf raise','overhead press'];
 
   function toast(msg){ const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 1800); }
   function fail(msg){ app.innerHTML = '<div class="state"><h2>hmm…</h2>' + msg + '</div>'; $('footer').hidden = true; }
-  function findSet(id){ for (const ex of state.exercises) for (const st of ex.sets) if (st.id === id) return { ex, st }; return null; }
   function recount(){
     let done = 0, vol = 0, n = 0;
     for (const ex of state.exercises) for (const st of ex.sets){ n++; if (st.done){ done++; vol += Math.round(Number(st.actual_weight || 0) * Number(st.actual_reps || 0)); } }
     state.done_count = done; state.volume_lb = vol; state.set_count = n;
   }
 
-  // ── optimistic writes: flip locally now, reconcile with the server's answer ──
+  // ── network: optimistic everywhere; the server's answer replaces state, a failure reverts ──
   async function api(method, path, body){
     inflight++;
     try {
@@ -128,19 +133,18 @@ button{font:inherit}
     st.done = !st.done;
     if (st.done){ st.actual_weight = st.actual_weight ?? st.planned_weight; st.actual_reps = st.actual_reps ?? st.planned_reps; }
     else { st.actual_weight = null; st.actual_reps = null; st.pr = null; st.edited = false; }
-    st._pending = true; recount(); render();
+    recount(); patch();
     const data = await api('POST', '/card/api/set/' + st.id, { done: st.done });
-    if (data){ state = data; if (data.pr) toast(data.pr); }
-    else Object.assign(st, before, { _pending: false });
-    render();
+    if (data){ if (data.pr) toast(data.pr); state = data; } else Object.assign(st, before);
+    patch();
   }
   async function saveEdit(st, w, r){
     const before = { ...st };
-    st.done = true; st.actual_weight = Number(w); st.actual_reps = Number(r); st._pending = true;
+    st.done = true; st.actual_weight = Number(w); st.actual_reps = Number(r);
     st.edited = (Number(w) !== Number(st.planned_weight) || Number(r) !== Number(st.planned_reps));
     editing = null; recount(); render();
     const data = await api('POST', '/card/api/set/' + st.id, { done: true, actual_weight: w, actual_reps: r });
-    if (data){ state = data; if (data.pr) toast(data.pr); } else Object.assign(st, before, { _pending: false });
+    if (data){ if (data.pr) toast(data.pr); state = data; } else Object.assign(st, before);
     render();
   }
   async function removeSet(st){
@@ -151,17 +155,29 @@ button{font:inherit}
     render();
   }
   async function addSet(ex){
+    const last = ex.sets[ex.sets.length - 1];
+    const ghost = { id: tmpId--, index: ex.sets.length, planned_weight: last ? last.planned_weight : 0, planned_reps: last ? last.planned_reps : 0,
+                    actual_weight: null, actual_reps: null, done: false, edited: false, pr: null, ghost: true };
+    ex.sets.push(ghost); recount(); render();
     const data = await api('POST', '/card/api/set', { exercise: ex.slug });
-    if (data){ state = data; render(); }
+    if (data) state = data; else ex.sets = ex.sets.filter((x) => x !== ghost);
+    render();
   }
   async function removeExercise(ex){
     if (!confirm('remove ' + ex.label + ' from today?')) return;
+    const keep = state.exercises; state.exercises = state.exercises.filter((x) => x !== ex); recount(); render();
     const data = await api('DELETE', '/card/api/exercise/' + encodeURIComponent(ex.slug));
-    if (data){ state = data; render(); }
+    if (data) state = data; else state.exercises = keep;
+    render();
   }
   async function addExercise(name, weight, reps, sets){
+    const n = Math.max(1, Number(sets) || 3), w = weight === '' ? null : Number(weight), r = reps === '' ? null : Number(reps);
+    const ghost = { slug: 'tmp-' + (tmpId--), label: name.toLowerCase(), ghost: true,
+                    sets: Array.from({ length: n }, (_, i) => ({ id: tmpId--, index: i, planned_weight: w, planned_reps: r, actual_weight: null, actual_reps: null, done: false, edited: false, pr: null })) };
+    adding = false; state.exercises.push(ghost); recount(); render();
     const data = await api('POST', '/card/api/exercise', { name, weight, reps, sets });
-    if (data){ adding = false; state = data; render(); }
+    if (data) state = data; else { state.exercises = state.exercises.filter((x) => x !== ghost); adding = true; }
+    render();
   }
 
   function stepper(label, value, step, min, onchange){
@@ -181,14 +197,60 @@ button{font:inherit}
     return { el: wrap, input: inp };
   }
 
+  function medal(msg, small){
+    const m = document.createElement('span'); m.className = 'medal'; m.textContent = 'PR'; m.title = msg || 'PR';
+    m.addEventListener('click', (e) => { e.stopPropagation(); if (msg) toast(msg); });
+    return m;
+  }
+
+  // Tap = on touch-up (no click delay); a real scroll cancels it.
+  function onTap(el, fn){
+    let sx = 0, sy = 0, moved = false;
+    el.addEventListener('touchstart', (e) => { const t = e.touches[0]; sx = t.clientX; sy = t.clientY; moved = false; }, { passive: true });
+    el.addEventListener('touchmove', (e) => { const t = e.touches[0]; if (Math.abs(t.clientX - sx) > 8 || Math.abs(t.clientY - sy) > 8) moved = true; }, { passive: true });
+    el.addEventListener('touchend', (e) => { if (moved) return; if (e.target.closest && e.target.closest('.edit, .medal, .nums, button, input')) return; e.preventDefault(); fn(); }, { passive: false });
+    el.addEventListener('click', (e) => { if (e.target.closest && e.target.closest('.edit, .medal, .nums, button, input')) return; if (!('ontouchstart' in window)) fn(); });
+  }
+
+  // ── rendering: full build on structure changes; in-place patch on a tap ──
+  const rowEls = new Map();   // set id → row element
+  function rowNumsText(st){ const w = st.done ? st.actual_weight : st.planned_weight, r = st.done ? st.actual_reps : st.planned_reps; return fmt(w) + ' × ' + fmt(r); }
+  function patchRow(st){
+    const row = rowEls.get(st.id); if (!row) return render();
+    row.classList.toggle('done', !!st.done);
+    row.classList.toggle('editing', editing === st.id);
+    const nums = row.querySelector('.nums');
+    nums.firstChild.textContent = rowNumsText(st);
+    nums.classList.toggle('edited', !!st.edited);
+    const had = nums.querySelector('.medal');
+    if (st.pr && st.done){ if (!had) nums.appendChild(medal(st.pr)); else had.title = st.pr; }
+    else if (had) had.remove();
+  }
+  function patch(){
+    if (!state) return;
+    let structural = false, seen = 0;
+    for (const ex of state.exercises) for (const st of ex.sets){ seen++; if (!rowEls.has(st.id)) structural = true; }
+    if (structural || seen !== rowEls.size) return render();
+    for (const ex of state.exercises) for (const st of ex.sets) patchRow(st);
+    $('prog').textContent = state.done_count + ' / ' + state.set_count + ' sets';
+    footer();
+  }
+  function footer(){
+    const s = state.session, closed = s.status === 'done', any = state.done_count > 0;
+    $('footer').hidden = false;
+    if (closed){ $('vol').innerHTML = '<b>' + state.volume_lb.toLocaleString() + ' lb</b> · done'; $('finish').classList.remove('show'); }
+    else { $('vol').innerHTML = any ? ('<b>' + state.volume_lb.toLocaleString() + ' lb</b> so far') : 'nothing logged yet'; $('finish').classList.toggle('show', any); }
+  }
+
   function render(){
     if (!state) return;
     const s = state.session, closed = s.status === 'done';
     const y = window.scrollY;
+    rowEls.clear();
     app.innerHTML = '';
     const hdr = document.createElement('div'); hdr.className = 'hdr';
     const h1 = document.createElement('h1'); h1.textContent = s.template_key.replace('_',' ') + ' · ' + s.weekday;
-    const prog = document.createElement('div'); prog.className = 'prog'; prog.textContent = state.done_count + ' / ' + state.set_count + ' sets';
+    const prog = document.createElement('div'); prog.className = 'prog'; prog.id = 'prog'; prog.textContent = state.done_count + ' / ' + state.set_count + ' sets';
     hdr.appendChild(h1); hdr.appendChild(prog); app.appendChild(hdr);
     if (!closed){
       const lead = document.createElement('p'); lead.className = 'lead';
@@ -196,23 +258,25 @@ button{font:inherit}
       app.appendChild(lead);
     }
     for (const ex of state.exercises){
-      const box = document.createElement('div'); box.className = 'ex';
+      const box = document.createElement('div'); box.className = 'ex' + (ex.ghost ? ' ghost' : '');
       const name = document.createElement('div'); name.className = 'name';
-      const nm = document.createElement('span'); nm.textContent = ex.label; name.appendChild(nm);
-      if (!closed && !ex.sets.some((x) => x.done)){
+      const nm = document.createElement('span'); nm.textContent = ex.label;
+      const exPR = ex.sets.find((x) => x.done && x.pr);
+      if (exPR) nm.appendChild(medal(exPR.pr, true));
+      name.appendChild(nm);
+      if (!closed && !ex.ghost && !ex.sets.some((x) => x.done)){
         const rmx = document.createElement('button'); rmx.type = 'button'; rmx.className = 'rmx'; rmx.textContent = 'remove';
         rmx.addEventListener('click', () => removeExercise(ex)); name.appendChild(rmx);
       }
       box.appendChild(name);
       for (const st of ex.sets){
         const row = document.createElement('div');
-        row.className = 'row' + (st.done ? ' done' : '') + (editing === st.id ? ' editing' : '') + (st._pending ? ' pending' : '');
+        row.className = 'row' + (st.done ? ' done' : '') + (editing === st.id ? ' editing' : '');
         const nums = document.createElement('span'); nums.className = 'nums' + (st.edited ? ' edited' : '');
-        const w = st.done ? st.actual_weight : st.planned_weight, r = st.done ? st.actual_reps : st.planned_reps;
-        nums.innerHTML = '<span></span><span class="dot"></span>'; nums.firstChild.textContent = fmt(w) + ' × ' + fmt(r);
+        nums.innerHTML = '<span></span><span class="dot"></span>'; nums.firstChild.textContent = rowNumsText(st);
+        if (st.pr && st.done) nums.appendChild(medal(st.pr));
         const circle = document.createElement('span'); circle.className = 'circle';
         row.appendChild(nums); row.appendChild(circle);
-        if (st.pr && st.done){ const p = document.createElement('div'); p.className = 'pr'; p.textContent = st.pr; row.appendChild(p); }
         if (editing === st.id){
           const ed = document.createElement('div'); ed.className = 'edit';
           let cw = Number(st.actual_weight ?? st.planned_weight), cr = Number(st.actual_reps ?? st.planned_reps);
@@ -229,13 +293,14 @@ button{font:inherit}
           ed.appendChild(sw.el); ed.appendChild(sr.el); ed.appendChild(acts); row.appendChild(ed);
           ed.addEventListener('click', (e) => e.stopPropagation());
         }
-        if (!closed){
-          nums.addEventListener('click', (e) => { e.stopPropagation(); if (editing === st.id) return; editing = st.id; render(); });
-          row.addEventListener('click', () => { if (editing === st.id) return; toggle(st); });
+        if (!closed && !st.ghost && !ex.ghost){
+          nums.addEventListener('click', (e) => { e.stopPropagation(); if (e.target.closest('.medal')) return; if (editing === st.id) return; editing = st.id; render(); });
+          onTap(row, () => { if (editing === st.id) return; toggle(st); });
         }
+        rowEls.set(st.id, row);
         box.appendChild(row);
       }
-      if (!closed){
+      if (!closed && !ex.ghost){
         const add = document.createElement('button'); add.type = 'button'; add.className = 'addset'; add.textContent = '+ set';
         add.addEventListener('click', () => addSet(ex)); box.appendChild(add);
       }
@@ -262,16 +327,8 @@ button{font:inherit}
       ax.appendChild(open); ax.appendChild(form); app.appendChild(ax);
       if (adding) setTimeout(() => nameIn.focus(), 0);
     }
-    const any = state.done_count > 0;
-    $('footer').hidden = false;
-    if (closed){
-      $('vol').innerHTML = '<b>' + state.volume_lb.toLocaleString() + ' lb</b> · done';
-      $('finish').classList.remove('show');
-      const line = document.createElement('div'); line.className = 'doneline'; line.textContent = 'logged. the summary’s in your thread.'; app.appendChild(line);
-    } else {
-      $('vol').innerHTML = any ? ('<b>' + state.volume_lb.toLocaleString() + ' lb</b> so far') : 'nothing logged yet';
-      $('finish').classList.toggle('show', any);
-    }
+    if (closed){ const line = document.createElement('div'); line.className = 'doneline'; line.textContent = 'logged. the summary’s in your thread.'; app.appendChild(line); }
+    footer();
     window.scrollTo(0, y);
   }
 
@@ -289,7 +346,7 @@ button{font:inherit}
     try {
       const res = await fetch(API + '/card/api/session', { headers: H, cache: 'no-store' });
       const data = await res.json();
-      if (data && data.ok && data.updated_at !== state.updated_at){ state = data; render(); }
+      if (data && data.ok && data.updated_at !== state.updated_at){ state = data; patch(); }
     } catch (e) {}
   }
   $('finish').addEventListener('click', async () => {
