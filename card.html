@@ -37,22 +37,43 @@ button{font:inherit}
 .hdr h1{font-family:var(--f-header);font-weight:400;font-size:30px;line-height:1.05;letter-spacing:-.01em;margin:0;text-transform:lowercase}
 .hdr .prog{font-size:14px;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
 .lead{font-size:15px;color:var(--ink-2);line-height:1.45;margin:0 0 14px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 84px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
 .ex{margin-top:18px}
 .ex .name{font-size:13px;font-weight:500;letter-spacing:.02em;color:var(--ink-3);text-transform:lowercase;padding:0 2px 6px}
-.row{display:flex;align-items:center;justify-content:space-between;min-height:52px;padding:0 2px;border-top:1px solid var(--line);font-size:17px;line-height:1.3;cursor:pointer}
+.row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;min-height:52px;padding:0 2px;border-top:1px solid var(--line);font-size:17px;line-height:1.3;cursor:pointer}
 .row:first-of-type{border-top:0}
-.row.editing{flex-wrap:wrap;cursor:default}
+.row.editing{cursor:default}
+.row.pending .circle{opacity:.55}
 .nums{font-variant-numeric:tabular-nums;color:var(--ink);display:inline-flex;align-items:center;gap:8px}
 .nums .dot{width:6px;height:6px;border-radius:50%;background:var(--blue);display:none}
 .nums.edited .dot{display:inline-block}
 .circle{width:28px;height:28px;border-radius:50%;border:2px solid var(--ink-3);flex:none;transition:background .18s var(--ease),border-color .18s var(--ease),transform .18s var(--ease)}
 .row.done .circle{background:var(--blue);border-color:var(--blue);transform:scale(1.04)}
 .row.done .nums{color:var(--ink-2)}
-.pr{flex-basis:100%;font-size:14px;color:var(--blue);padding:0 0 10px;line-height:1.35}
-.edit{flex-basis:100%;display:flex;gap:10px;align-items:center;padding:6px 0 12px}
-.edit label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-3)}
-.edit input{width:88px;min-height:44px;font:inherit;font-size:18px;text-align:center;border:1px solid var(--line);border-radius:12px;background:var(--fill);color:var(--ink)}
-.edit input:focus{outline:2px solid var(--blue);outline-offset:2px}
+.pr{flex-basis:100%;order:9;font-size:14px;color:var(--blue);padding:0 0 10px;line-height:1.35}
+.edit{flex-basis:100%;order:9;display:flex;flex-direction:column;gap:10px;padding:4px 0 14px}
+.stepper{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.stepper .lbl{font-size:12px;color:var(--ink-3);width:38px}
+.stepper .ctl{display:flex;align-items:center;gap:6px}
+.stepper button{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--fill);color:var(--ink);font-size:20px;line-height:1;cursor:pointer}
+.stepper input{width:84px;min-height:44px;font:inherit;font-size:19px;font-weight:500;text-align:center;border:1px solid var(--line);border-radius:12px;background:var(--fill);color:var(--ink)}
+.stepper input:focus{outline:2px solid var(--blue);outline-offset:2px}
+.edit .acts{display:flex;gap:8px;align-items:center;justify-content:flex-end}
+.edit .acts .rm{margin-right:auto;background:none;border:0;color:var(--error);font-size:14px;padding:8px 2px;cursor:pointer}
+.addset{display:block;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);color:var(--ink-3);font-size:14px;padding:12px 2px;cursor:pointer}
+.addset:active{color:var(--ink)}
+.ex .name{display:flex;align-items:baseline;justify-content:space-between}
+.ex .name .rmx{background:none;border:0;color:var(--ink-3);font-size:12px;padding:0 2px;cursor:pointer}
+.addex{margin:26px 0 8px}
+.addex .open{width:100%;min-height:48px;border:1px dashed var(--line);border-radius:14px;background:none;color:var(--ink-2);font-size:15px;cursor:pointer}
+.addex form{display:none;flex-direction:column;gap:10px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--fill)}
+.addex form.show{display:flex}
+.addex input[type=text]{min-height:44px;font:inherit;font-size:16px;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
+.addex .nums3{display:flex;gap:8px}
+.addex .nums3 label{flex:1;display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-3)}
+.addex .nums3 input{min-height:44px;font:inherit;font-size:17px;text-align:center;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);width:100%}
+.addex .acts{display:flex;gap:8px;justify-content:flex-end}
 .btn{min-height:44px;padding:0 18px;border:0;border-radius:999px;background:var(--blue);color:#fff;font-size:15px;font-weight:600;cursor:pointer}
 .btn:active{background:var(--blue-deep)}
 .btn.ghost{background:var(--fill);color:var(--ink-2)}
@@ -68,6 +89,7 @@ button{font:inherit}
 </head>
 <body>
 <div id="app"><div class="state">loading…</div></div>
+<div class="toast" id="toast"></div>
 <div class="footer" id="footer" hidden><span class="vol" id="vol"></span><button class="btn finish" id="finish" type="button">finish</button></div>
 <script>
 (function(){
@@ -77,73 +99,180 @@ button{font:inherit}
   const H = { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' };
   const $ = (id) => document.getElementById(id);
   const app = $('app');
-  let state = null, editing = null;
+  let state = null, editing = null, adding = false, inflight = 0;
   const fmt = (w) => (w === null || w === undefined) ? '' : String(Number(w));
-  const words = ['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty'];
+  const KNOWN = ['bench press','incline db press','cable fly','tricep pushdown','deadlift','barbell row','lat pulldown','face pull','barbell curl','squat','romanian deadlift','leg press','leg curl','calf raise','overhead press'];
 
-  function fail(msg){
-    app.innerHTML = '<div class="state"><h2>hmm…</h2>' + msg + '</div>';
-    $('footer').hidden = true;
+  function toast(msg){ const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 1800); }
+  function fail(msg){ app.innerHTML = '<div class="state"><h2>hmm…</h2>' + msg + '</div>'; $('footer').hidden = true; }
+  function findSet(id){ for (const ex of state.exercises) for (const st of ex.sets) if (st.id === id) return { ex, st }; return null; }
+  function recount(){
+    let done = 0, vol = 0, n = 0;
+    for (const ex of state.exercises) for (const st of ex.sets){ n++; if (st.done){ done++; vol += Math.round(Number(st.actual_weight || 0) * Number(st.actual_reps || 0)); } }
+    state.done_count = done; state.volume_lb = vol; state.set_count = n;
+  }
+
+  // ── optimistic writes: flip locally now, reconcile with the server's answer ──
+  async function api(method, path, body){
+    inflight++;
+    try {
+      const res = await fetch(API + path, { method, headers: H, body: body === undefined ? undefined : JSON.stringify(body) });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data || !data.ok){ toast((data && data.error) || 'couldn’t save — try again'); return null; }
+      return data;
+    } catch (e) { toast('offline — will retry on the next refresh'); return null; }
+    finally { inflight--; }
+  }
+  async function toggle(st){
+    const before = { ...st };
+    st.done = !st.done;
+    if (st.done){ st.actual_weight = st.actual_weight ?? st.planned_weight; st.actual_reps = st.actual_reps ?? st.planned_reps; }
+    else { st.actual_weight = null; st.actual_reps = null; st.pr = null; st.edited = false; }
+    st._pending = true; recount(); render();
+    const data = await api('POST', '/card/api/set/' + st.id, { done: st.done });
+    if (data){ state = data; if (data.pr) toast(data.pr); }
+    else Object.assign(st, before, { _pending: false });
+    render();
+  }
+  async function saveEdit(st, w, r){
+    const before = { ...st };
+    st.done = true; st.actual_weight = Number(w); st.actual_reps = Number(r); st._pending = true;
+    st.edited = (Number(w) !== Number(st.planned_weight) || Number(r) !== Number(st.planned_reps));
+    editing = null; recount(); render();
+    const data = await api('POST', '/card/api/set/' + st.id, { done: true, actual_weight: w, actual_reps: r });
+    if (data){ state = data; if (data.pr) toast(data.pr); } else Object.assign(st, before, { _pending: false });
+    render();
+  }
+  async function removeSet(st){
+    for (const ex of state.exercises) ex.sets = ex.sets.filter((x) => x.id !== st.id);
+    editing = null; recount(); render();
+    const data = await api('DELETE', '/card/api/set/' + st.id);
+    if (data) state = data; else await load();
+    render();
+  }
+  async function addSet(ex){
+    const data = await api('POST', '/card/api/set', { exercise: ex.slug });
+    if (data){ state = data; render(); }
+  }
+  async function removeExercise(ex){
+    if (!confirm('remove ' + ex.label + ' from today?')) return;
+    const data = await api('DELETE', '/card/api/exercise/' + encodeURIComponent(ex.slug));
+    if (data){ state = data; render(); }
+  }
+  async function addExercise(name, weight, reps, sets){
+    const data = await api('POST', '/card/api/exercise', { name, weight, reps, sets });
+    if (data){ adding = false; state = data; render(); }
+  }
+
+  function stepper(label, value, step, min, onchange){
+    const wrap = document.createElement('div'); wrap.className = 'stepper';
+    const l = document.createElement('span'); l.className = 'lbl'; l.textContent = label;
+    const ctl = document.createElement('div'); ctl.className = 'ctl';
+    const minus = document.createElement('button'); minus.type = 'button'; minus.textContent = '−';
+    const inp = document.createElement('input'); inp.type = 'number'; inp.inputMode = 'decimal'; inp.value = fmt(value);
+    const plus = document.createElement('button'); plus.type = 'button'; plus.textContent = '+';
+    const set = (v) => { v = Math.max(min, Math.round(v * 100) / 100); inp.value = fmt(v); onchange(v); };
+    minus.addEventListener('click', (e) => { e.stopPropagation(); set(Number(inp.value || 0) - step); });
+    plus.addEventListener('click', (e) => { e.stopPropagation(); set(Number(inp.value || 0) + step); });
+    inp.addEventListener('input', () => onchange(Number(inp.value || 0)));
+    inp.addEventListener('click', (e) => e.stopPropagation());
+    ctl.appendChild(minus); ctl.appendChild(inp); ctl.appendChild(plus);
+    wrap.appendChild(l); wrap.appendChild(ctl);
+    return { el: wrap, input: inp };
   }
 
   function render(){
     if (!state) return;
-    const s = state.session;
+    const s = state.session, closed = s.status === 'done';
+    const y = window.scrollY;
     app.innerHTML = '';
     const hdr = document.createElement('div'); hdr.className = 'hdr';
     const h1 = document.createElement('h1'); h1.textContent = s.template_key.replace('_',' ') + ' · ' + s.weekday;
     const prog = document.createElement('div'); prog.className = 'prog'; prog.textContent = state.done_count + ' / ' + state.set_count + ' sets';
     hdr.appendChild(h1); hdr.appendChild(prog); app.appendChild(hdr);
-    if (s.status !== 'done'){
+    if (!closed){
       const lead = document.createElement('p'); lead.className = 'lead';
       lead.textContent = 'tap a set when you did it as planned. tap the numbers if it went different — or just text me.';
       app.appendChild(lead);
     }
     for (const ex of state.exercises){
       const box = document.createElement('div'); box.className = 'ex';
-      const name = document.createElement('div'); name.className = 'name'; name.textContent = ex.label; box.appendChild(name);
+      const name = document.createElement('div'); name.className = 'name';
+      const nm = document.createElement('span'); nm.textContent = ex.label; name.appendChild(nm);
+      if (!closed && !ex.sets.some((x) => x.done)){
+        const rmx = document.createElement('button'); rmx.type = 'button'; rmx.className = 'rmx'; rmx.textContent = 'remove';
+        rmx.addEventListener('click', () => removeExercise(ex)); name.appendChild(rmx);
+      }
+      box.appendChild(name);
       for (const st of ex.sets){
-        const row = document.createElement('div'); row.className = 'row' + (st.done ? ' done' : '') + (editing === st.id ? ' editing' : '');
+        const row = document.createElement('div');
+        row.className = 'row' + (st.done ? ' done' : '') + (editing === st.id ? ' editing' : '') + (st._pending ? ' pending' : '');
         const nums = document.createElement('span'); nums.className = 'nums' + (st.edited ? ' edited' : '');
         const w = st.done ? st.actual_weight : st.planned_weight, r = st.done ? st.actual_reps : st.planned_reps;
-        nums.innerHTML = '<span></span><span class="dot"></span>';
-        nums.firstChild.textContent = fmt(w) + ' × ' + fmt(r);
+        nums.innerHTML = '<span></span><span class="dot"></span>'; nums.firstChild.textContent = fmt(w) + ' × ' + fmt(r);
         const circle = document.createElement('span'); circle.className = 'circle';
         row.appendChild(nums); row.appendChild(circle);
         if (st.pr && st.done){ const p = document.createElement('div'); p.className = 'pr'; p.textContent = st.pr; row.appendChild(p); }
         if (editing === st.id){
           const ed = document.createElement('div'); ed.className = 'edit';
-          const lw = document.createElement('label'); lw.textContent = 'lb';
-          const iw = document.createElement('input'); iw.type = 'number'; iw.inputMode = 'decimal'; iw.value = fmt(st.actual_weight ?? st.planned_weight); lw.appendChild(iw);
-          const lr = document.createElement('label'); lr.textContent = 'reps';
-          const ir = document.createElement('input'); ir.type = 'number'; ir.inputMode = 'numeric'; ir.value = fmt(st.actual_reps ?? st.planned_reps); lr.appendChild(ir);
-          const ok = document.createElement('button'); ok.type = 'button'; ok.className = 'btn'; ok.textContent = 'done';
-          ok.addEventListener('click', (e) => { e.stopPropagation(); editing = null; post(st.id, { done: true, actual_weight: iw.value, actual_reps: ir.value }); });
+          let cw = Number(st.actual_weight ?? st.planned_weight), cr = Number(st.actual_reps ?? st.planned_reps);
+          const sw = stepper('lb', cw, 5, 0, (v) => cw = v);
+          const sr = stepper('reps', cr, 1, 0, (v) => cr = v);
+          const acts = document.createElement('div'); acts.className = 'acts';
+          const rm = document.createElement('button'); rm.type = 'button'; rm.className = 'rm'; rm.textContent = 'remove set';
+          rm.addEventListener('click', (e) => { e.stopPropagation(); removeSet(st); });
           const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'btn ghost'; cancel.textContent = 'cancel';
           cancel.addEventListener('click', (e) => { e.stopPropagation(); editing = null; render(); });
-          ed.appendChild(lw); ed.appendChild(lr); ed.appendChild(ok); ed.appendChild(cancel); row.appendChild(ed);
-          setTimeout(() => { iw.focus(); iw.select(); }, 0);
+          const ok = document.createElement('button'); ok.type = 'button'; ok.className = 'btn'; ok.textContent = 'done';
+          ok.addEventListener('click', (e) => { e.stopPropagation(); saveEdit(st, cw, cr); });
+          acts.appendChild(rm); acts.appendChild(cancel); acts.appendChild(ok);
+          ed.appendChild(sw.el); ed.appendChild(sr.el); ed.appendChild(acts); row.appendChild(ed);
+          ed.addEventListener('click', (e) => e.stopPropagation());
         }
-        if (s.status !== 'done'){
+        if (!closed){
           nums.addEventListener('click', (e) => { e.stopPropagation(); if (editing === st.id) return; editing = st.id; render(); });
-          row.addEventListener('click', (e) => { if (editing === st.id || e.target.closest('.edit')) return; post(st.id, { done: !st.done }); });
+          row.addEventListener('click', () => { if (editing === st.id) return; toggle(st); });
         }
         box.appendChild(row);
       }
+      if (!closed){
+        const add = document.createElement('button'); add.type = 'button'; add.className = 'addset'; add.textContent = '+ set';
+        add.addEventListener('click', () => addSet(ex)); box.appendChild(add);
+      }
       app.appendChild(box);
+    }
+    if (!closed){
+      const ax = document.createElement('div'); ax.className = 'addex';
+      const open = document.createElement('button'); open.type = 'button'; open.className = 'open'; open.textContent = '+ exercise';
+      open.style.display = adding ? 'none' : 'block';
+      open.addEventListener('click', () => { adding = true; render(); });
+      const form = document.createElement('form'); form.className = adding ? 'show' : '';
+      const nameIn = document.createElement('input'); nameIn.type = 'text'; nameIn.placeholder = 'exercise (e.g. overhead press)'; nameIn.setAttribute('list', 'known'); nameIn.autocomplete = 'off';
+      const dl = document.createElement('datalist'); dl.id = 'known'; for (const k of KNOWN){ const o = document.createElement('option'); o.value = k; dl.appendChild(o); }
+      const nums3 = document.createElement('div'); nums3.className = 'nums3';
+      const mk = (lbl, val, mode) => { const l = document.createElement('label'); l.textContent = lbl; const i = document.createElement('input'); i.type = 'number'; i.inputMode = mode; i.value = val; l.appendChild(i); nums3.appendChild(l); return i; };
+      const wIn = mk('lb', '', 'decimal'), rIn = mk('reps', '', 'numeric'), nIn = mk('sets', '3', 'numeric');
+      const acts = document.createElement('div'); acts.className = 'acts';
+      const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'btn ghost'; cancel.textContent = 'cancel';
+      cancel.addEventListener('click', () => { adding = false; render(); });
+      const ok = document.createElement('button'); ok.type = 'submit'; ok.className = 'btn'; ok.textContent = 'add';
+      form.addEventListener('submit', (e) => { e.preventDefault(); if (!nameIn.value.trim()) return nameIn.focus(); addExercise(nameIn.value.trim(), wIn.value, rIn.value, nIn.value || 3); });
+      acts.appendChild(cancel); acts.appendChild(ok);
+      form.appendChild(nameIn); form.appendChild(dl); form.appendChild(nums3); form.appendChild(acts);
+      ax.appendChild(open); ax.appendChild(form); app.appendChild(ax);
+      if (adding) setTimeout(() => nameIn.focus(), 0);
     }
     const any = state.done_count > 0;
     $('footer').hidden = false;
-    if (s.status === 'done'){
+    if (closed){
       $('vol').innerHTML = '<b>' + state.volume_lb.toLocaleString() + ' lb</b> · done';
       $('finish').classList.remove('show');
-      const line = document.createElement('div'); line.className = 'doneline';
-      line.innerHTML = 'logged. the summary’s in your thread.';
-      app.appendChild(line);
+      const line = document.createElement('div'); line.className = 'doneline'; line.textContent = 'logged. the summary’s in your thread.'; app.appendChild(line);
     } else {
       $('vol').innerHTML = any ? ('<b>' + state.volume_lb.toLocaleString() + ' lb</b> so far') : 'nothing logged yet';
       $('finish').classList.toggle('show', any);
     }
+    window.scrollTo(0, y);
   }
 
   async function load(){
@@ -155,31 +284,19 @@ button{font:inherit}
       state = data; render();
     } catch (e) { fail('couldn’t reach cued. check your connection and try again.'); }
   }
-
-  async function post(setId, body){
-    try {
-      const res = await fetch(API + '/card/api/set/' + setId, { method: 'POST', headers: H, body: JSON.stringify(body) });
-      const data = await res.json();
-      if (data && data.ok){ state = data; render(); }
-    } catch (e) { /* the next poll reconciles */ }
-  }
-
   async function poll(){
-    if (!state || document.visibilityState !== 'visible' || editing !== null) return;
+    if (!state || document.visibilityState !== 'visible' || editing !== null || adding || inflight) return;
     try {
       const res = await fetch(API + '/card/api/session', { headers: H, cache: 'no-store' });
       const data = await res.json();
       if (data && data.ok && data.updated_at !== state.updated_at){ state = data; render(); }
     } catch (e) {}
   }
-
   $('finish').addEventListener('click', async () => {
     const b = $('finish'); b.disabled = true; b.textContent = 'finishing…';
-    try {
-      const res = await fetch(API + '/card/api/finish', { method: 'POST', headers: H, body: '{}' });
-      const data = await res.json();
-      if (data && data.ok){ state = data; render(); }
-    } catch (e) {} finally { b.disabled = false; b.textContent = 'finish'; }
+    const data = await api('POST', '/card/api/finish', {});
+    if (data){ state = data; render(); }
+    b.disabled = false; b.textContent = 'finish';
   });
 
   if (!TOKEN) fail('no session in this link.'); else load();
