@@ -6,18 +6,25 @@
   side of the screen: Cued is blue and RIGHT-aligned, the user is gray and
   LEFT-aligned. No phone mockup, no device chrome — the page is the interface.
 
-  Motion OK (any width): each tour section has a sticky 100vh stage with a
-  short hold budget. Scroll brings a section on stage; its choreography then
-  auto-plays one-shot on a timeline — blank stage with the header centered,
-  header glides up to top:10vh, then bubbles pop in sequence, the thread
-  translating up to make room like real Messages. Mobile (<768px) differs
-  only in the hero — a static block (blown-up Campanile crop, intro bubbles,
-  full-width CTA that pops once the sequence settles) plus an iOS-style
-  notification banner — and in sizing (17px bubbles, tighter shell).
+  Desktop landing (the hero's first --cv-len of scroll, scrubbed): headline
+  + CTA, the Campanile, app icons scattered like stickers, and a flat
+  vector phone frame peeking up from the bottom with the conversation on
+  its screen. Scroll lifts the phone to center, the icons orbit it and
+  stream in, the screen pulses blue, then the phone and drawing clear and
+  a one-sentence statement inks in word by word — the apps it replaces
+  sitting inline in the text. The claim before the proof; the icon row
+  near the end is the receipt. A flick lands wherever it lands.
 
-  prefers-reduced-motion: no pinning at all — a plain vertical thread with
-  inline section headers; bubbles fade in via IntersectionObserver.
-  Genuinely separate layout path, not a degraded pin.
+  Below the hero the tour is a plain vertical flow at every width: inline
+  serif section headers, bubbles fading in via IntersectionObserver as they
+  scroll into view. No sticky stages, no pinning, no push-up. Mobile
+  (<768px) differs in the hero — a static block (headline, blown-up
+  Campanile crop, intro bubbles, full-width CTA that pops once the sequence
+  settles) plus an iOS-style notification banner — and in sizing (17px
+  bubbles, tighter shell).
+
+  prefers-reduced-motion: the hero joins the flow too (headline, drawing
+  band, bubbles), and every transition is off.
 
   Vanilla HTML/CSS/JS, no build step. Deploys via GitHub Pages from /main.
 -->
@@ -74,6 +81,10 @@
   --poll-ink:#E9902E;
   --poll-pick:#FADFB8;
   --notif-bg:rgba(246,246,248,.9);   /* iOS notification banner glass */
+  --cv-bezel:#D6D8DC;    /* hero phone frame — titanium (flat vector, not a photo) */
+  --cv-edge:rgba(10,22,40,.22);      /* bezel outer hairline */
+  --cv-display:#0B0C10;  /* the dark display ring inside the bezel */
+  --cv-island:#0B0C10;   /* dynamic island */
 
   --f-header:'Hedvig Letters Serif', Georgia, 'Times New Roman', serif;
   --f-msg:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -82,6 +93,11 @@
   /* Layout */
   --shell:min(1520px, 100vw - 96px);   /* near-full width; capped on huge displays */
   --reveal-step:45vh;    /* hold-budget unit — pinned sections hold 2 steps */
+  /* Hero convergence (desktop pin): scroll distance the opening sequence
+     scrubs through (p 0→1) before the hero's normal hold budget begins. */
+  --cv-len:300vh;
+  --cv-phone-h:68vh;     /* phone frame height (340:600 box) */
+  --cv-icon:76px;        /* scattered / orbiting app-icon size */
   --msg-size:clamp(23px, 2.2vw, 34px);   /* trimmed ~15% — air over bulk */
 
   --ease:cubic-bezier(.22,1,.36,1);
@@ -114,6 +130,10 @@ html.dark{
   --poll-ink:#F5A93B;
   --poll-pick:#6B4E22;
   --notif-bg:rgba(38,38,42,.92);
+  --cv-bezel:#4A4B50;
+  --cv-edge:rgba(255,255,255,.14);
+  --cv-display:#000000;
+  --cv-island:#1A1A1E;
 }
 
 *{margin:0;padding:0;box-sizing:border-box}
@@ -153,12 +173,6 @@ nav .brand img{transform:translateX(-64px) rotate(-262deg)}
 nav .brand.show img{transform:none;transition:transform .65s var(--ease)}
 nav .brand span{opacity:0}
 nav .brand.show span{opacity:1;transition:opacity .35s ease .5s}
-/* Compact: from the "and i act on it" beat onward the ball rolls back over
-   the word and parks in its place — the nav keeps just the cue ball. Placed
-   after the .show rules so it wins when both classes are set; scrubbing back
-   above the beat replays the roll-in. */
-nav .brand.compact img{transform:translateX(-64px) rotate(-262deg);transition:transform .65s var(--ease)}
-nav .brand.compact span{opacity:0;transition:opacity .2s ease .1s}
 .nav-cta{background:none;border:none;cursor:pointer;font-family:var(--f-msg);font-size:15px;font-weight:500;color:var(--ink);padding:6px 2px}
 .nav-cta:hover{color:var(--blue)}
 .nav-right{display:flex;align-items:center;gap:20px}
@@ -299,13 +313,15 @@ html.dark .notif .logo-dark{display:block}
    header → header rises → bubbles) runs on a timeline, so height no longer
    scales with reveal count — every section gets the same hold budget as the
    hero, just enough to keep the stage pinned while the reader lingers. */
-.sec--pin{height:calc(100vh + 2 * var(--reveal-step))}
 /* Hero pins like the tour sections (its .stage rides the same sticky rule),
    but its reveals are time-driven, not scrubbed: the first scroll starts the
    bubble pop-in while the stage holds still, so reading never races the
    scroll. 90vh of budget covers the play-and-read beat before the tour
    engages. Not .sec--pin — the scroll machinery must not scrub it. */
-#hero{height:calc(100vh + 2 * var(--reveal-step))}
+/* The hero also carries the opening convergence sequence (see .cv below):
+   --cv-len of scrub, then a short hold on the inked statement (~a couple of
+   wheel notches) before the stage releases into the tour. */
+#hero{height:calc(100vh + var(--cv-len) + 20vh)}
 .stage{position:sticky;top:0;height:100vh;overflow:hidden}
 .shell{position:relative;width:var(--shell);height:100%;margin:0 auto}
 
@@ -433,6 +449,140 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
   .scroll-cue{display:none}  /* the FAQs link is the "more below" cue here */
 }
 
+/* ===== HERO HEADLINE ===== */
+/* The landing beat: serif headline with the wordmark in brand blue, quiet
+   subhead. Desktop pin: an absolutely placed layer that drifts up and out
+   as the phone rises (JS). Mobile and reduced motion: a flow block above
+   the drawing. */
+.hero-head{position:absolute;left:0;right:0;top:24vh;text-align:center;z-index:3;pointer-events:none;padding:0 24px}
+.hero-head.gone{visibility:hidden}   /* faded out — its buttons must not catch clicks */
+.hero-h1{
+  font-family:var(--f-header);font-weight:400;
+  font-size:clamp(2.6rem,5vw,4.6rem);line-height:1.02;letter-spacing:-.025em;color:var(--ink);
+}
+.hero-h1 .brand-mark{color:var(--blue)}
+/* Word-by-word ink-in on load: JS wraps each word in .w; they start muted
+   and ink in with a per-word delay (inline transition-delay) once fonts
+   land. Reduced motion renders inked. */
+.js .hero-h1 .w{color:var(--ink-3);transition:color .5s ease}
+.js .hero-h1.inked .w{color:inherit}
+.hero-sub{font-family:var(--f-msg);font-size:clamp(16px,1.35vw,19px);line-height:1.5;color:var(--ink-2);margin-top:16px}
+/* Inline app icon in running text (the Messages icon after "just texts"). */
+.nowrap{white-space:nowrap}
+.ico-inline{display:inline-block;width:1.25em;height:1.25em;vertical-align:-.3em;margin-left:.15em;border-radius:.3em}
+/* Conversion row under the subhead — the waitlist CTA (source 'hero').
+   Hidden on mobile, which has its own full-width CTA under the bubbles. */
+.hero-ctas{display:flex;justify-content:center;align-items:center;margin-top:24px;pointer-events:auto}
+
+/* ===== HERO CONVERGENCE (.cv) — the opening sequence, desktop pin only ===== */
+/* A hand-drawn phone peeks up from the bottom of the landing beat with the
+   conversation already on its screen (the hero thread, scaled down and
+   parked inside it — the same bubbles, not a copy). Scroll lifts the phone
+   to center as the headline leaves and the app icons (the ones Cued
+   replaces) arrive in orbit; they stream into the phone; the screen pulses
+   blue; then the phone clears and the statement inks in. The driver (JS, "Hero convergence") writes transform + opacity
+   only, once per frame, as a pure function of scroll progress. The phone
+   is the page's one piece of device chrome and it is destroyed on its way
+   out. No icon labels. Decorative: aria-hidden, pointer-events off. */
+.cv{position:absolute;inset:0;z-index:3;pointer-events:none}
+.cv-len{position:absolute;top:0;left:0;width:0;height:var(--cv-len);visibility:hidden}   /* JS reads the scrub length here */
+.cv-phone{
+  position:absolute;left:50%;top:50%;
+  width:calc(var(--cv-phone-h) * 340 / 600);height:var(--cv-phone-h);
+  margin:calc(var(--cv-phone-h) / -2) 0 0 calc(var(--cv-phone-h) * -170 / 600);
+  transform-origin:50% 50%;
+}
+.cv-phone svg{display:block;width:100%;height:100%;overflow:visible}
+/* A flat vector phone — bezel ring, island, side buttons — split across two
+   layers so the real thread sits on its screen: .cv-under (beneath the
+   thread) carries the page-colored screen paper and a Messages-style
+   header (cue-ball avatar, "cued", hairline); .cv (above) carries the
+   bezel (evenodd ring, see-through screen), the blue wash for the absorb
+   beat, and nothing else. */
+.cv-under{position:absolute;inset:0;z-index:1;pointer-events:none}
+.cv-under .cv-paper{fill:var(--bg)}
+.cv-under .cv-hdr-line{stroke:var(--line);stroke-width:1}
+.cv-under .cv-hdr-name{font-family:var(--f-msg);font-size:11px;font-weight:500;fill:var(--ink)}
+.cv-under .cv-hdr-chev{font-family:var(--f-msg);font-size:11px;fill:var(--ink-3)}
+.cv-under .cv-glyph{fill:none;stroke:var(--blue);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.cv-under .cv-mic{fill:none;stroke:var(--ink-3);stroke-width:1.2;stroke-linecap:round}
+.cv-under .cv-plus{fill:var(--fill)}
+.cv-under .cv-plus-glyph{fill:none;stroke:var(--ink-3);stroke-width:1.4;stroke-linecap:round}
+.cv-under .cv-comp{fill:var(--field);stroke:var(--line);stroke-width:1}
+.cv-under .cv-comp-text{font-family:var(--f-msg);font-size:11px;fill:var(--ink-3)}
+.cv-under .cv-home{fill:var(--ink);opacity:.85}
+.cv-under .logo-dark{display:none}
+html.dark .cv-under .logo-light{display:none}
+html.dark .cv-under .logo-dark{display:block}
+#hero .shell{z-index:2}
+.cv-phone .cv-screen{fill:var(--blue);opacity:0}
+.cv-phone .cv-bezel{fill:var(--cv-bezel);fill-rule:evenodd}
+.cv-phone .cv-display{fill:var(--cv-display);fill-rule:evenodd}
+.cv-phone .cv-edge{fill:none;stroke:var(--cv-edge);stroke-width:1}
+.cv-phone .cv-btn{fill:var(--cv-bezel);stroke:var(--cv-edge);stroke-width:.8}
+.cv-phone .cv-island{fill:var(--cv-island)}
+.cv-phone .cv-cam{fill:#1E2433}
+/* Icons — real logos at their real colors, the one thing here that isn't
+   line art. Centered on the phone; JS places each on the orbit ellipse. */
+.cv-icons{position:absolute;left:50%;top:50%;width:0;height:0}
+.cv-icon{
+  position:absolute;left:0;top:0;
+  width:var(--cv-icon);height:var(--cv-icon);margin:calc(var(--cv-icon) / -2);
+  border-radius:23%;object-fit:cover;opacity:0;   /* JS drives opacity */
+  border:1px solid var(--line);   /* hairline ring so white tiles (Canvas, Notes, Reminders) keep their shape on the page */
+}
+/* The thread parks inside the phone: JS scales the shell about its
+   bottom-right corner (where the thread's anchor lives). */
+#hero .shell{transform-origin:100% 100%}
+/* ===== HERO STATEMENT (.hero-say) ===== */
+/* After the icons are absorbed the phone leaves and this inks in, word by
+   word, as the reader keeps scrolling — the claim in one sentence, with the
+   apps it replaces sitting inline in the text as small tile clusters. JS
+   wraps words (and each icon cluster) in .sw and turns them on in order.
+   Mobile / reduced motion: a static, fully inked block after the hero. */
+/* Sits a little below center so the stage's trailing blank is short once
+   it releases; the tour starts on its own screen after a breath. */
+.hero-say{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;padding:14vh 8vw 0;pointer-events:none;opacity:0}
+.say{
+  font-family:var(--f-header);font-weight:400;
+  font-size:clamp(2.2rem,4.4vw,4.2rem);line-height:1.14;letter-spacing:-.02em;
+  text-align:center;max-width:1120px;color:var(--ink);text-wrap:balance;
+}
+.say .brand-mark{color:var(--blue)}
+.js .say .sw{color:var(--ink-3);opacity:.5;transition:color .25s ease,opacity .25s ease}
+.js .say .sw.on{color:inherit;opacity:1}
+.say-ico{display:inline-flex;align-items:center;vertical-align:-.18em;margin:0 .08em}
+.say-ico img{
+  width:1.05em;height:1.05em;border-radius:23%;object-fit:cover;
+  border:1px solid var(--line);box-shadow:0 0 0 .07em var(--bg);   /* page-colored ring, not a shadow */
+}
+.say-ico img + img{margin-left:-.3em}
+.js .say .sw.on .say-ico img{filter:none}
+.js .say .sw .say-ico img{filter:grayscale(1);opacity:.55;transition:filter .25s ease,opacity .25s ease}
+.js .say .sw.on .say-ico img{opacity:1}
+/* Compositor hints only while the sequence is live. */
+.cv-live .hero-head,.cv-live .shell,.cv-live .cv-phone,.cv-live .cv-phone path,.cv-live .cv-under,.cv-live .cv-icon,.cv-live .hero-say,.cv-live .hero-art{will-change:transform,opacity}
+/* Mobile and reduced motion: no sequence — the headline sits in flow above
+   the drawing and the hero is the static block it already was. */
+@media (max-width:767.98px){
+  .cv,.cv-under,.hero-ctas{display:none}
+  .hero-say{position:static;opacity:1;padding:3.5rem 22px 0}
+  .say{font-size:clamp(1.7rem,7vw,2.3rem)}
+  .js .say .sw,.js .say .sw .say-ico img{color:inherit;opacity:1;filter:none}
+  .hero-head{position:static;padding:0 22px 14px}
+  .hero-h1{font-size:clamp(1.8rem,7.4vw,2.6rem);letter-spacing:-.02em}
+  .hero-sub{font-size:15px;margin-top:12px}
+}
+@media (prefers-reduced-motion: reduce){
+  .cv,.cv-under{display:none}
+  .hero-say{position:static;opacity:1!important;padding:3.5rem 24px 0}
+  .js .say .sw,.js .say .sw .say-ico img{color:inherit!important;opacity:1!important;filter:none!important;transition:none!important}
+  .js .hero-h1 .w{color:inherit!important;transition:none!important}
+  .hero-head{position:static;padding:0 24px 8px}
+  .hero-ctas .cta{width:auto}   /* the flow block's full-width .cta is for the close section */
+  #hero .shell{transform:none!important}
+}
+
 /* ===== BUBBLES ===== */
 .msg{
   position:relative;max-width:40%;
@@ -496,11 +646,6 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
    themes), sized in em so it rides the thread scale. Bar area ≈ 1.6× the
    bubble line-height; initials land at ≈0.42em of bubble text. */
 .msg.chart svg{display:block;width:9em;max-width:100%;height:auto;margin:.15em 0 .05em}
-
-/* App-icon grid — a single gray user bubble holding a horizontal icon row.
-   No labels, no strikethroughs. */
-.msg.apps{display:flex;align-items:center;gap:.42em;max-width:none;flex-wrap:wrap}
-.msg.apps img,.msg.apps svg{display:block;width:1.75em;height:1.75em;border-radius:.4em;flex:none}
 
 /* ===== POLL (iOS 26 Messages) ===== */
 /* Width is matched to the widest Cued bubble by JS. The story auto-picks the
@@ -577,9 +722,14 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
 
 /* ===== CLOSE (static, no pin) ===== */
 .close{min-height:100vh;display:flex;flex-direction:column}
-.close .shell{flex:1;display:flex;flex-direction:column;justify-content:center;height:auto;min-height:0;padding:96px 0 48px}
-.close .thread{position:static;width:100%;transform:none}
-.close-cta{width:100%;text-align:center;margin-top:56px}
+.close .shell{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;height:auto;min-height:0;padding:96px 24px 48px}
+/* The close line rides .say (the hero statement's type) and inks in via
+   the [data-io] observer: JS wraps its words in .sw and turns them on in
+   order once it's in view. */
+.close-say{max-width:1040px}
+.close-sub{font-family:var(--f-msg);font-size:clamp(16px,1.3vw,19px);color:var(--ink-2);text-align:center;margin-top:18px}
+.js .close-say.on{opacity:1;transform:none}   /* the [data-io] fade is per word here, not on the block */
+.close-cta{width:100%;text-align:center;margin-top:44px}
 .cta{
   display:inline-flex;align-items:center;gap:8px;
   padding:16px 30px;border:none;border-radius:999px;cursor:pointer;
@@ -646,8 +796,6 @@ footer .fmeta{margin-top:10px}
    headers, compact close section. The hero's mobile layout lives in the
    width block up by the hero styles. */
 @media (max-width:767.98px){
-  .sec--pin{height:calc(100dvh + 2 * var(--reveal-step))}
-  .stage{height:100dvh}
   .shell{width:auto;margin:0 20px}
   .thread{font-size:17px}
   .msg{max-width:78%}
@@ -655,42 +803,61 @@ footer .fmeta{margin-top:10px}
   .msg.photo.tall{max-width:46%}
   .sec-h .hdr{font-size:24px}
   .close{min-height:0}
-  .close .shell{width:auto;margin:0;padding:24px 20px 32px}
-  .close .thread,.close-cta{width:100%;max-width:640px;margin-left:auto;margin-right:auto}
-  .close-cta{margin-top:36px}
+  .close .shell{width:auto;margin:0;padding:96px 20px 32px}
+  .close-say{font-size:clamp(1.7rem,7vw,2.3rem)}
+  .close-cta{width:100%;max-width:640px;margin:32px auto 0}
   .cta{width:100%;justify-content:center}
 }
 
-/* ===== FLOW LAYOUT (prefers-reduced-motion, any width) =====
-   No pinning, no sticky, no push-up. A plain vertical thread; headers become
+/* ===== TOUR — plain flow, any width, any motion preference =====
+   No pinning, no sticky, no push-up. A plain vertical thread; headers are
    inline dividers; bubbles fade in on IntersectionObserver. Sizing stays
-   width-driven: the desktop shell and desktop bubble scale above 768px, the
-   mobile sizing block below it — reduced motion changes how the page moves,
-   never how wide it is. (Windows "Animation effects: off" reports this
-   media query, so a real share of desktop visitors land here.) */
+   width-driven: the desktop shell and bubble scale above 768px, the mobile
+   sizing block below it. (The hero's own stage stays sticky for the
+   convergence — see .cv — unless mobile or reduced motion.) */
+.sec--pin{height:auto}
+.sec--pin .stage{position:static;height:auto;overflow:visible}
+.sec--pin .stage::before{content:none}   /* scrim is a pin-mode device */
+.sec--pin .shell{height:auto}
+.sec--pin .sec-h{display:none}
+/* Section rhythm: the gap between conversations lives on the section (the
+   thread zeroes its first child's margin, so it can't live on the header). */
+.sec--pin{padding-top:4.5rem}
+.hdr-flow{
+  display:block;font-family:var(--f-header);font-weight:400;
+  font-size:clamp(22px,1.7vw,26px);line-height:1.15;color:var(--ink);text-align:center;
+  margin:3.25rem auto 1.25rem;max-width:720px;   /* top margin is for mid-thread headers; the thread zeroes its first child's */
+}
+/* A Messages-width column, not the full shell: smaller bubbles, tighter
+   run — the conversations read as a thread, not a billboard. */
+.sec--pin .shell{width:min(760px, 100% - 48px);margin:0 auto}
+.sec--pin .thread{
+  position:static;width:100%;
+  font-size:clamp(18px,1.35vw,21px);
+  transform:none!important;transition:none;
+}
+.sec--pin .msg{max-width:72%}
+.sec--pin .msg.photo{max-width:46%}
+.sec--pin .msg.photo.tall{max-width:36%}
+@media (max-width:767.98px){
+  .sec--pin .shell{width:auto;margin:0 20px}
+  .sec--pin .thread{font-size:17px}
+  .sec--pin .msg{max-width:78%}
+  .sec--pin .msg.photo{max-width:62%}
+  .sec--pin .msg.photo.tall{max-width:46%}
+}
+/* Phone-width flow headers: tighter rhythm to match the 17px bubbles. */
+@media (max-width:767.98px){
+  .sec--pin{padding-top:3.5rem}
+  .hdr-flow{font-size:24px;margin-bottom:1.25rem}
+}
+/* Reduced motion: the hero joins the flow too. */
 @media (prefers-reduced-motion: reduce){
-  .sec--pin{height:auto}
-  .stage{position:static;height:auto;overflow:visible}
-  .stage::before{content:none}   /* scrim is a pin-mode device */
-  .shell{height:auto}
-  .sec-h{display:none}
-  .hdr-flow{
-    display:block;font-family:var(--f-header);font-weight:400;
-    font-size:clamp(27px,2.2vw,32px);line-height:1.15;color:var(--ink);text-align:center;
-    margin:7rem auto 2rem;max-width:720px;
-  }
-  .thread{
-    position:static;width:100%;
-    transform:none!important;transition:none;
-  }
   #hero{height:auto;padding-top:84px}
-  .close{min-height:0}
-  /* .close .shell is a flex item: auto margins + width:auto would shrink it
-     to fit-content, so stretch it explicitly. */
-  .close .shell{width:100%;margin:0;padding:24px 20px 32px}
-  .close .thread,.close-cta{width:100%;max-width:640px;margin-left:auto;margin-right:auto}
-  .close-cta{margin-top:36px}
-  .cta{width:100%;justify-content:center}
+  #hero .stage{position:static;height:auto;overflow:visible}
+  #hero .stage::before{content:none}
+  #hero .shell{height:auto}
+  #hero .thread{position:static;width:100%;transform:none!important;transition:none}
 }
 /* Desktop flow hero: no stage to hang the art from, so the drawing becomes
    an in-flow band above the intro bubbles (the mobile block already does
@@ -698,11 +865,6 @@ footer .fmeta{margin-top:10px}
 @media (prefers-reduced-motion: reduce) and (min-width:768px){
   .hero-art{position:static;margin-top:1rem}
   .hero-art svg{max-height:52vh}
-}
-/* Phone-width flow headers: tighter rhythm to match the 17px bubbles. Sits
-   after the flow block so it wins the cascade at equal specificity. */
-@media (prefers-reduced-motion: reduce) and (max-width:767.98px){
-  .hdr-flow{font-size:27px;margin:4rem auto 1.75rem}
 }
 @media (prefers-reduced-motion: reduce){
   [data-r],[data-io],.hdr-flow,.hero-mobile{opacity:1!important;transform:none!important;transition:none!important}
@@ -766,15 +928,26 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 
 <main>
 
-  <!-- ===== HERO — the drawing renders complete at load with the first bubble
-       already on screen; the rest pop in on a timeline at the first scroll
-       gesture, or on their own after ~2s if the reader doesn't scroll. The
-       floating waitlist pill surfaces bottom-center about a second after the
-       last bubble settles — the hero's CTA beat. Nothing else on screen — no
-       headline, no wordmark; the bubbles are the headline, and the
-       replacement claim lands before any proof. ===== -->
+  <!-- ===== HERO — lands on the headline, the Campanile drawn complete at
+       left, a CTA, app icons scattered like stickers, and a flat vector
+       phone frame peeking up from the bottom with the first bubble already
+       on its screen; the rest pop in on a timeline at the first scroll
+       gesture, or on their own after ~2s. Scrolling runs the convergence
+       (.cv): the headline leaves, the phone rises into an orbit of the
+       icons, the icons stream into it, the phone and drawing clear, and the
+       statement (.hero-say) inks in word by word. The floating waitlist
+       pill surfaces bottom-center once the sequence has played out and the
+       bubbles have settled — the hero's CTA beat. Mobile and reduced motion
+       skip the sequence (static hero, headline in flow, statement inked). ===== -->
   <section class="sec" id="hero">
     <div class="stage">
+      <div class="hero-head">
+        <h1 class="hero-h1">Meet <span class="brand-mark">cued</span>.<br>made for your college life.</h1>
+        <p class="hero-sub">Your personal fitness coach — no app, <span class="nowrap">just texts<svg class="ico-inline" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="9" fill="#5BD65B"/><path d="M20 9.5c-6.6 0-12 4.3-12 9.6 0 3 1.7 5.6 4.4 7.3-.2 1.4-.8 2.8-1.9 3.9 2.3-.3 4.3-1.2 5.7-2.3 1.2.3 2.5.5 3.8.5 6.6 0 12-4.3 12-9.6S26.6 9.5 20 9.5z" fill="#fff"/></svg></span><br>Your cue to lock in.</p>
+        <div class="hero-ctas">
+          <button type="button" class="cta" id="heroCtaTop">Join the waitlist</button>
+        </div>
+      </div>
       <div class="hero-art" aria-hidden="true">
         <svg viewBox="0 0 1920 650" preserveAspectRatio="xMinYMax meet">
           <defs>
@@ -813,12 +986,73 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
           <circle class="pen" r="7" fill="#007AFF" opacity="0"/>
         </svg>
       </div>
+      <!-- Phone paper — the page-colored fill of the drawn phone, under the
+           thread (see .cv-under). -->
+      <div class="cv-under" aria-hidden="true">
+        <div class="cv-phone"><svg viewBox="0 0 340 600">
+          <path class="cv-paper" d="M60 18 H280 A38 38 0 0 1 318 56 V544 A38 38 0 0 1 280 582 H60 A38 38 0 0 1 22 544 V56 A38 38 0 0 1 60 18 Z"/>
+          <!-- Messages header: back chevron, avatar, name, video, hairline -->
+          <path class="cv-glyph" d="M46 68l-7 8 7 8"/>
+          <image class="logo-light" href="images/cued-logo.svg" x="152" y="56" width="36" height="36"/>
+          <image class="logo-dark" href="images/cued-logo-reversed.svg" x="152" y="56" width="36" height="36"/>
+          <text class="cv-hdr-name" x="167" y="110" text-anchor="middle">cued</text>
+          <text class="cv-hdr-chev" x="184" y="110" text-anchor="middle">›</text>
+          <path class="cv-glyph" d="M283 71h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-14a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2zM299 74l6-3v12l-6-3"/>
+          <line class="cv-hdr-line" x1="22" y1="122" x2="318" y2="122"/>
+          <!-- composer + home indicator -->
+          <circle class="cv-plus" cx="40" cy="548" r="12"/>
+          <path class="cv-plus-glyph" d="M40 542.5v11M34.5 548h11"/>
+          <rect class="cv-comp" x="60" y="534" width="250" height="28" rx="14"/>
+          <text class="cv-comp-text" x="73" y="552">iMessage</text>
+          <path class="cv-mic" d="M296 542.5a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0zM293 547.5a6 6 0 0 0 12 0M299 553.5v3"/>
+          <rect class="cv-home" x="118" y="572" width="104" height="4" rx="2"/>
+        </svg></div>
+      </div>
       <div class="shell">
         <div class="thread">
           <div class="msg cued" data-r>hey 👋 i'm cued. the personal fitness coach for college students</div>
           <div class="msg cued" data-r>food log, workout tracker, wearables, class schedule, i handle it all. all in your messages. </div>
           <div class="msg cued t" data-r>ready to make fitness easy?</div>
         </div>
+      </div>
+      <!-- Convergence overlay (see .cv). The apps Cued replaces — trackers,
+           notes, reminders, plus Google Calendar and Canvas (the
+           class-schedule side of the claim) — no labels; Strava is
+           deliberately absent (it stays). -->
+      <div class="cv" aria-hidden="true">
+        <div class="cv-len"></div>
+        <div class="cv-phone">
+          <svg viewBox="0 0 340 600">
+            <path class="cv-screen" d="M60 18 H280 A38 38 0 0 1 318 56 V544 A38 38 0 0 1 280 582 H60 A38 38 0 0 1 22 544 V56 A38 38 0 0 1 60 18 Z"/>
+            <g class="cv-frame">
+              <path class="cv-bezel" d="M60 6 H280 A50 50 0 0 1 330 56 V544 A50 50 0 0 1 280 594 H60 A50 50 0 0 1 10 544 V56 A50 50 0 0 1 60 6 Z M60 13 H280 A43 43 0 0 1 323 56 V544 A43 43 0 0 1 280 587 H60 A43 43 0 0 1 17 544 V56 A43 43 0 0 1 60 13 Z"/>
+              <path class="cv-display" d="M60 13 H280 A43 43 0 0 1 323 56 V544 A43 43 0 0 1 280 587 H60 A43 43 0 0 1 17 544 V56 A43 43 0 0 1 60 13 Z M60 18 H280 A38 38 0 0 1 318 56 V544 A38 38 0 0 1 280 582 H60 A38 38 0 0 1 22 544 V56 A38 38 0 0 1 60 18 Z"/>
+              <path class="cv-edge" d="M60 6 H280 A50 50 0 0 1 330 56 V544 A50 50 0 0 1 280 594 H60 A50 50 0 0 1 10 544 V56 A50 50 0 0 1 60 6 Z"/>
+              <rect class="cv-island" x="126" y="30" width="88" height="24" rx="12"/>
+              <circle class="cv-cam" cx="200" cy="42" r="5"/>
+              <rect class="cv-btn" x="330" y="176" width="4" height="70" rx="1.5"/>   <!-- power -->
+              <rect class="cv-btn" x="6" y="122" width="4" height="26" rx="1.5"/>     <!-- action -->
+              <rect class="cv-btn" x="6" y="166" width="4" height="46" rx="1.5"/>     <!-- vol + -->
+              <rect class="cv-btn" x="6" y="222" width="4" height="46" rx="1.5"/>     <!-- vol - -->
+            </g>
+          </svg>
+        </div>
+        <div class="cv-icons">
+          <img class="cv-icon" src="images/app-icons/MyFitnessPal%20Review.jpg" alt="" draggable="false">
+          <img class="cv-icon" src="images/app-icons/MacroFactor-MacroTracker_icon.png" alt="" draggable="false">
+          <img class="cv-icon" src="images/app-icons/macrofactor_workouts.webp" alt="" draggable="false">
+          <img class="cv-icon" src="images/app-icons/hevy.png" alt="" draggable="false">
+          <img class="cv-icon" src="images/app-icons/mynetdiary.jpg" alt="" draggable="false">
+          <img class="cv-icon" src="images/app-icons/reminders_app.webp" alt="" draggable="false">
+          <img class="cv-icon" src="images/app-icons/notes.png" alt="" draggable="false">
+          <img class="cv-icon" src="images/app-icons/pen_paper.png" alt="" draggable="false">
+          <img class="cv-icon" src="images/app-icons/google-calendar.webp" alt="" draggable="false">
+          <img class="cv-icon" src="images/app-icons/canvas-student.jpg" alt="" draggable="false">
+        </div>
+      </div>
+      <!-- The statement (see .hero-say). Icon clusters sit inline. -->
+      <div class="hero-say">
+        <p class="say">meet <span class="brand-mark">cued</span>, the coach that lives in your texts <span class="say-ico"><svg viewBox="0 0 40 40" aria-hidden="true" style="width:1.05em;height:1.05em;border-radius:23%"><rect width="40" height="40" rx="9" fill="#5BD65B"/><path d="M20 9.5c-6.6 0-12 4.3-12 9.6 0 3 1.7 5.6 4.4 7.3-.2 1.4-.8 2.8-1.9 3.9 2.3-.3 4.3-1.2 5.7-2.3 1.2.3 2.5.5 3.8.5 6.6 0 12-4.3 12-9.6S26.6 9.5 20 9.5z" fill="#fff"/></svg></span> and already knows your classes <span class="say-ico"><img src="images/app-icons/google-calendar.webp" alt=""><img src="images/app-icons/canvas-student.jpg" alt=""></span>, your lifts <span class="say-ico"><img src="images/app-icons/hevy.png" alt=""><img src="images/app-icons/macrofactor_workouts.webp" alt=""></span> and your meals <span class="say-ico"><img src="images/app-icons/MyFitnessPal%20Review.jpg" alt=""><img src="images/app-icons/MacroFactor-MacroTracker_icon.png" alt=""><img src="images/app-icons/mynetdiary.jpg" alt=""></span>. your cue to lock in.</p>
       </div>
       <!-- Mobile-only hero CTA (see .hero-mobile) — full-width waitlist
            button + quiet FAQs link under the intro bubbles. -->
@@ -1013,7 +1247,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   <!-- ===== 7 · i read your watch — 5 reveals. Strava beat first: the run is
        Wednesday morning, same day as §3's push session — cardio's covered, so
        the evening stays push, and "keep strava. i read it." plants the one
-       app that deliberately never appears in the "delete these" icon row.
+       app that deliberately never appears in the hero's icon scatter.
        Then the sleep beat. ===== -->
   <section class="sec sec--pin" style="--n:5" data-label="i read your watch">
     <div class="stage">
@@ -1050,44 +1284,14 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     </div>
   </section>
 
-  <!-- ===== 9 · so you can delete these — 4 reveals. Gray = user-sent: the
-       reader showing Cued their homescreen, which sets up the closing
-       argument. Strava is deliberately absent from the icon row (§7 said
-       "keep strava" — the aside in reveal 2 closes that loop). Reveal 4 is
-       the page's one "no app. no login." refrain — keep the wording exact. ===== -->
-  <section class="sec sec--pin" style="--n:4" data-label="delete your apps">
-    <div class="stage">
-      <div class="shell">
-        <div class="sec-h"><h2 class="hdr">so you can delete these</h2></div>
-        <div class="thread">
-          <h2 class="hdr-flow">so you can delete these</h2>
-          <!-- Full icon lineup from the live site's "stop juggling apps"
-               section, same order. The bubble has max-width:none, so it
-               stretches to hold the whole row. -->
-          <div class="msg user apps t" data-r aria-label="A row of app icons: MyFitnessPal, MacroFactor, MacroFactor Workouts, Hevy, MyNetDiary, Reminders, Notes, Pen and paper">
-            <img src="images/app-icons/MyFitnessPal%20Review.jpg" alt="MyFitnessPal">
-            <img src="images/app-icons/MacroFactor-MacroTracker_icon.png" alt="MacroFactor">
-            <img src="images/app-icons/macrofactor_workouts.webp" alt="MacroFactor Workouts">
-            <img src="images/app-icons/hevy.png" alt="Hevy">
-            <img src="images/app-icons/mynetdiary.jpg" alt="MyNetDiary">
-            <img src="images/app-icons/reminders_app.webp" alt="Reminders">
-            <img src="images/app-icons/notes.png" alt="Notes">
-            <img src="images/app-icons/pen_paper.png" alt="Pen and paper">
-          </div>
-          <div class="msg cued turn" data-r>that's six apps, a notes file, and a coach you're paying for — all doing pieces of one job. (strava stays. i like strava.)</div>
-          <div class="msg cued" data-r>i'm all of them. one thread. one number.</div>
-          <div class="msg cued t" data-r>no app. no login. no $200/mo coach.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- ===== CLOSE — static, no pin. ===== -->
+  <!-- ===== CLOSE — the statement's twin: one serif line that inks in word
+       by word as it scrolls into view, then the pill. No bubble — the thread
+       has made its case; this is the sign-off. ===== -->
   <section class="sec close" id="signup" data-label="join the waitlist">
     <div class="shell">
-      <div class="thread">
-        <div class="msg cued t" data-io>ready when you are. nothing to download.</div>
-      </div>
+      <p class="say close-say" data-io>your cue to lock in.</p>
+      <p class="close-sub" data-io>nothing to download. ready when you are.</p>
       <div class="close-cta" data-io>
         <button type="button" class="cta" id="closeCta">Join the waitlist</button>
       </div>
@@ -1191,44 +1395,17 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 
 <script>
 // === Thread reveals ===
-// Two layout modes, switched live on media-query change:
-//  pin  — desktop + motion OK. Scroll only brings a section on stage; once
-//         its pin engages, the section auto-plays on a timeline, one-shot,
-//         like the hero: centered header → header rises → one bubble per
-//         beat. The thread is translated down by the height of the
-//         unrevealed bubbles; each beat shrinks that shift, pushing the
-//         thread up like real Messages. Scrolling back leaves played
-//         threads in place.
-//  flow — mobile or reduced motion. No pinning; IntersectionObserver fades
-//         bubbles and inline headers in as they scroll into view.
+// The tour is a plain vertical flow at every width: inline section headers,
+// bubbles fading in via IntersectionObserver as they scroll into view. Only
+// the hero pins (desktop, motion OK) — its sticky stage carries the opening
+// convergence sequence and the bubble push-up timeline.
 (function(){
   const mqDesktop = matchMedia('(min-width: 768px)');
   const mqReduce  = matchMedia('(prefers-reduced-motion: reduce)');
-  // The tour pins at every width — only reduced motion gets the flow layout.
-  // mqDesktop still distinguishes width-specific chrome (hero CTA vs pill).
-  const isPin = () => !mqReduce.matches;
-
-  const sections = Array.from(document.querySelectorAll('.sec--pin')).map(sec => {
-    const items = Array.from(sec.querySelectorAll('[data-r]'));
-    const poll = sec.querySelector('.poll');
-    const list = sec.querySelector('.checklist');
-    return {
-      el: sec,
-      thread: sec.querySelector('.thread'),
-      items,
-      poll,
-      pollIdx: poll ? items.indexOf(poll) : -1,
-      list,
-      listIdx: list ? items.indexOf(list) : -1,
-      hdrWrap: sec.querySelector('.sec-h'),
-      hdrs: Array.from(sec.querySelectorAll('.sec-h .hdr')),
-      switchAt: sec.dataset.hdrSwitch ? +sec.dataset.hdrSwitch : Infinity,
-      bottoms: [], total: 0, k: -1, played: false,
-    };
-  });
-  // The cue-ball compact beat rides the FIRST header-switch section
-  // ("and i act on it") — apply() toggles it when that switch fires.
-  const swFirstEl = document.querySelector('[data-hdr-switch]');
+  // The tour is a plain flow at every width; only the hero pins (desktop,
+  // motion OK). mqDesktop distinguishes width-specific chrome (hero CTA vs
+  // pill); heroPin gates the hero's sticky sequence.
+  const heroPin = () => mqDesktop.matches && !mqReduce.matches;
 
   // === Typing indicator ===
   // One three-dot pill per thread (see .typing in the sheet). showTyping
@@ -1243,20 +1420,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     thread.appendChild(t);
     return t;
   }
-  sections.forEach(s => { s.typing = mkTyping(s.thread); });
   const TYPE_LEAD = 500;   // how long the dots show before the bubble lands
-  function showTyping(s, idx){
-    const item = s.items[idx];
-    if (!s.typing || !item) return;
-    const side = item.classList.contains('user') ? 'user' : 'cued';
-    s.typing.classList.remove('cued', 'user');
-    s.typing.classList.add(side);
-    const gap = parseFloat(getComputedStyle(item).marginTop) || 0;
-    s.typing.style.top = ((idx > 0 ? s.bottoms[idx - 1] : 0) + gap) + 'px';
-    s.typing.classList.add('show');
-    shiftThread(s, idx, s.typing.offsetHeight + gap);
-  }
-
   // Pill-box sizing (poll + checklist): ~70% of the widest Cued bubble in the
   // thread — they hang under the blue side but shouldn't span the bubble's
   // full width.
@@ -1288,75 +1452,6 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     const sp = rows[2] && rows[2].querySelector('span');
     if (sp) sp.textContent = 'bench 190 × 4';
     clCheck(rows[2], 0); clCheck(rows[3], 600);
-  }
-
-  // Shift the whole column down by the height of everything not yet revealed,
-  // so the k-th bubble's bottom sits exactly on the bottom anchor. lift (the
-  // typing pill's height) raises the whole thread while the dots show.
-  function shiftThread(s, k, lift){
-    const shift = (k > 0 ? s.total - s.bottoms[k - 1] : s.total) - (lift || 0);
-    s.thread.style.transform = 'translateY(' + shift + 'px)';
-  }
-
-  function measure(){
-    sizePolls();
-    sections.forEach(s => {
-      s.bottoms = s.items.map(it => it.offsetTop + it.offsetHeight);
-      s.total = s.thread.scrollHeight;
-      // Re-anchor mid-play/played threads with the fresh metrics (font
-      // swaps, resizes, poll rewrites).
-      if (s.k >= 0) shiftThread(s, Math.max(0, s.k - 1));
-    });
-  }
-
-  function apply(s, beat){
-    if (beat === s.k) return;
-    s.k = beat;
-    // The arriving bubble replaces the dots (or a settle/rewind clears them).
-    if (s.typing) s.typing.classList.remove('show');
-    // Beat 0: header centered, stage blank. Beat 1: header up, stage still
-    // blank. Bubbles only start on beat 2 — the header always finishes its
-    // rise before the first message lands.
-    const k = Math.max(0, beat - 1);   // revealed bubble count
-    s.items.forEach((it, i) => it.classList.toggle('on', i < k));
-    shiftThread(s, k);
-    // The story picks its poll option in sync with the reveal AFTER the poll
-    // (the "locked" reply).
-    if (s.poll) s.poll.classList.toggle('chosen', k >= s.pollIdx + 2);
-    // Checklist: rows 1–2 log when the list lands; row 3 rewrites + logs (row
-    // 4 a beat later) when "swapped it in." lands two reveals after it.
-    if (s.list){
-      if (k >= s.listIdx + 1) clStage1(s.list);
-      if (k >= s.listIdx + 3) clStage2(s.list);
-    }
-    // Intro beat 0 only: header waits center-screen; it rises on beat 1.
-    if (s.hdrWrap) s.hdrWrap.classList.toggle('mid', beat === 0);
-    if (s.hdrs.length){
-      const idx = (s.hdrs.length > 1 && k >= s.switchAt) ? 1 : 0;
-      s.hdrs.forEach((h, i) => h.classList.toggle('on', i === idx));
-      // The nav cue-ball parks over the wordmark from "and i act on it" on.
-      if (s.el === swFirstEl){
-        const brandEl = document.querySelector('nav .brand');
-        if (brandEl) brandEl.classList.toggle('compact', idx === 1);
-      }
-    }
-  }
-
-  // Section auto-play — the pin engaging is the trigger; from there the
-  // choreography is time-driven, one-shot, like the hero. Beat 0 is already
-  // on stage when the timeline starts (blank stage, centered header).
-  const SEC_T0 = 700, SEC_STEP = 950;
-  function playSection(s){
-    s.played = true;
-    for (let b = 1; b <= s.items.length + 1; b++){
-      setTimeout(() => apply(s, b), SEC_T0 + (b - 1) * SEC_STEP);
-      // Bubble beats (b ≥ 2) get a short typing lead-in. Guarded on s.k so a
-      // deep-load settle (which jumps k to the end) never shows stray dots.
-      if (b >= 2){
-        setTimeout(() => { if (s.k === b - 1) showTyping(s, b - 2); },
-          SEC_T0 + (b - 1) * SEC_STEP - TYPE_LEAD);
-      }
-    }
   }
 
   // === Hero art trace ===
@@ -1392,13 +1487,15 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 
   // === Hero auto-play ===
   // The hero opens with the Campanile fully drawn and the first bubble
-  // already on screen. The rest pop in on their own — the thread pushing up
-  // like real Messages — at the reader's first scroll gesture, or after a
-  // ~2s idle beat if they don't scroll. Desktop: the sticky stage keeps the
-  // page from scrolling out from under them. Mobile: the thread sits under
-  // the blown-up drawing (transform overridden by CSS — just the staggered
-  // pop-in) and the .hero-mobile CTA block pops once the sequence settles.
-  // Reduced motion: CSS already shows every bubble and the CTA.
+  // already on screen — on the phone, in the desktop pin (the thread is
+  // scaled into the phone by the convergence driver below). The rest pop in
+  // on their own — the thread pushing up like real Messages — at the
+  // reader's first scroll gesture, or after a ~2s idle beat if they don't
+  // scroll. Mobile: the thread sits under the blown-up drawing (transform
+  // overridden by CSS — just the staggered pop-in) and the .hero-mobile CTA
+  // block pops once the sequence settles. Reduced motion: CSS already shows
+  // every bubble and the CTA. A load already past the hero settles it
+  // instantly.
   const heroEl = document.getElementById('hero');
   const heroItems = heroEl ? Array.from(heroEl.querySelectorAll('[data-r]')) : [];
   const heroThread = heroEl ? heroEl.querySelector('.thread') : null;
@@ -1409,7 +1506,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     heroK = k;
     if (!lift && heroTyping) heroTyping.classList.remove('show');
     heroItems.forEach((it, i) => it.classList.toggle('on', i < k));
-    // Same shift math as apply(): the k-th bubble's bottom lands on the anchor.
+    // Shift math: the k-th bubble's bottom lands on the anchor.
     // Re-measured each call so font swaps and resizes self-correct. (On
     // mobile the hero thread's transform is killed in CSS — bubbles pop in
     // place and the lift is a no-op there.)
@@ -1431,76 +1528,299 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   }
   const HERO_STEP = 950, HERO_IDLE = 2000, HERO_SETTLE = 1200;
   // The floating waitlist pill is the hero's CTA: it surfaces about a second
-  // after the last hero bubble settles. heroDone gates it; chromeRefresh is
+  // after the last hero bubble settles (and, in the desktop pin, once the
+  // convergence has opened — cvPast). heroDone gates it; chromeRefresh is
   // assigned by the scroll-chrome block below so the timeout can re-check.
-  let heroDone = false, chromeRefresh = null, notifCue = null;
+  let heroDone = false, chromeRefresh = null, notifCue = null, heroPlayed = false;
   const heroMobile = heroEl ? heroEl.querySelector('.hero-mobile') : null;
+  const heroPassed = () => !heroEl || heroEl.getBoundingClientRect().bottom <= window.innerHeight;
+  function heroFinish(){
+    heroDone = true;
+    if (heroMobile) heroMobile.classList.add('on');   // mobile hero CTA beat
+    if (chromeRefresh) chromeRefresh();
+    if (notifCue) notifCue();   // notification banner rides a later beat
+  }
+  // t0: lead before the first pop (150ms after a scroll start, 0 on idle).
+  function heroStart(t0){
+    if (heroPlayed) return;
+    heroPlayed = true;
+    // Already scrolled past (a fragment jump on load, a fling straight into
+    // the tour): settle instantly rather than playing it off-screen.
+    if (heroPassed()){ heroApply(heroItems.length); heroFinish(); return; }
+    for (let i = 1; i < heroItems.length; i++){
+      setTimeout(() => heroApply(i + 1), t0 + (i - 1) * HERO_STEP);
+      // Typing lead-in, only when there's room for it before the reveal —
+      // the first pop after a scroll start stays instant.
+      const at = t0 + (i - 1) * HERO_STEP - TYPE_LEAD;
+      if (at >= 60){
+        const idx = i;
+        setTimeout(() => { if (heroK === idx) heroShowTyping(idx); }, at);
+      }
+    }
+    setTimeout(heroFinish, t0 + (heroItems.length - 2) * HERO_STEP + HERO_SETTLE);
+  }
   function playHero(){
     if (!heroItems.length) return;
     setTrace(1);   // drawing complete from the first frame
-    if (mqReduce.matches){
-      heroDone = true;
-      if (heroMobile) heroMobile.classList.add('on');
+    if (mqReduce.matches || heroPassed()){
+      heroPlayed = true;
+      heroApply(heroItems.length);   // CSS shows the bubbles anyway / deep load
+      heroFinish();
       return;
     }
     heroApply(1);  // first bubble is on screen from load
-    let played = false, idleT = 0;
-    const start = (t0) => {
-      if (played) return;
-      played = true;
-      clearTimeout(idleT);
-      window.removeEventListener('scroll', onScroll);
-      for (let i = 1; i < heroItems.length; i++){
-        setTimeout(() => heroApply(i + 1), t0 + (i - 1) * HERO_STEP);
-        // Typing lead-in, only when there's room for it before the reveal —
-        // the first pop after a scroll start (t0=150) stays instant.
-        const at = t0 + (i - 1) * HERO_STEP - TYPE_LEAD;
-        if (at >= 60){
-          const idx = i;
-          setTimeout(() => { if (heroK === idx) heroShowTyping(idx); }, at);
+    let idleT = 0;
+    const onScroll = () => { clearTimeout(idleT); window.removeEventListener('scroll', onScroll); heroStart(150); };
+    window.addEventListener('scroll', onScroll, {passive: true});
+    idleT = setTimeout(() => { window.removeEventListener('scroll', onScroll); heroStart(0); }, HERO_IDLE);
+  }
+
+  // === Hero convergence (.cv) ===
+  // Desktop pin only. Everything is a pure function of p — progress through
+  // the hero's first --cv-len of scroll, 0→1 — plus a clock for the idle
+  // orbit, so a flick lands wherever it lands with nothing to catch up on.
+  // Beats: landing (headline, phone peeking up from the bottom with the
+  // thread on its screen) → the headline leaves and the phone rises to
+  // center while the icons arrive in orbit → the icons stream into the
+  // phone → absorb pulse, blue wash → the frame scales past the viewport
+  // and dissolves while the thread grows from phone size to page size, in
+  // place. One rAF loop reads scroll once per frame and writes every
+  // transform and opacity in that frame; it only runs while the hero is on
+  // screen and the sequence is still in progress.
+  const cv = heroEl ? heroEl.querySelector('.cv') : null;
+  let cvPast = () => true;     // has the sequence opened? (chrome block reads it)
+  let cvRefresh = () => {};    // re-measure + redraw (fonts, resize, load)
+  if (cv){
+    const cvStage = heroEl.querySelector('.stage');
+    const cvShell = heroEl.querySelector('.shell');
+    const cvHead = heroEl.querySelector('.hero-head');
+    const cvLen = cv.querySelector('.cv-len');
+    const cvPhone = cv.querySelector('.cv-phone');
+    const cvUnder = heroEl.querySelector('.cv-under');
+    const cvPaper = cvUnder.querySelector('.cv-phone');
+    const cvScreen = cv.querySelector('.cv-screen');
+    const cvStroke = cv.querySelector('.cv-frame');
+    const cvIcons = Array.from(cv.querySelectorAll('.cv-icon'));
+    const cvActive = () => mqDesktop.matches && !mqReduce.matches;
+    const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
+    const seg = (v, a, b) => clamp01((v - a) / (b - a));
+    const easeIO = u => u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+    const ORBIT_MS = 40000;   // one revolution, once the orbit is turning
+    const PEEK = 0.42;        // landing: phone center sits this far (× stage height) below center (top edge ≈ 62vh)
+    const TILT = [-8, 6, -5, 9, -7, 4, -9, 7, 5, -6];   // sticker-like resting tilts, degrees
+    // Landing scatter — sticker slots (× stage width/height) around the
+    // headline, CTA row and peeking phone, clear of all three. Each icon
+    // glides from its slot onto the orbit ellipse as the phone rises.
+    const SLOTS = [[.14,.21],[.86,.21],[.09,.50],[.91,.50],[.22,.58],[.78,.58],[.32,.76],[.68,.76],[.11,.82],[.89,.82]];
+    let orbit = 0, lastT = 0;   // accumulated orbit angle — the icons sit still at landing
+    let W = 0, H = 0, A = 0, B = 0, L = 1, PW = 0, PH = 0, shellR = 0, bubbleW = 1, peekPx = 0;
+    function cvMeasure(){
+      W = cvStage.clientWidth; H = cvStage.clientHeight;
+      L = Math.max(1, cvLen.offsetHeight);
+      PH = cvPhone.offsetHeight; PW = cvPhone.offsetWidth;
+      // Scatter / orbit ellipse — wide, framing the headline at landing and
+      // the phone once it's centered; clear of the nav.
+      A = Math.min(W * 0.40, H * 0.95);
+      B = Math.max(PH / 2 + 60, H * 0.36);
+      shellR = cvShell.offsetLeft + cvShell.offsetWidth;
+      // Landing offset for the phone: PEEK × height, but never so high that
+      // its top runs into the headline block (short viewports) — keep a
+      // 28px gap under the CTA row.
+      const headB = cvHead.offsetTop + cvHead.offsetHeight;
+      peekPx = Math.max(PEEK * H, (headB + 28) - (H / 2 - PH / 2));
+      bubbleW = 1;
+      heroItems.forEach(it => { bubbleW = Math.max(bubbleW, it.offsetWidth); });
+    }
+    const cvP = () => clamp01(-heroEl.getBoundingClientRect().top / L);
+    // Pin: the sequence has opened. Flow: the headline's own CTA row has
+    // scrolled off — one waitlist button on screen at a time.
+    cvPast = () => cvActive() ? cvP() >= 0.97 : cvHead.getBoundingClientRect().bottom < 0;
+    // Statement words: wrap each word (and each icon cluster) in .sw, in
+    // reading order, so the ink-in can walk them.
+    const say = heroEl.querySelector('.say');
+    const sayWords = [];
+    if (say){
+      Array.from(say.childNodes).forEach(n => {
+        if (n.nodeType === 3){
+          const frag = document.createDocumentFragment();
+          n.textContent.split(/(\s+)/).forEach(tok => {
+            if (!tok) return;
+            if (/^\s+$/.test(tok)){ frag.appendChild(document.createTextNode(tok)); return; }
+            const w = document.createElement('span'); w.className = 'sw'; w.textContent = tok;
+            frag.appendChild(w); sayWords.push(w);
+          });
+          n.replaceWith(frag);
+        } else if (n.nodeType === 1){
+          if (n.classList.contains('say-ico')){
+            const w = document.createElement('span'); w.className = 'sw';
+            n.replaceWith(w); w.appendChild(n); sayWords.push(w);
+          } else {
+            // the wordmark span: wrap its text as one word, keep the color
+            const w = document.createElement('span'); w.className = 'sw';
+            n.replaceWith(w); w.appendChild(n); sayWords.push(w);
+          }
+        }
+      });
+    }
+    const cvSay = heroEl.querySelector('.hero-say');
+    const cvArt = heroEl.querySelector('.hero-art');
+    // Beats (p): landing → headline out .05–.18, phone rises .08–.30 while
+    // the icons glide onto the orbit .08–.28 → converge .32–.56 → absorb
+    // .56–.62 → phone leaves .62–.70 → statement in .66–.74, inking .70–.98.
+    let sayK = -1;
+    function cvFrame(now){
+      if (!cvActive()){
+        // Flow layouts: leave every inline style alone (CSS owns them).
+        cvShell.style.transform = cvShell.style.opacity = '';
+        cvHead.style.opacity = cvHead.style.transform = '';
+        cvHead.classList.remove('gone');
+        cvUnder.style.opacity = '';
+        if (cvSay){ cvSay.style.opacity = cvSay.style.transform = ''; }
+        if (cvArt) cvArt.style.opacity = '';
+        return 1;
+      }
+      const p = cvP();
+      // Headline: drifts up and out as the phone starts to rise.
+      const hx = seg(p, 0.05, 0.18);
+      cvHead.style.opacity = (1 - hx).toFixed(3);
+      cvHead.style.transform = 'translateY(' + (-0.07 * H * easeIO(hx)).toFixed(1) + 'px)';
+      cvHead.classList.toggle('gone', hx >= 1);   // its CTA row must not catch clicks once gone
+      // Phone: peeking up from the bottom → centered.
+      const rise = easeIO(seg(p, 0.08, 0.30));
+      const dy = peekPx * (1 - rise);
+      // Absorb: one short pulse as the last icon lands, with a blue wash.
+      const ab = seg(p, 0.56, 0.62);
+      const pulse = 1 + 0.03 * Math.sin(Math.PI * ab);
+      // Leave: the phone (thread and all) settles back and fades — the
+      // apps are in; the statement takes the stage.
+      const out = easeIO(seg(p, 0.62, 0.70));
+      const phoneT = 'translateY(' + dy.toFixed(1) + 'px) scale(' + (pulse * (1 - 0.08 * out)).toFixed(4) + ')';
+      cvPhone.style.transform = phoneT;
+      cvPaper.style.transform = phoneT;
+      cvPhone.style.opacity = cvUnder.style.opacity = (1 - out).toFixed(3);
+      cvScreen.style.opacity = (0.22 * Math.sin(Math.PI * ab)).toFixed(3);
+      // Icons: scattered around the headline from the first frame like
+      // stickers — tilted, floating a little, still. The orbit starts
+      // turning as the phone rises (angle accumulates only while the gate
+      // is open, so nothing jumps), then they stream into the phone in
+      // index order — a stream, not a collapse; the orbit keeps turning
+      // underneath, so the paths curve inward.
+      const N = cvIcons.length;
+      const dt = lastT ? Math.min(100, now - lastT) : 0;
+      lastT = now;
+      orbit += (dt / ORBIT_MS) * Math.PI * 2 * seg(p, 0.08, 0.24);
+      const stag = N > 1 ? 0.12 / (N - 1) : 0;
+      const g = easeIO(seg(p, 0.08, 0.28));   // scatter → orbit
+      cvIcons.forEach((el, i) => {
+        const sl = SLOTS[i % SLOTS.length];
+        const sx = (sl[0] - 0.5) * W, sy = (sl[1] - 0.5) * H;
+        // Orbit angle from the slot's own direction, so the glide is short.
+        const th = Math.atan2(sy / B, sx / A) + orbit;
+        const ex = A * Math.cos(th), ey = B * Math.sin(th);
+        const c0 = 0.32 + i * stag;
+        const u = seg(p, c0, c0 + 0.12), c = u * u;
+        const bob = Math.sin(now / 1500 + i * 1.7) * 5 * (1 - c);
+        const x = (sx + (ex - sx) * g) * (1 - c), y = (sy + (ey - sy) * g) * (1 - c) + bob;
+        const sc = 1 - 0.85 * c;
+        const o = 1 - seg(c, 0.45, 1);
+        el.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' + (TILT[i % TILT.length] * (1 - c)).toFixed(1) + 'deg) scale(' + sc.toFixed(3) + ')';
+        el.style.opacity = o.toFixed(3);
+      });
+      // Thread: parked inside the phone screen (bottom-right, like real
+      // Messages), following the phone as it rises and leaving with it.
+      // The shell scales about its bottom-right corner, so the thread's
+      // anchor (bottom:12vh) rides along at 12vh × scale.
+      // The screen sits inside the SVG box (x 22–318 of 340, y 18–582 of
+      // 600); the bubbles' widest run fits the screen with a little more
+      // room on the right for the tail.
+      const FW = PW * 296 / 340, FH = PH * 564 / 600;
+      const pad = FW * 0.075;
+      const s0 = Math.min(1, (FW - 2.6 * pad) / bubbleW);
+      const cx = W / 2, cy = H / 2 + dy;
+      const innerR = cx + FW / 2 - pad * 1.6;
+      // Anchor above the composer (screen y 534 of 18–582) unless the
+      // phone is still cut off by the viewport bottom — and if even that
+      // would run the stack into the header, start the stack just under
+      // the header instead (later bubbles land below the fold until the
+      // phone rises). Top mode kills the thread's push-up transition so
+      // the anchor and the shift move together.
+      let innerB = Math.min(cy + PH * (534 - 300) / 600 - pad * 0.6, H - pad * 1.5);
+      const k = Math.max(0, heroK);
+      const last = heroItems[k - 1];
+      const stackH = last ? (last.offsetTop + last.offsetHeight) * s0 : 0;
+      const headerB = cy - PH / 2 + PH * 122 / 600 + pad * 0.8;
+      const topMode = innerB - stackH < headerB;
+      if (topMode) innerB = headerB + stackH;
+      if (heroThread) heroThread.style.transition = topMode ? 'none' : '';
+      const tx = innerR - shellR;
+      const ty = innerB - (H - 0.12 * H * s0);
+      cvShell.style.transform = 'translate(' + tx.toFixed(1) + 'px,' + ty.toFixed(1) + 'px) scale(' + (s0 * (1 - 0.08 * out)).toFixed(4) + ')';
+      cvShell.style.opacity = (1 - out).toFixed(3);
+      // The drawing clears with the phone so the statement sits on a clean page.
+      if (cvArt) cvArt.style.opacity = (1 - out).toFixed(3);
+      // Statement: fades up, then inks in word by word with the scroll.
+      if (cvSay){
+        const sin = easeIO(seg(p, 0.66, 0.74));
+        cvSay.style.opacity = sin.toFixed(3);
+        cvSay.style.transform = 'translateY(' + (24 * (1 - sin)).toFixed(1) + 'px)';
+        const k = Math.round(seg(p, 0.70, 0.98) * sayWords.length);
+        if (k !== sayK){
+          sayK = k;
+          sayWords.forEach((w, i) => w.classList.toggle('on', i < k));
         }
       }
-      setTimeout(() => {
-        heroDone = true;
-        if (heroMobile) heroMobile.classList.add('on');   // mobile hero CTA beat
-        if (chromeRefresh) chromeRefresh();
-        if (notifCue) notifCue();   // notification banner rides a later beat
-      }, t0 + (heroItems.length - 2) * HERO_STEP + HERO_SETTLE);
+      return p;
+    }
+    let raf = 0, onScreen = false;
+    function loop(now){
+      raf = 0;
+      const p = cvFrame(now);
+      if (onScreen && p < 1) raf = requestAnimationFrame(loop);
+      heroEl.classList.toggle('cv-live', onScreen && p < 1);   // will-change only while live
+    }
+    const kick = () => { if (!raf) raf = requestAnimationFrame(loop); };
+    new IntersectionObserver(entries => {
+      entries.forEach(e => { onScreen = e.isIntersecting; if (onScreen) kick(); });
+    }).observe(heroEl);
+    window.addEventListener('scroll', () => { if (onScreen) kick(); }, {passive: true});
+    cvRefresh = () => { cvMeasure(); kick(); };
+    window.addEventListener('resize', cvRefresh);
+    mqReduce.addEventListener('change', cvRefresh);
+    mqDesktop.addEventListener('change', cvRefresh);
+    cvMeasure();
+    cvFrame(performance.now());   // synchronously — no first-paint flash of the thread at page scale
+    kick();
+  }
+  // Headline ink-in: wrap each word in .w (keeping the blue wordmark span
+  // and the line break), stagger their delays, and flip .inked once fonts
+  // are in so the serif doesn't ink in mid-swap.
+  const h1 = heroEl ? heroEl.querySelector('.hero-h1') : null;
+  if (h1){
+    let wi = 0;
+    const wrapText = (node) => {
+      const frag = document.createDocumentFragment();
+      node.textContent.split(/(\s+)/).forEach(tok => {
+        if (!tok) return;
+        if (/^\s+$/.test(tok)){ frag.appendChild(document.createTextNode(tok)); return; }
+        const w = document.createElement('span');
+        w.className = 'w'; w.textContent = tok;
+        w.style.transitionDelay = (wi++ * 110) + 'ms';
+        frag.appendChild(w);
+      });
+      node.replaceWith(frag);
     };
-    const onScroll = () => start(150);
-    window.addEventListener('scroll', onScroll, {passive: true});
-    idleT = setTimeout(() => start(0), HERO_IDLE);   // no scroll? play anyway
-  }
-
-  function update(){
-    const vh = window.innerHeight;
-    sections.forEach(s => {
-      if (s.played) return;
-      const r = s.el.getBoundingClientRect();
-      if (r.bottom <= vh){
-        // Landed past it (deep link, fast restore) — settle instantly.
-        s.played = true;
-        apply(s, s.items.length + 1);
-      } else if (r.top <= vh * 0.25){
-        playSection(s);   // pin (nearly) engaged — run the timeline
-      } else if (s.k < 0){
-        apply(s, 0);      // waiting below: blank stage, header centered
-      }
+    Array.from(h1.childNodes).forEach(n => {
+      if (n.nodeType === 3) wrapText(n);
+      else if (n.nodeType === 1 && n.tagName !== 'BR') Array.from(n.childNodes).forEach(c => { if (c.nodeType === 3) wrapText(c); });
     });
+    const ink = () => setTimeout(() => h1.classList.add('inked'), 250);
+    (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(ink);
   }
-
-  let ticking = false;
-  window.addEventListener('scroll', () => {
-    if (!isPin() || ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => { ticking = false; update(); });
-  }, {passive: true});
 
   let io = null;
   function setFlow(){
     if (io) io.disconnect();
-    sections.forEach(s => { s.k = -1; s.thread.style.transform = ''; });
-    setTrace(1);   // no scrubbing in flow mode — show the drawing complete
+    setTrace(1);   // show the drawing complete
     sizePolls();
     io = new IntersectionObserver((entries) => {
       entries.forEach(e => {
@@ -1540,29 +1860,19 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     });
   }
 
-  function setPin(){
-    if (io){ io.disconnect(); io = null; }
-    document.querySelectorAll('.hdr-flow').forEach(h => h.classList.remove('on'));
-    sections.forEach(s => { s.k = -1; });
-    measure();
-    sections.forEach(s => { if (s.played) apply(s, s.items.length + 1); });
-    update();
-    // Enable thread transitions only after the first state is painted, so the
-    // initial load doesn't animate from translateY(0).
-    requestAnimationFrame(() => document.body.classList.add('anim'));
-  }
-
-  function setMode(){ isPin() ? setPin() : setFlow(); }
-  setMode();
+  setFlow();
+  // Enable thread transitions (the hero's push-up) only after the first
+  // state is painted, so the initial load doesn't animate from translateY(0).
+  requestAnimationFrame(() => document.body.classList.add('anim'));
   playHero();
-  mqDesktop.addEventListener('change', setMode);
-  mqReduce.addEventListener('change', setMode);
+  mqDesktop.addEventListener('change', setFlow);
+  mqReduce.addEventListener('change', setFlow);
 
-  window.addEventListener('resize', () => { if (isPin()){ measure(); update(); } else { sizePolls(); } heroApply(heroK); });
+  window.addEventListener('resize', () => { sizePolls(); heroApply(heroK); cvRefresh(); });
   // Re-measure once web fonts land (bubble heights depend on them) and after
   // images load.
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (isPin()){ measure(); update(); } heroApply(heroK); });
-  window.addEventListener('load', () => { if (isPin()){ measure(); update(); } heroApply(heroK); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { sizePolls(); heroApply(heroK); cvRefresh(); });
+  window.addEventListener('load', () => { sizePolls(); heroApply(heroK); cvRefresh(); });
 
   // Poll rows are clickable: the highlight moves to the clicked option and the
   // "locked" reply rewrites to match, so the conversation stays coherent.
@@ -1576,9 +1886,6 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       });
       poll.classList.add('chosen');
       if (lock) lock.textContent = 'locked. ' + row.dataset.t + ' it is 👍';
-      // The rewritten reply can change the bubble's size — refresh the cached
-      // offsets (measure re-anchors the thread with them).
-      if (isPin()) measure();
     }));
   });
 
@@ -1599,28 +1906,22 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   const scrollCue = document.getElementById('scrollCue');
   const railEl = document.getElementById('rail');
   const closeSec = document.getElementById('signup');
-  // Brand-compact trigger, flow mode only: the "and i act on it" inline
-  // header crossing mid-viewport. (Pin mode: apply() drives .compact off the
-  // section's header switch as its timeline plays.)
-  const swSec = document.querySelector('[data-hdr-switch]');
-  const swFlowHdr = swSec ? swSec.querySelectorAll('.hdr-flow')[1] : null;
   if (hero){
     let bt = false;
     const chromeChk = () => {
       bt = false;
       const pastHero = hero.getBoundingClientRect().bottom < window.innerHeight * 0.25;
       if (brand) brand.classList.toggle('show', pastHero);
-      if (brand && swFlowHdr && !isPin()){
-        brand.classList.toggle('compact', swFlowHdr.getBoundingClientRect().top < window.innerHeight * 0.5);
-      }
       if (railEl) railEl.classList.toggle('show', pastHero);
       if (floatCta){
         const closeNear = closeSec && closeSec.getBoundingClientRect().top < window.innerHeight * 0.85;
         // Desktop: on the hero the pill waits for the bubble sequence to
-        // settle (heroDone); past the hero it shows regardless. Mobile: the
-        // hero has its own full-width CTA, so the pill only surfaces once
-        // the hero is scrolled past.
-        const showPill = (mqDesktop.matches ? (pastHero || heroDone) : pastHero) && !closeNear;
+        // settle (heroDone) — and, in reduced motion where that's immediate,
+        // for the convergence to reach its handoff, so the pill never sits
+        // on the orbit; past the hero it shows regardless. Mobile: the hero
+        // has its own full-width CTA, so the pill only surfaces once the
+        // hero is scrolled past.
+        const showPill = (mqDesktop.matches ? (pastHero || (heroDone && cvPast())) : pastHero) && !closeNear;
         // First appearance only: a couple of small hops to catch the eye.
         if (showPill && !floatCta.classList.contains('show') && !floatCta.dataset.nudged){
           floatCta.dataset.nudged = '1';
@@ -1629,8 +1930,10 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
         floatCta.classList.toggle('show', showPill);
       }
       // The cue shows once the hero has settled and only while the page is
-      // still at the top — the first scroll tick answers it.
-      if (scrollCue) scrollCue.classList.toggle('show', heroDone && window.scrollY < 40);
+      // still at the top — flow layouts only; in the desktop pin the phone
+      // peeking up from the bottom edge is the cue (and sits where this
+      // would).
+      if (scrollCue) scrollCue.classList.toggle('show', heroDone && window.scrollY < 40 && !heroPin());
     };
     chromeRefresh = chromeChk;
     window.addEventListener('scroll', () => { if (!bt){ bt = true; requestAnimationFrame(chromeChk); } }, {passive: true});
@@ -1652,7 +1955,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   if (notif && !mqReduce.matches){
     // Any waitlist CTA press cancels the nudge — they're already converting.
     let wlTouched = false;
-    ['heroCta', 'floatCta', 'navCta', 'closeCta'].forEach(id => {
+    ['heroCta', 'heroCtaTop', 'floatCta', 'navCta', 'closeCta'].forEach(id => {
       const b = document.getElementById(id);
       b && b.addEventListener('click', () => { wlTouched = true; }, {once: true});
     });
@@ -1686,10 +1989,28 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     });
   }
 
-  // Close section (+ its CTA) fades in in both modes.
+  // Close section (+ its CTA) fades in in both modes. The close line inks
+  // in word by word (same .sw grammar as the hero statement), staggered on
+  // a timer once it's in view; reduced motion renders it inked via CSS.
+  const closeSay = document.querySelector('.close-say');
+  if (closeSay){
+    const frag = document.createDocumentFragment();
+    closeSay.textContent.split(/(\s+)/).forEach(tok => {
+      if (!tok) return;
+      if (/^\s+$/.test(tok)){ frag.appendChild(document.createTextNode(tok)); return; }
+      const w = document.createElement('span'); w.className = 'sw'; w.textContent = tok;
+      frag.appendChild(w);
+    });
+    closeSay.replaceChildren(frag);
+  }
   const ioClose = new IntersectionObserver((entries) => {
     entries.forEach(e => {
-      if (e.isIntersecting){ e.target.classList.add('on'); ioClose.unobserve(e.target); }
+      if (!e.isIntersecting) return;
+      e.target.classList.add('on');
+      if (e.target === closeSay){
+        Array.from(closeSay.querySelectorAll('.sw')).forEach((w, i) => setTimeout(() => w.classList.add('on'), 120 + i * 110));
+      }
+      ioClose.unobserve(e.target);
     });
   }, {threshold: 0.3});
   document.querySelectorAll('[data-io]').forEach(el => ioClose.observe(el));
@@ -1798,6 +2119,8 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   const heroCta = document.getElementById('heroCta');
   navCta && navCta.addEventListener('click', () => open('nav'));
   heroCta && heroCta.addEventListener('click', () => open('hero'));
+  const heroCtaTop = document.getElementById('heroCtaTop');
+  heroCtaTop && heroCtaTop.addEventListener('click', () => open('hero'));
   closeCta && closeCta.addEventListener('click', () => open('close'));
   floatCta && floatCta.addEventListener('click', () => open('floating'));
 
