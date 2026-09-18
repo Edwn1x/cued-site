@@ -29,7 +29,7 @@
   Vanilla HTML/CSS/JS, no build step. Deploys via GitHub Pages from /main.
 -->
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Cued — the fitness coach made for college.</title>
 <meta name="description" content="A coach you text. Built by Berkeley students for the actual rhythm of college life — class schedules, dorm gyms, midterm szn, dining hall food.">
 <meta property="og:title" content="Cued — the fitness coach made for college.">
@@ -237,6 +237,23 @@ nav .brand.show span{opacity:1;transition:opacity .35s ease .5s}
 @keyframes cueBob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
 @media(max-width:600px){.scroll-cue{bottom:0;width:18px;height:18px}}
 @media(max-width:600px){.float-cta{bottom:calc(20px + env(safe-area-inset-bottom,0px));font-size:12.5px;padding:9px 17px}}
+/* Mobile CTA bar — the previous live mobile page's full-width waitlist
+   button, pinned to the bottom of the screen: the one signup CTA on phones
+   from the first frame through the tour (the floating pill and scroll cue
+   stay desktop-only). Content scrolls under a short page-color fade; the
+   bar yields once the close section's own CTA is in view (chromeChk). */
+.m-cta{display:none}
+@media(max-width:767.98px){
+  .float-cta,.scroll-cue{display:none}
+  .m-cta{
+    display:block;position:fixed;left:0;right:0;bottom:0;z-index:45;
+    padding:22px 22px calc(14px + env(safe-area-inset-bottom,0px));
+    background:linear-gradient(to top,var(--bg) 68%,transparent);
+    transition:opacity .25s ease,transform .25s ease;
+  }
+  .m-cta .cta{width:100%;justify-content:center;padding:17px 24px;font-size:16px;border-radius:14px}
+  .m-cta.hide{opacity:0;transform:translateY(10px);pointer-events:none}
+}
 
 /* ===== NOTIFICATION BANNER ===== */
 /* Push-notification card — Cued texts first, literally. Overlays the nav
@@ -843,6 +860,7 @@ footer .fmeta{margin-top:10px}
   .poll-row i::after{transition:none!important}
   .rail button .dot{transition:none!important}
   .float-cta.nudge{animation:none!important}
+  .m-cta{transition:none!important}
   .scroll-cue svg{animation:none!important}
   .mode-switch,.mode-switch .ms-knob{transition:none!important}
   nav .brand img{transform:none!important;transition:none!important}
@@ -862,9 +880,9 @@ footer .fmeta{margin-top:10px}
   .hero-head{grid-area:1/1}
   .hero-art,#hero .cv-under,#hero .shell,#hero .cv{grid-area:2/1}
   .hero-say{grid-area:3/1}
-  /* CTA row shows here (it's the only hero CTA on phones) */
-  .hero-ctas{display:flex;margin-top:20px}
-  .hero-ctas .cta{width:100%;max-width:360px;justify-content:center;padding:16px 24px;font-size:16px}
+  /* The in-flow CTA row stays desktop-only; on phones the hero CTA is the
+     pinned bottom bar (.m-cta, styled next to the floating pill). */
+  .hero-ctas{display:none}
   /* Campanile: faint, behind, cropped band, tower nudged left of the phone */
   .hero-art{
     position:relative;align-self:end;z-index:0;overflow:hidden;height:64vw;opacity:.5;pointer-events:none;
@@ -944,6 +962,11 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 <button type="button" class="float-cta" id="floatCta" aria-label="Join the waitlist">
   Join the waitlist
 </button>
+
+<!-- Mobile-only pinned CTA bar (see .m-cta). #heroCta is the hero source. -->
+<div class="m-cta" id="mCta">
+  <button type="button" class="cta" id="heroCta">Join the waitlist</button>
+</div>
 
 <!-- Scroll cue — decorative; the rail and nav carry the real navigation. -->
 <div class="scroll-cue" id="scrollCue" aria-hidden="true">
@@ -1922,6 +1945,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   const brand = document.querySelector('nav .brand');
   const hero = document.getElementById('hero');
   const floatCta = document.getElementById('floatCta');
+  const mCta = document.getElementById('mCta');
   const scrollCue = document.getElementById('scrollCue');
   const railEl = document.getElementById('rail');
   const closeSec = document.getElementById('signup');
@@ -1932,8 +1956,10 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       const pastHero = hero.getBoundingClientRect().bottom < window.innerHeight * 0.25;
       if (brand) brand.classList.toggle('show', pastHero);
       if (railEl) railEl.classList.toggle('show', pastHero);
+      const closeNear = closeSec && closeSec.getBoundingClientRect().top < window.innerHeight * 0.85;
+      // Mobile pinned bar: the close CTA takes over once it's in view.
+      if (mCta) mCta.classList.toggle('hide', !!closeNear);
       if (floatCta){
-        const closeNear = closeSec && closeSec.getBoundingClientRect().top < window.innerHeight * 0.85;
         // Desktop: on the hero the pill waits for the bubble sequence to
         // settle (heroDone) — and, in reduced motion where that's immediate,
         // for the convergence to reach its handoff, so the pill never sits
