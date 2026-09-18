@@ -398,9 +398,6 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
 .hero-art{position:absolute;left:0;right:0;bottom:0;pointer-events:none}
 .hero-art svg{display:block;width:100%;max-height:62vh}
 .hero-art .trace{fill:none;stroke:#fff;stroke-width:64;stroke-linecap:round;stroke-linejoin:round}
-/* Mobile hero CTA block — hidden on desktop, where the floating pill is the
-   hero CTA. Styled inside the <768px block below. */
-.hero-mobile{display:none}
 /* Mobile hero — the drawing treatment is ported from the live site's mobile
    load. The panoramic band would shrink the Campanile into a sliver, so blow
    the image up well past the viewport and shift it right so the tower (~14%
@@ -412,41 +409,13 @@ html:not(.js) .sec-h .hdr:first-child{opacity:1}
   /* The nav is just the wordmark's landing spot on mobile — no dark-mode
      toggle, no "get started" (the hero CTA and floating pill carry signup). */
   .nav-right{display:none}
-  /* The hero alone stays a static flow block on mobile — the tour sections
-     below it pin like desktop (their mobile sizing lives in the width block
-     near the end of the sheet). */
+  /* The mobile hero is static — same three beats as desktop, stacked
+     instead of scrubbed (see the MOBILE HERO SCENE block at the end of the
+     sheet): headline + CTA, the phone with the thread on its screen and
+     sticker icons around it, the inked statement. */
   #hero{height:auto;padding-top:84px}
-  #hero .stage{position:static;height:auto;overflow:visible}
   #hero .stage::before{content:none}
-  #hero .shell{position:static;width:auto;height:auto;padding:0 20px}
-  /* relative, not static: the typing pill inside needs the thread as its
-     containing block (transform stays killed — mobile hero bubbles pop in
-     place, no shift). */
-  #hero .thread{
-    position:relative;width:100%;max-width:640px;margin:10px auto 0;
-    transform:none!important;transition:none;font-size:17px;
-  }
-  /* Crop the band further: the svg's natural height is ~85vw, the container
-     clips it to 64vw and a mask fades the cut edge out so the line art
-     dissolves instead of slicing — buys the thread ~80px of first-screen
-     room. */
-  .hero-art{
-    position:relative;overflow:hidden;height:64vw;
-    -webkit-mask-image:linear-gradient(to bottom,#000 70%,transparent 100%);
-    mask-image:linear-gradient(to bottom,#000 70%,transparent 100%);
-  }
-  .hero-art svg{width:250vw;height:auto;max-height:none;aspect-ratio:1920/650;margin-left:14.5vw}
-  .hero-mobile{display:block;padding:28px 22px 8px}
-  /* The CTA block pops in only after the intro bubbles settle (heroDone),
-     same reveal grammar as the bubbles. JS-less loads render it visible. */
-  .js .hero-mobile{
-    opacity:0;transform:translateY(10px) scale(.97);
-    transition:opacity 380ms var(--ease),transform 380ms var(--ease);
-  }
-  .js .hero-mobile.on{opacity:1;transform:none}
-  .cta.hm-cta{width:100%;justify-content:center;padding:17px 24px;font-size:16px;border-radius:14px}
-  .hm-faq{display:block;width:max-content;margin:16px auto 0;padding:6px 10px;color:var(--ink-3);font-size:14px;font-weight:500}
-  .scroll-cue{display:none}  /* the FAQs link is the "more below" cue here */
+  .scroll-cue{display:none}
 }
 
 /* ===== HERO HEADLINE ===== */
@@ -565,16 +534,15 @@ html.dark .cv-under .logo-dark{display:block}
 /* Mobile and reduced motion: no sequence — the headline sits in flow above
    the drawing and the hero is the static block it already was. */
 @media (max-width:767.98px){
-  .cv,.cv-under,.hero-ctas{display:none}
-  .hero-say{position:static;opacity:1;padding:3.5rem 22px 0}
-  .say{font-size:clamp(1.7rem,7vw,2.3rem)}
   .js .say .sw,.js .say .sw .say-ico img{color:inherit;opacity:1;filter:none}
-  .hero-head{position:static;padding:0 22px 14px}
+  .hero-head{position:static;padding:0 22px 0}
   .hero-h1{font-size:clamp(1.8rem,7.4vw,2.6rem);letter-spacing:-.02em}
   .hero-sub{font-size:15px;margin-top:12px}
 }
-@media (prefers-reduced-motion: reduce){
+@media (prefers-reduced-motion: reduce) and (min-width:768px){
   .cv,.cv-under{display:none}
+}
+@media (prefers-reduced-motion: reduce){
   .hero-say{position:static;opacity:1!important;padding:3.5rem 24px 0}
   .js .say .sw,.js .say .sw .say-ico img{color:inherit!important;opacity:1!important;filter:none!important;transition:none!important}
   .js .hero-h1 .w{color:inherit!important;transition:none!important}
@@ -867,7 +835,7 @@ footer .fmeta{margin-top:10px}
   .hero-art svg{max-height:52vh}
 }
 @media (prefers-reduced-motion: reduce){
-  [data-r],[data-io],.hdr-flow,.hero-mobile{opacity:1!important;transform:none!important;transition:none!important}
+  [data-r],[data-io],.hdr-flow{opacity:1!important;transform:none!important;transition:none!important}
   .thread{transition:none!important}
   .sec-h{transition:none!important}
   .sec-h .hdr{transition:none!important}
@@ -879,6 +847,66 @@ footer .fmeta{margin-top:10px}
   .mode-switch,.mode-switch .ms-knob{transition:none!important}
   nav .brand img{transform:none!important;transition:none!important}
   nav .brand span{transition:none!important}
+}
+/* ===== MOBILE HERO SCENE (<768px) =====
+   The desktop beats, stacked and static: the stage is a three-row grid —
+   headline + subhead + CTA, then one cell where the faint Campanile, the
+   phone paper (.cv-under), the thread (.shell) and the bezel + sticker
+   icons (.cv) overlap, then the statement. The bubbles pop in on the
+   phone's screen (heroApply toggles .on; transform stays killed); nothing
+   scrubs. Six icons, fixed sticker slots around the phone. Reduced motion
+   gets the same scene, inked. */
+@media (max-width:767.98px){
+  :root{--m-phone-w:64vw;--m-phone-h:calc(var(--m-phone-w) * 600 / 340)}
+  #hero .stage{position:relative;height:auto;overflow:visible;display:grid;grid-template-columns:100%;grid-template-rows:auto auto auto}
+  .hero-head{grid-area:1/1}
+  .hero-art,#hero .cv-under,#hero .shell,#hero .cv{grid-area:2/1}
+  .hero-say{grid-area:3/1}
+  /* CTA row shows here (it's the only hero CTA on phones) */
+  .hero-ctas{display:flex;margin-top:20px}
+  .hero-ctas .cta{width:100%;max-width:360px;justify-content:center;padding:16px 24px;font-size:16px}
+  /* Campanile: faint, behind, cropped band, tower nudged left of the phone */
+  .hero-art{
+    position:relative;align-self:end;z-index:0;overflow:hidden;height:64vw;opacity:.5;pointer-events:none;
+    -webkit-mask-image:linear-gradient(to bottom,#000 70%,transparent 100%);
+    mask-image:linear-gradient(to bottom,#000 70%,transparent 100%);
+  }
+  .hero-art svg{width:250vw;height:auto;max-height:none;aspect-ratio:1920/650;margin-left:-22vw}
+  /* Phone layers: same box, centered, no transforms */
+  #hero .cv-under,#hero .cv{position:relative;inset:auto;display:block;height:auto;pointer-events:none;opacity:1!important}
+  #hero .cv{z-index:3}
+  #hero .cv-under{z-index:1}
+  .cv-len{display:none}
+  #hero .cv-phone{
+    position:absolute;left:50%;top:22px;width:var(--m-phone-w);height:var(--m-phone-h);
+    margin:0 0 0 calc(var(--m-phone-w) / -2);transform:none!important;opacity:1!important;
+  }
+  #hero .cv-phone path,#hero .cv-screen{opacity:1!important}
+  #hero .cv-phone .cv-screen{opacity:0!important}
+  /* Thread on the screen: the shell is the scene's height; the thread sits
+     above the composer (screen y 534 of 600), inside the screen's edges. */
+  #hero .shell{position:relative;z-index:2;width:100%;height:calc(var(--m-phone-h) + 44px);margin:0;padding:0;transform:none!important;opacity:1!important}
+  #hero .thread{
+    position:absolute;left:calc(50% - var(--m-phone-w) * .41);right:calc(50% - var(--m-phone-w) * .42);
+    bottom:calc(var(--m-phone-h) * 66 / 600 + 22px + 8px);width:auto;margin:0;
+    font-size:13.5px;transform:none!important;transition:none;
+  }
+  #hero .msg{max-width:92%}
+  /* Sticker icons: six, fixed slots around the phone, tilted */
+  #hero .cv-icons{position:absolute;inset:0;left:0;top:0;width:auto;height:auto}
+  #hero .cv-icon{position:absolute;margin:0;width:52px;height:52px;opacity:1!important}
+  #hero .cv-icon:nth-child(3),#hero .cv-icon:nth-child(5),#hero .cv-icon:nth-child(6),#hero .cv-icon:nth-child(8){display:none}
+  #hero .cv-icon:nth-child(1){left:4%;top:3%;transform:rotate(-8deg)!important}
+  #hero .cv-icon:nth-child(2){left:auto;right:3%;top:9%;transform:rotate(7deg)!important}
+  #hero .cv-icon:nth-child(4){left:auto;right:1%;top:46%;transform:rotate(-6deg)!important}
+  #hero .cv-icon:nth-child(7){left:1%;top:40%;transform:rotate(6deg)!important}
+  #hero .cv-icon:nth-child(9){left:3%;top:78%;transform:rotate(-7deg)!important}
+  #hero .cv-icon:nth-child(10){left:auto;right:4%;top:76%;transform:rotate(8deg)!important}
+  /* Statement: smaller, tighter clusters */
+  .hero-say{position:static;opacity:1!important;transform:none!important;padding:2.25rem 22px 0}
+  .say{font-size:clamp(1.45rem,6vw,1.95rem);line-height:1.18}
+  .say-ico img{width:1em;height:1em}
+  .say-ico img + img{margin-left:-.28em}
 }
 </style>
 <!-- Gate reveal-hiding synchronously so a JS-less load renders fully visible.
@@ -1053,12 +1081,6 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       <!-- The statement (see .hero-say). Icon clusters sit inline. -->
       <div class="hero-say">
         <p class="say">meet <span class="brand-mark">cued</span>, the coach that lives in your texts <span class="say-ico"><svg viewBox="0 0 40 40" aria-hidden="true" style="width:1.05em;height:1.05em;border-radius:23%"><rect width="40" height="40" rx="9" fill="#5BD65B"/><path d="M20 9.5c-6.6 0-12 4.3-12 9.6 0 3 1.7 5.6 4.4 7.3-.2 1.4-.8 2.8-1.9 3.9 2.3-.3 4.3-1.2 5.7-2.3 1.2.3 2.5.5 3.8.5 6.6 0 12-4.3 12-9.6S26.6 9.5 20 9.5z" fill="#fff"/></svg></span> and already knows your classes <span class="say-ico"><img src="images/app-icons/google-calendar.webp" alt=""><img src="images/app-icons/canvas-student.jpg" alt=""></span>, your lifts <span class="say-ico"><img src="images/app-icons/hevy.png" alt=""><img src="images/app-icons/macrofactor_workouts.webp" alt=""></span> and your meals <span class="say-ico"><img src="images/app-icons/MyFitnessPal%20Review.jpg" alt=""><img src="images/app-icons/MacroFactor-MacroTracker_icon.png" alt=""><img src="images/app-icons/mynetdiary.jpg" alt=""></span>. your cue to lock in.</p>
-      </div>
-      <!-- Mobile-only hero CTA (see .hero-mobile) — full-width waitlist
-           button + quiet FAQs link under the intro bubbles. -->
-      <div class="hero-mobile">
-        <button type="button" class="cta hm-cta" id="heroCta">Join the waitlist <span aria-hidden="true">→</span></button>
-        <a class="hm-faq" href="#faq">FAQs ↓</a>
       </div>
     </div>
   </section>
@@ -1492,10 +1514,9 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   // on their own — the thread pushing up like real Messages — at the
   // reader's first scroll gesture, or after a ~2s idle beat if they don't
   // scroll. Mobile: the thread sits under the blown-up drawing (transform
-  // overridden by CSS — just the staggered pop-in) and the .hero-mobile CTA
-  // block pops once the sequence settles. Reduced motion: CSS already shows
-  // every bubble and the CTA. A load already past the hero settles it
-  // instantly.
+  // overridden by CSS — just the staggered pop-in on the phone's screen).
+  // Reduced motion: CSS already shows every bubble. A load already past the
+  // hero settles it instantly.
   const heroEl = document.getElementById('hero');
   const heroItems = heroEl ? Array.from(heroEl.querySelectorAll('[data-r]')) : [];
   const heroThread = heroEl ? heroEl.querySelector('.thread') : null;
@@ -1532,11 +1553,9 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   // convergence has opened — cvPast). heroDone gates it; chromeRefresh is
   // assigned by the scroll-chrome block below so the timeout can re-check.
   let heroDone = false, chromeRefresh = null, notifCue = null, heroPlayed = false;
-  const heroMobile = heroEl ? heroEl.querySelector('.hero-mobile') : null;
   const heroPassed = () => !heroEl || heroEl.getBoundingClientRect().bottom <= window.innerHeight;
   function heroFinish(){
     heroDone = true;
-    if (heroMobile) heroMobile.classList.add('on');   // mobile hero CTA beat
     if (chromeRefresh) chromeRefresh();
     if (notifCue) notifCue();   // notification banner rides a later beat
   }
