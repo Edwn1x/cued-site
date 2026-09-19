@@ -759,7 +759,9 @@ footer .fmeta{margin-top:10px}
    phone — their sends blue on the right, Cued's replies gray on the left,
    tails on the last bubble of each run, a typing pill before every reply.
    Every color is a --co-* token mapped from the page's, so html.dark flips
-   it to real Messages dark for free. Bottom sheet under 768px, sized from
+   it to real Messages dark for free. The sheet is frosted glass (translucent
+   over a heavy backdrop blur, hairline edge) so the page bleeds through —
+   the old modal's feel, on the card itself. Bottom sheet under 768px, sized from
    the visual viewport by JS so the keyboard never pushes the compose row
    off-screen; a fixed-height card on desktop capped to the viewport. A
    hairline under the header fills as the steps complete; "Delivered" sits
@@ -767,7 +769,9 @@ footer .fmeta{margin-top:10px}
 .co-bg{
   --co-blue:var(--blue);--co-blue-deep:var(--blue-deep);--co-blue-soft:var(--blue-soft);--co-blue-ink:var(--blue-ink);
   --co-gray:var(--gray);--co-gray-ink:var(--gray-ink);
-  --co-card:var(--card);--co-field:var(--field);--co-fill:var(--fill);--co-line:var(--line);
+  --co-card:var(--card);--co-fill:var(--fill);--co-line:var(--line);
+  --co-glass:rgba(255,255,255,.82);--co-glass-edge:rgba(255,255,255,.55);   /* the frosted sheet + its rim */
+  --co-field:rgba(255,255,255,.62);                                       /* inputs, chips, consent box sit on the glass */
   --co-ink:var(--ink);--co-ink-2:var(--ink-2);--co-ink-3:var(--ink-3);--co-error:var(--error);
   --co-shadow:0 24px 80px rgba(10,22,40,.28);
   position:fixed;inset:0;z-index:1000;background:var(--overlay);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
@@ -775,13 +779,13 @@ footer .fmeta{margin-top:10px}
   display:flex;align-items:center;justify-content:center;padding:24px;
   font-family:var(--f-msg);font-size:15px;line-height:1.5;color:var(--co-ink);text-align:left;
 }
-html.dark .co-bg{--co-shadow:0 24px 80px rgba(0,0,0,.6)}
+html.dark .co-bg{--co-glass:rgba(28,28,30,.8);--co-glass-edge:rgba(255,255,255,.09);--co-field:rgba(44,44,46,.66);--co-shadow:0 24px 80px rgba(0,0,0,.6)}
 .co-bg *{margin:0;padding:0;box-sizing:border-box}
 .co-bg button,.co-bg input{font:inherit;color:inherit}
 .co-bg.open{opacity:1;pointer-events:all}
 
 /* Card */
-.co-sheet{width:100%;max-width:420px;height:min(560px,100% - 48px);background:var(--co-card);border-radius:24px;box-shadow:var(--co-shadow);display:flex;flex-direction:column;overflow:hidden;transform:translateY(12px);transition:transform .3s var(--ease)}
+.co-sheet{width:100%;max-width:420px;height:min(560px,100% - 48px);background:var(--co-glass);backdrop-filter:blur(28px) saturate(1.6);-webkit-backdrop-filter:blur(28px) saturate(1.6);border-radius:24px;box-shadow:var(--co-shadow),inset 0 0 0 1px var(--co-glass-edge);display:flex;flex-direction:column;overflow:hidden;transform:translateY(12px);transition:transform .3s var(--ease)}
 .co-bg.open .co-sheet{transform:translateY(0)}
 .co-handle{display:none}
 
@@ -811,13 +815,17 @@ html.dark .co-bg{--co-shadow:0 24px 80px rgba(0,0,0,.6)}
 .co-msg.show{opacity:1;transform:none}
 .co-msg.coach{align-self:flex-start;background:var(--co-gray);color:var(--co-gray-ink);transform-origin:0 100%}
 .co-msg.user{align-self:flex-end;background:var(--co-blue);color:var(--co-blue-ink);transform-origin:100% 100%}
-/* Tails — last bubble of a run only. Two pseudo-elements: a color extension
-   plus a card-colored carve; both at least as tall as the corner radius. */
-.co-msg.t::before,.co-msg.t::after{content:'';position:absolute;bottom:-.1em;height:1em}
-.co-msg.user.t::before{right:-.35em;width:1em;background:var(--co-blue);border-bottom-left-radius:.8em .7em}
-.co-msg.user.t::after{right:-1.3em;width:1.3em;background:var(--co-card);border-bottom-left-radius:.5em}
-.co-msg.coach.t::before{left:-.35em;width:1em;background:var(--co-gray);border-bottom-right-radius:.8em .7em}
-.co-msg.coach.t::after{left:-1.3em;width:1.3em;background:var(--co-card);border-bottom-right-radius:.5em}
+/* Tails — last bubble of a run only. One color extension per bubble, shaped by
+   a mask (the page's tails use a card-colored carve, which would sit as an
+   opaque notch on the frosted sheet). The mask keeps the part inside the
+   bubble plus the curved tip; the carve's quarter-circle is subtracted. */
+.co-msg.t::before{content:'';position:absolute;bottom:-.1em;height:1em;width:1em}
+.co-msg.user.t::before{right:-.35em;background:var(--co-blue);border-bottom-left-radius:.8em .7em;
+  -webkit-mask:linear-gradient(#000,#000) 0 0/.65em 100% no-repeat,radial-gradient(circle .5em at .5em 0,transparent 97%,#000 100%) .65em .5em/.35em .5em no-repeat;
+          mask:linear-gradient(#000,#000) 0 0/.65em 100% no-repeat,radial-gradient(circle .5em at .5em 0,transparent 97%,#000 100%) .65em .5em/.35em .5em no-repeat}
+.co-msg.coach.t::before{left:-.35em;background:var(--co-gray);border-bottom-right-radius:.8em .7em;
+  -webkit-mask:linear-gradient(#000,#000) .35em 0/.65em 100% no-repeat,radial-gradient(circle .5em at -.15em 0,transparent 97%,#000 100%) 0 .5em/.35em .5em no-repeat;
+          mask:linear-gradient(#000,#000) .35em 0/.65em 100% no-repeat,radial-gradient(circle .5em at -.15em 0,transparent 97%,#000 100%) 0 .5em/.35em .5em no-repeat}
 
 /* Typing pill — Cued is typing (received side) */
 .co-typing{align-self:flex-start;display:inline-flex;gap:.28em;align-items:center;padding:.62em .8em;border-radius:1.05em;background:var(--co-gray);margin-top:.85em;font-size:15px;transform-origin:0 100%;animation:coPop .2s var(--ease)}
