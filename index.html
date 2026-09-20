@@ -2257,7 +2257,9 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 // SMS. Payload keeps the original waitlist keys
 //   { name, phone, email|null, source, ts, timezone, active:false, status:'waitlist' }
 // and adds
-//   { age, gender, goal:[…], biggest_obstacle, experience, equipment, sms_consent:true }.
+//   { full_name, age, gender, goal:[…], biggest_obstacle, experience, equipment, sms_consent:true }
+// — `name` is the FIRST name (it's what the coach's hook and prompts inject);
+// the full name rides along in `full_name` for the admin side only.
 // Phone is validated as a 10-digit US number before it's accepted (the backend
 // is strict too). Never run this against the real backend in tests.
 (function(){
@@ -2524,7 +2526,8 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     clearInput();
     await coachSay('saving your spot…', 260);
     const payload = {
-      name: sdata.name,
+      name: first(),          // what the coach says — first name only, never the full name
+      full_name: sdata.name,  // for us (admin, email later); the backend keeps it aside
       phone: sdata.phone,
       email: null,
       source: overlay.dataset.source || 'unknown',
