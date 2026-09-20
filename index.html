@@ -2278,7 +2278,11 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   let step = 0;
 
   function setProgress(n){ step = n; if (progress) progress.style.setProperty('--p', Math.min(100, Math.round(n / STEPS * 100)) + '%'); }
-  function scrollBottom(){ requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight; }); }
+  function scrollBottom(){ msgs.scrollTop = msgs.scrollHeight; requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight; }); }
+  // The thread is a real scroller now (earlier bubbles are reachable), so it
+  // has to be re-pinned to the bottom whenever its box changes — the composer
+  // appearing/disappearing, a chip row landing, the keyboard opening.
+  if (window.ResizeObserver) new ResizeObserver(scrollBottom).observe(msgs);
 
   function addMsg(text, who, extraClass = ''){
     const m = document.createElement('div');
