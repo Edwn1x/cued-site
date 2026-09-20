@@ -2353,7 +2353,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       clearInput();
       const { row, inp, btn } = composer(placeholder, type);
       inp.setAttribute('inputmode', type === 'tel' ? 'tel' : type === 'number' ? 'numeric' : 'text');
-      inp.setAttribute('autocomplete', type === 'tel' ? 'tel' : type === 'text' ? 'given-name' : 'off');
+      inp.setAttribute('autocomplete', type === 'tel' ? 'tel' : type === 'text' ? 'name' : 'off');
       inp.setAttribute('enterkeyhint', 'send');
       if (type === 'tel'){
         // Formats as they type — (510) 555-1234 — so the number reads back like a contact card.
@@ -2550,7 +2550,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
         const already = data.status === 'exists';
         setProgress(STEPS);
         successScreen(
-          already ? (data.message || "you're already on the list.").toLowerCase() : `you're on the list, ${sdata.name}.`,
+          already ? (data.message || "you're already on the list.").toLowerCase() : `you're on the list, ${first()}.`,
           linkOk ? "one more thing — text me once so i can reach you on iMessage the second your spot opens. from the number you just gave me."
                  : (already ? 'nothing else to do here.' : "i'll text you the second your spot opens. keep an eye on your messages."),
           linkOk ? link : null);
@@ -2564,17 +2564,19 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     }
   }
 
-  // Nine quick steps, one bubble each, in the coach's texting voice. Chips
-  // answer with one tap; only name, age and phone are typed.
+  // Nine quick steps, one bubble each, in the coach's texting voice. Only
+  // name (full — the backend keeps it), age and phone are typed; the coach
+  // greets by first name.
+  const first = () => (sdata.name || '').trim().split(/\s+/)[0];
   async function runChat(){
     msgs.innerHTML = '';
     clearInput();
     sdata = {};
     setProgress(0);
 
-    await coachSay("hey, i'm cued. what's your first name?", 450);
-    sdata.name = await textInput('first name');                                   setProgress(1);
-    await coachSay(`nice to meet you, ${sdata.name}. how old are you?`);
+    await coachSay("hey, i'm cued. what's your full name?", 450);
+    sdata.name = await textInput('full name');                                    setProgress(1);
+    await coachSay(`nice to meet you, ${first()}. how old are you?`);
     sdata.age = await askAge();                                                   setProgress(2);
     await coachSay('and your gender?');
     [sdata.gender] = await chips([{label:'male',value:'male'},{label:'female',value:'female'},{label:'non-binary',value:'non_binary'},{label:'rather not say',value:'prefer_not_to_say'}]);  setProgress(3);
