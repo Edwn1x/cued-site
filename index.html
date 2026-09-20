@@ -846,10 +846,13 @@ html.dark .co-bg{--co-glass:rgba(28,28,30,.8);--co-glass-edge:rgba(255,255,255,.
 .co-send:hover{background:var(--co-blue-deep)}
 .co-send svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 
-/* Suggestion chips */
-.co-chips{display:flex;flex-wrap:wrap;gap:8px}
-.co-chip{padding:8px 14px;border-radius:999px;border:1px solid var(--co-line);background:var(--co-field);font-size:14px;font-weight:500;color:var(--co-ink);cursor:pointer;transition:background .15s,border-color .15s,color .15s,transform .1s}
-.co-chip:active{transform:scale(.96)}
+/* Answer chips — a two-column grid of equal-width pills (an odd last option
+   spans the row), so every question reads as one tidy block instead of a
+   ragged wrap. Labels may break to a second line on the narrowest phones. */
+.co-chips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.co-chip{min-height:42px;padding:9px 14px;border-radius:999px;border:1px solid var(--co-line);background:var(--co-field);font-size:14px;font-weight:500;line-height:1.2;color:var(--co-ink);text-align:center;cursor:pointer;transition:background .15s,border-color .15s,color .15s,transform .1s}
+.co-chip:last-child:nth-child(odd){grid-column:1/-1}
+.co-chip:active{transform:scale(.97)}
 .co-chip:hover{border-color:var(--co-blue);color:var(--co-blue)}
 .co-chip.sel{background:var(--co-blue-soft);border-color:var(--co-blue);color:var(--co-blue)}
 
@@ -895,7 +898,7 @@ html.dark .co-bg{--co-glass:rgba(28,28,30,.8);--co-glass-edge:rgba(255,255,255,.
   .co-input-area{padding:10px 14px calc(12px + env(safe-area-inset-bottom))}
   .co-input{font-size:16px}/* prevent iOS auto-zoom on focus */
   .co-msg{font-size:16px}
-  .co-chip{padding:7px 13px}
+  .co-chip{padding:8px 12px}
 }
 @media (prefers-reduced-motion:reduce){
   .co-bg,.co-sheet,.co-msg,.co-progress i{transition:none}
