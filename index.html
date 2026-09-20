@@ -26,6 +26,12 @@
   prefers-reduced-motion: the hero joins the flow too (headline, drawing
   band, bubbles), and every transition is off.
 
+  Every CTA opens the waitlist — not a form but the sign-up chat: a Messages
+  card (the reader's sends blue, Cued's replies gray) that collects the
+  profile the coach starts from, POSTs it to the backend's /waitlist, and
+  ends on "Text me on iMessage" so their line is open before an admin
+  activates them. See the WAITLIST blocks at the end of the sheet and script.
+
   Vanilla HTML/CSS/JS, no build step. Deploys via GitHub Pages from /main.
 -->
 <meta charset="UTF-8">
@@ -747,32 +753,170 @@ footer a{margin:0 10px;color:var(--ink-2)}
 footer a:hover{color:var(--ink)}
 footer .fmeta{margin-top:10px}
 
-/* ===== WAITLIST MODAL ===== */
-.wl-overlay{position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:100;display:none;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .25s ease}
-.wl-overlay.open{display:flex}
-.wl-overlay.show{opacity:1}
-.wl-modal{background:var(--card);border-radius:24px;padding:36px clamp(28px,4vw,40px);width:100%;max-width:440px;box-shadow:0 24px 80px rgba(10,22,40,.28);position:relative;transform:translateY(12px);transition:transform .3s var(--ease)}
-.wl-overlay.show .wl-modal{transform:translateY(0)}
-.wl-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:transparent;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--ink-3);font-size:18px;transition:color .15s,background .15s}
-.wl-close:hover{color:var(--ink);background:var(--fill)}
-.wl-h{font-family:var(--f-header);font-weight:400;font-size:clamp(1.5rem,2.2vw,1.9rem);letter-spacing:-.4px;line-height:1.1;color:var(--ink);margin-bottom:8px}
-.wl-sub{font-size:14.5px;color:var(--ink-2);line-height:1.55;margin-bottom:24px}
-.wl-form{display:flex;flex-direction:column;gap:12px}
-.wl-field{display:flex;flex-direction:column;gap:6px}
-.wl-field label{font-size:12px;font-weight:500;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-3)}
-.wl-field label .opt{text-transform:none;letter-spacing:.2px;font-weight:400;margin-left:4px}
-.wl-field input{font-family:var(--f-msg);font-size:15px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--field);color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s;width:100%}
-.wl-field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
-.wl-submit{margin-top:8px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 22px;background:var(--blue);color:#fff;font-size:15px;font-weight:500;border-radius:999px;border:none;cursor:pointer;transition:background .15s}
-.wl-submit:hover:not(:disabled){background:var(--blue-deep)}
-.wl-submit:disabled{opacity:.55;cursor:not-allowed}
-.wl-error{font-size:13px;color:var(--error);margin-top:4px;min-height:18px}
-.wl-success{text-align:center;display:none}
-.wl-success.show{display:block}
-.wl-success-icon{font-size:38px;margin-bottom:10px}
-.wl-success h3{font-family:var(--f-header);font-weight:400;font-size:clamp(1.5rem,2.2vw,1.9rem);color:var(--ink);margin-bottom:10px}
-.wl-success p{font-size:15px;color:var(--ink-2);line-height:1.55;max-width:320px;margin:0 auto}
-.wl-form.hidden{display:none}
+/* ===== WAITLIST — the sign-up chat =====
+   Every CTA opens this card (window.openWaitlist). Not a form: the same
+   conversational sign-up as legacy/js/signup.js, seen from the reader's
+   phone — their sends blue on the right, Cued's replies gray on the left,
+   tails on the last bubble of each run, a typing pill before every reply.
+   Every color is a --co-* token mapped from the page's, so html.dark flips
+   it to real Messages dark for free. The sheet is frosted glass (translucent
+   over a heavy backdrop blur, hairline edge) so the page bleeds through —
+   the old modal's feel, on the card itself. Bottom sheet under 768px, sized from
+   the visual viewport by JS so the keyboard never pushes the compose row
+   off-screen; a fixed-height card on desktop capped to the viewport. A
+   hairline under the header fills as the steps complete; "Delivered" sits
+   under the reader's latest bubble. Nothing here needs scrolling to see. */
+.co-bg{
+  --co-blue:var(--blue);--co-blue-deep:var(--blue-deep);--co-blue-soft:var(--blue-soft);--co-blue-ink:var(--blue-ink);
+  --co-gray:var(--gray);--co-gray-ink:var(--gray-ink);
+  --co-card:var(--card);--co-fill:var(--fill);--co-line:var(--line);
+  --co-glass:rgba(255,255,255,.82);--co-glass-edge:rgba(255,255,255,.55);   /* the frosted sheet + its rim */
+  --co-opt-line:rgba(0,0,0,.07);--co-opt-hover:rgba(0,0,0,.035);              /* rows inside the options bubble */
+  --co-field:rgba(255,255,255,.62);                                       /* inputs, chips, consent box sit on the glass */
+  --co-ink:var(--ink);--co-ink-2:var(--ink-2);--co-ink-3:var(--ink-3);--co-error:var(--error);
+  --co-shadow:0 24px 80px rgba(10,22,40,.28);
+  position:fixed;inset:0;z-index:1000;background:var(--overlay);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  opacity:0;pointer-events:none;transition:opacity .25s ease;
+  display:flex;align-items:center;justify-content:center;padding:24px;
+  font-family:var(--f-msg);font-size:15px;line-height:1.5;color:var(--co-ink);text-align:left;
+}
+html.dark .co-bg{--co-glass:rgba(28,28,30,.8);--co-opt-line:rgba(255,255,255,.09);--co-opt-hover:rgba(255,255,255,.05);--co-glass-edge:rgba(255,255,255,.09);--co-field:rgba(44,44,46,.66);--co-shadow:0 24px 80px rgba(0,0,0,.6)}
+.co-bg *{margin:0;padding:0;box-sizing:border-box}
+.co-bg button,.co-bg input{font:inherit;color:inherit}
+.co-bg.open{opacity:1;pointer-events:all}
+
+/* Card */
+.co-sheet{width:100%;max-width:420px;height:min(560px,100% - 48px);background:var(--co-glass);backdrop-filter:blur(28px) saturate(1.6);-webkit-backdrop-filter:blur(28px) saturate(1.6);border-radius:24px;box-shadow:var(--co-shadow),inset 0 0 0 1px var(--co-glass-edge);display:flex;flex-direction:column;overflow:hidden;transform:translateY(12px);transition:transform .3s var(--ease)}
+.co-bg.open .co-sheet{transform:translateY(0)}
+.co-handle{display:none}
+
+/* Header — Messages contact bar */
+.co-head{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 10px 20px;flex-shrink:0}
+.co-head-info{display:flex;align-items:center;gap:11px}
+.co-avatar{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:block}
+.co-avatar svg{display:block;width:100%;height:100%}
+.co-head-name{font-size:15px;font-weight:500;color:var(--co-ink);line-height:1.2}
+.co-head-sub{font-size:12px;color:var(--co-ink-3);margin-top:2px}
+.co-close{width:32px;height:32px;border-radius:50%;background:transparent;border:none;cursor:pointer;font-size:18px;color:var(--co-ink-3);display:inline-flex;align-items:center;justify-content:center;transition:color .15s,background .15s}
+.co-close:hover{color:var(--co-ink);background:var(--co-fill)}
+/* Progress hairline — fills a step at a time (9 steps), sits on the header's bottom edge */
+.co-progress{height:2px;background:var(--co-line);flex-shrink:0;overflow:hidden}
+.co-progress i{display:block;height:100%;width:var(--p,0%);background:var(--co-blue);transition:width .45s var(--ease)}
+/* "Delivered" under the reader's latest bubble — the Messages detail */
+.co-meta{align-self:flex-end;font-size:11px;font-weight:500;color:var(--co-ink-3);margin:.25em .35em 0 0}
+
+/* Thread */
+.co-msgs{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;scrollbar-width:none;overscroll-behavior:contain;
+  -webkit-mask-image:linear-gradient(to bottom,transparent,#000 18px);mask-image:linear-gradient(to bottom,transparent,#000 18px)}  /* earlier bubbles fade out under the header instead of clipping */
+.co-msgs::-webkit-scrollbar{display:none}
+.co-msgs > *{flex-shrink:0}
+.co-msg{position:relative;max-width:78%;padding:.52em .82em;border-radius:1.05em;font-size:15px;line-height:1.3;font-weight:400;margin-top:.25em;overflow-wrap:break-word;opacity:0;transform:translateY(6px) scale(.98);transition:opacity .2s var(--ease),transform .2s var(--ease)}
+.co-msg.turn{margin-top:.85em}
+/* Bottom-aligned via the first child's auto margin, NOT justify-content:flex-end —
+   a flex-end column makes everything overflowing at the top unscrollable. */
+.co-msgs > :first-child{margin-top:auto}
+.co-msg.show{opacity:1;transform:none}
+.co-msg.coach{align-self:flex-start;background:var(--co-gray);color:var(--co-gray-ink);transform-origin:0 100%}
+.co-msg.user{align-self:flex-end;background:var(--co-blue);color:var(--co-blue-ink);transform-origin:100% 100%}
+/* Tails — last bubble of a run only. One color extension per bubble, shaped by
+   a mask (the page's tails use a card-colored carve, which would sit as an
+   opaque notch on the frosted sheet). The mask keeps the part inside the
+   bubble plus the curved tip; the carve's quarter-circle is subtracted. */
+.co-msg.t::before{content:'';position:absolute;bottom:-.1em;height:1em;width:1em}
+.co-msg.user.t::before{right:-.35em;background:var(--co-blue);border-bottom-left-radius:.8em .7em;
+  -webkit-mask:linear-gradient(#000,#000) 0 0/.65em 100% no-repeat,radial-gradient(circle .5em at .5em 0,transparent 97%,#000 100%) .65em .5em/.35em .5em no-repeat;
+          mask:linear-gradient(#000,#000) 0 0/.65em 100% no-repeat,radial-gradient(circle .5em at .5em 0,transparent 97%,#000 100%) .65em .5em/.35em .5em no-repeat}
+.co-msg.coach.t::before{left:-.35em;background:var(--co-gray);border-bottom-right-radius:.8em .7em;
+  -webkit-mask:linear-gradient(#000,#000) .35em 0/.65em 100% no-repeat,radial-gradient(circle .5em at -.15em 0,transparent 97%,#000 100%) 0 .5em/.35em .5em no-repeat;
+          mask:linear-gradient(#000,#000) .35em 0/.65em 100% no-repeat,radial-gradient(circle .5em at -.15em 0,transparent 97%,#000 100%) 0 .5em/.35em .5em no-repeat}
+
+/* Typing pill — Cued is typing (received side) */
+.co-typing{align-self:flex-start;display:inline-flex;gap:.28em;align-items:center;padding:.62em .8em;border-radius:1.05em;background:var(--co-gray);margin-top:.85em;font-size:15px;transform-origin:0 100%;animation:coPop .2s var(--ease)}
+.co-typing .co-dot{width:.44em;height:.44em;border-radius:50%;background:var(--co-ink-3);animation:coTypeDot 1.1s ease-in-out infinite}
+.co-typing .co-dot:nth-child(2){animation-delay:.15s}
+.co-typing .co-dot:nth-child(3){animation-delay:.3s}
+@keyframes coTypeDot{0%,60%,100%{opacity:.35;transform:none}30%{opacity:1;transform:translateY(-.12em)}}
+@keyframes coPop{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
+
+/* Compose area — a constant composer (field + send) with, when a question
+   has fixed answers, a slim strip of suggestion chips above it, like the
+   suggestions over an iPhone keyboard. Tapping a chip drops it into the field
+   and sends it; multi-select accumulates in the field and the arrow sends. */
+.co-input-area{flex-shrink:0;padding:10px 14px 14px;border-top:1px solid var(--co-line);display:flex;flex-direction:column;gap:8px}
+.co-input-area:empty{display:none}
+.co-input-row{display:flex;gap:8px;align-items:center}
+.co-input{flex:1;min-width:0;padding:10px 16px;border:1px solid var(--co-line);border-radius:999px;font-size:15px;color:var(--co-ink);background:var(--co-field);outline:none;transition:border-color .15s,box-shadow .15s}
+.co-input:focus{border-color:var(--co-blue);box-shadow:0 0 0 3px var(--co-blue-soft)}
+.co-input::placeholder{color:var(--co-ink-3)}
+.co-input[readonly]{cursor:default;caret-color:transparent}
+.co-send{width:36px;height:36px;border-radius:50%;background:var(--co-blue);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;transition:background .15s,opacity .15s}
+.co-send:hover:not(:disabled){background:var(--co-blue-deep)}
+.co-send:disabled{opacity:.35;cursor:default}
+.co-send svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+
+/* Answer options — a list bubble IN the thread, sent by cued right after
+   the question: one gray received bubble, rows stacked with hairlines, a
+   ring at the right that fills blue with a check when picked (the tour
+   poll's ring, in the thread's own palette). Every option is visible, the
+   composer below stays its one slim row. Once answered the bubble locks:
+   picks stay checked, the rest dim. */
+.co-msg.co-opts{padding:0;max-width:86%;min-width:62%;overflow:hidden}
+.co-opt{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:.62em .85em .62em .95em;border:none;background:transparent;font:inherit;line-height:1.25;color:var(--co-gray-ink);text-align:left;cursor:pointer;transition:background .15s}
+.co-opt + .co-opt{border-top:1px solid var(--co-opt-line)}
+.co-opt:hover{background:var(--co-opt-hover)}
+.co-opt i{flex:none;width:1.25em;height:1.25em;border-radius:50%;border:1.5px solid var(--co-ink-3);display:inline-flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s}
+.co-opt i::after{content:'';width:.42em;height:.24em;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:translateY(-.06em) rotate(-45deg) scale(0);transition:transform .22s var(--ease)}
+.co-opt.sel i{background:var(--co-blue);border-color:var(--co-blue)}
+.co-opt.sel i::after{transform:translateY(-.06em) rotate(-45deg) scale(1)}
+.co-opts.done .co-opt{cursor:default;pointer-events:none}
+.co-opts.done .co-opt:not(.sel){opacity:.45}
+
+/* Primary pill button (Confirm / Put me on the list / Try again) */
+.co-confirm{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 22px;border-radius:999px;border:none;cursor:pointer;background:var(--co-blue);color:#fff;font-size:15px;font-weight:500;transition:background .15s}
+.co-confirm:hover{background:var(--co-blue-deep)}
+.co-confirm:disabled{opacity:.55;cursor:not-allowed}
+
+/* SMS consent — cued's fine-print bubble (terms + privacy inline); the
+   reader answers with the "i agree" chip, which sends as their bubble. */
+.co-msg.fine{font-size:12.5px;line-height:1.4;color:var(--co-ink-2);max-width:88%}
+.co-msg.fine a{color:var(--co-blue);text-decoration:none}
+.co-msg.fine a:hover{text-decoration:underline}
+
+/* Success */
+.co-success{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 20px;gap:10px}
+.co-success-icon{font-size:38px;margin-bottom:2px}
+.co-success h3{font-family:var(--f-header);font-weight:400;font-size:clamp(1.5rem,2.2vw,1.9rem);letter-spacing:-.4px;line-height:1.1;color:var(--co-ink)}
+.co-success p{font-size:15px;color:var(--co-ink-2);line-height:1.55;max-width:300px}
+/* iMessage-first choice (shown only when the backend returned a link) */
+.co-success .co-imsg{width:auto;min-width:240px;margin-top:8px;text-decoration:none}
+.co-success .co-alt{background:none;border:none;cursor:pointer;padding:8px 12px;font-size:14px;color:var(--co-ink-3);text-decoration:underline;text-underline-offset:3px}
+.co-success .co-alt:hover{color:var(--co-ink-2)}
+.co-success .co-alt:disabled{cursor:default;text-decoration:none}
+.co-success .co-imsg-note{font-size:13px;color:var(--co-ink-3);max-width:300px}
+
+/* Phones: a bottom sheet. The overlay's height/top are set from
+   window.visualViewport by the script while the sheet is open, so an open
+   keyboard shrinks the sheet instead of covering the compose row; the sheet
+   itself is a fixed share of that height (no growing, no jumping) and the
+   thread scrolls inside it. */
+@media (max-width:767.98px){
+  .co-bg{align-items:flex-end;padding:0;height:100dvh}
+  .co-sheet{max-width:none;height:calc(100% - 40px);max-height:none;border-radius:24px 24px 0 0;transform:translateY(100%)}
+  .co-bg.open .co-sheet{transform:translateY(0)}
+  .co-handle{display:block;width:36px;height:4px;border-radius:2px;background:var(--co-line);margin:8px auto 0;flex-shrink:0}
+  .co-head{padding-top:6px}
+  .co-msgs{padding:14px 16px;min-height:0}
+  .co-input-area{padding:10px 14px calc(12px + env(safe-area-inset-bottom))}
+  .co-input{font-size:16px}/* prevent iOS auto-zoom on focus */
+  .co-msg{font-size:16px}
+  .co-opt{padding:.66em .85em .66em .95em}
+}
+@media (prefers-reduced-motion:reduce){
+  .co-bg,.co-sheet,.co-msg,.co-progress i{transition:none}
+  .co-typing{animation:none}
+  .co-typing .co-dot{animation:none;opacity:.6}
+  .co-opt,.co-opt i,.co-opt i::after{transition:none}
+}
 
 /* ===== MOBILE SIZING (<768px, all modes) =====
    The tour pins on mobile too — same machinery as desktop. These are size
@@ -1405,36 +1549,23 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 
 </main>
 
-<!-- ===== WAITLIST MODAL ===== -->
-<div class="wl-overlay" id="waitlistOverlay" role="dialog" aria-modal="true" aria-labelledby="wlTitle" aria-hidden="true">
-  <div class="wl-modal" role="document">
-    <button type="button" class="wl-close" id="waitlistClose" aria-label="Close">✕</button>
-    <form class="wl-form" id="waitlistForm" novalidate>
-      <h2 id="wlTitle" class="wl-h">Join the waitlist.</h2>
-      <p class="wl-sub">We'll text you when we go live. No spam — just one message.</p>
-
-      <div class="wl-field">
-        <label for="wlName">Name</label>
-        <input id="wlName" name="name" type="text" autocomplete="given-name" required>
+<!-- ===== WAITLIST — the sign-up chat (script at the bottom of the page) ===== -->
+<div class="co-bg" id="waitlistOverlay" role="dialog" aria-modal="true" aria-label="Join the waitlist" aria-hidden="true">
+  <div class="co-sheet" role="document">
+    <div class="co-handle"></div>
+    <div class="co-head">
+      <div class="co-head-info">
+        <div class="co-avatar" aria-hidden="true"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="var(--blue)"/><circle cx="63" cy="61" r="8.6" fill="#FFFFFF"/></svg></div>
+        <div>
+          <div class="co-head-name">cued</div>
+          <div class="co-head-sub">Text Message</div>
+        </div>
       </div>
-      <div class="wl-field">
-        <label for="wlPhone">Phone</label>
-        <input id="wlPhone" name="phone" type="tel" autocomplete="tel" placeholder="(510) 555-1234" required>
-      </div>
-      <div class="wl-field">
-        <label for="wlEmail">Email <span class="opt">(optional)</span></label>
-        <input id="wlEmail" name="email" type="email" autocomplete="email">
-      </div>
-
-      <div class="wl-error" id="wlError" aria-live="polite"></div>
-      <button type="submit" class="wl-submit" id="wlSubmit">Join the waitlist</button>
-    </form>
-
-    <div class="wl-success" id="waitlistSuccess">
-      <div class="wl-success-icon">🎉</div>
-      <h3>You're on the list.</h3>
-      <p>We'll text you the moment we go live. Welcome to cued.</p>
+      <button type="button" class="co-close" id="waitlistClose" aria-label="Close">✕</button>
     </div>
+    <div class="co-progress" aria-hidden="true"><i id="coProgress"></i></div>
+    <div class="co-msgs" id="coMsgs" aria-live="polite"></div>
+    <div class="co-input-area" id="coInputArea"></div>
   </div>
 </div>
 
@@ -2114,57 +2245,399 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   secs.forEach(s => io.observe(s));
 })();
 
-// === Waitlist modal ===
-// Posts to the Railway /waitlist endpoint with
-// { name, phone, email|null, source, ts, timezone, active:false, status:'waitlist' }.
-// Contract unchanged from the previous site — do not modify the payload.
+// === Waitlist — the sign-up chat ===
+// Every CTA calls open(source) → window.openWaitlist. The same conversational
+// sign-up the legacy pages run (legacy/js/signup.js), posting to /waitlist
+// instead of /signup: the backend stores the profile on a PENDING row, sends
+// no text, provisions their iMessage line and returns `imessage_link`. The
+// success screen asks for the one tap that opens that line ("Text me on
+// iMessage" → Messages pre-addressed with "hey cued"; the backend answers a
+// pending user with one holding line and nothing else until an admin
+// activates them), or "I don't have an iPhone" → /signup/channel puts them on
+// SMS. Payload keeps the original waitlist keys
+//   { name, phone, email|null, source, ts, timezone, active:false, status:'waitlist' }
+// and adds
+//   { full_name, age, gender, goal:[…], biggest_obstacle, experience, equipment, sms_consent:true }
+// — `name` is the FIRST name (it's what the coach's hook and prompts inject);
+// the full name rides along in `full_name` for the admin side only.
+// Phone is validated as a 10-digit US number before it's accepted (the backend
+// is strict too). Never run this against the real backend in tests.
 (function(){
-  const WAITLIST_ENDPOINT = 'https://web-production-90171c.up.railway.app/waitlist';
+  const API = 'https://web-production-90171c.up.railway.app';
+  const WAITLIST_ENDPOINT = API + '/waitlist';
+  const CHANNEL_ENDPOINT  = API + '/signup/channel';
 
-  const overlay  = document.getElementById('waitlistOverlay');
-  const closeBtn = document.getElementById('waitlistClose');
-  const form     = document.getElementById('waitlistForm');
-  const success  = document.getElementById('waitlistSuccess');
-  const submit   = document.getElementById('wlSubmit');
-  const errorEl  = document.getElementById('wlError');
-  const nameEl   = document.getElementById('wlName');
-  const phoneEl  = document.getElementById('wlPhone');
-  const emailEl  = document.getElementById('wlEmail');
-  if (!overlay || !form) return;
+  const overlay   = document.getElementById('waitlistOverlay');
+  const closeBtn  = document.getElementById('waitlistClose');
+  const msgs      = document.getElementById('coMsgs');
+  const inputArea = document.getElementById('coInputArea');
+  const progress  = document.getElementById('coProgress');
+  if (!overlay || !msgs || !inputArea) return;
 
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const STEPS = 9;   // name, age, gender, goals, obstacle, experience, equipment, phone, consent
+  let sdata = {};
+  let step = 0;
+
+  function setProgress(n){ step = n; if (progress) progress.style.setProperty('--p', Math.min(100, Math.round(n / STEPS * 100)) + '%'); }
+  function scrollBottom(){ msgs.scrollTop = msgs.scrollHeight; requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight; }); }
+  // The thread is a real scroller now (earlier bubbles are reachable), so it
+  // has to be re-pinned to the bottom whenever its box changes — the composer
+  // appearing/disappearing, a chip row landing, the keyboard opening.
+  if (window.ResizeObserver) new ResizeObserver(scrollBottom).observe(msgs);
+
+  function addMsg(text, who, extraClass = ''){
+    const m = document.createElement('div');
+    m.className = 'co-msg ' + who + ' t' + (extraClass ? ' ' + extraClass : '');
+    if (text instanceof Node) m.appendChild(text);
+    else if (who === 'user') m.textContent = text; else m.innerHTML = text;
+    // Tail only on the last bubble of a run; a gap when the sender changes.
+    const all = msgs.querySelectorAll('.co-msg');
+    const prev = all[all.length - 1];
+    if (prev){
+      if (prev.classList.contains(who)) prev.classList.remove('t');
+      else m.classList.add('turn');
+    }
+    msgs.appendChild(m);
+    if (who === 'user'){
+      // "Delivered" under the reader's latest bubble, like Messages (it stays
+      // through the reply; it moves when they send again).
+      const oldMeta = msgs.querySelector('.co-meta');
+      if (oldMeta) oldMeta.remove();
+      const meta = document.createElement('div');
+      meta.className = 'co-meta';
+      meta.textContent = 'Delivered';
+      msgs.appendChild(meta);
+    }
+    requestAnimationFrame(() => { m.classList.add('show'); scrollBottom(); });
+    return m;
+  }
+
+  function showTyping(){
+    const t = document.createElement('div');
+    t.className = 'co-typing';
+    t.innerHTML = '<div class="co-dot"></div><div class="co-dot"></div><div class="co-dot"></div>';
+    msgs.appendChild(t);
+    scrollBottom();
+    return t;
+  }
+
+  function coachSay(text, typingMs = 320, extraClass = ''){
+    return new Promise(resolve => {
+      const ms = reduced.matches ? 0 : typingMs;
+      const t = showTyping();
+      setTimeout(() => { t.remove(); addMsg(text, 'coach', extraClass); resolve(); }, ms);
+    });
+  }
+
+  function clearInput(){ inputArea.innerHTML = ''; }
+
+  function composer(placeholder, type = 'text', readonly = false){
+    const row = document.createElement('div');
+    row.className = 'co-input-row';
+    const inp = document.createElement('input');
+    inp.className = 'co-input';
+    inp.placeholder = placeholder;
+    inp.type = type;
+    if (readonly){ inp.readOnly = true; inp.setAttribute('inputmode', 'none'); inp.setAttribute('aria-label', placeholder); }
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'co-send';
+    btn.setAttribute('aria-label', 'Send');
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>';
+    row.appendChild(inp);
+    row.appendChild(btn);
+    return { row, inp, btn };
+  }
+
+  function textInput(placeholder, type = 'text'){
+    return new Promise(resolve => {
+      clearInput();
+      const { row, inp, btn } = composer(placeholder, type);
+      inp.setAttribute('inputmode', type === 'tel' ? 'tel' : type === 'number' ? 'numeric' : 'text');
+      inp.setAttribute('autocomplete', type === 'tel' ? 'tel' : type === 'text' ? 'name' : 'off');
+      inp.setAttribute('enterkeyhint', 'send');
+      if (type === 'tel'){
+        // Formats as they type — (510) 555-1234 — so the number reads back like a contact card.
+        inp.addEventListener('input', () => {
+          let d = inp.value.replace(/\D/g, '');
+          if (d.length === 11 && d[0] === '1') d = d.slice(1);
+          d = d.slice(0, 10);
+          inp.value = d.length > 6 ? `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`
+                    : d.length > 3 ? `(${d.slice(0,3)}) ${d.slice(3)}`
+                    : d;
+        });
+      }
+      function submit(){
+        const val = inp.value.trim();
+        if (!val) return;
+        addMsg(val, 'user');
+        clearInput();
+        resolve(val);
+      }
+      btn.addEventListener('click', submit);
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+      inputArea.appendChild(row);
+      scrollBottom();
+      inp.focus();
+    });
+  }
+
+  // Fixed answers: cued sends a list bubble right after the question; the
+  // composer below is read-only and mirrors the pick. Single-select rows send
+  // themselves; multi-select rows toggle, the field shows the running answer,
+  // the arrow sends. The bubble then locks in place with the picks checked.
+  function chips(options, multi = false, placeholder){
+    return new Promise(resolve => {
+      clearInput();
+      const list = document.createElement('div');
+      list.setAttribute('role', multi ? 'group' : 'radiogroup');
+      const bubble = addMsg(list, 'coach', 'co-opts');
+      const { row, inp, btn } = composer(placeholder || (multi ? 'tap all that apply' : 'tap one'), 'text', true);
+      btn.disabled = true;
+      const selected = new Set();
+      const labelsOf = () => options.filter(o => selected.has(o.value)).map(o => o.label).join(', ');
+      function send(){
+        if (!selected.size) return;
+        bubble.classList.add('done');
+        addMsg(labelsOf(), 'user');
+        clearInput();
+        resolve([...selected]);
+      }
+      options.forEach(opt => {
+        const r = document.createElement('button');
+        r.type = 'button';
+        r.className = 'co-opt';
+        r.setAttribute('role', multi ? 'checkbox' : 'radio');
+        r.setAttribute('aria-checked', 'false');
+        r.innerHTML = '<span></span><i aria-hidden="true"></i>';
+        r.firstChild.textContent = opt.label;
+        r.addEventListener('click', () => {
+          if (bubble.classList.contains('done')) return;
+          if (!multi){
+            list.querySelectorAll('.co-opt').forEach(x => { x.classList.remove('sel'); x.setAttribute('aria-checked', 'false'); });
+            selected.clear(); selected.add(opt.value);
+            r.classList.add('sel'); r.setAttribute('aria-checked', 'true');
+            inp.value = opt.label;
+            btn.disabled = false;
+            setTimeout(send, reduced.matches ? 0 : 220);   // the check lands, then it sends
+          } else {
+            const on = r.classList.toggle('sel');
+            r.setAttribute('aria-checked', String(on));
+            on ? selected.add(opt.value) : selected.delete(opt.value);
+            inp.value = labelsOf();
+            btn.disabled = !selected.size;
+          }
+        });
+        list.appendChild(r);
+      });
+      btn.addEventListener('click', send);
+      inputArea.appendChild(row);
+      scrollBottom();
+    });
+  }
+
+  // Consent: the fine print is cued's bubble (terms + privacy inline); the
+  // reader's "i agree" is their bubble, sent from the one chip on offer.
+  async function consentStep(){
+    await coachSay('by joining you agree to get recurring automated texts from cued — workouts, meals, check-ins — once your spot opens. 5–8 msgs/day, msg &amp; data rates may apply, reply STOP to cancel or HELP for help. <a href="terms.html" target="_blank" rel="noopener">terms</a> · <a href="privacy.html" target="_blank" rel="noopener">privacy</a>', 320, 'fine');
+    await chips([{label: 'i agree', value: true}], false, 'tap to agree');
+    return true;
+  }
+
+  function validPhone(v){
+    const d = v.replace(/\D/g, '');
+    return d.length === 10 || (d.length === 11 && d[0] === '1');
+  }
+
+  async function askPhone(){
+    let v = await textInput('(510) 555-1234', 'tel');
+    while (!validPhone(v)){
+      await coachSay("hmm, that's not a 10-digit US number — try again?", 320);
+      v = await textInput('(510) 555-1234', 'tel');
+    }
+    return v;
+  }
+
+  async function askAge(){
+    let v = await textInput('Your age', 'number');
+    while (!/^\d{1,3}$/.test(v)){
+      await coachSay('just the number is fine — how old are you?', 320);
+      v = await textInput('Your age', 'number');
+    }
+    return Number(v);
+  }
+
+  function successScreen(title, body, link){
+    msgs.innerHTML = '';
+    clearInput();
+    const s = document.createElement('div');
+    s.className = 'co-success';
+    s.innerHTML = '<div class="co-success-icon">🎉</div><h3></h3><p></p>';
+    s.querySelector('h3').textContent = title;
+    s.querySelector('p').textContent = body;
+    if (link){
+      // iMessage-first (Photon shared pool): Cued can't text a new number in
+      // blue until that number texts Cued's line once. The link opens Messages
+      // pre-addressed with "hey cued" typed in; their send opens the line (the
+      // backend holds them with one reply while they're pending). Secondary:
+      // "I don't have an iPhone" → /signup/channel → SMS when their spot opens.
+      const a = document.createElement('a');
+      a.className = 'co-confirm co-imsg';
+      a.href = link;
+      a.textContent = 'text me on iMessage';
+      const alt = document.createElement('button');
+      alt.type = 'button';
+      alt.className = 'co-alt';
+      alt.textContent = "i don't have an iPhone";
+      alt.addEventListener('click', async () => {
+        alt.disabled = true;
+        alt.textContent = 'one sec…';
+        try {
+          const r = await fetch(CHANNEL_ENDPOINT, { method: 'POST', headers: {'Content-Type': 'application/json'},
+                                                  body: JSON.stringify({ phone: sdata.phone, channel: 'sms' }) });
+          const d = await r.json().catch(() => ({}));
+          if (r.ok && d.status === 'ok'){
+            a.remove(); alt.remove();
+            const note = document.createElement('p');
+            note.className = 'co-imsg-note';
+            note.textContent = "got it — i'll text you by SMS the second your spot opens.";
+            s.appendChild(note);
+          } else { alt.disabled = false; alt.textContent = "i don't have an iPhone"; }
+        } catch { alt.disabled = false; alt.textContent = "i don't have an iPhone"; }
+      });
+      s.appendChild(a);
+      s.appendChild(alt);
+    }
+    msgs.appendChild(s);
+  }
+
+  function showRetry(){
+    clearInput();
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'co-confirm';
+    btn.textContent = 'try again';
+    btn.addEventListener('click', submitProfile);
+    inputArea.appendChild(btn);
+  }
+
+  async function submitProfile(){
+    clearInput();
+    await coachSay('saving your spot…', 260);
+    const payload = {
+      name: first(),          // what the coach says — first name only, never the full name
+      full_name: sdata.name,  // for us (admin, email later); the backend keeps it aside
+      phone: sdata.phone,
+      email: null,
+      source: overlay.dataset.source || 'unknown',
+      ts: new Date().toISOString(),
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      active: false,
+      status: 'waitlist',
+      age: sdata.age,
+      gender: sdata.gender,
+      goal: sdata.goal,
+      biggest_obstacle: sdata.biggest_obstacle,
+      experience: sdata.experience,
+      equipment: sdata.equipment,
+      sms_consent: true,
+    };
+    try {
+      const res = await fetch(WAITLIST_ENDPOINT, { method: 'POST', headers: {'Content-Type': 'application/json'},
+                                                 body: JSON.stringify(payload) });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && (data.status === 'ok' || data.status === 'exists')){
+        const link = data.imessage_link;
+        const linkOk = typeof link === 'string' && /^https:\/\//.test(link);
+        const already = data.status === 'exists';
+        setProgress(STEPS);
+        successScreen(
+          already ? (data.message || "you're already on the list.").toLowerCase() : `you're on the list, ${first()}.`,
+          linkOk ? "one more thing — text me once so i can reach you on iMessage the second your spot opens. from the number you just gave me."
+                 : (already ? 'nothing else to do here.' : "i'll text you the second your spot opens. keep an eye on your messages."),
+          linkOk ? link : null);
+      } else {
+        await coachSay((data && data.message) || 'something went wrong — try again?', 320);
+        showRetry();
+      }
+    } catch (err) {
+      await coachSay('connection error — check your internet and try again.', 320);
+      showRetry();
+    }
+  }
+
+  // Nine quick steps, one bubble each, in the coach's texting voice. Only
+  // name (full — the backend keeps it), age and phone are typed; the coach
+  // greets by first name.
+  const first = () => (sdata.name || '').trim().split(/\s+/)[0];
+  async function runChat(){
+    msgs.innerHTML = '';
+    clearInput();
+    sdata = {};
+    setProgress(0);
+
+    await coachSay("hey, i'm cued. what's your full name?", 450);
+    sdata.name = await textInput('full name');                                    setProgress(1);
+    await coachSay(`nice to meet you, ${first()}. how old are you?`);
+    sdata.age = await askAge();                                                   setProgress(2);
+    await coachSay('and your gender?');
+    [sdata.gender] = await chips([{label:'male',value:'male'},{label:'female',value:'female'},{label:'non-binary',value:'non_binary'},{label:'rather not say',value:'prefer_not_to_say'}]);  setProgress(3);
+    await coachSay('what are you training for? pick all that apply');
+    sdata.goal = await chips([{label:'lose fat',value:'fat_loss'},{label:'build muscle',value:'muscle_building'},{label:'get stronger',value:'strength'},{label:'general fitness',value:'general_fitness'},{label:'endurance',value:'endurance'}], true);  setProgress(4);
+    await coachSay('what gets in the way most?');
+    [sdata.biggest_obstacle] = await chips([{label:'consistency',value:'consistency'},{label:'nutrition',value:'nutrition'},{label:'knowing what to do',value:'knowledge'},{label:'time',value:'time'},{label:'motivation',value:'motivation'},{label:'injuries',value:'injuries'}]);  setProgress(5);
+    await coachSay('how long have you been training?');
+    [sdata.experience] = await chips([{label:'just starting',value:'none'},{label:'under 6 months',value:'beginner'},{label:'6 months – 2 years',value:'intermediate'},{label:'2+ years',value:'advanced'}]);  setProgress(6);
+    await coachSay('what do you have access to?');
+    [sdata.equipment] = await chips([{label:'full gym',value:'full_gym'},{label:'limited gym',value:'limited_gym'},{label:'home gym',value:'home_gym'},{label:'bodyweight only',value:'bodyweight'}]);  setProgress(7);
+    await coachSay("last one — your number? that's where i'll text you when your spot opens");
+    sdata.phone = await askPhone();                                               setProgress(8);
+    await coachSay('last thing — the fine print:');
+    await consentStep();                                                          setProgress(9);
+    await submitProfile();
+  }
+
+  // ── open / close ──
+  // While open, the overlay is sized to the VISUAL viewport (window.visualViewport):
+  // on phones an open keyboard shrinks it, so the sheet shrinks with it and the
+  // compose row stays on screen instead of sliding under the keys.
+  const vv = window.visualViewport;
+  function fitViewport(){
+    if (!vv || !overlay.classList.contains('open')) return;
+    overlay.style.height = Math.round(vv.height) + 'px';
+    overlay.style.top = Math.round(vv.offsetTop) + 'px';
+    scrollBottom();
+  }
   let lastFocus = null;
-
   function open(source){
     lastFocus = document.activeElement;
+    overlay.dataset.source = source || 'unknown';
     overlay.classList.add('open');
     overlay.setAttribute('aria-hidden', 'false');
-    form.classList.remove('hidden');
-    success.classList.remove('show');
-    errorEl.textContent = '';
-    submit.disabled = false;
-    submit.textContent = 'Join the waitlist →';
-    overlay.dataset.source = source || 'unknown';
-    requestAnimationFrame(() => overlay.classList.add('show'));
-    setTimeout(() => nameEl && nameEl.focus(), 280);
+    document.body.style.overflow = 'hidden';
+    if (vv){ vv.addEventListener('resize', fitViewport); vv.addEventListener('scroll', fitViewport); fitViewport(); }
+    if (!msgs.children.length) runChat();   // re-opening resumes where they left off
+    else { const inp = inputArea.querySelector('.co-input'); inp && inp.focus(); }
   }
   window.openWaitlist = open;
 
   function close(){
-    overlay.classList.remove('show');
+    overlay.classList.remove('open');
     overlay.setAttribute('aria-hidden', 'true');
-    setTimeout(() => {
-      overlay.classList.remove('open');
-      if (lastFocus && lastFocus.focus) lastFocus.focus();
-    }, 250);
+    document.body.style.overflow = '';
+    if (vv){ vv.removeEventListener('resize', fitViewport); vv.removeEventListener('scroll', fitViewport); }
+    overlay.style.height = ''; overlay.style.top = '';
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
 
   const navCta = document.getElementById('navCta');
   const closeCta = document.getElementById('closeCta');
   const floatCta = document.getElementById('floatCta');
   const heroCta = document.getElementById('heroCta');
+  const heroCtaTop = document.getElementById('heroCtaTop');
   navCta && navCta.addEventListener('click', () => open('nav'));
   heroCta && heroCta.addEventListener('click', () => open('hero'));
-  const heroCtaTop = document.getElementById('heroCtaTop');
   heroCtaTop && heroCtaTop.addEventListener('click', () => open('hero'));
   closeCta && closeCta.addEventListener('click', () => open('close'));
   floatCta && floatCta.addEventListener('click', () => open('floating'));
@@ -2173,54 +2646,6 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && overlay.classList.contains('open')) close();
-  });
-
-  function validPhone(v){ return v.replace(/\D/g,'').length >= 10; }
-  function validEmail(v){ return !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()); }
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    errorEl.textContent = '';
-    const name  = nameEl.value.trim();
-    const phone = phoneEl.value.trim();
-    const email = emailEl.value.trim();
-    if (!name)  { errorEl.textContent = 'Please add your name.'; nameEl.focus();  return; }
-    if (!validPhone(phone)){ errorEl.textContent = "That phone number doesn't look right."; phoneEl.focus(); return; }
-    if (!validEmail(email)){ errorEl.textContent = "That email doesn't look right."; emailEl.focus(); return; }
-
-    submit.disabled = true;
-    submit.textContent = 'Joining…';
-
-    const payload = {
-      name, phone,
-      email: email || null,
-      source: overlay.dataset.source || 'unknown',
-      ts: new Date().toISOString(),
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      active: false,
-      status: 'waitlist',
-    };
-
-    try {
-      const res = await fetch(WAITLIST_ENDPOINT, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && (data.status === 'ok' || data.status === 'exists' || res.status === 200 || res.status === 201)){
-        form.classList.add('hidden');
-        success.classList.add('show');
-      } else {
-        errorEl.textContent = (data && data.message) || 'Something went wrong. Try again?';
-        submit.disabled = false;
-        submit.textContent = 'Join the waitlist →';
-      }
-    } catch (err) {
-      errorEl.textContent = 'Connection error. Check your internet and try again.';
-      submit.disabled = false;
-      submit.textContent = 'Join the waitlist →';
-    }
   });
 })();
 </script>
