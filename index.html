@@ -835,41 +835,45 @@ html.dark .co-bg{--co-glass:rgba(28,28,30,.8);--co-glass-edge:rgba(255,255,255,.
 @keyframes coTypeDot{0%,60%,100%{opacity:.35;transform:none}30%{opacity:1;transform:translateY(-.12em)}}
 @keyframes coPop{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
 
-/* Compose area */
-.co-input-area{flex-shrink:0;padding:12px 16px 16px;border-top:1px solid var(--co-line);display:flex;flex-direction:column;gap:10px}
+/* Compose area — a constant composer (field + send) with, when a question
+   has fixed answers, a slim strip of suggestion chips above it, like the
+   suggestions over an iPhone keyboard. Tapping a chip drops it into the field
+   and sends it; multi-select accumulates in the field and the arrow sends. */
+.co-input-area{flex-shrink:0;padding:10px 14px 14px;border-top:1px solid var(--co-line);display:flex;flex-direction:column;gap:8px}
 .co-input-area:empty{display:none}
 .co-input-row{display:flex;gap:8px;align-items:center}
 .co-input{flex:1;min-width:0;padding:10px 16px;border:1px solid var(--co-line);border-radius:999px;font-size:15px;color:var(--co-ink);background:var(--co-field);outline:none;transition:border-color .15s,box-shadow .15s}
 .co-input:focus{border-color:var(--co-blue);box-shadow:0 0 0 3px var(--co-blue-soft)}
 .co-input::placeholder{color:var(--co-ink-3)}
-.co-send{width:36px;height:36px;border-radius:50%;background:var(--co-blue);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;transition:background .15s}
-.co-send:hover{background:var(--co-blue-deep)}
+.co-input[readonly]{cursor:default;caret-color:transparent}
+.co-send{width:36px;height:36px;border-radius:50%;background:var(--co-blue);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;transition:background .15s,opacity .15s}
+.co-send:hover:not(:disabled){background:var(--co-blue-deep)}
+.co-send:disabled{opacity:.35;cursor:default}
 .co-send svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 
-/* Answer chips — a two-column grid of equal-width pills (an odd last option
-   spans the row), so every question reads as one tidy block instead of a
-   ragged wrap. Labels may break to a second line on the narrowest phones. */
-.co-chips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.co-chip{min-height:42px;padding:9px 14px;border-radius:999px;border:1px solid var(--co-line);background:var(--co-field);font-size:14px;font-weight:500;line-height:1.2;color:var(--co-ink);text-align:center;cursor:pointer;transition:background .15s,border-color .15s,color .15s,transform .1s}
-.co-chip:last-child:nth-child(odd){grid-column:1/-1}
-.co-chip:active{transform:scale(.97)}
+/* Suggestion chips — ONE row, like the suggestions over an iPhone keyboard:
+   it scrolls sideways when a question has more answers than fit (a fade at
+   the edge says so; the script maps the mouse wheel to it on desktop), so
+   the composer is the same slim height on every question. Selected = filled
+   blue: what's about to be sent. */
+.co-chips{display:flex;flex-wrap:nowrap;gap:6px;padding:2px 2px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.co-chips::-webkit-scrollbar{display:none}
+.co-chips.more{-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 36px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 36px),transparent)}
+.co-chip{flex:0 0 auto;white-space:nowrap;padding:6px 12px;border-radius:999px;border:1px solid var(--co-line);background:var(--co-field);font-size:13.5px;font-weight:500;line-height:1.25;color:var(--co-ink);cursor:pointer;transition:background .15s,border-color .15s,color .15s,transform .1s}
+.co-chip:active{transform:scale(.96)}
 .co-chip:hover{border-color:var(--co-blue);color:var(--co-blue)}
-.co-chip.sel{background:var(--co-blue-soft);border-color:var(--co-blue);color:var(--co-blue)}
+.co-chip.sel{background:var(--co-blue);border-color:var(--co-blue);color:#fff}
 
 /* Primary pill button (Confirm / Put me on the list / Try again) */
 .co-confirm{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 22px;border-radius:999px;border:none;cursor:pointer;background:var(--co-blue);color:#fff;font-size:15px;font-weight:500;transition:background .15s}
 .co-confirm:hover{background:var(--co-blue-deep)}
 .co-confirm:disabled{opacity:.55;cursor:not-allowed}
 
-/* SMS consent */
-.co-consent-wrap{border:1px solid var(--co-line);border-radius:14px;padding:10px 12px;background:var(--co-field)}
-.co-consent-label{display:flex;align-items:flex-start;gap:10px;cursor:pointer}
-.co-consent-box{flex-shrink:0;margin-top:2px;width:18px;height:18px;border-radius:5px;border:1.5px solid var(--co-ink-3);background:transparent;display:flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s}
-.co-consent-box.checked{background:var(--co-blue);border-color:var(--co-blue)}
-.co-consent-box.shake{border-color:var(--co-error)}
-.co-consent-text{font-size:11.5px;color:var(--co-ink-2);line-height:1.45}
-.co-consent-text a{color:var(--co-blue);text-decoration:none}
-.co-consent-text a:hover{text-decoration:underline}
+/* SMS consent — cued's fine-print bubble (terms + privacy inline); the
+   reader answers with the "i agree" chip, which sends as their bubble. */
+.co-msg.fine{font-size:12.5px;line-height:1.4;color:var(--co-ink-2);max-width:88%}
+.co-msg.fine a{color:var(--co-blue);text-decoration:none}
+.co-msg.fine a:hover{text-decoration:underline}
 
 /* Success */
 .co-success{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 20px;gap:10px}
@@ -898,7 +902,7 @@ html.dark .co-bg{--co-glass:rgba(28,28,30,.8);--co-glass-edge:rgba(255,255,255,.
   .co-input-area{padding:10px 14px calc(12px + env(safe-area-inset-bottom))}
   .co-input{font-size:16px}/* prevent iOS auto-zoom on focus */
   .co-msg{font-size:16px}
-  .co-chip{padding:8px 12px}
+  .co-chip{font-size:14px;padding:7px 12px}
 }
 @media (prefers-reduced-motion:reduce){
   .co-bg,.co-sheet,.co-msg,.co-progress i{transition:none}
@@ -2263,15 +2267,14 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const STEPS = 9;   // name, age, gender, goals, obstacle, experience, equipment, phone, consent
   let sdata = {};
-  let consentChecked = false;
   let step = 0;
 
   function setProgress(n){ step = n; if (progress) progress.style.setProperty('--p', Math.min(100, Math.round(n / STEPS * 100)) + '%'); }
   function scrollBottom(){ requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight; }); }
 
-  function addMsg(text, who){
+  function addMsg(text, who, extraClass = ''){
     const m = document.createElement('div');
-    m.className = 'co-msg ' + who + ' t';
+    m.className = 'co-msg ' + who + ' t' + (extraClass ? ' ' + extraClass : '');
     if (who === 'user') m.textContent = text; else m.innerHTML = text;
     // Tail only on the last bubble of a run; a gap when the sender changes.
     const all = msgs.querySelectorAll('.co-msg');
@@ -2303,25 +2306,38 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     return t;
   }
 
-  function coachSay(text, typingMs = 320){
+  function coachSay(text, typingMs = 320, extraClass = ''){
     return new Promise(resolve => {
       const ms = reduced.matches ? 0 : typingMs;
       const t = showTyping();
-      setTimeout(() => { t.remove(); addMsg(text, 'coach'); resolve(); }, ms);
+      setTimeout(() => { t.remove(); addMsg(text, 'coach', extraClass); resolve(); }, ms);
     });
   }
 
   function clearInput(){ inputArea.innerHTML = ''; }
 
+  function composer(placeholder, type = 'text', readonly = false){
+    const row = document.createElement('div');
+    row.className = 'co-input-row';
+    const inp = document.createElement('input');
+    inp.className = 'co-input';
+    inp.placeholder = placeholder;
+    inp.type = type;
+    if (readonly){ inp.readOnly = true; inp.setAttribute('inputmode', 'none'); inp.setAttribute('aria-label', placeholder); }
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'co-send';
+    btn.setAttribute('aria-label', 'Send');
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>';
+    row.appendChild(inp);
+    row.appendChild(btn);
+    return { row, inp, btn };
+  }
+
   function textInput(placeholder, type = 'text'){
     return new Promise(resolve => {
       clearInput();
-      const row = document.createElement('div');
-      row.className = 'co-input-row';
-      const inp = document.createElement('input');
-      inp.className = 'co-input';
-      inp.placeholder = placeholder;
-      inp.type = type;
+      const { row, inp, btn } = composer(placeholder, type);
       inp.setAttribute('inputmode', type === 'tel' ? 'tel' : type === 'number' ? 'numeric' : 'text');
       inp.setAttribute('autocomplete', type === 'tel' ? 'tel' : type === 'text' ? 'given-name' : 'off');
       inp.setAttribute('enterkeyhint', 'send');
@@ -2336,11 +2352,6 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
                     : d;
         });
       }
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'co-send';
-      btn.setAttribute('aria-label', 'Send');
-      btn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>';
       function submit(){
         const val = inp.value.trim();
         if (!val) return;
@@ -2350,20 +2361,30 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       }
       btn.addEventListener('click', submit);
       inp.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
-      row.appendChild(inp);
-      row.appendChild(btn);
       inputArea.appendChild(row);
       scrollBottom();
       inp.focus();
     });
   }
 
-  function chips(options, multi = false){
+  // Fixed answers: a suggestion strip over a read-only composer. Single-select
+  // taps land in the field and send themselves; multi-select toggles chips,
+  // the field shows the running answer, the arrow sends it.
+  function chips(options, multi = false, placeholder){
     return new Promise(resolve => {
       clearInput();
-      const wrap = document.createElement('div');
-      wrap.className = 'co-chips';
+      const strip = document.createElement('div');
+      strip.className = 'co-chips';
+      const { row, inp, btn } = composer(placeholder || (multi ? 'tap all that apply' : 'tap one'), 'text', true);
+      btn.disabled = true;
       const selected = new Set();
+      const labelsOf = () => options.filter(o => selected.has(o.value)).map(o => o.label).join(', ');
+      function send(){
+        if (!selected.size) return;
+        addMsg(labelsOf(), 'user');
+        clearInput();
+        resolve([...selected]);
+      }
       options.forEach(opt => {
         const c = document.createElement('button');
         c.type = 'button';
@@ -2371,78 +2392,42 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
         c.textContent = opt.label;
         c.addEventListener('click', () => {
           if (!multi){
-            addMsg(opt.label, 'user');
-            clearInput();
-            resolve([opt.value]);
+            selected.clear(); selected.add(opt.value);
+            inp.value = opt.label;
+            btn.disabled = false;
+            setTimeout(send, reduced.matches ? 0 : 140);   // seen in the field, then sent
           } else {
             c.classList.toggle('sel');
             selected.has(opt.value) ? selected.delete(opt.value) : selected.add(opt.value);
+            inp.value = labelsOf();
+            btn.disabled = !selected.size;
           }
         });
-        wrap.appendChild(c);
+        strip.appendChild(c);
       });
-      inputArea.appendChild(wrap);
-      if (multi){
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'co-confirm';
-        btn.textContent = 'that\'s it →';
-        btn.addEventListener('click', () => {
-          if (!selected.size) return;
-          const labels = options.filter(o => selected.has(o.value)).map(o => o.label).join(', ');
-          addMsg(labels, 'user');
-          clearInput();
-          resolve([...selected]);
-        });
-        inputArea.appendChild(btn);
-      }
+      btn.addEventListener('click', send);
+      // Sideways strip: the edge fade only while there's more to the right;
+      // a mouse wheel scrolls it on desktop (trackpads and thumbs already do).
+      const more = () => strip.classList.toggle('more', strip.scrollWidth - strip.clientWidth - strip.scrollLeft > 4);
+      strip.addEventListener('scroll', more, { passive: true });
+      strip.addEventListener('wheel', e => {
+        if (strip.scrollWidth <= strip.clientWidth || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+        strip.scrollLeft += e.deltaY; e.preventDefault();
+      }, { passive: false });
+      inputArea.appendChild(strip);
+      inputArea.appendChild(row);
+      more();                         // layout is live once appended
+      requestAnimationFrame(more);    // and again after fonts/paint settle
       scrollBottom();
     });
   }
 
-  function consentStep(){
-    return new Promise(resolve => {
-      clearInput();
-      consentChecked = false;
-      const wrap = document.createElement('div');
-      wrap.className = 'co-consent-wrap';
-      const lbl = document.createElement('label');
-      lbl.className = 'co-consent-label';
-      const box = document.createElement('div');
-      box.className = 'co-consent-box';
-      box.setAttribute('role', 'checkbox');
-      box.setAttribute('aria-checked', 'false');
-      const txt = document.createElement('span');
-      txt.className = 'co-consent-text';
-      txt.innerHTML = 'cued can text me — workouts, meals, check-ins — once my spot opens. 5–8 msgs/day, msg &amp; data rates may apply, reply STOP to cancel or HELP for help. <a href="terms.html" target="_blank" rel="noopener">terms</a> · <a href="privacy.html" target="_blank" rel="noopener">privacy</a>';
-      lbl.appendChild(box);
-      lbl.appendChild(txt);
-      lbl.addEventListener('click', (e) => {
-        if (e.target.closest('a')) return; // let Terms/Privacy open without toggling
-        consentChecked = !consentChecked;
-        box.classList.toggle('checked', consentChecked);
-        box.setAttribute('aria-checked', String(consentChecked));
-        box.innerHTML = consentChecked ? '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '';
-      });
-      wrap.appendChild(lbl);
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'co-confirm';
-      btn.style.marginTop = '10px';
-      btn.textContent = 'put me on the list →';
-      btn.addEventListener('click', () => {
-        if (!consentChecked){
-          box.classList.add('shake');
-          setTimeout(() => box.classList.remove('shake'), 1200);
-          return;
-        }
-        clearInput();
-        resolve(true);
-      });
-      inputArea.appendChild(wrap);
-      inputArea.appendChild(btn);
-      scrollBottom();
-    });
+  // Consent: the fine print is cued's bubble (terms + privacy inline); the
+  // reader's "i agree" is their bubble, sent from the one chip on offer.
+  async function consentStep(){
+    await coachSay('by joining you agree to get recurring automated texts from cued — workouts, meals, check-ins — once your spot opens. 5–8 msgs/day, msg &amp; data rates may apply, reply STOP to cancel or HELP for help. <a href="terms.html" target="_blank" rel="noopener">terms</a> · <a href="privacy.html" target="_blank" rel="noopener">privacy</a>', 320, 'fine');
+    await chips([{label: 'i agree', value: true}], false, 'tap to agree');
+    return true;
   }
 
   function validPhone(v){
@@ -2590,7 +2575,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     [sdata.equipment] = await chips([{label:'full gym',value:'full_gym'},{label:'limited gym',value:'limited_gym'},{label:'home gym',value:'home_gym'},{label:'bodyweight only',value:'bodyweight'}]);  setProgress(7);
     await coachSay("last one — your number? that's where i'll text you when your spot opens");
     sdata.phone = await askPhone();                                               setProgress(8);
-    await coachSay("one tap so i'm allowed to text you:");
+    await coachSay('last thing — the fine print:');
     await consentStep();                                                          setProgress(9);
     await submitProfile();
   }
