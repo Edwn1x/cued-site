@@ -771,6 +771,7 @@ footer .fmeta{margin-top:10px}
   --co-gray:var(--gray);--co-gray-ink:var(--gray-ink);
   --co-card:var(--card);--co-fill:var(--fill);--co-line:var(--line);
   --co-glass:rgba(255,255,255,.82);--co-glass-edge:rgba(255,255,255,.55);   /* the frosted sheet + its rim */
+  --co-opt-line:rgba(0,0,0,.07);--co-opt-hover:rgba(0,0,0,.035);              /* rows inside the options bubble */
   --co-field:rgba(255,255,255,.62);                                       /* inputs, chips, consent box sit on the glass */
   --co-ink:var(--ink);--co-ink-2:var(--ink-2);--co-ink-3:var(--ink-3);--co-error:var(--error);
   --co-shadow:0 24px 80px rgba(10,22,40,.28);
@@ -779,7 +780,7 @@ footer .fmeta{margin-top:10px}
   display:flex;align-items:center;justify-content:center;padding:24px;
   font-family:var(--f-msg);font-size:15px;line-height:1.5;color:var(--co-ink);text-align:left;
 }
-html.dark .co-bg{--co-glass:rgba(28,28,30,.8);--co-glass-edge:rgba(255,255,255,.09);--co-field:rgba(44,44,46,.66);--co-shadow:0 24px 80px rgba(0,0,0,.6)}
+html.dark .co-bg{--co-glass:rgba(28,28,30,.8);--co-opt-line:rgba(255,255,255,.09);--co-opt-hover:rgba(255,255,255,.05);--co-glass-edge:rgba(255,255,255,.09);--co-field:rgba(44,44,46,.66);--co-shadow:0 24px 80px rgba(0,0,0,.6)}
 .co-bg *{margin:0;padding:0;box-sizing:border-box}
 .co-bg button,.co-bg input{font:inherit;color:inherit}
 .co-bg.open{opacity:1;pointer-events:all}
@@ -851,18 +852,22 @@ html.dark .co-bg{--co-glass:rgba(28,28,30,.8);--co-glass-edge:rgba(255,255,255,.
 .co-send:disabled{opacity:.35;cursor:default}
 .co-send svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 
-/* Suggestion chips — ONE row, like the suggestions over an iPhone keyboard:
-   it scrolls sideways when a question has more answers than fit (a fade at
-   the edge says so; the script maps the mouse wheel to it on desktop), so
-   the composer is the same slim height on every question. Selected = filled
-   blue: what's about to be sent. */
-.co-chips{display:flex;flex-wrap:nowrap;gap:6px;padding:2px 2px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.co-chips::-webkit-scrollbar{display:none}
-.co-chips.more{-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 36px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 36px),transparent)}
-.co-chip{flex:0 0 auto;white-space:nowrap;padding:6px 12px;border-radius:999px;border:1px solid var(--co-line);background:var(--co-field);font-size:13.5px;font-weight:500;line-height:1.25;color:var(--co-ink);cursor:pointer;transition:background .15s,border-color .15s,color .15s,transform .1s}
-.co-chip:active{transform:scale(.96)}
-.co-chip:hover{border-color:var(--co-blue);color:var(--co-blue)}
-.co-chip.sel{background:var(--co-blue);border-color:var(--co-blue);color:#fff}
+/* Answer options — a list bubble IN the thread, sent by cued right after
+   the question: one gray received bubble, rows stacked with hairlines, a
+   ring at the right that fills blue with a check when picked (the tour
+   poll's ring, in the thread's own palette). Every option is visible, the
+   composer below stays its one slim row. Once answered the bubble locks:
+   picks stay checked, the rest dim. */
+.co-msg.co-opts{padding:0;max-width:86%;min-width:62%;overflow:hidden}
+.co-opt{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:.62em .85em .62em .95em;border:none;background:transparent;font:inherit;line-height:1.25;color:var(--co-gray-ink);text-align:left;cursor:pointer;transition:background .15s}
+.co-opt + .co-opt{border-top:1px solid var(--co-opt-line)}
+.co-opt:hover{background:var(--co-opt-hover)}
+.co-opt i{flex:none;width:1.25em;height:1.25em;border-radius:50%;border:1.5px solid var(--co-ink-3);display:inline-flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s}
+.co-opt i::after{content:'';width:.42em;height:.24em;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:translateY(-.06em) rotate(-45deg) scale(0);transition:transform .22s var(--ease)}
+.co-opt.sel i{background:var(--co-blue);border-color:var(--co-blue)}
+.co-opt.sel i::after{transform:translateY(-.06em) rotate(-45deg) scale(1)}
+.co-opts.done .co-opt{cursor:default;pointer-events:none}
+.co-opts.done .co-opt:not(.sel){opacity:.45}
 
 /* Primary pill button (Confirm / Put me on the list / Try again) */
 .co-confirm{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 22px;border-radius:999px;border:none;cursor:pointer;background:var(--co-blue);color:#fff;font-size:15px;font-weight:500;transition:background .15s}
@@ -902,12 +907,13 @@ html.dark .co-bg{--co-glass:rgba(28,28,30,.8);--co-glass-edge:rgba(255,255,255,.
   .co-input-area{padding:10px 14px calc(12px + env(safe-area-inset-bottom))}
   .co-input{font-size:16px}/* prevent iOS auto-zoom on focus */
   .co-msg{font-size:16px}
-  .co-chip{font-size:14px;padding:7px 12px}
+  .co-opt{padding:.66em .85em .66em .95em}
 }
 @media (prefers-reduced-motion:reduce){
   .co-bg,.co-sheet,.co-msg,.co-progress i{transition:none}
   .co-typing{animation:none}
   .co-typing .co-dot{animation:none;opacity:.6}
+  .co-opt,.co-opt i,.co-opt i::after{transition:none}
 }
 
 /* ===== MOBILE SIZING (<768px, all modes) =====
@@ -2275,7 +2281,8 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   function addMsg(text, who, extraClass = ''){
     const m = document.createElement('div');
     m.className = 'co-msg ' + who + ' t' + (extraClass ? ' ' + extraClass : '');
-    if (who === 'user') m.textContent = text; else m.innerHTML = text;
+    if (text instanceof Node) m.appendChild(text);
+    else if (who === 'user') m.textContent = text; else m.innerHTML = text;
     // Tail only on the last bubble of a run; a gap when the sender changes.
     const all = msgs.querySelectorAll('.co-msg');
     const prev = all[all.length - 1];
@@ -2295,6 +2302,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       msgs.appendChild(meta);
     }
     requestAnimationFrame(() => { m.classList.add('show'); scrollBottom(); });
+    return m;
   }
 
   function showTyping(){
@@ -2367,57 +2375,56 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     });
   }
 
-  // Fixed answers: a suggestion strip over a read-only composer. Single-select
-  // taps land in the field and send themselves; multi-select toggles chips,
-  // the field shows the running answer, the arrow sends it.
+  // Fixed answers: cued sends a list bubble right after the question; the
+  // composer below is read-only and mirrors the pick. Single-select rows send
+  // themselves; multi-select rows toggle, the field shows the running answer,
+  // the arrow sends. The bubble then locks in place with the picks checked.
   function chips(options, multi = false, placeholder){
     return new Promise(resolve => {
       clearInput();
-      const strip = document.createElement('div');
-      strip.className = 'co-chips';
+      const list = document.createElement('div');
+      list.setAttribute('role', multi ? 'group' : 'radiogroup');
+      const bubble = addMsg(list, 'coach', 'co-opts');
       const { row, inp, btn } = composer(placeholder || (multi ? 'tap all that apply' : 'tap one'), 'text', true);
       btn.disabled = true;
       const selected = new Set();
       const labelsOf = () => options.filter(o => selected.has(o.value)).map(o => o.label).join(', ');
       function send(){
         if (!selected.size) return;
+        bubble.classList.add('done');
         addMsg(labelsOf(), 'user');
         clearInput();
         resolve([...selected]);
       }
       options.forEach(opt => {
-        const c = document.createElement('button');
-        c.type = 'button';
-        c.className = 'co-chip' + (multi ? ' multi' : '');
-        c.textContent = opt.label;
-        c.addEventListener('click', () => {
+        const r = document.createElement('button');
+        r.type = 'button';
+        r.className = 'co-opt';
+        r.setAttribute('role', multi ? 'checkbox' : 'radio');
+        r.setAttribute('aria-checked', 'false');
+        r.innerHTML = '<span></span><i aria-hidden="true"></i>';
+        r.firstChild.textContent = opt.label;
+        r.addEventListener('click', () => {
+          if (bubble.classList.contains('done')) return;
           if (!multi){
+            list.querySelectorAll('.co-opt').forEach(x => { x.classList.remove('sel'); x.setAttribute('aria-checked', 'false'); });
             selected.clear(); selected.add(opt.value);
+            r.classList.add('sel'); r.setAttribute('aria-checked', 'true');
             inp.value = opt.label;
             btn.disabled = false;
-            setTimeout(send, reduced.matches ? 0 : 140);   // seen in the field, then sent
+            setTimeout(send, reduced.matches ? 0 : 220);   // the check lands, then it sends
           } else {
-            c.classList.toggle('sel');
-            selected.has(opt.value) ? selected.delete(opt.value) : selected.add(opt.value);
+            const on = r.classList.toggle('sel');
+            r.setAttribute('aria-checked', String(on));
+            on ? selected.add(opt.value) : selected.delete(opt.value);
             inp.value = labelsOf();
             btn.disabled = !selected.size;
           }
         });
-        strip.appendChild(c);
+        list.appendChild(r);
       });
       btn.addEventListener('click', send);
-      // Sideways strip: the edge fade only while there's more to the right;
-      // a mouse wheel scrolls it on desktop (trackpads and thumbs already do).
-      const more = () => strip.classList.toggle('more', strip.scrollWidth - strip.clientWidth - strip.scrollLeft > 4);
-      strip.addEventListener('scroll', more, { passive: true });
-      strip.addEventListener('wheel', e => {
-        if (strip.scrollWidth <= strip.clientWidth || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
-        strip.scrollLeft += e.deltaY; e.preventDefault();
-      }, { passive: false });
-      inputArea.appendChild(strip);
       inputArea.appendChild(row);
-      more();                         // layout is live once appended
-      requestAnimationFrame(more);    // and again after fonts/paint settle
       scrollBottom();
     });
   }
