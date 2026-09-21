@@ -2255,7 +2255,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 // pending user with one holding line and nothing else until an admin
 // activates them), or "I don't have an iPhone" → /signup/channel puts them on
 // SMS. Payload keeps the original waitlist keys
-//   { name, phone, email|null, source, ts, timezone, active:false, status:'waitlist' }
+//   { name, phone, email, source, ts, timezone, active:false, status:'waitlist' }
 // and adds
 //   { full_name, age, gender, goal:[…], biggest_obstacle, experience, equipment, sms_consent:true }
 // — `name` is the FIRST name (it's what the coach's hook and prompts inject);
@@ -2275,7 +2275,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   if (!overlay || !msgs || !inputArea) return;
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const STEPS = 9;   // name, age, gender, goals, obstacle, experience, equipment, phone, consent
+  const STEPS = 10;  // name, age, gender, goals, obstacle, experience, equipment, phone, email, consent
   let sdata = {};
   let step = 0;
 
@@ -2354,8 +2354,9 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     return new Promise(resolve => {
       clearInput();
       const { row, inp, btn } = composer(placeholder, type);
-      inp.setAttribute('inputmode', type === 'tel' ? 'tel' : type === 'number' ? 'numeric' : 'text');
-      inp.setAttribute('autocomplete', type === 'tel' ? 'tel' : type === 'text' ? 'name' : 'off');
+      inp.setAttribute('inputmode', type === 'tel' ? 'tel' : type === 'number' ? 'numeric' : type === 'email' ? 'email' : 'text');
+      inp.setAttribute('autocomplete', type === 'tel' ? 'tel' : type === 'email' ? 'email' : type === 'text' ? 'name' : 'off');
+      if (type === 'email'){ inp.autocapitalize = 'off'; inp.spellcheck = false; }
       inp.setAttribute('enterkeyhint', 'send');
       if (type === 'tel'){
         // Formats as they type — (510) 555-1234 — so the number reads back like a contact card.
@@ -2459,6 +2460,17 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     return v;
   }
 
+  function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()); }
+
+  async function askEmail(){
+    let v = await textInput('email', 'email');
+    while (!validEmail(v)){
+      await coachSay("hmm, that email doesn't look right — try again?", 320);
+      v = await textInput('email', 'email');
+    }
+    return v.trim().toLowerCase();
+  }
+
   async function askAge(){
     let v = await textInput('Your age', 'number');
     while (!/^\d{1,3}$/.test(v)){
@@ -2529,7 +2541,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       name: first(),          // what the coach says — first name only, never the full name
       full_name: sdata.name,  // for us (admin, email later); the backend keeps it aside
       phone: sdata.phone,
-      email: null,
+      email: sdata.email || null,
       source: overlay.dataset.source || 'unknown',
       ts: new Date().toISOString(),
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -2567,9 +2579,9 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     }
   }
 
-  // Nine quick steps, one bubble each, in the coach's texting voice. Only
-  // name (full — the backend keeps it), age and phone are typed; the coach
-  // greets by first name.
+  // Ten quick steps, one bubble each, in the coach's texting voice. Only
+  // name (full — the backend keeps it), age, phone and email are typed; the
+  // coach greets by first name.
   const first = () => (sdata.name || '').trim().split(/\s+/)[0];
   async function runChat(){
     msgs.innerHTML = '';
@@ -2593,8 +2605,10 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     [sdata.equipment] = await chips([{label:'full gym',value:'full_gym'},{label:'limited gym',value:'limited_gym'},{label:'home gym',value:'home_gym'},{label:'bodyweight only',value:'bodyweight'}]);  setProgress(7);
     await coachSay("last one — your number? that's where i'll text you when your spot opens");
     sdata.phone = await askPhone();                                               setProgress(8);
+    await coachSay("and your email? for the stuff that doesn't fit in a text");
+    sdata.email = await askEmail();                                               setProgress(9);
     await coachSay('last thing — the fine print:');
-    await consentStep();                                                          setProgress(9);
+    await consentStep();                                                          setProgress(10);
     await submitProfile();
   }
 
