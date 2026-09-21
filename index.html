@@ -849,6 +849,8 @@ html.dark .co-bg{--co-glass:rgba(28,28,30,.8);--co-opt-line:rgba(255,255,255,.09
 .co-input:focus{border-color:var(--co-blue);box-shadow:0 0 0 3px var(--co-blue-soft)}
 .co-input::placeholder{color:var(--co-ink-3)}
 .co-input[readonly]{cursor:default;caret-color:transparent}
+.co-skip{flex:none;background:none;border:none;padding:6px 6px;font-size:13.5px;font-weight:500;color:var(--co-ink-3);cursor:pointer;transition:color .15s}
+.co-skip:hover{color:var(--co-blue)}
 .co-send{width:36px;height:36px;border-radius:50%;background:var(--co-blue);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;transition:background .15s,opacity .15s}
 .co-send:hover:not(:disabled){background:var(--co-blue-deep)}
 .co-send:disabled{opacity:.35;cursor:default}
@@ -2332,7 +2334,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 
   function clearInput(){ inputArea.innerHTML = ''; }
 
-  function composer(placeholder, type = 'text', readonly = false){
+  function composer(placeholder, type = 'text', readonly = false, optional = false){
     const row = document.createElement('div');
     row.className = 'co-input-row';
     const inp = document.createElement('input');
@@ -2346,14 +2348,24 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     btn.setAttribute('aria-label', 'Send');
     btn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>';
     row.appendChild(inp);
+    let skip = null;
+    if (optional){
+      skip = document.createElement('button');
+      skip.type = 'button';
+      skip.className = 'co-skip';
+      skip.textContent = 'skip';
+      row.appendChild(skip);
+    }
     row.appendChild(btn);
-    return { row, inp, btn };
+    return { row, inp, btn, skip };
   }
 
-  function textInput(placeholder, type = 'text'){
+  // optional=true: a "skip" button sits in the row (an empty send skips too);
+  // the skip is echoed as the reader's bubble and resolves ''.
+  function textInput(placeholder, type = 'text', optional = false){
     return new Promise(resolve => {
       clearInput();
-      const { row, inp, btn } = composer(placeholder, type);
+      const { row, inp, btn, skip } = composer(placeholder, type, false, optional);
       inp.setAttribute('inputmode', type === 'tel' ? 'tel' : type === 'number' ? 'numeric' : type === 'email' ? 'email' : 'text');
       inp.setAttribute('autocomplete', type === 'tel' ? 'tel' : type === 'email' ? 'email' : type === 'text' ? 'name' : 'off');
       if (type === 'email'){ inp.autocapitalize = 'off'; inp.spellcheck = false; }
@@ -2371,12 +2383,19 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       }
       function submit(){
         const val = inp.value.trim();
-        if (!val) return;
+        if (!val){
+          if (!optional) return;
+          addMsg('skip', 'user');
+          clearInput();
+          resolve('');
+          return;
+        }
         addMsg(val, 'user');
         clearInput();
         resolve(val);
       }
       btn.addEventListener('click', submit);
+      skip && skip.addEventListener('click', () => { inp.value = ''; submit(); });
       inp.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
       inputArea.appendChild(row);
       scrollBottom();
@@ -2463,12 +2482,12 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()); }
 
   async function askEmail(){
-    let v = await textInput('email', 'email');
-    while (!validEmail(v)){
-      await coachSay("hmm, that email doesn't look right — try again?", 320);
-      v = await textInput('email', 'email');
+    let v = await textInput('email (optional)', 'email', true);
+    while (v && !validEmail(v)){
+      await coachSay("hmm, that email doesn't look right — try again, or skip it?", 320);
+      v = await textInput('email (optional)', 'email', true);
     }
-    return v.trim().toLowerCase();
+    return v ? v.trim().toLowerCase() : null;
   }
 
   async function askAge(){
@@ -2605,7 +2624,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     [sdata.equipment] = await chips([{label:'full gym',value:'full_gym'},{label:'limited gym',value:'limited_gym'},{label:'home gym',value:'home_gym'},{label:'bodyweight only',value:'bodyweight'}]);  setProgress(7);
     await coachSay("last one — your number? that's where i'll text you when your spot opens");
     sdata.phone = await askPhone();                                               setProgress(8);
-    await coachSay("and your email? for the stuff that doesn't fit in a text");
+    await coachSay("and your email? totally optional — just for the stuff that doesn't fit in a text");
     sdata.email = await askEmail();                                               setProgress(9);
     await coachSay('last thing — the fine print:');
     await consentStep();                                                          setProgress(10);
