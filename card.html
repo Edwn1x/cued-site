@@ -247,7 +247,10 @@ button{font:inherit}
 
   // ── rendering: full build on structure changes; in-place patch on a tap ──
   const rowEls = new Map();   // set id → row element
-  function rowNumsText(st){ const w = st.done ? st.actual_weight : st.planned_weight, r = st.done ? st.actual_reps : st.planned_reps; return fmt(w) + ' × ' + fmt(r); }
+  // Show the ACTUAL numbers whenever they're present — even on an undone set, so a
+  // pre-entered/edited weight shows through (with the edited dot) instead of the row
+  // still reading the planned number. Falls back to planned when no actual is set.
+  function rowNumsText(st){ const w = st.actual_weight ?? st.planned_weight, r = st.actual_reps ?? st.planned_reps; return fmt(w) + ' × ' + fmt(r); }
   function patchRow(st){
     const row = rowEls.get(st.id); if (!row) return render();
     row.classList.toggle('done', !!st.done);
