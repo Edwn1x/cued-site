@@ -161,11 +161,14 @@ button{font:inherit}
     patch();
   }
   async function saveEdit(st, w, r){
+    // Saving numbers just saves numbers — it no longer completes the set. Omit `done`
+    // so the server preserves the current done state (edit a weight without checking
+    // it off; a done set keeps its numbers updated). Completion stays the circle tap.
     const before = { ...st };
-    st.done = true; st.actual_weight = Number(w); st.actual_reps = Number(r);
+    st.actual_weight = Number(w); st.actual_reps = Number(r);
     st.edited = (Number(w) !== Number(st.planned_weight) || Number(r) !== Number(st.planned_reps));
     editing = null; recount(); render();
-    const data = await api('POST', '/card/api/set/' + st.id, { done: true, actual_weight: w, actual_reps: r });
+    const data = await api('POST', '/card/api/set/' + st.id, { actual_weight: w, actual_reps: r });
     if (data){ if (data.pr) toast(data.pr); state = data; } else Object.assign(st, before);
     render();
   }
@@ -244,7 +247,10 @@ button{font:inherit}
 
   // ── rendering: full build on structure changes; in-place patch on a tap ──
   const rowEls = new Map();   // set id → row element
-  function rowNumsText(st){ const w = st.done ? st.actual_weight : st.planned_weight, r = st.done ? st.actual_reps : st.planned_reps; return fmt(w) + ' × ' + fmt(r); }
+  // Show the ACTUAL numbers whenever they're present — even on an undone set, so a
+  // pre-entered/edited weight shows through (with the edited dot) instead of the row
+  // still reading the planned number. Falls back to planned when no actual is set.
+  function rowNumsText(st){ const w = st.actual_weight ?? st.planned_weight, r = st.actual_reps ?? st.planned_reps; return fmt(w) + ' × ' + fmt(r); }
   function patchRow(st){
     const row = rowEls.get(st.id); if (!row) return render();
     row.classList.toggle('done', !!st.done);
@@ -297,17 +303,16 @@ button{font:inherit}
       if (exPR) nm.appendChild(medal(exPR.pr, true));
       name.appendChild(nm);
       if (!closed && !ex.ghost){
+        // swap + remove are always available for every live exercise — even once a set
+        // is done. Swap keeps the done sets (server-side); remove deletes the whole lift,
+        // guarded by the two-tap 'remove → sure?' confirm below.
         const acts = document.createElement('span'); acts.className = 'acts';
-        if (ex.sets.some((x) => !x.done)){
-          const swx = document.createElement('button'); swx.type = 'button'; swx.className = 'swx'; swx.textContent = swapping === ex.slug ? 'cancel' : 'swap';
-          swx.addEventListener('click', () => { swapping = swapping === ex.slug ? null : ex.slug; armed = null; render(); });
-          acts.appendChild(swx);
-        }
-        if (!ex.sets.some((x) => x.done)){
-          const rmx = document.createElement('button'); rmx.type = 'button'; rmx.className = 'rmx' + (armed === ex.slug ? ' arm' : ''); rmx.textContent = armed === ex.slug ? 'sure?' : 'remove';
-          rmx.addEventListener('click', () => { if (armed === ex.slug) removeExercise(ex); else { armed = ex.slug; swapping = null; render(); setTimeout(() => { if (armed === ex.slug){ armed = null; render(); } }, 3000); } });
-          acts.appendChild(rmx);
-        }
+        const swx = document.createElement('button'); swx.type = 'button'; swx.className = 'swx'; swx.textContent = swapping === ex.slug ? 'cancel' : 'swap';
+        swx.addEventListener('click', () => { swapping = swapping === ex.slug ? null : ex.slug; armed = null; render(); });
+        acts.appendChild(swx);
+        const rmx = document.createElement('button'); rmx.type = 'button'; rmx.className = 'rmx' + (armed === ex.slug ? ' arm' : ''); rmx.textContent = armed === ex.slug ? 'sure?' : 'remove';
+        rmx.addEventListener('click', () => { if (armed === ex.slug) removeExercise(ex); else { armed = ex.slug; swapping = null; render(); setTimeout(() => { if (armed === ex.slug){ armed = null; render(); } }, 3000); } });
+        acts.appendChild(rmx);
         name.appendChild(acts);
       }
       box.appendChild(name);
