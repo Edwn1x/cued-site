@@ -857,6 +857,16 @@ html.dark .co-bg{--co-glass:rgba(28,28,30,.8);--co-opt-line:rgba(255,255,255,.09
 .co-input[readonly]{cursor:default;caret-color:transparent}
 .co-skip{flex:none;background:none;border:none;padding:6px 6px;font-size:13.5px;font-weight:500;color:var(--co-ink-3);cursor:pointer;transition:color .15s}
 .co-skip:hover{color:var(--co-blue)}
+/* Height + weight composer: a unit toggle above two or three short number
+   fields. Same pills as the composer; the toggle is a pair of small chips. */
+.co-stats{display:flex;flex-direction:column;gap:8px}
+.co-units{display:flex;gap:6px;justify-content:flex-end}
+.co-unit{background:none;border:1px solid var(--co-line);border-radius:999px;padding:4px 10px;font:inherit;font-size:12.5px;font-weight:500;color:var(--co-ink-3);cursor:pointer;transition:color .15s,border-color .15s,background .15s}
+.co-unit.sel{color:var(--co-blue);border-color:var(--co-blue);background:var(--co-blue-soft)}
+.co-input.co-num{flex:1 1 0;min-width:0;padding-left:14px;padding-right:14px;text-align:center}
+.co-input.co-num::placeholder{text-align:center}
+@keyframes co-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.co-shake{animation:co-shake .28s var(--ease)}
 .co-send{width:36px;height:36px;border-radius:50%;background:var(--co-blue);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;transition:background .15s,opacity .15s}
 .co-send:hover:not(:disabled){background:var(--co-blue-deep)}
 .co-send:disabled{opacity:.35;cursor:default}
@@ -2269,6 +2279,12 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 //   { name, phone, email, source, ts, timezone, active:false, status:'waitlist' }
 // and adds
 //   { full_name, age, gender, goal:[…], biggest_obstacle, experience, equipment, sms_consent:true }
+// and, since 2026-10-01 (backend #155), the objective stats the coach would
+// otherwise have to ask for over text — a user who texted "168 cm" to an
+// extractor that only knew feet sat in onboarding for 27 turns:
+//   { height_cm, weight_kg } or { height_ft, height_in, weight_lbs },
+//   workout_days (2–6), workout_time (morning|afternoon|evening),
+//   diet, restrictions (optional free text), existing_tools:[…] }
 // — `name` is the FIRST name (it's what the coach's hook and prompts inject);
 // the full name rides along in `full_name` for the admin side only.
 // Phone is validated as a 10-digit US number before it's accepted (the backend
@@ -2286,7 +2302,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   if (!overlay || !msgs || !inputArea) return;
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const STEPS = 10;  // name, age, gender, goals, obstacle, experience, equipment, phone, email, consent
+  const STEPS = 15;  // name, age, gender, goals, obstacle, experience, equipment, stats, days, time, diet, restrictions, apps, phone, email, consent (email+consent share the last tick)
   let sdata = {};
   let step = 0;
 
@@ -2466,6 +2482,106 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     });
   }
 
+  // Height + weight in one composer: a unit toggle (ft/lb ↔ cm/kg) and two or
+  // three small number fields. The backend takes either system (signup_stats);
+  // nothing is converted here. Resolves the keys to post, and echoes the
+  // reader's bubble as they'd type it ("5'6, 120 lbs" / "168 cm, 50 kg").
+  function statsInput(){
+    return new Promise(resolve => {
+      clearInput();
+      // Default unit by locale: en-US → ft/lb, everyone else → cm/kg.
+      let metric = !/^en-US$/i.test((navigator.language || 'en-US'));
+      const wrap = document.createElement('div');
+      wrap.className = 'co-stats';
+      const units = document.createElement('div');
+      units.className = 'co-units';
+      units.setAttribute('role', 'radiogroup');
+      units.setAttribute('aria-label', 'units');
+      const row = document.createElement('div');
+      row.className = 'co-input-row';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'co-send';
+      btn.setAttribute('aria-label', 'Send');
+      btn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>';
+      let fields = {};
+      function num(name, placeholder, maxlen){
+        const i = document.createElement('input');
+        i.className = 'co-input co-num';
+        i.type = 'text';
+        i.inputMode = 'decimal';
+        i.autocomplete = 'off';
+        i.placeholder = placeholder;
+        i.maxLength = maxlen;
+        i.setAttribute('aria-label', placeholder);
+        i.setAttribute('enterkeyhint', 'send');
+        i.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+        fields[name] = i;
+        return i;
+      }
+      function build(){
+        row.innerHTML = '';
+        fields = {};
+        if (metric){
+          row.appendChild(num('cm', 'height (cm)', 3));
+          row.appendChild(num('kg', 'weight (kg)', 5));
+        } else {
+          row.appendChild(num('ft', 'ft', 1));
+          row.appendChild(num('in', 'in', 2));
+          row.appendChild(num('lbs', 'weight (lbs)', 5));
+        }
+        row.appendChild(btn);
+        units.querySelectorAll('.co-unit').forEach(u => {
+          const on = (u.dataset.metric === '1') === metric;
+          u.classList.toggle('sel', on);
+          u.setAttribute('aria-checked', String(on));
+        });
+        const firstField = row.querySelector('.co-input');
+        firstField && firstField.focus();
+      }
+      [['ft / lb', '0'], ['cm / kg', '1']].forEach(([label, m]) => {
+        const u = document.createElement('button');
+        u.type = 'button';
+        u.className = 'co-unit';
+        u.dataset.metric = m;
+        u.setAttribute('role', 'radio');
+        u.textContent = label;
+        u.addEventListener('click', () => { metric = m === '1'; build(); });
+        units.appendChild(u);
+      });
+      const n = el => { const v = parseFloat(String(el.value).replace(',', '.')); return Number.isFinite(v) ? v : NaN; };
+      function submit(){
+        let out, echo;
+        if (metric){
+          const cm = n(fields.cm), kg = n(fields.kg);
+          if (!(cm >= 120 && cm <= 230 && kg >= 30 && kg <= 270)) return shake();
+          out = { height_cm: Math.round(cm), weight_kg: Math.round(kg * 10) / 10 };
+          echo = `${out.height_cm} cm, ${out.weight_kg} kg`;
+        } else {
+          const ft = n(fields.ft), inch = fields.in.value.trim() === '' ? 0 : n(fields.in), lbs = n(fields.lbs);
+          if (!(ft >= 4 && ft <= 7 && inch >= 0 && inch <= 11 && lbs >= 60 && lbs <= 600)) return shake();
+          out = { height_ft: Math.round(ft), height_in: Math.round(inch), weight_lbs: Math.round(lbs) };
+          echo = `${out.height_ft}'${out.height_in}, ${out.weight_lbs} lbs`;
+        }
+        addMsg(echo, 'user');
+        clearInput();
+        resolve(out);
+      }
+      function shake(){
+        row.classList.remove('co-shake');
+        requestAnimationFrame(() => row.classList.add('co-shake'));
+        const empty = [...row.querySelectorAll('.co-input')].find(i => !i.value.trim());
+        (empty || row.querySelector('.co-input')).focus();
+      }
+      btn.addEventListener('click', submit);
+      wrap.appendChild(units);
+      wrap.appendChild(row);
+      inputArea.appendChild(wrap);
+      build();
+      scrollBottom();
+    });
+  }
+
   // Consent: the fine print is cued's bubble (terms + privacy inline); the
   // reader's "i agree" is their bubble, sent from the one chip on offer.
   async function consentStep(){
@@ -2581,6 +2697,13 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       biggest_obstacle: sdata.biggest_obstacle,
       experience: sdata.experience,
       equipment: sdata.equipment,
+      // the objective stats (backend #155) — either unit system, backend converts
+      ...(sdata.stats || {}),
+      workout_days: sdata.workout_days || null,
+      workout_time: sdata.workout_time || null,
+      diet: sdata.diet || null,
+      restrictions: sdata.restrictions || null,
+      existing_tools: sdata.existing_tools && sdata.existing_tools.length ? sdata.existing_tools : null,
       sms_consent: true,
     };
     try {
@@ -2607,9 +2730,9 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     }
   }
 
-  // Ten quick steps, one bubble each, in the coach's texting voice. Only
-  // name (full — the backend keeps it), age, phone and email are typed; the
-  // coach greets by first name.
+  // Fifteen quick steps, one bubble each, in the coach's texting voice. Only
+  // name (full — the backend keeps it), age, height/weight, the optional
+  // allergies line, phone and email are typed; the coach greets by first name.
   const first = () => (sdata.name || '').trim().split(/\s+/)[0];
   async function runChat(){
     msgs.innerHTML = '';
@@ -2631,12 +2754,27 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     [sdata.experience] = await chips([{label:'just starting',value:'none'},{label:'under 6 months',value:'beginner'},{label:'6 months – 2 years',value:'intermediate'},{label:'2+ years',value:'advanced'}]);  setProgress(6);
     await coachSay('what do you have access to?');
     [sdata.equipment] = await chips([{label:'full gym',value:'full_gym'},{label:'limited gym',value:'limited_gym'},{label:'home gym',value:'home_gym'},{label:'bodyweight only',value:'bodyweight'}]);  setProgress(7);
-    await coachSay("last one — your number? that's where i'll text you when your spot opens");
-    sdata.phone = await askPhone();                                               setProgress(8);
+    // The objective stats (backend #155). Numbers on a form, not over text —
+    // the coach never has to ask for any of these.
+    await coachSay('how tall are you, and what do you weigh? ballpark is fine');
+    sdata.stats = await statsInput();                                             setProgress(8);
+    await coachSay('how many days a week can you realistically train?');
+    [sdata.workout_days] = await chips([{label:'2',value:'2'},{label:'3',value:'3'},{label:'4',value:'4'},{label:'5',value:'5'},{label:'6',value:'6'}]);  setProgress(9);
+    await coachSay('and when do you usually get to it?');
+    [sdata.workout_time] = await chips([{label:'mornings',value:'morning'},{label:'afternoons',value:'afternoon'},{label:'evenings',value:'evening'}]);  setProgress(10);
+    await coachSay('how do you eat?');
+    [sdata.diet] = await chips([{label:'no restrictions',value:'omnivore'},{label:'vegetarian',value:'vegetarian'},{label:'vegan',value:'vegan'},{label:'pescatarian',value:'pescatarian'},{label:'halal',value:'halal'},{label:'kosher',value:'kosher'}]);  setProgress(11);
+    await coachSay("any allergies, or foods you just won't eat? skip if nothing comes to mind");
+    sdata.restrictions = (await textInput('e.g. peanuts, mushrooms (optional)', 'text', true)).trim() || null;  setProgress(12);
+    await coachSay('track anything already? pick all that apply');
+    sdata.existing_tools = await chips([{label:'nothing yet',value:'none'},{label:'apple watch',value:'apple_watch'},{label:'fitbit / google',value:'fitbit'},{label:'garmin',value:'garmin'},{label:'whoop',value:'whoop'},{label:'oura',value:'oura'},{label:'strava',value:'strava'},{label:'myfitnesspal',value:'myfitnesspal'}], true);
+    if (sdata.existing_tools.includes('none')) sdata.existing_tools = ['none'];   setProgress(13);
+    await coachSay("almost there — your number? that's where i'll text you when your spot opens");
+    sdata.phone = await askPhone();                                               setProgress(14);
     await coachSay("and your email? totally optional — just for the stuff that doesn't fit in a text");
-    sdata.email = await askEmail();                                               setProgress(9);
+    sdata.email = await askEmail();
     await coachSay('last thing — the fine print:');
-    await consentStep();                                                          setProgress(10);
+    await consentStep();                                                          setProgress(15);
     await submitProfile();
   }
 
