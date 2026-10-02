@@ -2608,10 +2608,10 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()); }
 
   async function askEmail(){
-    let v = await textInput('email (optional)', 'email', true);
+    let v = await textInput('gmail (optional)', 'email', true);
     while (v && !validEmail(v)){
       await coachSay("hmm, that email doesn't look right — try again, or skip it?", 320);
-      v = await textInput('email (optional)', 'email', true);
+      v = await textInput('gmail (optional)', 'email', true);
     }
     return v ? v.trim().toLowerCase() : null;
   }
@@ -2734,6 +2734,9 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   // Fifteen quick steps, one bubble each, in the coach's texting voice. Only
   // name (full — the backend keeps it), age, height/weight, the optional
   // allergies line, phone and email are typed; the coach greets by first name.
+  // The email ask is framed as the GOOGLE account on purpose (2026-10-02): while the
+  // OAuth app is in Testing, that address has to be allowlisted before the coach can
+  // read their calendar or fitbit, and a reason is what gets people to fill it in.
   const first = () => (sdata.name || '').trim().split(/\s+/)[0];
   async function runChat(){
     msgs.innerHTML = '';
@@ -2772,7 +2775,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     if (sdata.existing_tools.includes('none')) sdata.existing_tools = ['none'];   setProgress(13);
     await coachSay("almost there — your number? that's where i'll text you when your spot opens");
     sdata.phone = await askPhone();                                               setProgress(14);
-    await coachSay("and your email? totally optional — just for the stuff that doesn't fit in a text");
+    await coachSay("and ur gmail? optional, but it's what i need to read ur google calendar or fitbit later");
     sdata.email = await askEmail();
     await coachSay('last thing — the fine print:');
     await consentStep();                                                          setProgress(15);
