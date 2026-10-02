@@ -37,9 +37,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Cued — the fitness coach made for college.</title>
-<meta name="description" content="A coach you text. Built by Berkeley students for the actual rhythm of college life — class schedules, dorm gyms, midterm szn, dining hall food.">
+<meta name="description" content="Cued is an AI fitness coach for college students that works over iMessage or SMS: workouts, meals and check-ins planned around your real schedule. With your permission it reads your Google Calendar, bCourses and Fitbit/Pixel Watch (Google Health).">
 <meta property="og:title" content="Cued — the fitness coach made for college.">
-<meta property="og:description" content="A coach you text. Built by Berkeley students for the actual rhythm of college life — class schedules, dorm gyms, midterm szn, dining hall food.">
+<meta property="og:description" content="Cued is an AI fitness coach for college students that works over iMessage or SMS: workouts, meals and check-ins planned around your real schedule.">
 <!-- Square OG image first — Instagram DM, iMessage, WhatsApp, Slack, Discord
      pick the first og:image they find, and most crop hard to square. -->
 <meta property="og:image" content="images/og-image-cued-square.png">
@@ -735,6 +735,19 @@ html.dark .cv-under .logo-dark{display:block}
 }
 .cta:hover{background:var(--blue-deep)}
 /* ===== FAQ (ported from the previous live site) ===== */
+/* About — plain prose stating what the product is and what it connects to.
+   Static on purpose (no data-io reveal): the OAuth verification crawler and
+   anyone without JS read it as-is. */
+.about{padding:110px 24px 0}
+.about-wrap{max-width:840px;margin:0 auto}
+.about h2{font-family:var(--f-header);font-weight:400;font-size:clamp(1.9rem,3vw,2.6rem);letter-spacing:-.5px;color:var(--ink);margin-bottom:18px;text-align:center}
+.about p{font-size:16px;line-height:1.7;color:var(--ink-2);max-width:680px;margin:0 auto 14px}
+.about ul{list-style:none;padding:0;max-width:680px;margin:18px auto 0}
+.about li{font-size:16px;line-height:1.7;color:var(--ink-2);padding:10px 0 10px 22px;position:relative;border-top:1px solid var(--line)}
+.about li:last-child{border-bottom:1px solid var(--line)}
+.about li::before{content:'';position:absolute;left:4px;top:1.4em;width:6px;height:6px;border-radius:50%;background:var(--blue)}
+.about strong{color:var(--ink);font-weight:500}
+.about a{color:var(--blue)}
 .faq{padding:110px 24px 0}
 .faq-wrap{max-width:840px;margin:0 auto}
 .faq-head{text-align:center;margin-bottom:36px}
@@ -1509,6 +1522,24 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     </div>
   </section>
 
+  <!-- ===== ABOUT — what Cued is and what it connects to, in plain prose.
+       Static (no reveal classes): Google's OAuth verification requires the home
+       page to clearly state the application's purpose and its use of Google data,
+       and the crawler doesn't scroll the tour. Keep this honest and current. ===== -->
+  <section class="sec about" id="about" aria-labelledby="aboutTitle">
+    <div class="about-wrap">
+      <h2 id="aboutTitle">What cued is</h2>
+      <p><strong>Cued is an AI fitness coach for college students that lives in your texts.</strong> There is no app to download: you text a number on iMessage or SMS, and the coach builds your workouts, suggests meals, and checks in with you around your actual schedule. It logs what you lift and eat from your messages, adapts your plan week to week, and keeps you accountable the way a friend who lifts would.</p>
+      <p>Everything it knows comes from you, and from the accounts you choose to connect. Each connection is optional, read-only unless stated, and can be disconnected at any time by texting the coach. Here is exactly what Cued does with each one:</p>
+      <ul>
+        <li><strong>Google Calendar.</strong> Cued reads your upcoming events (the next 60 days) so it can schedule workouts in free windows, avoid texting you during class, and plan meals and check-ins around deadlines. If you ask it to put a training block on your calendar, it creates that one event. It never edits or deletes events you made.</li>
+        <li><strong>bCourses / Canvas.</strong> Paste your calendar feed link and Cued tracks assignment due dates and exam times so training eases up around them.</li>
+        <li><strong>Fitbit or Pixel Watch, through Google Health.</strong> Cued reads daily sleep, steps, active minutes, resting heart rate and weight so it can go lighter after a short night and keep your weight trend current. No watch? It works without one.</li>
+      </ul>
+      <p>Your data is used only to coach you. It is never sold or used for advertising. Details, including how we handle Google user data, are in the <a href="privacy.html">privacy policy</a>.</p>
+    </div>
+  </section>
+
   <!-- ===== FAQ — ported from the previous live site, restyled to the thread design. ===== -->
   <section class="sec faq" id="faq">
     <div class="faq-wrap">
@@ -1527,15 +1558,15 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
         </details>
         <details>
           <summary>What data does Cued use?</summary>
-          <div class="faq-body">Only what you connect: your wearable (sleep, HRV, heart rate), your calendar (for scheduling), and the goals/preferences you share over text. Nothing more, nothing sold.</div>
+          <div class="faq-body">Only what you connect and what you tell it: your Google Calendar or bCourses feed (for scheduling around classes and deadlines), your Fitbit or Pixel Watch through Google Health (sleep, steps, heart rate, weight), and the goals and preferences you share over text. Nothing more, nothing sold. See <a href="privacy.html">the privacy policy</a> for exactly how each is used.</div>
         </details>
         <details>
           <summary>Do I need a wearable?</summary>
-          <div class="faq-body">Nope. Cued works without one — you just tell it how you slept, how you're feeling, and what's coming up, and it builds your week from there. If you do have an Apple Watch, Whoop, Oura, or Garmin, connecting it lets Cued read your data passively so you don't have to report in every morning — plus Strava, if you run. Better with one, totally usable without.</div>
+          <div class="faq-body">Nope. Cued works without one — you just tell it how you slept, how you're feeling, and what's coming up, and it builds your week from there. If you have a Fitbit or Pixel Watch, connecting it through Google Health lets Cued read your sleep, steps and heart rate passively so you don't have to report in every morning. Apple Watch, Whoop, Oura, Garmin and Strava are on the way. Better with one, totally usable without.</div>
         </details>
         <details>
           <summary>How does the wearable connect?</summary>
-          <div class="faq-body">A one-time link via Apple Health, Whoop, Oura, Garmin, or Strava. Takes about 30 seconds. After that, Cued reads passively — you don't have to do anything.</div>
+          <div class="faq-body">Ask the coach and it texts you a one-time Google sign-in link; you pick the account your Fitbit or Pixel Watch syncs to and approve read access. Takes about 30 seconds. After that, Cued reads passively — you don't have to do anything. Text "disconnect my fitbit" to turn it off.</div>
         </details>
         <details>
           <summary>Is this actually a coach or just a chatbot?</summary>
@@ -1543,7 +1574,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
         </details>
         <details>
           <summary>What about privacy?</summary>
-          <div class="faq-body">Your conversations and health data are encrypted in transit and at rest. We never sell data and never share it with third parties. You can delete everything any time by texting "delete me".</div>
+          <div class="faq-body">Your conversations and health data are encrypted in transit and at rest. We never sell data; only the providers that run the service (message delivery, AI, hosting) process it, and only for that. You can delete everything any time by texting "delete me".</div>
         </details>
         <details>
           <summary>Can I cancel any time?</summary>
