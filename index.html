@@ -925,9 +925,10 @@ html.dark .co-bg{--co-glass:rgba(28,28,30,.8);--co-opt-line:rgba(255,255,255,.09
   .co-head{padding-top:6px}
   .co-msgs{padding:14px 16px;min-height:0}
   .co-input-area{padding:10px 14px calc(12px + env(safe-area-inset-bottom))}
-  .co-input{font-size:16px}/* prevent iOS auto-zoom on focus */
+  .co-bg .co-input{font-size:16px}/* prevent iOS auto-zoom on focus — needs to outrank `.co-bg input{font:inherit}` (class+element), or it computes to the sheet's 15px and iOS zooms 16/15 and never zooms back, leaving the sheet wider than the screen */
   .co-msg{font-size:16px}
   .co-opt{padding:.66em .85em .66em .95em}
+  .co-input.co-num{padding-left:10px;padding-right:10px}/* three fields + send on a 320px screen: room for the "weight" placeholder at 16px */
 }
 @media (prefers-reduced-motion:reduce){
   .co-bg,.co-sheet,.co-msg,.co-progress i{transition:none}
@@ -2787,6 +2788,11 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     if (!vv || !overlay.classList.contains('open')) return;
     overlay.style.height = Math.round(vv.height) + 'px';
     overlay.style.top = Math.round(vv.offsetTop) + 'px';
+    // width/left too: if the page is zoomed (pinch, or an earlier focus zoom),
+    // the layout viewport is wider than what's on screen — fit the sheet to
+    // the visible part instead of letting its right side run off the edge.
+    overlay.style.width = Math.round(vv.width) + 'px';
+    overlay.style.left = Math.round(vv.offsetLeft) + 'px';
     scrollBottom();
   }
   let lastFocus = null;
@@ -2807,7 +2813,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     overlay.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
     if (vv){ vv.removeEventListener('resize', fitViewport); vv.removeEventListener('scroll', fitViewport); }
-    overlay.style.height = ''; overlay.style.top = '';
+    overlay.style.height = ''; overlay.style.top = ''; overlay.style.width = ''; overlay.style.left = '';
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
 
