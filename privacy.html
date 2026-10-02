@@ -4,80 +4,95 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Privacy Policy — Cued</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#050506;--bg2:#0A0A0C;--surface:#19191D;--border:#1F1F24;--text:#F5F5F7;--text2:#A1A1A6;--text3:#6E6E73;--accent:#007AFF;--f:'DM Sans',-apple-system,sans-serif;--m:'JetBrains Mono',monospace}
-*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
-body{font-family:var(--f);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
-nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(24px,5vw,64px);background:transparent;border-bottom:none}
-.nv-logo{font-size:18px;font-weight:600;letter-spacing:-.5px;color:var(--text);text-decoration:none;margin-left:24px;transition:color .3s}
-.nv-logo.light{color:var(--accent)}
-.nv-r{display:flex;gap:28px;align-items:center}
-.nv-r a{color:var(--text3);font-size:13px;text-decoration:none;transition:color .2s}
-.nv-r a:hover{color:var(--text)}
-.nv-btn{background:var(--accent);color:#fff!important;font-size:12px;font-weight:600;padding:7px 16px;border-radius:980px;text-decoration:none;transition:all .2s}
-.nv-btn:hover{background:#6B2EE6}
-.wrap{max-width:700px;margin:0 auto;padding:120px 24px 100px}
-.page-label{font-size:11px;font-family:var(--m);color:var(--accent);text-transform:uppercase;letter-spacing:3px;margin-bottom:16px}
-h1{font-size:clamp(32px,5vw,48px);font-weight:700;letter-spacing:-2px;line-height:1.05;margin-bottom:10px}
-.updated{font-size:13px;color:var(--text3);font-family:var(--m);margin-bottom:64px}
-h2{font-size:18px;font-weight:600;letter-spacing:-.3px;margin:48px 0 12px;padding-top:48px;border-top:1px solid var(--border)}
-p{font-size:15px;color:var(--text2);line-height:1.75;margin-bottom:16px;font-weight:300}
-ul{margin:0 0 16px 0;padding:0;list-style:none}
-li{font-size:15px;color:var(--text2);line-height:1.75;font-weight:300;padding:4px 0 4px 20px;position:relative}
-li::before{content:'—';position:absolute;left:0;color:var(--text3)}
-a{color:var(--accent);text-decoration:none}
-a:hover{text-decoration:underline}
-footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);display:flex;justify-content:space-between;align-items:center}
-.ftl{font-size:12px;color:var(--text3)}
-.ftr{display:flex;gap:20px}
-.ftr a{font-size:12px;color:var(--text3);text-decoration:none;transition:color .2s}
-.ftr a:hover{color:var(--text2)}
-.hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;background:none;border:none;cursor:pointer;padding:4px;z-index:200}
-.hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:transform .3s ease,opacity .3s ease,width .3s ease}
-.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
-.hamburger.open span:nth-child(2){opacity:0;width:0}
-.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-.mobile-menu{position:fixed;inset:0;background:rgba(5,5,6,.97);z-index:150;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transform:translateY(-100%);transition:transform .4s cubic-bezier(.16,1,.3,1);pointer-events:none}
-.mobile-menu.open{transform:translateY(0);pointer-events:all}
-.mobile-menu a{font-size:clamp(28px,7vw,40px);font-weight:600;letter-spacing:-1px;color:var(--text);text-decoration:none;padding:12px 0;transition:color .2s}
-.mobile-menu a:hover{color:var(--accent)}
-.mobile-menu .mm-cta{margin-top:24px;background:var(--accent);color:#fff!important;font-size:16px!important;font-weight:600;padding:14px 36px;border-radius:980px;letter-spacing:0}
-.mobile-menu .mm-cta:hover{background:#6B2EE6}
-.mm-close{position:absolute;top:18px;right:24px;background:none;border:none;color:var(--text3);font-size:28px;cursor:pointer;line-height:1;transition:color .2s}
-.mm-close:hover{color:var(--text)}
-@media(max-width:768px){.nv-r{display:none}.hamburger{display:flex}}
-</style>
+<meta name="description" content="How Cued collects, uses, and protects your information — including Google Calendar and Google Health data.">
 <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hedvig+Letters+Serif:opsz@12..24&family=Inter:wght@400;500&family=Outfit:wght@400;500&display=swap" rel="stylesheet">
+<script>try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}</script>
+<style>
+/* Legal pages share the homepage's tokens: flat white page, iMessage blue,
+   Hedvig serif for headings, Inter for text, Outfit for the wordmark. Dark
+   mode = html.dark, persisted under the same 'cued-theme' key. */
+:root{
+  color-scheme:light;
+  --blue:#007AFF;--blue-deep:#0062CC;--blue-soft:#E5F1FF;
+  --gray:#E9E9EB;--gray-ink:#000000;
+  --bg:#FFFFFF;--ink:#0A1628;--ink-2:#4A5A6E;--ink-3:#8A95A5;
+  --line:#E5EAF2;--fill:#F2F3F5;
+  --f-header:'Hedvig Letters Serif', Georgia, 'Times New Roman', serif;
+  --f-msg:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --f-brand:'Outfit', -apple-system, sans-serif;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+html.dark{
+  color-scheme:dark;
+  --blue:#0A84FF;--blue-deep:#3395FF;--blue-soft:#123A63;
+  --gray:#3B3B3D;--gray-ink:#FFFFFF;
+  --bg:#000000;--ink:#F5F5F7;--ink-2:#A8B3C2;--ink-3:#6E7A8A;
+  --line:#26262A;--fill:#1C1C1E;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--f-msg);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+a{color:var(--blue);text-decoration:none}
+a:hover{color:var(--blue-deep)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:6px}
+
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:20px clamp(32px,5vw,84px);background:var(--bg);
+}
+.brand{display:flex;align-items:center;gap:9px;font-family:var(--f-brand);font-size:22px;font-weight:400;letter-spacing:-.2px;color:var(--blue)}
+.brand img{display:block;width:28px;height:28px}
+.brand .logo-dark{display:none}
+html.dark .brand .logo-light{display:none}
+html.dark .brand .logo-dark{display:block}
+.nav-cta{font-family:var(--f-msg);font-size:15px;font-weight:500;color:var(--ink);padding:6px 2px}
+.nav-cta:hover{color:var(--blue)}
+
+main{max-width:720px;margin:0 auto;padding:148px 24px 96px}
+.eyebrow{font-size:13px;font-weight:500;color:var(--ink-3);letter-spacing:.02em;margin-bottom:14px}
+h1{font-family:var(--f-header);font-weight:400;font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.08;letter-spacing:-.02em;color:var(--ink);text-wrap:balance}
+.updated{font-size:14px;color:var(--ink-3);margin:14px 0 56px}
+.intro{font-size:17px;line-height:1.7;color:var(--ink-2);margin-bottom:8px}
+h2{font-family:var(--f-header);font-weight:400;font-size:1.5rem;letter-spacing:-.01em;line-height:1.2;color:var(--ink);margin:0 0 14px;padding-top:40px;border-top:1px solid var(--line)}
+h2 + h2{border-top:none;padding-top:0}
+section{margin-top:40px}
+p{font-size:16px;line-height:1.7;color:var(--ink-2);margin-bottom:14px}
+p strong,li strong{color:var(--ink);font-weight:500}
+ul{margin:0 0 16px 0;padding:0;list-style:none}
+li{font-size:16px;line-height:1.7;color:var(--ink-2);padding:3px 0 3px 22px;position:relative}
+li::before{content:'';position:absolute;left:4px;top:.78em;width:6px;height:6px;border-radius:50%;background:var(--blue)}
+.note{background:var(--fill);border-radius:16px;padding:16px 18px;margin:8px 0 18px}
+.note p{margin:0;color:var(--ink)}
+footer{padding:28px 20px 32px;text-align:center;font-size:13px;color:var(--ink-3);border-top:1px solid var(--line);margin-top:40px}
+footer a{margin:0 10px;color:var(--ink-2)}
+footer a:hover{color:var(--ink)}
+footer .fmeta{margin-top:10px}
+
+.mode-btn{position:fixed;right:28px;bottom:28px;z-index:45;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--gray);color:var(--ink);border:none;cursor:pointer;padding:0;transition:background .25s ease,color .2s ease}
+.mode-btn:hover{color:var(--blue)}
+.mode-btn svg{display:block;width:18px;height:18px;transition:transform .35s var(--ease)}
+.mode-btn:hover svg{transform:rotate(20deg)}
+.mode-btn .ico-sun{display:none}
+html.dark .mode-btn .ico-moon{display:none}
+html.dark .mode-btn .ico-sun{display:block}
+@media(max-width:767.98px){.mode-btn{display:none} main{padding-top:120px}}
+</style>
 </head>
 <body>
 <nav>
-  <a href="index.html" class="nv-logo">cued</a>
-  <div class="nv-r">
-    <a href="how-it-works.html">How it works</a>
-    <a href="discover.html">Discover</a>
-    <a href="index.html#pricing">Pricing</a>
-    <a href="signup.html" class="nv-btn">Get started</a>
-  </div>
-  <button class="hamburger" id="hamburger" aria-label="Open menu">
-    <span></span><span></span><span></span>
-  </button>
+  <a href="index.html" class="brand" aria-label="cued home"><img class="logo-light" src="images/cued-logo.svg" alt=""><img class="logo-dark" src="images/cued-logo-reversed.svg" alt=""><span>cued</span></a>
+  <a href="index.html" class="nav-cta">get started</a>
 </nav>
-<div class="mobile-menu" id="mobileMenu">
-  <button class="mm-close" id="mmClose">&#x2715;</button>
-  <a href="index.html">Home</a>
-  <a href="how-it-works.html">How it works</a>
-  <a href="discover.html">Discover</a>
-  <a href="index.html#pricing">Pricing</a>
-  <a href="signup.html" class="mm-cta">Get started</a>
-</div>
-<div class="wrap">
-<p class="page-label">Legal</p>
+
+<main>
+<p class="eyebrow">Legal</p>
 <h1>Privacy Policy</h1>
 <p class="updated">Last updated: October 2, 2026</p>
-
-<p>Cued ("we," "our," or "us") operates an AI-powered fitness coaching service delivered via SMS. This Privacy Policy explains how we collect, use, and protect your information when you use our service.</p>
+<p class="intro">Cued ("we," "our," or "us") operates an AI-powered fitness coaching service delivered over text messages (iMessage or SMS). This Privacy Policy explains how we collect, use, and protect your information when you use our service.</p>
 
 <h2>Information We Collect</h2>
 <p>When you sign up for Cued, we collect the following information:</p>
@@ -85,7 +100,7 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
 <li><strong>Account information:</strong> name, phone number, age, gender</li>
 <li><strong>Body and fitness data:</strong> height, weight, body fat percentage, fitness goals, experience level, injuries, and dietary preferences</li>
 <li><strong>Schedule and lifestyle data:</strong> wake time, bedtime, workout schedule, occupation, stress level, sleep quality, and activity level</li>
-<li><strong>Conversation data:</strong> all SMS messages exchanged between you and your AI coach, including workout logs, meal responses, and daily check-ins</li>
+<li><strong>Conversation data:</strong> all text messages exchanged between you and your AI coach, including workout logs, meal responses, and daily check-ins</li>
 <li><strong>Wearable data:</strong> if you choose to connect a wearable device (Apple Watch, Oura, Garmin, Whoop, Fitbit or Pixel Watch via Google Health), we may receive health and fitness data including heart rate, HRV, sleep duration, sleep stages, and activity metrics</li>
 <li><strong>Calendar data:</strong> if you choose to connect Google Calendar or a bCourses/Canvas calendar feed, we receive your upcoming events (titles, start and end times, and whether an event is all-day) so your coach can plan workouts and check-ins around your schedule</li>
 </ul>
@@ -151,24 +166,33 @@ footer{border-top:1px solid var(--border);padding:28px clamp(20px,4vw,48px);disp
 <h2>Contact Us</h2>
 <p>If you have questions about this Privacy Policy or your data, contact us at:</p>
 <p><a href="mailto:hello@cued.fit">hello@cued.fit</a></p>
-</div>
+</main>
 
 <footer>
-  <div class="ftl">&copy; 2026 Cued</div>
-  <div class="ftr">
+  <div>
+    <a href="index.html">Home</a>
     <a href="privacy.html">Privacy</a>
     <a href="terms.html">Terms</a>
+    <a href="mailto:hello@cued.fit">Contact</a>
   </div>
+  <div class="fmeta">© 2026 Cued. Made in Berkeley, For Berkeley.</div>
 </footer>
+
+<button type="button" class="mode-btn" id="modeBtn" role="switch" aria-checked="false" aria-label="Dark mode" title="Dark mode">
+  <svg class="ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <svg class="ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7L7 17M17 7l1.7-1.7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+</button>
 <script>
-const hamburger=document.getElementById('hamburger');
-const mobileMenu=document.getElementById('mobileMenu');
-const mmClose=document.getElementById('mmClose');
-function openMenu(){mobileMenu.classList.add('open');hamburger.classList.add('open');document.body.style.overflow='hidden';}
-function closeMenu(){mobileMenu.classList.remove('open');hamburger.classList.remove('open');document.body.style.overflow='';}
-hamburger.addEventListener('click',openMenu);
-mmClose.addEventListener('click',closeMenu);
-mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));
+(function(){
+  var root=document.documentElement, btn=document.getElementById('modeBtn');
+  function sync(){ btn.setAttribute('aria-checked', root.classList.contains('dark') ? 'true' : 'false'); }
+  btn.addEventListener('click', function(){
+    root.classList.toggle('dark');
+    try{ localStorage.setItem('cued-theme', root.classList.contains('dark') ? 'dark' : 'light'); }catch(e){}
+    sync();
+  });
+  sync();
+})();
 </script>
 </body>
 </html>
