@@ -546,7 +546,7 @@ html.dark .cv-under .logo-dark{display:block}
   font-size:clamp(2.2rem,4.4vw,4.2rem);line-height:1.14;letter-spacing:-.02em;
   text-align:center;max-width:1120px;color:var(--ink);text-wrap:balance;
 }
-.say .brand-mark{color:var(--blue)}
+.say .brand-mark,.say .key{color:var(--blue)}   /* .key: the verbs that explain the icon clusters + the no-download promise */
 .js .say .sw{color:var(--ink-3);opacity:.5;transition:color .25s ease,opacity .25s ease}
 .js .say .sw.on{color:inherit;opacity:1}
 .say-ico{display:inline-flex;align-items:center;vertical-align:-.18em;margin:0 .08em}
@@ -880,7 +880,7 @@ html.dark .co-bg{--co-glass:rgba(28,28,30,.8);--co-opt-line:rgba(255,255,255,.09
 .co-input.co-num::placeholder{text-align:center}
 @keyframes co-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 .co-shake{animation:co-shake .28s var(--ease)}
-.co-send{width:36px;height:36px;border-radius:50%;background:var(--co-blue);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;transition:background .15s,opacity .15s}
+.co-bg .co-send{width:36px;height:36px;border-radius:50%;background:var(--co-blue);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--co-blue-ink);/* class+element so it outranks `.co-bg button{color:inherit}` — otherwise the arrow inherits the page ink and sits black on blue */transition:background .15s,opacity .15s}
 .co-send:hover:not(:disabled){background:var(--co-blue-deep)}
 .co-send:disabled{opacity:.35;cursor:default}
 .co-send svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
@@ -1280,51 +1280,35 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
           <img class="cv-icon" src="images/app-icons/canvas-student.jpg" alt="" draggable="false">
         </div>
       </div>
-      <!-- The statement (see .hero-say). Icon clusters sit inline. -->
+      <!-- The statement (see .hero-say). Icon clusters sit inline. Each
+           cluster follows a verb that says what it is: "knows your classes"
+           (connected accounts) vs. "replaces your lift ... and meal ... apps"
+           (retired) — without the verbs, readers took the icons for a list of
+           apps they'd have to install (reader feedback, 2026-10-05). -->
       <div class="hero-say">
-        <p class="say">meet <span class="brand-mark">cued</span>, the coach that lives in your texts <span class="say-ico"><svg viewBox="0 0 40 40" aria-hidden="true" style="width:1.05em;height:1.05em;border-radius:23%"><rect width="40" height="40" rx="9" fill="#5BD65B"/><path d="M20 9.5c-6.6 0-12 4.3-12 9.6 0 3 1.7 5.6 4.4 7.3-.2 1.4-.8 2.8-1.9 3.9 2.3-.3 4.3-1.2 5.7-2.3 1.2.3 2.5.5 3.8.5 6.6 0 12-4.3 12-9.6S26.6 9.5 20 9.5z" fill="#fff"/></svg></span> and already knows your classes <span class="say-ico"><img src="images/app-icons/google-calendar.webp" alt=""><img src="images/app-icons/canvas-student.jpg" alt=""></span>, your lifts <span class="say-ico"><img src="images/app-icons/hevy.png" alt=""><img src="images/app-icons/macrofactor_workouts.webp" alt=""></span> and your meals <span class="say-ico"><img src="images/app-icons/MyFitnessPal%20Review.jpg" alt=""><img src="images/app-icons/MacroFactor-MacroTracker_icon.png" alt=""><img src="images/app-icons/mynetdiary.jpg" alt=""></span>. your cue to lock in.</p>
+        <p class="say">meet <span class="brand-mark">cued</span>, the coach that lives in your texts <span class="say-ico"><svg viewBox="0 0 40 40" aria-hidden="true" style="width:1.05em;height:1.05em;border-radius:23%"><rect width="40" height="40" rx="9" fill="#5BD65B"/><path d="M20 9.5c-6.6 0-12 4.3-12 9.6 0 3 1.7 5.6 4.4 7.3-.2 1.4-.8 2.8-1.9 3.9 2.3-.3 4.3-1.2 5.7-2.3 1.2.3 2.5.5 3.8.5 6.6 0 12-4.3 12-9.6S26.6 9.5 20 9.5z" fill="#fff"/></svg></span>. it <span class="key">knows</span> your classes <span class="say-ico"><img src="images/app-icons/google-calendar.webp" alt=""><img src="images/app-icons/canvas-student.jpg" alt=""></span>, and <span class="key">replaces</span> your lift <span class="say-ico"><img src="images/app-icons/hevy.png" alt=""><img src="images/app-icons/macrofactor_workouts.webp" alt=""></span> and meal <span class="say-ico"><img src="images/app-icons/MyFitnessPal%20Review.jpg" alt=""><img src="images/app-icons/MacroFactor-MacroTracker_icon.png" alt=""><img src="images/app-icons/mynetdiary.jpg" alt=""></span> apps. <span class="key">nothing</span> <span class="key">to</span> <span class="key">download</span>. your cue to lock in.</p>
       </div>
     </div>
   </section>
 
-  <!-- ===== 1 · i text first — 2 reveals, Cued only.
-       The empty left side is the argument — do not fill it. Bubble 1 proves
-       Cued is reading the user's life (class schedule), not just gym traffic. ===== -->
-  <section class="sec sec--pin" style="--n:2" data-label="i text first">
-    <div class="stage">
-      <div class="shell">
-        <div class="sec-h"><h2 class="hdr">i text first</h2></div>
-        <div class="thread">
-          <h2 class="hdr-flow">i text first</h2>
-          <div class="msg cued" data-r>gym's dead right now and you're out of class till 3.</div>
-          <div class="msg cued t" data-r>quick upper push? in and out before the rush 💪</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <!-- ===== TOUR — five conversations, compressed 2026-10-05 from eight.
+       Each section stacks several highlights so the page scrolls about half
+       as far; the Berkeley timeline still holds across them: ochem midterm
+       Tuesday → leg day moved to Wednesday → §2's push session is Wednesday
+       → §4's chart has its tall Wednesday bar and calls the midterm back. ===== -->
 
-  <!-- ===== 2 · i know your week → and i act on it — 7 reveals, 2 headers.
-       The Berkeley-specific proof lives here: calendar (ochem midterm — §5
-       "i remember" calls back to it), location (Moffitt → RSF), and the RSF
-       virtual queue, each stated as something Cued did. Header B crossfades
-       in at reveal 5, one beat before the poll payoff. Page timeline: midterm
-       Tuesday, the moved session lands Wednesday (§3's workout, §5's tall
-       Wednesday bar). ===== -->
-  <section class="sec sec--pin" style="--n:7" data-hdr-switch="5" data-label="i know your week">
+  <!-- ===== 1 · i know your week — 5 reveals, Cued opens cold. Texts first
+       (class schedule + empty gym), reads the calendar (the midterm move),
+       then the poll. The empty left side at the top is the argument. ===== -->
+  <section class="sec sec--pin" style="--n:5" data-label="i know your week">
     <div class="stage">
       <div class="shell">
-        <div class="sec-h">
-          <h2 class="hdr">i know your week</h2>
-          <h2 class="hdr">and i act on it</h2>
-        </div>
+        <div class="sec-h"><h2 class="hdr">i know your week</h2></div>
         <div class="thread">
           <h2 class="hdr-flow">i know your week</h2>
-          <div class="msg cued t" data-r>saw the ochem midterm on your calendar tues. moving leg day to wednesday.</div>
-          <div class="msg cued turn" data-r>you're at moffitt. rsf is 6 min away and half empty.</div>
-          <div class="msg cued t" data-r>line at rsf is 25 min. put you in the virtual queue — you're up at 5:32, leave by 5:20.</div>
-          <div class="msg user t turn" data-r>alr bet lmk. i'll probably be studying at doe most of the weekend.</div>
-          <h2 class="hdr-flow">and i act on it</h2>
-          <div class="msg cued t turn" data-r>i looked at your schedule today, it seems like you have class from 2-5. which of these do you prefer? lmk</div>
+          <div class="msg cued" data-r>gym's dead right now and you're out of class till 3. quick upper push? in and out before the rush 💪</div>
+          <div class="msg cued t" data-r>also saw the ochem midterm on your calendar tues — moving leg day to wednesday.</div>
+          <div class="msg cued t turn" data-r>you've got class 2–5 wednesday. when do you want it?</div>
           <div class="poll" data-r aria-label="Poll: pick a workout time">
             <button type="button" class="poll-row pick" data-t="5:30" aria-pressed="true"><span>5:30pm – 7pm</span><i aria-hidden="true"></i></button>
             <button type="button" class="poll-row" data-t="12:30" aria-pressed="false"><span>12:30pm – 1:30pm</span><i aria-hidden="true"></i></button>
@@ -1336,22 +1320,16 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     </div>
   </section>
 
-  <!-- ===== 3 · i log your sets → and i know when you're stronger — 7 reveals,
-       2 headers. The Wednesday session §2 set up. Cued already knows the
-       plan, so it sends the sets as a tappable checklist — one row per set,
-       target pre-filled; a tap means "did it as planned", and the reader only
-       sees one gray text ("190 x4") for the set that went differently. The
-       story checks rows off as it plays (skipping any the reader tapped
-       first), the PR reply carries the header crossfade at reveal 5, and the
-       workout card sums the session inside a normal blue bubble, like the
-       chart in "i remember". ===== -->
-  <section class="sec sec--pin" style="--n:7" data-hdr-switch="5" data-label="i log your sets">
+  <!-- ===== 2 · i log your sets — 6 reveals. The Wednesday session §1 set up.
+       Cued sends the sets as a tappable checklist; a tap means "did it as
+       planned", and the reader only sees one gray text ("190 x4") for the
+       set that went differently. The story checks rows off as it plays
+       (skipping any the reader tapped first), the swap reply carries the PR,
+       and the workout card sums the session inside a normal blue bubble. ===== -->
+  <section class="sec sec--pin" style="--n:6" data-label="i log your sets">
     <div class="stage">
       <div class="shell">
-        <div class="sec-h">
-          <h2 class="hdr">i log your sets</h2>
-          <h2 class="hdr">and i know when you're stronger</h2>
-        </div>
+        <div class="sec-h"><h2 class="hdr">i log your sets</h2></div>
         <div class="thread">
           <h2 class="hdr-flow">i log your sets</h2>
           <div class="msg cued t" data-r>push day. 4 sets bench, then the usual. tap as you go — text me if a set goes different.</div>
@@ -1362,9 +1340,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
             <button type="button" class="poll-row" aria-pressed="false"><span>bench 185 × 5</span><i aria-hidden="true"></i></button>
           </div>
           <div class="msg user t turn" data-r>190 x4</div>
-          <div class="msg cued t turn cl-swap" data-r>swapped it in.</div>
-          <h2 class="hdr-flow">and i know when you're stronger</h2>
-          <div class="msg cued turn" data-r>190 × 4 is a PR 🎉 last time was 185 × 3.</div>
+          <div class="msg cued turn cl-swap" data-r>swapped it in. and 190 × 4 is a PR 🎉 last time was 185 × 3.</div>
           <div class="msg cued card" data-r>
             <div class="wc-head">push · wed · 48 min</div>
             <div class="wc-row">bench press — 185×5 · 185×5 · <b class="wc-pr">190×4</b> · 185×5</div>
@@ -1379,20 +1355,19 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     </div>
   </section>
 
-  <!-- ===== 4 · i know what's for dinner — 5 reveals, two-sided. The plate
-       photo beat: Cued reads a meal from a picture. The receipt beat lives
-       in its own section right after — together they were pushing this
-       thread far past the stage height, retiring the opening bubbles under
-       the header scrim before the section finished. ===== -->
-  <section class="sec sec--pin" style="--n:5" data-label="what's for dinner">
+  <!-- ===== 3 · i know what's for dinner — 4 reveals, two-sided. Dining-hall
+       pick with the protein math folded into the reply, then the plate photo
+       beat: Cued reads a meal from a picture. (The Trader Joe's receipt beat
+       was cut in the 2026-10-05 compression; images/tj-receipt.jpg stays in
+       the repo.) ===== -->
+  <section class="sec sec--pin" style="--n:4" data-label="what's for dinner">
     <div class="stage">
       <div class="shell">
         <div class="sec-h"><h2 class="hdr">i know what's for dinner</h2></div>
         <div class="thread">
           <h2 class="hdr-flow">i know what's for dinner</h2>
           <div class="msg user t" data-r>what's good at crossroads rn</div>
-          <div class="msg cued turn" data-r>chimichurri tri-tip tonight. grab the roasted sweet potatoes, pile on the veg</div>
-          <div class="msg cued t" data-r>that's ~45g protein. you're at 80 for the day</div>
+          <div class="msg cued t turn" data-r>chimichurri tri-tip tonight. grab the roasted sweet potatoes, pile on the veg — that's ~45g protein, you're at 80 for the day</div>
           <!-- Photo attachment — real plate photo. -->
           <div class="msg user photo turn" data-r>
             <img src="images/dinner-plate.jpg" width="1000" height="855" loading="lazy"
@@ -1404,36 +1379,20 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     </div>
   </section>
 
-  <!-- ===== 5 · i read receipts — 2 reveals. The groceries beat on its own
-       stage: snap the Trader Joe's receipt (a real one — 1885 University
-       Ave) and Cued logs it; the yogurt/eggs/chicken in the reply are items
-       actually on it. ===== -->
-  <section class="sec sec--pin" style="--n:2" data-label="i read receipts">
+  <!-- ===== 4 · i remember → and i read your watch — 7 reveals, 2 headers.
+       Cued opens cold and calls back to §1's ochem midterm; the chart bubble
+       is memory made visible (short Mon–Tue around the Tuesday midterm,
+       tallest Wednesday — §2's session). The second header folds the
+       wearable story in: a short night moves the day, and the same thing
+       happens from a plain gray text if there's no watch. Device list
+       matches the FAQ (Apple Watch, Whoop, Oura, Garmin). ===== -->
+  <section class="sec sec--pin" style="--n:7" data-hdr-switch="5" data-label="i remember">
     <div class="stage">
       <div class="shell">
-        <div class="sec-h"><h2 class="hdr">groceries? got it.</h2></div>
-        <div class="thread">
-          <h2 class="hdr-flow">groceries? got it. </h2>
-          <div class="msg user photo tall" data-r>
-            <img src="images/tj-receipt.jpg" width="972" height="1200" loading="lazy"
-                 alt="Photo of a Trader Joe's receipt from Berkeley listing chicken, ribeye steak, salmon, ground beef, greek yogurt, eggs, and produce">
-          </div>
-          <div class="msg cued t turn" data-r>got your trader joe's receipt. logged the yogurt, eggs, and chicken — you're stocked through thursday.</div>
+        <div class="sec-h">
+          <h2 class="hdr">i remember</h2>
+          <h2 class="hdr">and i read your watch</h2>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== 6 · i remember — 6 reveals. Cued opens cold, unprompted; the time
-       jump lives entirely in Cued speaking first and calling back to §2's
-       ochem midterm. The chart bubble is memory made visible — it answers a
-       question about the past, and its bars follow the page timeline: short
-       Mon–Tue around the Tuesday midterm, tallest on Wednesday, the moved
-       session from §3. ===== -->
-  <section class="sec sec--pin" style="--n:6" data-label="i remember">
-    <div class="stage">
-      <div class="shell">
-        <div class="sec-h"><h2 class="hdr">i remember</h2></div>
         <div class="thread">
           <h2 class="hdr-flow">i remember</h2>
           <div class="msg cued t" data-r>how'd the ochem midterm go</div>
@@ -1461,48 +1420,31 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
               </g>
             </svg>
           </div>
-          <div class="msg cued" data-r>ok. you're back on normal sched now — pull day tonight, the one we pushed from last week</div>
-          <div class="msg cued t" data-r>and you've had the tri-tip four times 😭 there's salmon at foothill</div>
+          <div class="msg cued t" data-r>solid week considering. you're back on normal sched now — pull day tonight, the one we pushed.</div>
+          <h2 class="hdr-flow">and i read your watch</h2>
+          <div class="msg cued t turn" data-r>your watch says you slept 4 hours 💀 not the day for heavy squats. moved leg day to thursday — tonight: walk, protein, early bed</div>
+          <div class="msg cued t turn" data-r>no watch? just text me "slept like garbage" and i'll do the same thing. apple watch, whoop, oura, garmin — great if you have one, never required</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ===== 7 · i read your watch — 5 reveals. Strava beat first: the run is
-       Wednesday morning, same day as §3's push session — cardio's covered, so
-       the evening stays push, and "keep strava. i read it." plants the one
-       app that deliberately never appears in the hero's icon scatter.
-       Then the sleep beat. ===== -->
-  <section class="sec sec--pin" style="--n:5" data-label="i read your watch">
+  <!-- ===== 5 · it stays between us — 4 reveals. The privacy beat, asked by
+       the reader right after watching Cued read their sleep. Every bubble is
+       a promise privacy.html backs (no sale, no ads, only the providers that
+       run the service process it, deletion within 30 days) — if the policy
+       changes, this changes. The Limited Use language stays in the static
+       about block below, where Google's reviewers look for it. ===== -->
+  <section class="sec sec--pin" style="--n:4" data-label="it stays between us">
     <div class="stage">
       <div class="shell">
-        <div class="sec-h"><h2 class="hdr">i read your watch</h2></div>
+        <div class="sec-h"><h2 class="hdr">it stays between us</h2></div>
         <div class="thread">
-          <h2 class="hdr-flow">i read your watch</h2>
-          <div class="msg cued" data-r>saw the run on strava — 4.2 mi, 8:40 pace, before your 9am. nice.</div>
-          <div class="msg cued t" data-r>keep strava. i read it. cardio's covered, so tonight stays push.</div>
-          <div class="msg cued t turn" data-r>your watch says you slept 4 hours 💀 today is not the day for heavy squats</div>
-          <div class="msg user t turn" data-r>yeah… rough night lol</div>
-          <div class="msg cued t turn" data-r>moved leg day to thursday. tonight: walk, protein, early bed</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== 8 · no watch? no problem — 3 reveals. Split out of the watch
-       section so the claim gets the full centered-header intro beat of its
-       own (as an in-place crossfade it read as no change at all). A plain
-       gray text is enough, and Cued does the identical thing. Device list
-       matches the FAQ (Apple Watch, Whoop, Oura, Garmin). ===== -->
-  <section class="sec sec--pin" style="--n:3" data-label="no watch? no problem">
-    <div class="stage">
-      <div class="shell">
-        <div class="sec-h"><h2 class="hdr">no watch? no problem</h2></div>
-        <div class="thread">
-          <h2 class="hdr-flow">no watch? no problem</h2>
-          <div class="msg user t" data-r>slept like garbage</div>
-          <div class="msg cued turn" data-r>that works too. no watch needed — pushing legs a day, easy pull today.</div>
-          <div class="msg cued t" data-r>apple watch, whoop, oura, garmin — great if you have one, never required</div>
+          <h2 class="hdr-flow">it stays between us</h2>
+          <div class="msg user t" data-r>wait who else sees all this</div>
+          <div class="msg cued turn" data-r>nobody. it's used to coach you, that's it — no ads, nothing sold, nobody but the services literally running me.</div>
+          <div class="msg cued t" data-r>and if you ever want out, text "delete me" and it's gone within 30 days.</div>
+          <div class="msg user t turn" data-r>ok good</div>
         </div>
       </div>
     </div>
