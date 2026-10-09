@@ -16,6 +16,16 @@ python3 -m http.server 8080
 npx serve .
 ```
 
+## Tests
+
+`tests/` is the one place with a dependency: tier-1 DOM tests for the interactive pages, run with Node's built-in runner against jsdom with the backend stubbed in-memory (`tests/harness.mjs`). The site itself still has no build step.
+
+```bash
+cd tests && npm install && npm test
+```
+
+Red-first for behaviour changes to `card.html` (gestures, rendering, API calls); green guards for what already works.
+
 ## Architecture
 
 The site is entirely self-contained vanilla HTML/CSS/JS with no framework or build step. All CSS is inlined in `<style>` tags; all JS is inlined in `<script>` tags at the bottom of each page.
