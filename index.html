@@ -2257,7 +2257,8 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 // otherwise have to ask for over text — a user who texted "168 cm" to an
 // extractor that only knew feet sat in onboarding for 27 turns:
 //   { height_cm, weight_kg } or { height_ft, height_in, weight_lbs },
-//   workout_days (2–6), workout_time (morning|afternoon|evening),
+//   workout_days (2–6), workout_time (morning|afternoon|evening — the first pick),
+//   workout_times ([…] of those when they picked more than one; since 2026-10-09),
 //   diet, restrictions (optional free text), existing_tools:[…] }
 // — `name` is the FIRST name (it's what the coach's hook and prompts inject);
 // the full name rides along in `full_name` for the admin side only.
@@ -2675,6 +2676,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       ...(sdata.stats || {}),
       workout_days: sdata.workout_days || null,
       workout_time: sdata.workout_time || null,
+      workout_times: sdata.workout_times && sdata.workout_times.length > 1 ? sdata.workout_times : null,
       diet: sdata.diet || null,
       restrictions: sdata.restrictions || null,
       existing_tools: sdata.existing_tools && sdata.existing_tools.length ? sdata.existing_tools : null,
@@ -2737,8 +2739,12 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     sdata.stats = await statsInput();                                             setProgress(8);
     await coachSay('how many days a week can you realistically train?');
     [sdata.workout_days] = await chips([{label:'2',value:'2'},{label:'3',value:'3'},{label:'4',value:'4'},{label:'5',value:'5'},{label:'6',value:'6'}]);  setProgress(9);
-    await coachSay('and when do you usually get to it?');
-    [sdata.workout_time] = await chips([{label:'mornings',value:'morning'},{label:'afternoons',value:'afternoon'},{label:'evenings',value:'evening'}]);  setProgress(10);
+    // Multi-select (founder 2026-10-09): different days, different times. The first
+    // pick rides in workout_time (what every backend reads); the whole list rides in
+    // workout_times (backend restructure PR 4 reads it; older backends ignore it).
+    await coachSay('and when do you usually get to it? pick all that apply');
+    sdata.workout_times = await chips([{label:'mornings',value:'morning'},{label:'afternoons',value:'afternoon'},{label:'evenings',value:'evening'}], true);
+    sdata.workout_time = sdata.workout_times[0];                                  setProgress(10);
     await coachSay('how do you eat?');
     [sdata.diet] = await chips([{label:'no restrictions',value:'omnivore'},{label:'vegetarian',value:'vegetarian'},{label:'vegan',value:'vegan'},{label:'pescatarian',value:'pescatarian'},{label:'halal',value:'halal'},{label:'kosher',value:'kosher'}]);  setProgress(11);
     await coachSay("any allergies, or foods you just won't eat? skip if nothing comes to mind");
