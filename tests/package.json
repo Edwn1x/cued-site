@@ -1,0 +1,12 @@
+{
+  "name": "cued-site-tests",
+  "private": true,
+  "type": "module",
+  "description": "Tier-1 DOM tests for the interactive pages (card.html). The site itself has no build step; this folder is the only place with a dependency.",
+  "scripts": {
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "jsdom": "^27.0.0"
+  }
+}
