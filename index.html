@@ -26,11 +26,12 @@
   prefers-reduced-motion: the hero joins the flow too (headline, drawing
   band, bubbles), and every transition is off.
 
-  Every CTA opens the waitlist — not a form but the sign-up chat: a Messages
+  Every CTA ("text cued") opens the sign-up chat — not a form: a Messages
   card (the reader's sends blue, Cued's replies gray) that collects the
-  profile the coach starts from, POSTs it to the backend's /waitlist, and
-  ends on "Text me on iMessage" so their line is open before an admin
-  activates them. See the WAITLIST blocks at the end of the sheet and script.
+  profile the coach starts from, POSTs it to the backend's /waitlist (the
+  route name is historical — since 2026-10-15 sign-ups are LIVE), and ends
+  on "text me on iMessage": their one tap is what makes the coach's first
+  text land blue. See the WAITLIST blocks at the end of the sheet and script.
 
   Vanilla HTML/CSS/JS, no build step. Deploys via GitHub Pages from /main.
 -->
@@ -1132,13 +1133,13 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   </div>
 </div>
 
-<button type="button" class="float-cta" id="floatCta" aria-label="Join the waitlist">
-  Join the waitlist
+<button type="button" class="float-cta" id="floatCta" aria-label="Text cued">
+  text cued
 </button>
 
 <!-- Mobile-only pinned CTA bar (see .m-cta). #heroCta is the hero source. -->
 <div class="m-cta" id="mCta">
-  <button type="button" class="cta" id="heroCta">Join the waitlist</button>
+  <button type="button" class="cta" id="heroCta">text cued</button>
 </div>
 
 <!-- Dark-mode toggle — sun/moon button in the bottom-right corner (see .mode-btn). -->
@@ -1175,7 +1176,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
         <h1 class="hero-h1">Meet <span class="brand-mark">cued</span>.<br>made for your college life.</h1>
         <p class="hero-sub">Your personal fitness coach — no app, <span class="nowrap">just texts<svg class="ico-inline" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="9" fill="#5BD65B"/><path d="M20 9.5c-6.6 0-12 4.3-12 9.6 0 3 1.7 5.6 4.4 7.3-.2 1.4-.8 2.8-1.9 3.9 2.3-.3 4.3-1.2 5.7-2.3 1.2.3 2.5.5 3.8.5 6.6 0 12-4.3 12-9.6S26.6 9.5 20 9.5z" fill="#fff"/></svg></span><br>Your cue to lock in.</p>
         <div class="hero-ctas">
-          <button type="button" class="cta" id="heroCtaTop">Join the waitlist</button>
+          <button type="button" class="cta" id="heroCtaTop">text cued</button>
         </div>
       </div>
       <div class="hero-art" aria-hidden="true">
@@ -1454,12 +1455,12 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   <!-- ===== CLOSE — the statement's twin: one serif line that inks in word
        by word as it scrolls into view, then the pill. No bubble — the thread
        has made its case; this is the sign-off. ===== -->
-  <section class="sec close" id="signup" data-label="join the waitlist">
+  <section class="sec close" id="signup" data-label="text cued">
     <div class="shell">
       <p class="say close-say" data-io>your cue to lock in.</p>
       <p class="close-sub" data-io>nothing to open. ready when you are.</p>
       <div class="close-cta" data-io>
-        <button type="button" class="cta" id="closeCta">Join the waitlist</button>
+        <button type="button" class="cta" id="closeCta">text cued</button>
       </div>
     </div>
   </section>
@@ -1545,7 +1546,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </main>
 
 <!-- ===== WAITLIST — the sign-up chat (script at the bottom of the page) ===== -->
-<div class="co-bg" id="waitlistOverlay" role="dialog" aria-modal="true" aria-label="Join the waitlist" aria-hidden="true">
+<div class="co-bg" id="waitlistOverlay" role="dialog" aria-modal="true" aria-label="Text cued" aria-hidden="true">
   <div class="co-sheet" role="document">
     <div class="co-handle"></div>
     <div class="co-head">
@@ -2243,13 +2244,15 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 // === Waitlist — the sign-up chat ===
 // Every CTA calls open(source) → window.openWaitlist. The same conversational
 // sign-up the legacy pages run (legacy/js/signup.js), posting to /waitlist
-// instead of /signup: the backend stores the profile on a PENDING row, sends
-// no text, provisions their iMessage line and returns `imessage_link`. The
-// success screen asks for the one tap that opens that line ("Text me on
-// iMessage" → Messages pre-addressed with "hey cued"; the backend answers a
-// pending user with one holding line and nothing else until an admin
-// activates them), or "I don't have an iPhone" → /signup/channel puts them on
-// SMS. Payload keeps the original waitlist keys
+// instead of /signup. LIVE since 2026-10-15 (the route name is historical):
+// the backend creates a live account, provisions their iMessage line and
+// returns `imessage_link` + `live: true` + `hook_deferred`. With a link the
+// coach's first text WAITS for the one tap that opens the line ("text me on
+// iMessage" → Messages pre-addressed with "hey cued"; their send gets the
+// coach's first text back, blue) or "i don't have an iPhone" → /signup/channel
+// sends it by SMS now; without a link it's already on its way. An older
+// backend (no `live` in the response) still means the waitlist, and the
+// success copy says so. Payload keeps the original waitlist keys
 //   { name, phone, email, source, ts, timezone, active:false, status:'waitlist' }
 // and adds
 //   { full_name, age, gender, goal:[…], biggest_obstacle, experience, equipment, sms_consent:true }
@@ -2560,7 +2563,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   // Consent: the fine print is cued's bubble (terms + privacy inline); the
   // reader's "i agree" is their bubble, sent from the one chip on offer.
   async function consentStep(){
-    await coachSay('by joining you agree to get recurring automated texts from cued — workouts, meals, check-ins — once your spot opens. 5–8 msgs/day, msg &amp; data rates may apply, reply STOP to cancel or HELP for help. <a href="terms.html" target="_blank" rel="noopener">terms</a> · <a href="privacy.html" target="_blank" rel="noopener">privacy</a>', 320, 'fine');
+    await coachSay('by joining you agree to get recurring automated texts from cued — workouts, meals, check-ins. 5–8 msgs/day, msg &amp; data rates may apply, reply STOP to cancel or HELP for help. <a href="terms.html" target="_blank" rel="noopener">terms</a> · <a href="privacy.html" target="_blank" rel="noopener">privacy</a>', 320, 'fine');
     await chips([{label: 'i agree', value: true}], false, 'tap to agree');
     return true;
   }
@@ -2610,9 +2613,9 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     if (link){
       // iMessage-first (Photon shared pool): Cued can't text a new number in
       // blue until that number texts Cued's line once. The link opens Messages
-      // pre-addressed with "hey cued" typed in; their send opens the line (the
-      // backend holds them with one reply while they're pending). Secondary:
-      // "I don't have an iPhone" → /signup/channel → SMS when their spot opens.
+      // pre-addressed with "hey cued" typed in; their send opens the line and
+      // (live) the coach's first text is the reply. Secondary: "i don't have an
+      // iPhone" → /signup/channel → the first text by SMS, right away.
       const a = document.createElement('a');
       a.className = 'co-confirm co-imsg';
       a.href = link;
@@ -2632,7 +2635,8 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
             a.remove(); alt.remove();
             const note = document.createElement('p');
             note.className = 'co-imsg-note';
-            note.textContent = "got it — i'll text you by SMS the second your spot opens.";
+            note.textContent = d.hook_sent ? "got it — just texted you by SMS. check your messages."
+                                           : "got it — i'll text you by SMS the second your spot opens.";
             s.appendChild(note);
           } else { alt.disabled = false; alt.textContent = "i don't have an iPhone"; }
         } catch { alt.disabled = false; alt.textContent = "i don't have an iPhone"; }
@@ -2655,7 +2659,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 
   async function submitProfile(){
     clearInput();
-    await coachSay('saving your spot…', 260);
+    await coachSay('setting you up…', 260);
     const payload = {
       name: first(),          // what the coach says — first name only, never the full name
       full_name: sdata.name,  // for us (admin, email later); the backend keeps it aside
@@ -2690,12 +2694,25 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
         const link = data.imessage_link;
         const linkOk = typeof link === 'string' && /^https:\/\//.test(link);
         const already = data.status === 'exists';
+        const live = data.live === true;   // absent → an older backend: still the waitlist
         setProgress(STEPS);
-        successScreen(
-          already ? (data.message || "you're already on the list.").toLowerCase() : `you're on the list, ${first()}.`,
-          linkOk ? "one more thing — text me once so i can reach you on iMessage the second your spot opens. from the number you just gave me."
-                 : (already ? 'nothing else to do here.' : "i'll text you the second your spot opens. keep an eye on your messages."),
-          linkOk ? link : null);
+        let title, body;
+        if (live && !already){
+          // Signed up for real. With a link, their tap IS what brings the first
+          // text (backend: hook deferred until their first blue text, or until
+          // "i don't have an iPhone"); without one it's already on its way.
+          title = `you're in, ${first()}.`;
+          body = linkOk ? "one more thing — text me once from the number you just gave me so i can reach you on iMessage. i'll text you right back and we'll get going."
+                        : "just texted you. keep an eye on your messages — that's where everything happens.";
+        } else if (live && already){
+          title = "you're already signed up.";
+          body = linkOk ? "i'm right here — text me whenever." : "nothing else to do here — text me whenever.";
+        } else {
+          title = already ? (data.message || "you're already on the list.").toLowerCase() : `you're on the list, ${first()}.`;
+          body = linkOk ? "one more thing — text me once so i can reach you on iMessage the second your spot opens. from the number you just gave me."
+                        : (already ? 'nothing else to do here.' : "i'll text you the second your spot opens. keep an eye on your messages.");
+        }
+        successScreen(title, body, linkOk ? link : null);
       } else {
         await coachSay((data && data.message) || 'something went wrong — try again?', 320);
         showRetry();
@@ -2752,7 +2769,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     await coachSay('track anything already? pick all that apply');
     sdata.existing_tools = await chips([{label:'nothing yet',value:'none'},{label:'apple watch',value:'apple_watch'},{label:'fitbit / google',value:'fitbit'},{label:'garmin',value:'garmin'},{label:'whoop',value:'whoop'},{label:'oura',value:'oura'},{label:'strava',value:'strava'},{label:'myfitnesspal',value:'myfitnesspal'}], true);
     if (sdata.existing_tools.includes('none')) sdata.existing_tools = ['none'];   setProgress(13);
-    await coachSay("almost there — your number? that's where i'll text you when your spot opens");
+    await coachSay("almost there — your number? that's where i'll text you");
     sdata.phone = await askPhone();                                               setProgress(14);
     await coachSay("and ur gmail? optional, but it's what i need to read ur google calendar or fitbit later");
     sdata.email = await askEmail();
