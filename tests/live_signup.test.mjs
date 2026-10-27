@@ -45,12 +45,14 @@ async function type(d, value, { skip = false } = {}) {
   const inp = await until(() => d.querySelector('#coInputArea input.co-input:not([readonly])'));
   if (skip) { (await until(() => d.querySelector('#coInputArea .co-skip'))).click(); return; }
   inp.value = value; inp.dispatchEvent(new d.defaultView.Event('input', { bubbles: true }));
-  const btn = await until(() => [...d.querySelectorAll('#coInputArea button')].find(b => !b.classList.contains('co-opt') && !b.disabled));
+  // prefer the send arrow: an optional field's row has "skip" before it
+  const btn = await until(() => d.querySelector('#coInputArea .co-send:not([disabled])')
+                             || [...d.querySelectorAll('#coInputArea button')].find(b => !b.classList.contains('co-opt') && !b.disabled));
   btn.click();
 }
 const bubbles = (d) => [...d.querySelectorAll('#coMsgs .co-msg')].map(x => x.textContent);
 
-async function walk(w) {
+async function walk(w, { referral = null } = {}) {
   const d = w.document; lastDoc = d;
   await until(() => typeof w.openWaitlist === 'function');
   w.openWaitlist('hero');
@@ -75,7 +77,10 @@ async function walk(w) {
   const phoneAsk = await until(() => bubbles(d).find(t => /your number\?/.test(t)));
   assert.doesNotMatch(phoneAsk, /spot/);
   await type(d, '5105550123');
-  await type(d, '', { skip: true });
+  await type(d, '', { skip: true });                       // gmail
+  const refAsk = await until(() => bubbles(d).find(t => /referral code/.test(t)));
+  assert.match(refAsk, /skip if not/);
+  if (referral) await type(d, referral); else await type(d, '', { skip: true });
   const consent = await until(() => bubbles(d).find(t => /recurring automated texts/.test(t)));
   assert.doesNotMatch(consent, /spot opens/);
   await chip(d, 'i agree');
@@ -136,4 +141,29 @@ test('older backend (no `live`): the waitlist copy still reads right', async () 
   const { success } = await walk(w);
   assert.equal(success.querySelector('h3').textContent, "you're on the list, Edwin.");
   assert.match(success.querySelector('p').textContent, /spot opens/);
+});
+
+// The referral code (founder 2026-10-27): the last optional ask, after gmail. Typed → posted
+// upper-cased as `referral_code` and the success copy names who got the credit; skipped →
+// null, nothing said; an unknown code → a soft line, still in.
+test('referral code: typed → posted + credited line; skipped → null; unknown → soft line', async () => {
+  let posted = [];
+  let w = boot(posted, () => ({ status: 'ok', live: true, hook_deferred: false, imessage_link: null,
+                                referral: { credited: true, referrer: 'Jayden' } }));
+  let { success } = await walk(w, { referral: 'jayden42' });
+  assert.equal(posted[0].body.referral_code, 'JAYDEN42');
+  assert.match(success.querySelector('p').textContent, /jayden gets the referral credit/);
+
+  posted = [];
+  w = boot(posted, () => ({ status: 'ok', live: true, hook_deferred: false, imessage_link: null, referral: null }));
+  ({ success } = await walk(w));
+  assert.equal(posted[0].body.referral_code, null);
+  assert.doesNotMatch(success.querySelector('p').textContent, /referral/);
+
+  posted = [];
+  w = boot(posted, () => ({ status: 'ok', live: true, hook_deferred: false, imessage_link: null,
+                            referral: { credited: false, referrer: null } }));
+  ({ success } = await walk(w, { referral: 'zzz99' }));
+  assert.equal(posted[0].body.referral_code, 'ZZZ99');
+  assert.match(success.querySelector('p').textContent, /didn't match anyone, but you're in/);
 });

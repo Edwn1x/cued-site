@@ -74,6 +74,7 @@ test('training time is multi-select and posts first pick + list', async () => {
   await chip(d, 'nothing yet', { send: true });
   await type(d, '5105550123');
   await type(d, '', { skip: true });
+  await type(d, '', { skip: true });   // gmail, then the referral code (2026-10-27)
   await chip(d, 'i agree');
   const p = (await until(() => posted[0])).body;
   assert.equal(p.workout_time, 'morning');
@@ -96,7 +97,7 @@ test('a single pick posts no workout_times', async () => {
   await chip(d, '3');
   await chip(d, 'evenings', { send: true });
   await chip(d, 'vegan'); await type(d, '', { skip: true }); await chip(d, 'strava', { send: true });
-  await type(d, '5105550124'); await type(d, '', { skip: true }); await chip(d, 'i agree');
+  await type(d, '5105550124'); await type(d, '', { skip: true }); await type(d, '', { skip: true }); await chip(d, 'i agree');
   const p = (await until(() => posted[0])).body;
   assert.equal(p.workout_time, 'evening');
   assert.equal(p.workout_times, null);
