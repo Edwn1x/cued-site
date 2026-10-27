@@ -2263,6 +2263,9 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 //   workout_days (2–6), workout_time (morning|afternoon|evening — the first pick),
 //   workout_times ([…] of those when they picked more than one; since 2026-10-09),
 //   diet, restrictions (optional free text), existing_tools:[…] }
+// and, since 2026-10-27, the friend's referral code (the last optional ask, after the
+// gmail one — the founder's frat sign-up challenge): { referral_code } — the backend
+// credits the friend when it matches and the success screen says so.
 // — `name` is the FIRST name (it's what the coach's hook and prompts inject);
 // the full name rides along in `full_name` for the admin side only.
 // Phone is validated as a 10-digit US number before it's accepted (the backend
@@ -2280,7 +2283,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   if (!overlay || !msgs || !inputArea) return;
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const STEPS = 15;  // name, age, gender, goals, obstacle, experience, equipment, stats, days, time, diet, restrictions, apps, phone, email, consent (email+consent share the last tick)
+  const STEPS = 15;  // name, age, gender, goals, obstacle, experience, equipment, stats, days, time, diet, restrictions, apps, phone, email, referral code, consent (email+code+consent share the last tick)
   let sdata = {};
   let step = 0;
 
@@ -2366,12 +2369,15 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   // optional=true: a "skip" button sits in the row (an empty send skips too);
   // the skip is echoed as the reader's bubble and resolves ''.
   function textInput(placeholder, type = 'text', optional = false){
+    const kind = type;
+    if (type === 'code') type = 'text';   // a referral code: text, but no name autocomplete, caps
     return new Promise(resolve => {
       clearInput();
       const { row, inp, btn, skip } = composer(placeholder, type, false, optional);
       inp.setAttribute('inputmode', type === 'tel' ? 'tel' : type === 'number' ? 'numeric' : type === 'email' ? 'email' : 'text');
       inp.setAttribute('autocomplete', type === 'tel' ? 'tel' : type === 'email' ? 'email' : type === 'text' ? 'name' : 'off');
       if (type === 'email'){ inp.autocapitalize = 'off'; inp.spellcheck = false; }
+      if (kind === 'code'){ inp.setAttribute('autocomplete', 'off'); inp.autocapitalize = 'characters'; inp.spellcheck = false; }
       inp.setAttribute('enterkeyhint', 'send');
       if (type === 'tel'){
         // Formats as they type — (510) 555-1234 — so the number reads back like a contact card.
@@ -2684,6 +2690,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       diet: sdata.diet || null,
       restrictions: sdata.restrictions || null,
       existing_tools: sdata.existing_tools && sdata.existing_tools.length ? sdata.existing_tools : null,
+      referral_code: sdata.referral_code || null,   // a friend's code (backend referrals.py credits them)
       sms_consent: true,
     };
     try {
@@ -2704,6 +2711,10 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
           title = `you're in, ${first()}.`;
           body = linkOk ? "one more thing — text me once from the number you just gave me so i can reach you on iMessage. i'll text you right back and we'll get going."
                         : "just texted you. keep an eye on your messages — that's where everything happens.";
+          // The friend's code matched (backend `referral`): say who got the credit.
+          const ref = data.referral;
+          if (ref && ref.credited && ref.referrer) body += ` ${String(ref.referrer).toLowerCase()} gets the referral credit.`;
+          else if (sdata.referral_code && ref && ref.credited === false) body += " that referral code didn't match anyone, but you're in all the same.";
         } else if (live && already){
           title = "you're already signed up.";
           body = linkOk ? "i'm right here — text me whenever." : "nothing else to do here — text me whenever.";
@@ -2773,6 +2784,8 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     sdata.phone = await askPhone();                                               setProgress(14);
     await coachSay("and ur gmail? optional, but it's what i need to read ur google calendar or fitbit later");
     sdata.email = await askEmail();
+    await coachSay("did a friend send you? drop their referral code and they get the credit — skip if not");
+    sdata.referral_code = (await textInput('e.g. NAU42 (optional)', 'code', true)).trim().toUpperCase() || null;
     await coachSay('last thing — the fine print:');
     await consentStep();                                                          setProgress(15);
     await submitProfile();
