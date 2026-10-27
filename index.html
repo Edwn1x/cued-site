@@ -2785,7 +2785,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     await coachSay("and ur gmail? optional, but it's what i need to read ur google calendar or fitbit later");
     sdata.email = await askEmail();
     await coachSay("did a friend send you? drop their referral code and they get the credit — skip if not");
-    sdata.referral_code = (await textInput('e.g. NAU42 (optional)', 'code', true)).trim().toUpperCase() || null;
+    sdata.referral_code = (await textInput('Alex1234', 'code', true)).trim().toUpperCase() || null;
     await coachSay('last thing — the fine print:');
     await consentStep();                                                          setProgress(15);
     await submitProfile();

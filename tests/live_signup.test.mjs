@@ -80,6 +80,7 @@ async function walk(w, { referral = null } = {}) {
   await type(d, '', { skip: true });                       // gmail
   const refAsk = await until(() => bubbles(d).find(t => /referral code/.test(t)));
   assert.match(refAsk, /skip if not/);
+  assert.equal((await until(() => d.querySelector('#coInputArea input.co-input'))).placeholder, 'Alex1234');
   if (referral) await type(d, referral); else await type(d, '', { skip: true });
   const consent = await until(() => bubbles(d).find(t => /recurring automated texts/.test(t)));
   assert.doesNotMatch(consent, /spot opens/);
@@ -150,8 +151,8 @@ test('referral code: typed → posted + credited line; skipped → null; unknown
   let posted = [];
   let w = boot(posted, () => ({ status: 'ok', live: true, hook_deferred: false, imessage_link: null,
                                 referral: { credited: true, referrer: 'Jayden' } }));
-  let { success } = await walk(w, { referral: 'jayden42' });
-  assert.equal(posted[0].body.referral_code, 'JAYDEN42');
+  let { success } = await walk(w, { referral: 'jayden4821' });
+  assert.equal(posted[0].body.referral_code, 'JAYDEN4821');
   assert.match(success.querySelector('p').textContent, /jayden gets the referral credit/);
 
   posted = [];
@@ -163,7 +164,7 @@ test('referral code: typed → posted + credited line; skipped → null; unknown
   posted = [];
   w = boot(posted, () => ({ status: 'ok', live: true, hook_deferred: false, imessage_link: null,
                             referral: { credited: false, referrer: null } }));
-  ({ success } = await walk(w, { referral: 'zzz99' }));
-  assert.equal(posted[0].body.referral_code, 'ZZZ99');
+  ({ success } = await walk(w, { referral: 'zzz9999' }));
+  assert.equal(posted[0].body.referral_code, 'ZZZ9999');
   assert.match(success.querySelector('p').textContent, /didn't match anyone, but you're in/);
 });
