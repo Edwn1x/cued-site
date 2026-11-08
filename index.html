@@ -377,7 +377,7 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 .apps-row h3{font-family:var(--f-head);font-weight:400;font-size:32px;line-height:1.15;color:var(--ink)}
 .apps{display:flex;flex-wrap:wrap;gap:20px}
 .app{width:68px;text-align:center}
-.app img,.app svg{display:block;width:56px;height:56px;border-radius:14px;margin:0 auto;object-fit:cover}
+.app img{display:block;width:56px;height:56px;border-radius:14px;margin:0 auto;object-fit:cover;background:#fff}
 .app span{display:block;font-size:13px;color:var(--gray-text);margin-top:8px;line-height:1.25}
 .apps.retired img{filter:saturate(.85)}
 .apps-note{text-align:center;font-size:18px;color:var(--gray-text);margin-top:36px}
@@ -859,7 +859,9 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       <div class="apps">
         <div class="app"><img src="images/app-icons/google-calendar.webp" alt=""><span>google calendar</span></div>
         <div class="app"><img src="images/app-icons/canvas-student.jpg" alt=""><span>bcourses / canvas</span></div>
-        <div class="app"><svg viewBox="0 0 56 56" aria-hidden="true"><rect width="56" height="56" rx="14" fill="#fff"/><rect x=".5" y=".5" width="55" height="55" rx="13.5" fill="none" stroke="#EEF2F8"/><path d="M28 41s-11-7.2-11-15.1A6.2 6.2 0 0 1 28 22.6a6.2 6.2 0 0 1 11 3.3C39 33.8 28 41 28 41z" fill="none" stroke="#006EFD" stroke-width="2.6" stroke-linejoin="round"/><path d="M21 29h4l2-4 3 8 2-4h3" fill="none" stroke="#006EFD" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>google health<br>(fitbit, pixel watch)</span></div>
+        <div class="app"><img src="images/app-icons/google-health.webp" alt=""><span>google health<br>(fitbit, pixel watch)</span></div>
+        <div class="app"><img src="images/app-icons/apple-watch.webp" alt=""><span>apple watch</span></div>
+        <div class="app"><img src="images/app-icons/strava.webp" alt=""><span>strava</span></div>
       </div>
     </div>
     <div class="apps-row" data-io>
