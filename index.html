@@ -153,7 +153,7 @@ nav{
 }
 nav.scrolled{background:var(--bg);border-bottom-color:var(--line)}
 .brand{display:flex;align-items:center;gap:10px;font-family:var(--f-ui);font-weight:300;font-size:28px;color:var(--ink);letter-spacing:-.01em}
-.brand img{display:block;width:34px;height:34px;border-radius:50%}
+.brand img{display:block;width:34px;height:34px}
 nav .btn{height:44px;padding:0 20px;font-size:16px}
 @media(max-width:767.98px){
   nav{height:64px}
@@ -166,9 +166,11 @@ nav .btn{height:44px;padding:0 20px;font-size:16px}
 #hero{padding:clamp(120px,16vh,180px) 0 clamp(96px,12vw,150px);overflow:hidden;min-height:100vh;display:flex;align-items:center}
 #hero .wrap{position:relative;z-index:1;text-align:center}
 .hero-h{
-  font-size:clamp(36px,4.5vw,76px);line-height:1.1;max-width:1100px;margin:0 auto;
+  font-size:clamp(44px,6.6vw,96px);line-height:1.06;max-width:12em;margin:0 auto;
   color:var(--ink);text-wrap:balance;
 }
+.hero-sub{font-size:clamp(18px,1.6vw,22px);line-height:1.5;color:var(--gray-text);max-width:38em;margin:28px auto 0}
+.hero-sub .b{color:var(--blue);white-space:nowrap}
 .hero-h .b{color:var(--blue)}
 .hero-h .g{color:var(--gray-text)}
 .ic{display:inline-block;width:1em;height:1em;border-radius:.22em;vertical-align:-.14em;margin:0 .15em;object-fit:cover}
@@ -176,17 +178,18 @@ picture.ic{display:inline-block;width:1em;height:1em;margin:0 .15em;vertical-ali
 picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radius:0;margin:0;vertical-align:baseline}
 .ic.round,picture.ic.round{border-radius:50%}
 .ic.ic-svg{border-radius:.22em}
-.hero-cap{margin-top:32px;font-size:18px;color:var(--gray-text)}
-.hero-cta{margin-top:24px}
+.hero-cap{margin-top:18px;font-size:15px;color:var(--ink-3)}
+.hero-cta{margin-top:32px}
 .js .hero-in{opacity:0;transition:opacity .4s ease}
 .js .hero-in.in{opacity:1}
 .campanile{position:absolute;left:-6%;bottom:-4%;width:min(64vw,920px);opacity:.4;pointer-events:none;user-select:none;z-index:0}
 .campanile img{display:block;width:100%;height:auto}
 @media(max-width:767.98px){
   #hero{min-height:0;padding-top:120px}
-  .hero-h{font-size:clamp(36px,9.6vw,40px);line-height:1.18}
+  .hero-h{font-size:clamp(38px,11vw,46px);line-height:1.1}
+  .hero-sub{font-size:17px;margin-top:20px}
   .campanile{display:none}
-  .hero-cap{font-size:16px;margin-top:28px}
+  .hero-cap{font-size:14px;margin-top:16px}
 }
 
 /* ===== SAY ANYTHING ===== */
@@ -650,7 +653,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 
 <nav id="nav">
   <a href="#hero" class="brand" aria-label="cued, back to top">
-    <picture><source srcset="assets/mascot/cued-avatar-256.webp" type="image/webp"><img src="assets/mascot/cued-avatar-256.png" alt="" width="34" height="34"></picture>
+    <picture><source srcset="assets/brand/cued-logo-3d-160.webp" type="image/webp"><img src="assets/brand/cued-logo-3d-160.png" alt="" width="34" height="34"></picture>
     <span>cued</span>
   </a>
   <button type="button" class="btn" id="navCta">text cued</button>
@@ -669,9 +672,10 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 <section id="hero">
   <div class="campanile" aria-hidden="true"><img src="images/hero-drawing.png" alt="" width="1920" height="650"></div>
   <div class="wrap hero-in" id="heroIn">
-    <h1 class="hero-h">meet <span class="b">cued</span><picture class="ic round"><source srcset="assets/mascot/cued-avatar-256.webp" type="image/webp"><img src="assets/mascot/cued-avatar-256.png" alt=""></picture>. the coach that lives in your texts<svg class="ic ic-svg" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="9" fill="#5BD65B"/><path d="M20 9.5c-6.6 0-12 4.3-12 9.6 0 3 1.7 5.6 4.4 7.3-.2 1.4-.8 2.8-1.9 3.9 2.3-.3 4.3-1.2 5.7-2.3 1.2.3 2.5.5 3.8.5 6.6 0 12-4.3 12-9.6S26.6 9.5 20 9.5z" fill="#fff"/></svg>. it <span class="b">knows</span> your classes<img class="ic" src="images/app-icons/google-calendar.webp" alt="Google Calendar"><img class="ic" src="images/app-icons/canvas-student.jpg" alt="Canvas">, <span class="b">replaces</span> your lift<img class="ic" src="images/app-icons/hevy.png" alt="Hevy"> and meal<img class="ic" src="images/app-icons/MyFitnessPal%20Review.jpg" alt="MyFitnessPal"><img class="ic" src="images/app-icons/MacroFactor-MacroTracker_icon.png" alt="MacroFactor"> apps, and texts first. <span class="b">nothing to download.</span> <span class="g">your cue to lock in.</span></h1>
-    <p class="hero-cap">free during beta · made in berkeley</p>
+    <h1 class="hero-h">cued<picture class="ic round"><source srcset="assets/mascot/cued-avatar-256.webp" type="image/webp"><img src="assets/mascot/cued-avatar-256.png" alt=""></picture>, the coach that lives in your texts.</h1>
+    <p class="hero-sub">it knows your classes, replaces your lift and meal apps, and texts first. <span class="b">nothing to download.</span></p>
     <div class="hero-cta"><button type="button" class="btn lg" id="heroCtaTop">text cued</button></div>
+    <p class="hero-cap">free during beta · made in berkeley</p>
   </div>
 </section>
 
