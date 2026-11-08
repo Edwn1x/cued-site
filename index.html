@@ -175,12 +175,12 @@ nav .btn{height:44px;padding:0 20px;font-size:16px}
 /* Rotating end of the headline: "the coach that" + one phrase at a time. The
    slot's height is set by JS to the tallest phrase so nothing below shifts. */
 .rot{display:block;position:relative;height:1.06em}
-.rot-item{position:absolute;left:0;right:0;top:0;opacity:0;transform:translateY(.3em);transition:opacity .45s var(--ease),transform .45s var(--ease);pointer-events:none}
+.rot-item{position:absolute;left:0;right:0;top:0;color:var(--blue);opacity:0;transform:translateY(.3em);transition:opacity .45s var(--ease),transform .45s var(--ease);pointer-events:none}
 .rot-item.on{opacity:1;transform:none}
 .rot-item.out{opacity:0;transform:translateY(-.3em)}
 .rot-icons{display:inline-flex;gap:.08em;vertical-align:-.06em;margin-left:.06em}
 .rot-icons img{width:.72em;height:.72em;border-radius:.18em;object-fit:cover}
-.hero-sub{font-size:clamp(17px,1.45vw,20px);line-height:1.5;color:var(--gray-text);max-width:52em;margin:26px auto 0}
+.hero-sub{font-size:clamp(17px,1.45vw,20px);line-height:1.5;color:var(--gray-text);max-width:52em;margin:36px auto 0}
 .hero-sub .b{color:var(--blue);white-space:nowrap}
 .hero-h .b{color:var(--blue)}
 .hero-h .g{color:var(--gray-text)}
