@@ -43,7 +43,7 @@ The site is entirely self-contained vanilla HTML/CSS/JS with no framework or bui
 
 ## index.html Design System (v2, 2026-11-08)
 
-**Structure** — one `<section>` per beat, full-bleed backgrounds alternating white / `--tint-1` / `--tint-2`, 1200px `.wrap`, 24px side padding (64px from 1024px). In order: `#hero` → `#say` (strip) → `#proof` (pinned phone) → `#apps` → `#privacy` → `#berkeley` → `#signup` (close) → `#faq` → footer. Lowercase everywhere; exactly one emoji on the page (🎉 on the PR bubble). No floating or drifting elements.
+**Structure** — one `<section>` per beat, full-bleed backgrounds alternating white / `--tint-1` / `--tint-2`, 1200px `.wrap`, 24px side padding (64px from 1024px). In order: `#hero` (`--tint-2`) → `#say` (strip, white) → `#proof` (pinned phone) → `#apps` → `#privacy` → `#berkeley` → `#signup` (close) → `#faq` → footer. Lowercase everywhere; exactly one emoji on the page (🎉 on the PR bubble). No floating or drifting elements.
 
 **Tokens** — `--blue #006EFD`, `--blue-hover #0052BD` (the spec calls this `--blue-ink`, but that name means "text on blue" to the sign-up card, so hover is `--blue-hover`/`--blue-deep`), `--black`, `--gray-bubble #E9E9EB`, `--gray-text`, `--tint-1 #F3F7FF`, `--tint-2 #E9F1FF`, poll orange kept. Aliases (`--bg`, `--ink`, `--line`, `--fill`, `--card`, `--field`, `--gray`, `--f-msg`, `--f-header`…) exist only because the sign-up card (`.co-*`) reads them. Tinted sections set `--bg` locally so bubble tails carve the right color.
 
