@@ -164,7 +164,7 @@ nav .btn{height:44px;padding:0 20px;font-size:16px}
 
 /* ===== HERO ===== */
 #hero{padding:clamp(104px,13vh,150px) 0 clamp(80px,10vw,130px);overflow:hidden;min-height:100vh;display:flex;align-items:center}
-#hero .wrap{position:relative;z-index:1;text-align:center}
+#hero .wrap{position:relative;z-index:1;text-align:center;width:100%}   /* flex item — without this it shrinks to its widest line */
 .hero-mark{display:block;width:clamp(120px,14vw,200px);height:clamp(120px,14vw,200px);margin:0 auto 6px;line-height:0}
 .hero-mark img{display:block;width:100%;height:100%;border-radius:50%}
 .hero-h{
@@ -172,6 +172,14 @@ nav .btn{height:44px;padding:0 20px;font-size:16px}
   color:var(--ink);text-wrap:balance;
 }
 .hero-h .kicker{display:block;font-size:.5em;line-height:1.3;margin-bottom:.42em;color:var(--ink)}
+/* Rotating end of the headline: "the coach that" + one phrase at a time. The
+   slot's height is set by JS to the tallest phrase so nothing below shifts. */
+.rot{display:block;position:relative;height:1.06em}
+.rot-item{position:absolute;left:0;right:0;top:0;opacity:0;transform:translateY(.3em);transition:opacity .45s var(--ease),transform .45s var(--ease);pointer-events:none}
+.rot-item.on{opacity:1;transform:none}
+.rot-item.out{opacity:0;transform:translateY(-.3em)}
+.rot-icons{display:inline-flex;gap:.08em;vertical-align:-.06em;margin-left:.06em}
+.rot-icons img{width:.72em;height:.72em;border-radius:.18em;object-fit:cover}
 .hero-sub{font-size:clamp(17px,1.45vw,20px);line-height:1.5;color:var(--gray-text);max-width:52em;margin:26px auto 0}
 .hero-sub .b{color:var(--blue);white-space:nowrap}
 .hero-h .b{color:var(--blue)}
@@ -463,7 +471,7 @@ html.dark .mode-btn .ico-sun{display:block}
   .thread[data-play]{transition:none!important;transform:none!important}
   .poll-row,.poll-row i,.poll-row i::after{transition:none!important;animation:none!important}
   .ph-status::before{animation:none}
-  .float-cta,.hero-in{transition:none}
+  .float-cta,.hero-in,.rot-item{transition:none}
   .js .hero-in{opacity:1}
 }
 
@@ -677,7 +685,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   <div class="campanile" aria-hidden="true"><img src="images/hero-drawing.png" alt="" width="1920" height="650"></div>
   <div class="wrap hero-in" id="heroIn">
     <picture class="hero-mark"><source srcset="assets/mascot/cued-avatar-256.webp" type="image/webp"><img src="assets/mascot/cued-avatar-256.png" alt="" width="256" height="256"></picture>
-    <h1 class="hero-h"><span class="kicker">meet cued</span>the coach that lives in your texts.</h1>
+    <h1 class="hero-h"><span class="kicker">meet cued</span>the coach that<span class="sr-only"> lives in your texts.</span><span class="rot" id="heroRot" aria-hidden="true"><span class="rot-item on">lives in your texts.</span><span class="rot-item">replaces <span class="rot-icons"><img src="images/app-icons/hevy.png" alt="Hevy"><img src="images/app-icons/MyFitnessPal%20Review.jpg" alt="MyFitnessPal"><img src="images/app-icons/MacroFactor-MacroTracker_icon.png" alt="MacroFactor"><img src="images/app-icons/notes.png" alt="Notes"><img src="images/app-icons/reminders_app.webp" alt="Reminders"><img src="images/app-icons/pen_paper.png" alt="pen and paper"></span></span><span class="rot-item">builds your workouts.</span><span class="rot-item">tracks your food.</span><span class="rot-item">knows the college life.</span><span class="rot-item">knows your schedule.</span></span></h1>
     <p class="hero-sub">it knows your classes, replaces your lift and meal apps, and texts first. <span class="b">nothing to download.</span></p>
     <div class="hero-cta"><button type="button" class="btn lg" id="heroCtaTop">text cued</button></div>
     <p class="hero-cap">free during beta · made in berkeley</p>
@@ -982,6 +990,36 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   const heroIn = document.getElementById('heroIn');
   requestAnimationFrame(() => requestAnimationFrame(() => heroIn && heroIn.classList.add('in')));
   requestAnimationFrame(() => document.body.classList.add('anim'));
+
+  // Headline rotation: one phrase at a time after "the coach that". The slot
+  // is sized to the tallest phrase (re-measured on resize / font load) so the
+  // sub-line and button never move. Paused while the hero is off screen;
+  // static under reduced motion.
+  const rot = document.getElementById('heroRot');
+  if (rot){
+    const items = Array.from(rot.children);
+    const size = () => { rot.style.height = Math.max(...items.map(i => i.offsetHeight)) + 'px'; };
+    size();
+    window.addEventListener('resize', size);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(size);
+    if (!reduce.matches && items.length > 1){
+      let i = 0, timer = 0, visible = true;
+      const tick = () => {
+        if (!visible) return;
+        const cur = items[i]; i = (i + 1) % items.length; const nxt = items[i];
+        cur.classList.remove('on'); cur.classList.add('out');
+        nxt.classList.add('on');
+        setTimeout(() => cur.classList.remove('out'), 500);
+        timer = setTimeout(tick, 2600);
+      };
+      timer = setTimeout(tick, 2600);
+      new IntersectionObserver(es => es.forEach(e => {
+        visible = e.isIntersecting;
+        clearTimeout(timer);
+        if (visible) timer = setTimeout(tick, 1800);
+      }), {threshold: 0}).observe(hero);
+    }
+  }
 
   // Nav: transparent over the hero, white with a hairline once past it.
   function navState(){
