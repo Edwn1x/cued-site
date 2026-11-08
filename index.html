@@ -1109,8 +1109,8 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // eye anchors as fractions of the body image (measured from the 3D render)
-  const A = { L:[0.3907, 0.5875], R:[0.6463, 0.5818], r:0.3930, arm:{ left:0.7959, top:0.5628, width:0.2025, height:0.2879, pivotX:0.2877, pivotY:0.2712 } };
-  const T = { eyeShift:0.028, eyeShiftY:0.016, lean:3, parallax:0.012, blinkMin:2.6, blinkMax:6.2, glanceEvery:[5,10], winkEvery:[14,26], waveEvery:[18,36], ease:0.14 };
+  const A = { L:[0.3907, 0.5875], R:[0.6463, 0.5818], r:0.3930, mouth:{ left:0.4033, top:0.6407, width:0.1901, height:0.1742 }, arm:{ left:0.7959, top:0.5628, width:0.2025, height:0.2879, pivotX:0.2877, pivotY:0.2712 } };
+  const T = { eyeShift:0.05, eyeShiftY:0.03, lean:3, parallax:0.012, blinkMin:2.6, blinkMax:6.2, glanceEvery:[5,10], winkEvery:[14,26], waveEvery:[18,36], ease:0.14 };
   const now = () => performance.now()/1000;
   const rnd = (a,b) => a + Math.random()*(b-a);
 
@@ -1180,11 +1180,12 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     if (reduce) return;
     cx += (tx - cx) * T.ease; cy += (ty - cy) * T.ease;
     const S = root.offsetWidth;
-    const ex = cx * T.eyeShift * S, ey = cy * T.eyeShiftY * S;
+    const bx = cx*T.parallax*S, by = cy*T.parallax*0.6*S;            // head shift
+    const ex = bx + cx * T.eyeShift * S, ey = by + cy * T.eyeShiftY * S; // eyes: head shift + their own
     eyeL.style.transform = `translate(${ex}px, ${ey}px) rotate(${eyeL.dataset.rot}deg)`;
     eyeR.style.transform = `translate(${ex}px, ${ey}px) rotate(${eyeR.dataset.rot}deg)`;
     wink.style.transform = `translate(${ex}px, ${ey}px)`;
-    if (!root.classList.contains('is-poked')) body.style.transform = `translate(${cx*T.parallax*S}px, ${cy*T.parallax*0.6*S}px) rotate(${cx*T.lean}deg)`;
+    if (!root.classList.contains('is-poked')) body.style.transform = `translate(${bx}px, ${by}px) rotate(${cx*T.lean}deg)`;
   }
   new IntersectionObserver(es => es.forEach(e => {
     visible = e.isIntersecting;
