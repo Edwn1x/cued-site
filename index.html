@@ -165,8 +165,41 @@ nav .btn{height:44px;padding:0 20px;font-size:16px}
 /* ===== HERO ===== */
 #hero{padding:clamp(104px,13vh,150px) 0 clamp(80px,10vw,130px);overflow:hidden;min-height:100vh;display:flex;align-items:center}
 #hero .wrap{position:relative;z-index:1;text-align:center;width:100%}   /* flex item — without this it shrinks to its widest line */
-.hero-mark{display:block;width:clamp(120px,14vw,200px);height:clamp(120px,14vw,200px);margin:0 auto 6px;line-height:0}
-.hero-mark img{display:block;width:100%;height:100%;border-radius:50%}
+.hero-mark{--size:clamp(120px,14vw,200px);display:block;margin:0 auto 6px;line-height:0}
+/* ===== cued live avatar (founder prototype, copied verbatim; --size is the only knob) ===== */
+.cued-avatar{
+  --blue:#006EFD;
+  --rest:0deg;              /* as rendered: the short arm at the side */
+  --up:-118deg;             /* how far it swings up to wave */
+  position:relative;width:var(--size);height:var(--size);cursor:pointer;user-select:none;-webkit-user-select:none;
+}
+.cued-avatar .ca-clip{position:absolute;inset:0;border-radius:50%;background:var(--blue);overflow:hidden;z-index:1;box-shadow:0 18px 40px -18px rgba(0,110,253,.45)}
+.cued-avatar picture{display:contents}
+.cued-avatar .ca-body{position:absolute;left:2%;bottom:-5%;width:96%;height:auto;display:block;pointer-events:none;-webkit-user-drag:none;transform-origin:50% 100%;will-change:transform;z-index:1}
+.cued-avatar .ca-arm{position:absolute;z-index:0;pointer-events:none;-webkit-user-drag:none;will-change:transform;transform:rotate(var(--rest))}
+.cued-avatar.is-waving .ca-arm{animation:ca-wave 2.1s cubic-bezier(.3,.9,.3,1) both}
+@keyframes ca-wave{
+  0%{transform:rotate(var(--rest))}
+  24%{transform:rotate(var(--up))}
+  38%{transform:rotate(calc(var(--up) + 22deg))}
+  52%{transform:rotate(calc(var(--up) - 8deg))}
+  66%{transform:rotate(calc(var(--up) + 20deg))}
+  78%{transform:rotate(var(--up))}
+  100%{transform:rotate(var(--rest))}
+}
+.cued-avatar .ca-eye{
+  position:absolute;z-index:2;border-radius:50%;pointer-events:none;transform-origin:center;will-change:transform;
+  background:radial-gradient(circle at 36% 32%,#3B86FF 0%,#0A4ED6 42%,#062E7A 100%);
+  box-shadow:inset 0 -1px 2px rgba(255,255,255,.25);
+}
+.cued-avatar .ca-eye::after{content:"";position:absolute;left:22%;top:14%;width:34%;height:26%;border-radius:50%;background:#fff}
+.cued-avatar .ca-wink{position:absolute;z-index:2;pointer-events:none;display:none;overflow:visible}
+.cued-avatar.is-winking .ca-eye.ca-l{display:none}
+.cued-avatar.is-winking .ca-wink{display:block}
+.cued-avatar.is-blinking .ca-eye{transform:scaleY(.08)!important}
+.cued-avatar.is-poked .ca-body{animation:ca-boing .55s cubic-bezier(.2,1.6,.4,1)}
+@keyframes ca-boing{0%{transform:scale(1)}30%{transform:scale(1.06,.94) translateY(2%)}60%{transform:scale(.97,1.04) translateY(-3%)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.cued-avatar .ca-body,.cued-avatar .ca-eye{transition:none!important}}
 .hero-h{
   font-size:clamp(42px,6.2vw,88px);line-height:1.06;max-width:12em;margin:0 auto;
   color:var(--ink);text-wrap:balance;
@@ -198,7 +231,7 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 @media(max-width:767.98px){
   #hero{min-height:0;padding-top:120px}
   .hero-h{font-size:clamp(36px,10vw,42px);line-height:1.1}
-  .hero-mark{width:120px;height:120px;margin-bottom:4px}
+  .hero-mark{--size:120px;margin-bottom:4px}
   .hero-sub{font-size:17px;margin-top:20px}
   .campanile{display:none}
   .hero-cap{font-size:14px;margin-top:16px}
@@ -684,7 +717,19 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 <section id="hero" class="tint-2">
   <div class="campanile" aria-hidden="true"><img src="images/hero-drawing.png" alt="" width="1920" height="650"></div>
   <div class="wrap hero-in" id="heroIn">
-    <picture class="hero-mark"><source srcset="assets/mascot/cued-avatar-256.webp" type="image/webp"><img src="assets/mascot/cued-avatar-256.png" alt="" width="256" height="256"></picture>
+    <!-- Live avatar (founder's cued-live-avatar prototype, 2026-11-08): the body
+         render has no eyes — they're drawn as divs that follow the cursor; the
+         arm is a separate layer that waves. Hover winks + waves, click boings,
+         idle glances/blinks/winks on their own. Reduced motion: still. -->
+    <div class="hero-mark cued-avatar" id="cuedAvatar" role="img" aria-label="cued">
+      <div class="ca-clip">
+        <picture><source srcset="assets/mascot/cued-avatar-arm.webp" type="image/webp"><img class="ca-arm" src="assets/mascot/cued-avatar-arm.png" alt="" width="162" height="175"></picture>
+        <picture><source srcset="assets/mascot/cued-avatar-body.webp" type="image/webp"><img class="ca-body" src="assets/mascot/cued-avatar-body.png" alt="" width="512" height="389"></picture>
+        <div class="ca-eye ca-l"></div>
+        <div class="ca-eye ca-r"></div>
+        <svg class="ca-wink" viewBox="0 0 20 10" aria-hidden="true"><path d="M1 7.5 Q10 -1.5 19 7.5" fill="none" stroke="#0B0B0C" stroke-width="3" stroke-linecap="round"/></svg>
+      </div>
+    </div>
     <h1 class="hero-h"><span class="kicker">meet cued</span>the coach that<span class="sr-only"> lives in your texts.</span><span class="rot" id="heroRot" aria-hidden="true"><span class="rot-item on">lives in your texts.</span><span class="rot-item">replaces <span class="rot-icons"><img src="images/app-icons/hevy.png" alt="Hevy"><img src="images/app-icons/MyFitnessPal%20Review.jpg" alt="MyFitnessPal"><img src="images/app-icons/MacroFactor-MacroTracker_icon.png" alt="MacroFactor"><img src="images/app-icons/notes.png" alt="Notes"><img src="images/app-icons/reminders_app.webp" alt="Reminders"><img src="images/app-icons/pen_paper.png" alt="pen and paper"></span></span><span class="rot-item">builds your workouts.</span><span class="rot-item">tracks your food.</span><span class="rot-item">knows the college life.</span><span class="rot-item">knows your schedule.</span></span></h1>
     <p class="hero-sub">it knows your classes, replaces your lift and meal apps, and texts first. <span class="b">nothing to download.</span></p>
     <div class="hero-cta"><button type="button" class="btn lg" id="heroCtaTop">text cued</button></div>
@@ -1052,6 +1097,106 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   }, {threshold: 0.05});
   hero && ioPill.observe(hero);
   close && ioPill.observe(close);
+})();
+
+// === cued live avatar (founder prototype, 2026-11-08) ===
+// Eyes follow the cursor, the body leans a touch, the arm waves on hover /
+// click / now and then; blinks and winks on a loose timer. The frame loop
+// only runs while the hero is on screen. Reduced motion: no motion at all.
+(function cuedAvatar(){
+  const root = document.getElementById('cuedAvatar'); if (!root) return;
+  const body = root.querySelector('.ca-body'), arm = root.querySelector('.ca-arm'), eyeL = root.querySelector('.ca-l'), eyeR = root.querySelector('.ca-r'), wink = root.querySelector('.ca-wink');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // eye anchors as fractions of the body image (measured from the 3D render)
+  const A = { L:[0.3907, 0.5875], R:[0.6463, 0.5818], r:0.3930, arm:{ left:0.7959, top:0.5628, width:0.2025, height:0.2879, pivotX:0.2877, pivotY:0.2712 } };
+  const T = { eyeShift:0.028, eyeShiftY:0.016, lean:3, parallax:0.012, blinkMin:2.6, blinkMax:6.2, glanceEvery:[5,10], winkEvery:[14,26], waveEvery:[18,36], ease:0.14 };
+  const now = () => performance.now()/1000;
+  const rnd = (a,b) => a + Math.random()*(b-a);
+
+  function layout(){
+    const bw = body.offsetWidth, bh = body.offsetHeight, bl = body.offsetLeft, bt = body.offsetTop;
+    if (!bw) return;
+    const ew = 2*0.088*A.r*bw, eh = 2*0.128*A.r*bw;
+    for (const [el, p, rot] of [[eyeL, A.L, -6], [eyeR, A.R, 6]]) {
+      el.style.width = ew+'px'; el.style.height = eh+'px';
+      el.style.left = (bl + p[0]*bw - ew/2)+'px'; el.style.top = (bt + p[1]*bh - eh/2)+'px'; el.dataset.rot = rot;
+    }
+    const ww = 0.2*A.r*bw, wh = ww*0.5;
+    wink.style.width = ww+'px'; wink.style.height = wh+'px';
+    wink.style.left = (bl + A.L[0]*bw - ww/2)+'px'; wink.style.top = (bt + A.L[1]*bh - wh/2)+'px';
+    const a = A.arm;
+    arm.style.width = (a.width*bw)+'px'; arm.style.height = (a.height*bh)+'px';
+    arm.style.left = (bl + a.left*bw)+'px'; arm.style.top = (bt + a.top*bh)+'px';
+    arm.style.transformOrigin = (a.pivotX*100)+'% '+(a.pivotY*100)+'%';
+  }
+  let tx = 0, ty = 0, cx = 0, cy = 0, mouse = null, lastMove = 0, glanceAt = 0, hovering = false, winkT = 0, nextWink = 0, nextWave = 1e9, raf = 0, visible = false;
+  function wave(){ if (reduce) return; root.classList.remove('is-waving'); void root.offsetWidth; root.classList.add('is-waving'); nextWave = now() + rnd(...T.waveEvery); }
+  arm.addEventListener('animationend', () => root.classList.remove('is-waving'));
+  if (body.complete) layout(); else body.addEventListener('load', layout);
+  addEventListener('resize', layout);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
+
+  function aim(px, py){
+    const r = root.getBoundingClientRect(), ox = r.left + r.width/2, oy = r.top + r.height*0.55;
+    const dx = px - ox, dy = py - oy, d = Math.hypot(dx, dy) || 1, k = Math.min(1, d/(r.width*1.6));
+    tx = dx/d*k; ty = dy/d*k;
+  }
+  addEventListener('mousemove', e => { mouse = [e.clientX, e.clientY]; lastMove = now(); aim(e.clientX, e.clientY); });
+  addEventListener('mouseleave', () => { mouse = null; });
+  root.addEventListener('mouseenter', () => { hovering = true; root.classList.add('is-winking'); if (!root.classList.contains('is-waving')) wave(); });
+  root.addEventListener('mouseleave', () => { hovering = false; setTimeout(() => { if (!hovering && winkT <= 0) root.classList.remove('is-winking'); }, 400); });
+  root.addEventListener('click', () => {
+    root.classList.remove('is-poked'); void root.offsetWidth; root.classList.add('is-poked'); wave();
+    root.dispatchEvent(new CustomEvent('cued:poke'));          // hook: listen for this to open the text flow, etc.
+  });
+  body.addEventListener('animationend', () => { root.classList.remove('is-poked'); });
+
+  // Everything periodic starts on the first "in view" signal, so an
+  // environment without a real IntersectionObserver (jsdom) never spins.
+  let started = false;
+  function blink(){
+    if (!reduce && !root.classList.contains('is-winking')) {
+      root.classList.add('is-blinking'); setTimeout(() => root.classList.remove('is-blinking'), 120);
+      if (Math.random() < 0.18) setTimeout(() => { root.classList.add('is-blinking'); setTimeout(() => root.classList.remove('is-blinking'), 110); }, 220);
+    }
+    setTimeout(blink, rnd(T.blinkMin, T.blinkMax)*1000);
+  }
+
+  function frame(){
+    if (!visible){ raf = 0; return; }
+    raf = requestAnimationFrame(frame);
+    const t = now();
+    if ((!mouse || t - lastMove > 4) && t > glanceAt) {
+      const settle = Math.random() < 0.45;
+      tx = settle ? 0 : rnd(-0.7, 0.7); ty = settle ? 0 : rnd(-0.3, 0.35);
+      glanceAt = t + rnd(...T.glanceEvery) * (settle ? 0.4 : 1);
+    }
+    if (!hovering && !reduce) {
+      if (winkT <= 0 && t > nextWink) { winkT = 0.5; root.classList.add('is-winking'); }
+      if (winkT > 0) { winkT -= 1/60; if (winkT <= 0) { root.classList.remove('is-winking'); nextWink = t + rnd(...T.winkEvery); } }
+    }
+    if (!hovering && t > nextWave && !root.classList.contains('is-waving')) wave();
+    if (reduce) return;
+    cx += (tx - cx) * T.ease; cy += (ty - cy) * T.ease;
+    const S = root.offsetWidth;
+    const ex = cx * T.eyeShift * S, ey = cy * T.eyeShiftY * S;
+    eyeL.style.transform = `translate(${ex}px, ${ey}px) rotate(${eyeL.dataset.rot}deg)`;
+    eyeR.style.transform = `translate(${ex}px, ${ey}px) rotate(${eyeR.dataset.rot}deg)`;
+    wink.style.transform = `translate(${ex}px, ${ey}px)`;
+    if (!root.classList.contains('is-poked')) body.style.transform = `translate(${cx*T.parallax*S}px, ${cy*T.parallax*0.6*S}px) rotate(${cx*T.lean}deg)`;
+  }
+  new IntersectionObserver(es => es.forEach(e => {
+    visible = e.isIntersecting;
+    if (visible && !started){
+      started = true;
+      layout();
+      nextWink = now() + rnd(...T.winkEvery);
+      setTimeout(wave, 900);   // say hi on arrival
+      blink();
+    }
+    if (visible && !raf) frame();
+  }), {threshold: 0}).observe(root);
 })();
 
 // === "say anything." strip — two rows, opposite directions, duplicated for a seamless loop ===
