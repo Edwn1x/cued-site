@@ -166,7 +166,8 @@ nav{
   background:transparent;border-bottom:1px solid transparent;
   transition:background .25s,border-color .25s;
 }
-nav.scrolled{background:var(--bg);border-bottom-color:var(--line)}
+/* transparent all the way down (founder, 2026-11-08); .scrolled is still toggled but styles nothing */
+nav.scrolled{background:transparent;border-bottom-color:transparent}
 .brand{display:flex;align-items:center;gap:9px;font-family:var(--f-ui);font-weight:400;font-size:22px;color:var(--blue);letter-spacing:-.2px}
 .brand svg{display:block;width:28px;height:28px}
 nav .btn{height:44px;padding:0 20px;font-size:16px}
