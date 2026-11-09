@@ -1071,6 +1071,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   const nav = document.getElementById('nav');
   const hero = document.getElementById('hero');
   const close = document.getElementById('signup');
+  const faq = document.getElementById('faq');
   const pill = document.getElementById('floatCta');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -1129,19 +1130,20 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 
   // Floating pill: hidden while the hero or the close is in view (both carry
   // their own CTA); under 480px also hidden while the pinned proof is active.
-  const vis = {hero: true, close: false};
+  const vis = {hero: true, close: false, faq: false};
   window.proofActive = false;
   function pillState(){
     const narrow = window.innerWidth < 480;
-    pill.classList.toggle('hide', vis.hero || vis.close || (narrow && window.proofActive));
+    pill.classList.toggle('hide', vis.hero || vis.close || vis.faq || (narrow && window.proofActive));
   }
   window.pillState = pillState;
   const ioPill = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.target === hero) vis.hero = e.isIntersecting; if (e.target === close) vis.close = e.isIntersecting; });
+    entries.forEach(e => { if (e.target === hero) vis.hero = e.isIntersecting; if (e.target === close) vis.close = e.isIntersecting; if (e.target === faq) vis.faq = e.isIntersecting; });
     pillState();
   }, {threshold: 0.05});
   hero && ioPill.observe(hero);
   close && ioPill.observe(close);
+  faq && ioPill.observe(faq);   // past the close there's nothing left to sell — no pill over the FAQ/footer
 })();
 
 // === cued live avatar (founder prototype, 2026-11-08) ===
