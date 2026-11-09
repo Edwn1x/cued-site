@@ -152,13 +152,13 @@ nav{
   transition:background .25s,border-color .25s;
 }
 nav.scrolled{background:var(--bg);border-bottom-color:var(--line)}
-.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-ui);font-weight:300;font-size:28px;color:var(--ink);letter-spacing:-.01em}
-.brand img{display:block;width:34px;height:34px}
+.brand{display:flex;align-items:center;gap:9px;font-family:var(--f-ui);font-weight:400;font-size:22px;color:var(--blue);letter-spacing:-.2px}
+.brand svg{display:block;width:28px;height:28px}
 nav .btn{height:44px;padding:0 20px;font-size:16px}
 @media(max-width:767.98px){
   nav{height:64px}
-  .brand{font-size:24px}
-  .brand img{width:30px;height:30px}
+  .brand{font-size:20px}
+  .brand svg{width:26px;height:26px}
   nav .btn{height:40px;padding:0 16px;font-size:15px}
 }
 
@@ -717,9 +717,11 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 <body>
 
 <nav id="nav">
+  <!-- The live site's brand: blue wordmark, flat circle-and-dot mark after it
+       (inline so the ball takes --blue exactly). -->
   <a href="#hero" class="brand" aria-label="cued, back to top">
-    <picture><source srcset="assets/brand/cued-logo-3d-160.webp" type="image/webp"><img src="assets/brand/cued-logo-3d-160.png" alt="" width="34" height="34"></picture>
     <span>cued</span>
+    <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="currentColor"/><circle cx="63" cy="61" r="8.6" fill="#fff"/></svg>
   </a>
   <button type="button" class="btn" id="navCta">text cued</button>
 </nav>
