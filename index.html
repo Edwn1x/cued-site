@@ -128,6 +128,17 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var
 section{position:relative;background:var(--bg);padding:clamp(72px,10vw,140px) 0}
 section.tint-1{background:var(--tint-1);--bg:var(--tint-1)}   /* --bg scoped so bubble tails carve the right color */
 section.tint-2{background:var(--tint-2);--bg:var(--tint-2)}
+/* Soft seams (tomo.ai-style): a section can fade IN from the previous
+   section's color (.blend + --from) or OUT into the next one (.blend-to +
+   --to). Sections isolate so the band paints above their background but
+   under their content. */
+section{isolation:isolate}
+section.blend::before,section.blend-to::after{
+  content:'';position:absolute;left:0;right:0;z-index:-1;pointer-events:none;
+  height:clamp(72px,12vh,150px);
+}
+section.blend::before{top:0;background:linear-gradient(to bottom,var(--from),transparent)}
+section.blend-to::after{bottom:0;background:linear-gradient(to bottom,transparent,var(--to))}
 h1,h2{font-family:var(--f-head);font-weight:400;color:var(--ink);letter-spacing:-.01em}
 h2{font-size:clamp(34px,4.2vw,56px);line-height:1.08}
 .sub{font-size:clamp(18px,1.6vw,22px);line-height:1.5;color:var(--gray-text);margin-top:18px;max-width:34em}
@@ -766,7 +777,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== SAY ANYTHING ===== -->
-<section id="say">
+<section id="say" class="blend blend-to" style="--from:var(--tint-2);--to:var(--tint-2)">
   <div class="wrap">
     <h2 data-io>say anything.</h2>
     <p class="sub" data-io>it's a text thread. so text it like one.</p>
@@ -925,7 +936,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== APPS ===== -->
-<section id="apps">
+<section id="apps" class="blend" style="--from:var(--tint-2)">
   <div class="wrap">
     <div class="apps-row" data-io>
       <h3>plugs into what you already use.</h3>
@@ -953,7 +964,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== PRIVACY ===== -->
-<section id="privacy" class="tint-1">
+<section id="privacy" class="tint-1 blend" style="--from:var(--card)">
   <div class="wrap two">
     <div data-io>
       <h2>it stays between us</h2>
@@ -975,7 +986,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== BERKELEY ===== -->
-<section id="berkeley">
+<section id="berkeley" class="blend" style="--from:var(--tint-1)">
   <div class="wrap two">
     <!-- [FOUNDER PHOTO: the founder or the team at the RSF or on Sproul,
          daylight, no logos needed]. Until then, the Campanile drawing in a
@@ -993,7 +1004,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== CLOSE ===== -->
-<section id="signup" class="tint-2">
+<section id="signup" class="tint-2 blend" style="--from:var(--card)">
   <div class="campanile r" aria-hidden="true"><img src="images/hero-drawing.png" alt="" width="1920" height="650"></div>
   <div class="wrap">
     <picture><source srcset="assets/mascot/cued-mascot-flex.webp" type="image/webp"><img class="mascot" src="assets/mascot/cued-mascot-flex.png" alt="cued, a round white mascot in a blue headband, raising a dumbbell" width="720" height="550" loading="lazy"></picture>
@@ -1004,7 +1015,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== FAQ ===== -->
-<section id="faq">
+<section id="faq" class="blend" style="--from:var(--tint-2)">
   <div class="wrap faq-wrap">
     <h2 data-io>the stuff people ask.</h2>
     <div class="faq-list" data-io>
