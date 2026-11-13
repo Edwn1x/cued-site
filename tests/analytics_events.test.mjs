@@ -17,9 +17,9 @@ async function until(cond, { timeout = 4000, step = 10 } = {}) {
     await new Promise(r => setTimeout(r, step)); }
 }
 
-function boot(respond, { tracker = true } = {}) {
+function boot(respond, { tracker = true, url = 'https://cued.fit/', lateTracker = 0 } = {}) {
   const events = [];
-  const dom = new JSDOM(html, { runScripts: 'dangerously', pretendToBeVisual: true, url: 'https://cued.fit/',
+  const dom = new JSDOM(html, { runScripts: 'dangerously', pretendToBeVisual: true, url,
     beforeParse(w) {
       w.matchMedia = (q) => ({ matches: /reduced-motion/.test(q), media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} });
       w.IntersectionObserver = class { observe() {} unobserve() {} disconnect() {} };
@@ -28,7 +28,9 @@ function boot(respond, { tracker = true } = {}) {
       w.SVGElement.prototype.getTotalLength = () => 100;
       w.HTMLElement.prototype.animate = () => ({ finished: Promise.resolve(), cancel() {}, onfinish: null });
       // clone out of the jsdom realm so deepEqual compares plain Node objects
-      if (tracker) w.umami = { track: (name, data) => events.push(JSON.parse(JSON.stringify({ name, data }))) };
+      const stub = { track: (name, data) => events.push(JSON.parse(JSON.stringify({ name, data }))) };
+      if (tracker && !lateTracker) w.umami = stub;
+      if (lateTracker) setTimeout(() => { w.umami = stub; }, lateTracker);   // the deferred head script landing after inline code
       w.fetch = async (url, opts) => {
         const body = JSON.parse(opts.body);
         const r = respond(String(url), body);
@@ -145,4 +147,35 @@ test('without the tracker the chat runs to the success screen untouched', async 
   const d = await walk(w, 'nav');
   await until(() => d.querySelector('#coMsgs .co-success'));
   assert.equal(events.length, 0);
+});
+
+// Printed QR codes / shared links: `?src=<label>` fires one qr-scan and rides as
+// `ref` on every funnel event, so a flyer's scans can be followed into sign-ups.
+test('?src=flyer: one qr-scan on landing, and ref on every funnel event through to submit', async () => {
+  const { w, events } = boot(() => ({ status: 'ok', live: true }), { url: 'https://cued.fit/?src=Flyer%20Moffitt' });
+  await until(() => events.some(e => e.name === 'qr-scan'));
+  const d = await walk(w, 'hero');
+  await until(() => d.querySelector('#coMsgs .co-success'));
+  const scans = events.filter(e => e.name === 'qr-scan');
+  assert.deepEqual(scans, [{ name: 'qr-scan', data: { src: 'flyer-moffitt', ref: 'flyer-moffitt' } }], 'label is lowercased and slugged');
+  assert.deepEqual(events[1], { name: 'signup-open', data: { source: 'hero', ref: 'flyer-moffitt' } });
+  const rest = events.filter(e => e.name !== 'qr-scan');
+  assert.ok(rest.length >= 17 && rest.every(e => e.data.ref === 'flyer-moffitt'), 'every funnel event carries ref');
+  assert.equal(rest.at(-1).name, 'signup-submit');
+});
+
+test('?utm_source works as the label too; the tracker loading late still gets the scan', async () => {
+  const { events } = boot(() => ({}), { url: 'https://cued.fit/?utm_source=poster', lateTracker: 600 });
+  assert.equal(events.length, 0);
+  await until(() => events.length, { timeout: 3000 });
+  assert.deepEqual(events, [{ name: 'qr-scan', data: { src: 'poster', ref: 'poster' } }]);
+});
+
+test('a plain URL fires no qr-scan and adds no ref', async () => {
+  const { w, events } = boot(() => ({ status: 'ok', live: true }));
+  await until(() => typeof w.openWaitlist === 'function');
+  await new Promise(r => setTimeout(r, 300));
+  w.openWaitlist('nav');
+  await until(() => events.length);
+  assert.deepEqual(events, [{ name: 'signup-open', data: { source: 'nav' } }]);
 });
