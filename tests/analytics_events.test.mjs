@@ -179,3 +179,13 @@ test('a plain URL fires no qr-scan and adds no ref', async () => {
   await until(() => events.length);
   assert.deepEqual(events, [{ name: 'signup-open', data: { source: 'nav' } }]);
 });
+
+// The six printed flyers (2026-11-12). Their labels must reach the dashboard exactly as printed.
+test('the six printed flyer labels arrive exactly as printed', async () => {
+  for (const name of ['gym', 'partner', 'food', 'school', 'plan', 'weights']) {
+    const label = `poster-${name}`;
+    const { events } = boot(() => ({}), { url: `https://cued.fit/?src=${label}` });
+    await until(() => events.length);
+    assert.deepEqual(events, [{ name: 'qr-scan', data: { src: label, ref: label } }], label);
+  }
+});
