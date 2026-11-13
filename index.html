@@ -2298,9 +2298,30 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   // loaded (blocked, offline, jsdom) — the chat must never depend on it.
   // Names: signup-open {source} · signup-step {step, name, source} · signup-submit
   // {result, source} · signup-imessage {source} · signup-sms {source}.
+  // Printed QR codes / shared links carry `?src=<label>` (or utm_source). That
+  // label is `ref` on every event above, so a flyer's scans can be followed into
+  // sign-ups, and it fires one `qr-scan {src}` per landing. The label is kept in
+  // a variable only (nothing stored in the browser) and never leaves this load.
   const STEP_NAMES = ['', 'name', 'age', 'gender', 'goals', 'obstacle', 'experience', 'equipment', 'stats', 'days', 'time', 'diet', 'restrictions', 'apps', 'phone', 'consent'];
+  const ref = (() => {
+    try {
+      const q = new URLSearchParams(location.search);
+      const v = (q.get('src') || q.get('utm_source') || '').trim().toLowerCase().replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '');
+      return v ? v.slice(0, 50) : null;
+    } catch (e) { return null; }
+  })();
   function track(name, data){
-    try { if (window.umami && typeof window.umami.track === 'function') window.umami.track(name, data); } catch (e) {}
+    try {
+      if (!(window.umami && typeof window.umami.track === 'function')) return false;
+      window.umami.track(name, ref ? Object.assign({}, data, { ref }) : data);
+      return true;
+    } catch (e) { return false; }
+  }
+  if (ref){
+    // The tracker is a deferred head script; it may land after this runs. Retry
+    // briefly, then give up quietly (blocked / offline / jsdom).
+    let tries = 0;
+    (function scan(){ if (!track('qr-scan', { src: ref }) && tries++ < 20) setTimeout(scan, 250); })();
   }
   const ctaSource = () => overlay.dataset.source || 'unknown';
 
