@@ -1110,6 +1110,10 @@ html.dark .co-bg{--co-glass:rgba(28,28,30,.8);--co-opt-line:rgba(255,255,255,.09
 document.documentElement.classList.add('js');
 try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}
 </script>
+<!-- Umami Cloud analytics: cookieless page views, referrers, devices, UTM campaigns, and the
+     sign-up funnel events index.html fires (signup-open/-step/-submit/-imessage/-sms). Nothing
+     stored in the browser, no fingerprinting. One website id for all of cued.fit. -->
+<script defer src="https://cloud.umami.is/script.js" data-website-id="ddb5f65b-1a10-4c50-a155-46ba8095639f"></script>
 </head>
 <body>
 
@@ -2287,7 +2291,24 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   let sdata = {};
   let step = 0;
 
-  function setProgress(n){ step = n; if (progress) progress.style.setProperty('--p', Math.min(100, Math.round(n / STEPS * 100)) + '%'); }
+  // ── analytics (Umami, head tag) ──
+  // Funnel events so the dashboard shows where readers stop, split by which CTA
+  // opened the card (`source`). Page views are automatic; these are the only
+  // custom events on the site. Every call is a no-op when the tracker hasn't
+  // loaded (blocked, offline, jsdom) — the chat must never depend on it.
+  // Names: signup-open {source} · signup-step {step, name, source} · signup-submit
+  // {result, source} · signup-imessage {source} · signup-sms {source}.
+  const STEP_NAMES = ['', 'name', 'age', 'gender', 'goals', 'obstacle', 'experience', 'equipment', 'stats', 'days', 'time', 'diet', 'restrictions', 'apps', 'phone', 'consent'];
+  function track(name, data){
+    try { if (window.umami && typeof window.umami.track === 'function') window.umami.track(name, data); } catch (e) {}
+  }
+  const ctaSource = () => overlay.dataset.source || 'unknown';
+
+  function setProgress(n){
+    if (n > step && STEP_NAMES[n]) track('signup-step', { step: n, name: STEP_NAMES[n], source: ctaSource() });
+    step = n;
+    if (progress) progress.style.setProperty('--p', Math.min(100, Math.round(n / STEPS * 100)) + '%');
+  }
   function scrollBottom(){ msgs.scrollTop = msgs.scrollHeight; requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight; }); }
   // The thread is a real scroller now (earlier bubbles are reachable), so it
   // has to be re-pinned to the bottom whenever its box changes — the composer
@@ -2626,11 +2647,13 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       a.className = 'co-confirm co-imsg';
       a.href = link;
       a.textContent = 'text me on iMessage';
+      a.addEventListener('click', () => track('signup-imessage', { source: ctaSource() }));
       const alt = document.createElement('button');
       alt.type = 'button';
       alt.className = 'co-alt';
       alt.textContent = "i don't have an iPhone";
       alt.addEventListener('click', async () => {
+        track('signup-sms', { source: ctaSource() });
         alt.disabled = true;
         alt.textContent = 'one sec…';
         try {
@@ -2703,6 +2726,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
         const already = data.status === 'exists';
         const live = data.live === true;   // absent → an older backend: still the waitlist
         setProgress(STEPS);
+        track('signup-submit', { result: (live ? 'live' : 'waitlist') + (already ? '-exists' : ''), source: ctaSource() });
         let title, body;
         if (live && !already){
           // Signed up for real. With a link, their tap IS what brings the first
@@ -2725,10 +2749,12 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
         }
         successScreen(title, body, linkOk ? link : null);
       } else {
+        track('signup-submit', { result: 'rejected', source: ctaSource() });
         await coachSay((data && data.message) || 'something went wrong — try again?', 320);
         showRetry();
       }
     } catch (err) {
+      track('signup-submit', { result: 'error', source: ctaSource() });
       await coachSay('connection error — check your internet and try again.', 320);
       showRetry();
     }
@@ -2815,7 +2841,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     overlay.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
     if (vv){ vv.addEventListener('resize', fitViewport); vv.addEventListener('scroll', fitViewport); fitViewport(); }
-    if (!msgs.children.length) runChat();   // re-opening resumes where they left off
+    if (!msgs.children.length){ track('signup-open', { source: ctaSource() }); runChat(); }   // re-opening resumes where they left off
     else { const inp = inputArea.querySelector('.co-input'); inp && inp.focus(); }
   }
   window.openWaitlist = open;

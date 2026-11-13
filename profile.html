@@ -304,6 +304,10 @@ footer .fmeta{margin-top:10px}
 // Applied before first paint so a dark-mode reader never sees a white flash.
 try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}
 </script>
+<!-- Umami Cloud analytics: cookieless page views, referrers, devices, UTM campaigns, and the
+     sign-up funnel events index.html fires (signup-open/-step/-submit/-imessage/-sms). Nothing
+     stored in the browser, no fingerprinting. One website id for all of cued.fit. -->
+<script defer src="https://cloud.umami.is/script.js" data-website-id="ddb5f65b-1a10-4c50-a155-46ba8095639f"></script>
 </head>
 <body>
 
