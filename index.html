@@ -55,21 +55,22 @@
   --blue-ink:#FFFFFF;       /* text ON blue — the sign-up card reads this name */
   --black:#0B0B0C;
   --white:#FFFFFF;
-  --gray-bubble:#E9E9EB;
+  --gray-bubble:#ECE7E1;    /* iMessage gray, warmed a touch for the cream page */
   --gray-text:#5A5A60;
-  --tint-1:#F3F7FF;
-  --tint-2:#E9F1FF;
-  --cream:#F5EAE0;          /* the mascot renders' backdrop (sampled; the hero video is a hair darker) — hero, proof and close sit on it */
+  --cream:#F5EAE0;          /* the mascot renders' backdrop (sampled) — hero, proof, privacy, close */
+  --cream-2:#FBF6F1;        /* the lighter cream the other sections alternate with */
+  --tint-1:var(--cream-2);  /* the old blue tints now resolve to the creams */
+  --tint-2:var(--cream);
   --poll-fill:#FCEBD0;      /* iOS 26 Messages poll pill (kept) */
   --poll-ink:#E9902E;
   --poll-pick:#FADFB8;
   /* page surfaces + aliases the sign-up card (.co-*) depends on */
-  --bg:var(--white);
+  --bg:var(--cream-2);      /* page default: light cream, never white */
   --ink:var(--black);
   --ink-2:var(--gray-text);
   --ink-3:#8A8A92;
-  --line:#EEF2F8;
-  --fill:#F2F4F8;
+  --line:#E8DCCF;           /* warm hairlines */
+  --fill:#EFE3D7;           /* status pill, dark-mode button, composer plus */
   --card:#FFFFFF;
   --field:#FFFFFF;
   --gray:var(--gray-bubble);
@@ -99,15 +100,16 @@ html.dark{
   --ink:#F5F5F7;
   --ink-2:#A6A6AE;
   --ink-3:#6E6E76;
-  --line:#1E2229;
-  --fill:#15171B;
-  --card:#15171B;
+  --line:#2A241F;
+  --fill:#1F1A16;
+  --card:#1A1512;
   --field:#1C1E23;
   --gray-text:#A6A6AE;
   --black:#F5F5F7;          /* page text; bubbles below keep their own inks */
-  --tint-1:#0F131A;
-  --tint-2:#121A26;
-  --cream:#15110E;          /* dark: the hero goes warm near-black; the video stays a cream card */
+  --cream:#15110E;          /* dark: warm near-black; the renders stay cream cards */
+  --cream-2:#0F0C0A;
+  --tint-1:var(--cream-2);
+  --tint-2:var(--cream);
   --overlay:rgba(0,0,0,.6);
   --error:#FF7369;
   --bubble-coach:#E9E9EB;   /* bubbles stay the same colors in dark mode */
@@ -371,13 +373,13 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
   box-shadow:0 0 0 1px var(--phone-edge,transparent);
 }
 .phone-screen{
-  --bg:#fff;position:relative;height:100%;background:#fff;border-radius:44px;overflow:hidden;
+  --bg:var(--card);position:relative;height:100%;background:var(--card);border-radius:44px;overflow:hidden;
   display:flex;flex-direction:column;font-family:var(--f-phone);color:#0B0B0C;
 }
 .island{position:absolute;top:11px;left:50%;width:120px;height:34px;margin-left:-60px;background:#0B0B0C;border-radius:20px;z-index:3}
 .ph-head{
-  flex:none;padding:52px 16px 10px;border-bottom:1px solid #EEF2F8;
-  display:flex;flex-direction:column;align-items:center;position:relative;background:#fff;
+  flex:none;padding:52px 16px 10px;border-bottom:1px solid var(--line);
+  display:flex;flex-direction:column;align-items:center;position:relative;background:var(--card);
 }
 .ph-head .chev,.ph-head .vid{position:absolute;top:60px;color:var(--blue);width:22px;height:22px}
 .ph-head .chev{left:18px}
@@ -396,9 +398,9 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 .screen .thread{will-change:transform}
 .proof-sticky .screen .thread{display:none}
 .proof-sticky .screen .thread.active{display:flex}
-.ph-comp{flex:none;display:flex;align-items:center;gap:8px;padding:8px 14px 26px;background:#fff}
-.ph-comp .plus{width:30px;height:30px;border-radius:50%;background:#F2F4F8;display:flex;align-items:center;justify-content:center;color:#5A5A60;font-size:20px;line-height:1}
-.ph-comp .field{flex:1;height:34px;border:1px solid #DFE3EA;border-radius:17px;padding:0 12px;display:flex;align-items:center;color:#8A8A92;font-size:15px}
+.ph-comp{flex:none;display:flex;align-items:center;gap:8px;padding:8px 14px 26px;background:var(--card)}
+.ph-comp .plus{width:30px;height:30px;border-radius:50%;background:var(--fill);display:flex;align-items:center;justify-content:center;color:#5A5A60;font-size:20px;line-height:1}
+.ph-comp .field{flex:1;height:34px;border:1px solid var(--line);border-radius:17px;padding:0 12px;display:flex;align-items:center;color:#8A8A92;font-size:15px}
 .ph-comp .mic{color:#8A8A92;width:16px;height:22px}
 .ph-home{position:absolute;bottom:8px;left:50%;width:120px;height:5px;margin-left:-60px;border-radius:3px;background:#0B0B0C;opacity:.85}
 
@@ -462,7 +464,7 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 #proof .ph-head{padding:0 0 16px;border:none;background:none}
 #proof .ph-avatar{width:48px;height:48px}
 #proof .ph-name{font-family:var(--f-ui);font-size:14px;font-weight:500;margin-top:8px;color:var(--ink)}
-#proof .ph-status{margin-top:6px;height:26px;padding:0 12px;border-radius:13px;font-family:var(--f-ui);font-size:12.5px;background:var(--fill);color:var(--gray-text)}
+#proof .ph-status{margin-top:6px;height:26px;padding:0 12px;border-radius:13px;font-family:var(--f-ui);font-size:12.5px;background:var(--card);color:var(--gray-text)}
 #proof .screen{flex:none;height:min(520px,calc(100vh - 280px));padding:0 0 8px}   /* flex:none — the base .screen is flex:1, which lets content (the plate photo) override the height */
 #proof .thread{font-family:var(--f-ui);font-size:clamp(15px,1.15vw,16.5px)}
 #proof .msg{max-width:86%;padding:.7em .95em;border-radius:1.1em;line-height:1.38;text-align:left}
@@ -510,7 +512,7 @@ html.dark #proof .ph-status{background:var(--fill)}
 }
 
 /* ===== BERKELEY ===== */
-.photo-slot{position:relative;aspect-ratio:4/5;border-radius:16px;overflow:hidden;background:var(--tint-2)}
+.photo-slot{position:relative;aspect-ratio:4/5;border-radius:16px;overflow:hidden;background:var(--cream)}
 .photo-slot > img,.photo-slot > video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .photo-slot > img.placeholder{width:auto;height:72%;top:auto;bottom:-2%;left:-8%;max-width:none;object-fit:contain}
 .founder p{font-size:20px;line-height:1.5;color:var(--gray-text);margin-top:18px}
@@ -562,7 +564,7 @@ footer{border-top:1px solid var(--line);padding:28px var(--pad);font-size:14px;c
   position:fixed;left:50%;bottom:24px;z-index:45;transform:translate(-50%,0);
   height:44px;padding:0 22px;border:none;border-radius:999px;
   background:var(--blue);color:#fff;font-family:var(--f-ui);font-size:15px;
-  box-shadow:0 0 0 2px #fff,0 8px 24px rgba(11,11,12,.18);
+  box-shadow:0 0 0 2px var(--cream-2),0 8px 24px rgba(60,40,20,.18);
   transition:opacity .25s,transform .25s var(--ease),background .15s;
 }
 .float-cta:hover{background:var(--blue-hover)}
@@ -1008,7 +1010,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== PRIVACY ===== -->
-<section id="privacy" class="tint-1 blend" style="--from:var(--card)">
+<section id="privacy" class="cream blend" style="--from:var(--cream-2)">
   <div class="wrap two">
     <div data-io>
       <h2>it stays between us</h2>
@@ -1030,7 +1032,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== BERKELEY ===== -->
-<section id="berkeley" class="blend" style="--from:var(--tint-1)">
+<section id="berkeley" class="blend" style="--from:var(--cream)">
   <div class="wrap two">
     <!-- [FOUNDER PHOTO: the founder or the team at the RSF or on Sproul,
          daylight, no logos needed]. Until then, the Campanile drawing in a
@@ -1048,7 +1050,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== CLOSE ===== -->
-<section id="signup" class="cream blend" style="--from:var(--card)">
+<section id="signup" class="cream blend" style="--from:var(--cream-2)">
   <div class="campanile r" aria-hidden="true"><img src="images/hero-drawing.png" alt="" width="1920" height="650"></div>
   <div class="wrap">
     <picture><source srcset="assets/mascot/v2/cued-dumbbell.webp" type="image/webp"><img class="mascot" src="assets/mascot/v2/cued-dumbbell.jpg" alt="cued, a round white mascot in a blue headband, lifting a dumbbell" width="900" height="900" loading="lazy"></picture>
