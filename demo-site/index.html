@@ -98,29 +98,6 @@
   --pad:24px;
 }
 @media(min-width:1024px){:root{--pad:64px}}
-html.dark{
-  color-scheme:dark;
-  --bg:#0B0B0C;
-  --ink:#F5F5F7;
-  --ink-2:#A6A6AE;
-  --ink-3:#6E6E76;
-  --line:#2A241F;
-  --fill:#1F1A16;
-  --card:#1A1512;
-  --field:#1C1E23;
-  --gray-text:#A6A6AE;
-  --black:#F5F5F7;          /* page text; bubbles below keep their own inks */
-  --cream:#15110E;          /* dark: warm near-black; the renders stay cream cards */
-  --cream-2:#0F0C0A;
-  --tint-1:var(--cream-2);
-  --tint-2:var(--cream);
-  --overlay:rgba(0,0,0,.6);
-  --error:#FF7369;
-  --bubble-coach:#E9E9EB;   /* bubbles stay the same colors in dark mode */
-  --bubble-coach-ink:#0B0B0C;
-  --blue-soft:#123A63;
-  --phone-edge:rgba(255,255,255,.14);   /* the black slab needs an edge on a near-black page */
-}
 
 /* ===== BASE ===== */
 *{box-sizing:border-box;margin:0;padding:0}
@@ -376,7 +353,6 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
   position:absolute;left:0;top:0;width:390px;height:var(--ph);
   transform:scale(var(--ps));transform-origin:0 0;
   background:#0B0B0C;border-radius:56px;padding:12px;
-  box-shadow:0 0 0 1px var(--phone-edge,transparent);
 }
 .phone-screen{
   --bg:var(--card);position:relative;height:100%;background:var(--card);border-radius:44px;overflow:hidden;
@@ -480,7 +456,6 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 #proof .poll,#proof .checklist{width:88%;font-size:.7em}
 #proof .msg.photo{max-width:70%}
 #proof .msg.chart svg{width:12em}
-html.dark #proof .ph-status{background:var(--fill)}
 /* stacked proof (<1024px): headline + small mascot in a row, the chat under it
    at its natural height (no clipping, no empty box), one header per step */
 #proof .proof-copy .step-mascot{display:none}   /* desktop uses the big corner render */
@@ -680,18 +655,6 @@ footer{border-top:1px solid var(--line);padding:28px var(--pad);font-size:14px;c
 }
 .rail button:hover::after,.rail button:focus-visible::after{opacity:1;transform:translate(0,-50%)}
 
-/* ===== DARK MODE TOGGLE ===== */
-.mode-btn{
-  position:fixed;right:24px;bottom:24px;z-index:45;width:38px;height:38px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;background:var(--fill);color:var(--ink);border:none;padding:0;
-}
-.mode-btn:hover{color:var(--blue)}
-.mode-btn svg{display:block;width:18px;height:18px}
-.mode-btn .ico-sun{display:none}
-html.dark .mode-btn .ico-moon{display:none}
-html.dark .mode-btn .ico-sun{display:block}
-@media(max-width:767.98px){.mode-btn{display:none}}
-
 /* ===== REDUCED MOTION ===== */
 @media(prefers-reduced-motion:reduce){
   [data-io]{opacity:1!important;transform:none!important;transition:none!important}
@@ -708,8 +671,8 @@ html.dark .mode-btn .ico-sun{display:block}
    conversational sign-up as legacy/js/signup.js, seen from the reader's
    phone — their sends blue on the right, Cued's replies gray on the left,
    tails on the last bubble of each run, a typing pill before every reply.
-   Every color is a --co-* token mapped from the page's, so html.dark flips
-   it to real Messages dark for free. The sheet is frosted glass (translucent
+   Every color is a --co-* token mapped from the page's, (this page has no
+   dark mode). The sheet is frosted glass (translucent
    over a heavy backdrop blur, hairline edge) so the page bleeds through —
    the old modal's feel, on the card itself. Bottom sheet under 768px, sized from
    the visual viewport by JS so the keyboard never pushes the compose row
@@ -730,7 +693,6 @@ html.dark .mode-btn .ico-sun{display:block}
   display:flex;align-items:center;justify-content:center;padding:24px;
   font-family:var(--f-msg);font-size:15px;line-height:1.5;color:var(--co-ink);text-align:left;
 }
-html.dark .co-bg{--co-glass:rgba(28,28,30,.8);--co-opt-line:rgba(255,255,255,.09);--co-opt-hover:rgba(255,255,255,.05);--co-glass-edge:rgba(255,255,255,.09);--co-field:rgba(44,44,46,.66);--co-shadow:0 24px 80px rgba(0,0,0,.6)}
 .co-bg *{margin:0;padding:0;box-sizing:border-box}
 .co-bg button,.co-bg input{font:inherit;color:inherit}
 .co-bg.open{opacity:1;pointer-events:all}
@@ -883,11 +845,8 @@ html.dark .co-bg{--co-glass:rgba(28,28,30,.8);--co-opt-line:rgba(255,255,255,.09
 
 </style>
 <!-- Gate reveal-hiding synchronously so a JS-less load renders fully visible.
-     Also apply the saved theme pre-paint so dark mode doesn't flash white. -->
-<script>
-document.documentElement.classList.add('js');
-try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}
-</script>
+     (No dark mode on this page — a saved 'cued-theme' from the root page is ignored.) -->
+<script>document.documentElement.classList.add('js');</script>
 <!-- Preview path (cued.fit/demo-site): keep it out of search results while the
      root page is still the live design. -->
 <meta name="robots" content="noindex, nofollow">
@@ -917,10 +876,6 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   <button type="button" class="btn sq" id="heroCta">text cued</button>
 </div>
 
-<button type="button" class="mode-btn" id="modeBtn" role="switch" aria-checked="false" aria-label="dark mode" title="dark mode">
-  <svg class="ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  <svg class="ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7L7 17M17 7l1.7-1.7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
-</button>
 
 <!-- Progress rail — one dot per [data-label] section, down the left edge (desktop). -->
 <div class="rail" id="rail" role="navigation" aria-label="steps"></div>   <!-- one dot per proof step; only shown while the proof is pinned. A div, not <nav>: the page's nav rule is a full-width bar -->
@@ -1828,20 +1783,6 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   reduce.addEventListener('change', mode);
   window.addEventListener('resize', () => { if (pinned) fitPhone(); else fitStacked(); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (pinned) fitPhone(); });
-})();
-
-// === Dark-mode toggle (bottom-right sun/moon button) ===
-(function(){
-  const sw = document.getElementById('modeBtn');
-  if (!sw) return;
-  const root = document.documentElement;
-  const sync = () => sw.setAttribute('aria-checked', root.classList.contains('dark') ? 'true' : 'false');
-  sw.addEventListener('click', () => {
-    root.classList.toggle('dark');
-    try{ localStorage.setItem('cued-theme', root.classList.contains('dark') ? 'dark' : 'light'); }catch(e){}
-    sync();
-  });
-  sync();
 })();
 
 // === Waitlist — the sign-up chat ===
