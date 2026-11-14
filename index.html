@@ -59,6 +59,7 @@
   --gray-text:#5A5A60;
   --tint-1:#F3F7FF;
   --tint-2:#E9F1FF;
+  --cream:#F3E7DC;          /* the hero video's backdrop (sampled) — the hero section matches it */
   --poll-fill:#FCEBD0;      /* iOS 26 Messages poll pill (kept) */
   --poll-ink:#E9902E;
   --poll-pick:#FADFB8;
@@ -106,6 +107,7 @@ html.dark{
   --black:#F5F5F7;          /* page text; bubbles below keep their own inks */
   --tint-1:#0F131A;
   --tint-2:#121A26;
+  --cream:#15110E;          /* dark: the hero goes warm near-black; the video stays a cream card */
   --overlay:rgba(0,0,0,.6);
   --error:#FF7369;
   --bubble-coach:#E9E9EB;   /* bubbles stay the same colors in dark mode */
@@ -128,6 +130,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var
 section{position:relative;background:var(--bg);padding:clamp(72px,10vw,140px) 0}
 section.tint-1{background:var(--tint-1);--bg:var(--tint-1)}   /* --bg scoped so bubble tails carve the right color */
 section.tint-2{background:var(--tint-2);--bg:var(--tint-2)}
+section.cream{background:var(--cream);--bg:var(--cream)}
 /* Soft seams (tomo.ai-style): a section can fade IN from the previous
    section's color (.blend + --from) or OUT into the next one (.blend-to +
    --to). Sections isolate so the band paints above their background but
@@ -175,8 +178,13 @@ nav .btn{height:44px;padding:0 20px;font-size:16px}
 }
 
 /* ===== HERO ===== */
-#hero{padding:clamp(104px,13vh,150px) 0 clamp(80px,10vw,130px);overflow:hidden;min-height:100vh;display:flex;align-items:center}
-#hero .wrap{position:relative;z-index:1;text-align:center;width:100%}   /* flex item — without this it shrinks to its widest line */
+#hero{padding:clamp(104px,13vh,150px) 0 clamp(64px,8vw,110px);overflow:hidden;min-height:100vh;display:flex;align-items:center}
+#hero .wrap{position:relative;z-index:1;width:100%}
+/* two columns: copy left, the mascot loop right (founder reference, 2026-11-14) */
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(32px,5vw,72px);align-items:center;text-align:left}
+.hero-copy{max-width:640px}
+.hero-video{position:relative;aspect-ratio:4/3;border-radius:28px;overflow:hidden;background:var(--cream);box-shadow:inset 0 0 0 1px rgba(11,11,12,.06),0 30px 60px -40px rgba(60,40,20,.35)}
+.hero-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .hero-mark{--size:clamp(96px,10vw,140px);display:block;margin:0 auto 8px;line-height:0}
 /* ===== cued live avatar (founder prototype, copied verbatim; --size is the only knob) ===== */
 .cued-avatar{
@@ -213,8 +221,8 @@ nav .btn{height:44px;padding:0 20px;font-size:16px}
 @keyframes ca-boing{0%{transform:scale(1)}30%{transform:scale(1.06,.94) translateY(2%)}60%{transform:scale(.97,1.04) translateY(-3%)}100%{transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.cued-avatar .ca-body,.cued-avatar .ca-eye{transition:none!important}}
 .hero-h{
-  font-size:clamp(42px,6.2vw,88px);line-height:1.06;max-width:12em;margin:0 auto;
-  color:var(--ink);text-wrap:balance;
+  font-size:clamp(36px,4.3vw,54px);line-height:1.06;margin:0;   /* capped so every rotating phrase stays one line in the 545px column at 1440 */
+  color:var(--ink);
 }
 .hero-h .kicker{display:block;font-size:.5em;line-height:1.3;margin-bottom:.42em;color:var(--ink)}
 /* Rotating end of the headline: "the coach that" + one phrase at a time. The
@@ -225,8 +233,8 @@ nav .btn{height:44px;padding:0 20px;font-size:16px}
 .rot-item.out{opacity:0;transform:translateY(-.3em)}
 .rot-icons{display:inline-flex;gap:.08em;vertical-align:-.06em;margin-left:.06em}
 .rot-icons img{width:.72em;height:.72em;border-radius:.18em;object-fit:cover}
-.hero-sub{font-size:clamp(17px,1.45vw,20px);line-height:1.5;color:var(--gray-text);max-width:52em;margin:36px auto 0}
-.hero-sub .b{color:var(--blue);white-space:nowrap}
+.hero-sub{font-size:clamp(17px,1.45vw,20px);line-height:1.5;color:var(--gray-text);max-width:30em;margin:28px 0 0}
+.hero-sub .b{color:var(--blue)}
 .hero-h .b{color:var(--blue)}
 .hero-h .g{color:var(--gray-text)}
 .ic{display:inline-block;width:1em;height:1em;border-radius:.22em;vertical-align:-.14em;margin:0 .15em;object-fit:cover}
@@ -239,7 +247,7 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 /* hero chatbox: a white pill with the input on the left and the CTA inside at the right */
 .hero-box{
   display:flex;align-items:center;gap:8px;
-  width:min(560px,100%);margin:30px auto 0;padding:6px 6px 6px 22px;
+  width:min(520px,100%);margin:28px 0 0;padding:6px 6px 6px 22px;
   background:var(--card);border:1px solid var(--line);border-radius:18px;
   box-shadow:0 10px 30px -18px rgba(0,110,253,.35);
   transition:border-color .15s,box-shadow .15s;
@@ -258,13 +266,18 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 }
 .js .hero-in{opacity:0;transition:opacity .4s ease}
 .js .hero-in.in{opacity:1}
+@media(max-width:1023.98px){
+  .hero-grid{grid-template-columns:1fr;gap:36px}
+  .hero-copy{max-width:640px}
+  .hero-video{aspect-ratio:16/11;max-width:640px}
+}
 .campanile{position:absolute;left:-6%;bottom:-4%;width:min(64vw,920px);opacity:.4;pointer-events:none;user-select:none;z-index:0}
 .campanile img{display:block;width:100%;height:auto}
 @media(max-width:767.98px){
-  #hero{min-height:0;padding-top:120px}
-  .hero-h{font-size:clamp(36px,10vw,42px);line-height:1.1}
-  .hero-mark{--size:96px;margin-bottom:4px}
+  #hero{min-height:0;padding-top:104px}
+  .hero-h{font-size:clamp(30px,8.4vw,34px);line-height:1.1}
   .hero-sub{font-size:17px;margin-top:20px}
+  .hero-video{border-radius:20px}
   .campanile{display:none}
   .hero-cap{font-size:14px;margin-top:16px}
 }
@@ -748,37 +761,32 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 <main>
 
 <!-- ===== HERO ===== -->
-<section id="hero" class="tint-2">
-  <div class="wrap hero-in" id="heroIn">
-    <!-- Live avatar (founder's cued-live-avatar prototype, 2026-11-08): the body
-         render has no eyes — they're drawn as divs that follow the cursor; the
-         arm is a separate layer that waves. Hover winks + waves, click boings,
-         idle glances/blinks/winks on their own. Reduced motion: still. -->
-    <div class="hero-mark cued-avatar" id="cuedAvatar" role="img" aria-label="cued">
-      <div class="ca-clip">
-        <picture><source srcset="assets/mascot/cued-avatar-arm.webp" type="image/webp"><img class="ca-arm" src="assets/mascot/cued-avatar-arm.png" alt="" width="162" height="175"></picture>
-        <picture><source srcset="assets/mascot/cued-avatar-body.webp" type="image/webp"><img class="ca-body" src="assets/mascot/cued-avatar-body.png" alt="" width="512" height="389"></picture>
-        <div class="ca-eye ca-l"></div>
-        <div class="ca-eye ca-r"></div>
-        <svg class="ca-wink" viewBox="0 0 20 10" aria-hidden="true"><path d="M1 7.5 Q10 -1.5 19 7.5" fill="none" stroke="#0B0B0C" stroke-width="3" stroke-linecap="round"/></svg>
-      </div>
+<section id="hero" class="cream">
+  <div class="wrap hero-in hero-grid" id="heroIn">
+    <div class="hero-copy">
+      <h1 class="hero-h"><span class="kicker">meet cued</span>the coach that<span class="sr-only"> lives in your texts.</span><span class="rot" id="heroRot" aria-hidden="true"><span class="rot-item on">lives in your texts.</span><span class="rot-item">replaces <span class="rot-icons"><img src="images/app-icons/hevy.png" alt="Hevy"><img src="images/app-icons/MyFitnessPal%20Review.jpg" alt="MyFitnessPal"><img src="images/app-icons/MacroFactor-MacroTracker_icon.png" alt="MacroFactor"><img src="images/app-icons/notes.png" alt="Notes"><img src="images/app-icons/reminders_app.webp" alt="Reminders"><img src="images/app-icons/pen_paper.png" alt="pen and paper"></span></span><span class="rot-item">builds your workouts.</span><span class="rot-item">tracks your food.</span><span class="rot-item">knows the college life.</span><span class="rot-item">knows your schedule.</span></span></h1>
+      <p class="hero-sub">it knows your classes, replaces your lift and meal apps, and texts first. <span class="b">nothing to download.</span></p>
+      <!-- "Chatbox" — for show: a composer row. Typing does nothing by itself;
+           the button (or Enter) opens the sign-up chat, same as every other CTA. -->
+      <form class="hero-box" id="heroBox" autocomplete="off">
+        <label class="sr-only" for="heroInput">message</label>
+        <input class="hero-input" id="heroInput" type="text" placeholder="say anything…" maxlength="140" enterkeyhint="send">
+        <button type="button" class="btn" id="heroCtaTop">text cued</button>
+      </form>
+      <p class="hero-cap">free during beta · made in berkeley</p>
     </div>
-    <h1 class="hero-h"><span class="kicker">meet cued</span>the coach that<span class="sr-only"> lives in your texts.</span><span class="rot" id="heroRot" aria-hidden="true"><span class="rot-item on">lives in your texts.</span><span class="rot-item">replaces <span class="rot-icons"><img src="images/app-icons/hevy.png" alt="Hevy"><img src="images/app-icons/MyFitnessPal%20Review.jpg" alt="MyFitnessPal"><img src="images/app-icons/MacroFactor-MacroTracker_icon.png" alt="MacroFactor"><img src="images/app-icons/notes.png" alt="Notes"><img src="images/app-icons/reminders_app.webp" alt="Reminders"><img src="images/app-icons/pen_paper.png" alt="pen and paper"></span></span><span class="rot-item">builds your workouts.</span><span class="rot-item">tracks your food.</span><span class="rot-item">knows the college life.</span><span class="rot-item">knows your schedule.</span></span></h1>
-    <p class="hero-sub">it knows your classes, replaces your lift and meal apps, and texts first. <span class="b">nothing to download.</span></p>
-    <!-- "Chatbox" — for show: a composer row where the button used to be.
-         Typing does nothing by itself; the button (or Enter) opens the
-         sign-up chat, same as every other CTA. -->
-    <form class="hero-box" id="heroBox" autocomplete="off">
-      <label class="sr-only" for="heroInput">message</label>
-      <input class="hero-input" id="heroInput" type="text" placeholder="say anything…" maxlength="140" enterkeyhint="send">
-      <button type="button" class="btn" id="heroCtaTop">text cued</button>
-    </form>
-    <p class="hero-cap">free during beta · made in berkeley</p>
+    <!-- The mascot: a locked-off render loop (founder, 2026-11-14), muted and
+         inline so it autoplays everywhere; the poster is its first frame.
+         Paused off screen and under reduced motion (script). Not in LFS on
+         purpose — GitHub Pages serves LFS pointers, not the file. -->
+    <div class="hero-video" aria-hidden="true">
+      <video id="heroVideo" src="assets/hero/cued-hero.mp4" poster="assets/hero/cued-hero-poster.jpg" autoplay muted loop playsinline preload="auto" disablepictureinpicture></video>
+    </div>
   </div>
 </section>
 
 <!-- ===== SAY ANYTHING ===== -->
-<section id="say" class="blend blend-to" style="--from:var(--tint-2);--to:var(--tint-2)">
+<section id="say" class="blend blend-to" style="--from:var(--cream);--to:var(--tint-2)">
   <div class="wrap">
     <h2 data-io>say anything.</h2>
     <p class="sub" data-io>it's a text thread. so text it like one.</p>
@@ -1107,6 +1115,17 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
         if (visible) timer = setTimeout(tick, 1800);
       }), {threshold: 0}).observe(hero);
     }
+  }
+
+  // Hero video: a decorative loop — paused while off screen, and left on its
+  // poster under reduced motion.
+  const heroVideo = document.getElementById('heroVideo');
+  if (heroVideo){
+    if (reduce.matches){ heroVideo.removeAttribute('autoplay'); heroVideo.pause(); }
+    else new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting){ const p = heroVideo.play(); if (p && p.catch) p.catch(() => {}); }
+      else heroVideo.pause();
+    }), {threshold: 0}).observe(heroVideo);
   }
 
   // Hero chatbox: Enter submits → the sign-up chat (the button has its own click binding).
