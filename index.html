@@ -591,7 +591,9 @@ footer{border-top:1px solid var(--line);padding:28px var(--pad);font-size:14px;c
 .rail{
   position:fixed;left:22px;top:50%;transform:translateY(-50%);z-index:40;
   display:none;flex-direction:column;gap:6px;
+  opacity:0;pointer-events:none;transition:opacity .3s ease;
 }
+.rail.show{opacity:1;pointer-events:auto}
 @media(min-width:1024px){.rail{display:flex}}
 .rail button{
   position:relative;display:flex;align-items:center;justify-content:center;
@@ -628,7 +630,7 @@ html.dark .mode-btn .ico-sun{display:block}
   .thread[data-play]{transition:none!important;transform:none!important}
   .poll-row,.poll-row i,.poll-row i::after{transition:none!important;animation:none!important}
   .ph-status::before{animation:none}
-  .float-cta,.hero-in,.rot-item,.rail .dot,.rail button::after{transition:none}
+  .float-cta,.hero-in,.rot-item,.rail,.rail .dot,.rail button::after{transition:none}
   .js .hero-in{opacity:1}
 }
 
@@ -837,7 +839,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </button>
 
 <!-- Progress rail — one dot per [data-label] section, down the left edge (desktop). -->
-<div class="rail" id="rail" role="navigation" aria-label="page sections"></div>   <!-- a div, not <nav>: the page's nav rule is a full-width bar -->
+<div class="rail" id="rail" role="navigation" aria-label="steps"></div>   <!-- one dot per proof step; only shown while the proof is pinned. A div, not <nav>: the page's nav rule is a full-width bar -->
 
 <main>
 
@@ -1562,7 +1564,23 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     sticky.appendChild(grid); track.appendChild(sticky);
     stepsWrap.style.display = 'none';
     section.appendChild(track);
-    pinned = {track, sticky, copy, stepper, phoneWrap, screen, threads, mascot,
+    // step dots on the left edge (#rail): shown only while the proof is pinned
+    const rail = document.getElementById('rail');
+    const dots = [];
+    if (rail){
+      rail.innerHTML = '';
+      steps.forEach((s, i) => {
+        const b = document.createElement('button'); b.type = 'button';
+        b.setAttribute('aria-label', copy.children[i].querySelector('h2').textContent);   // the step copy already moved into `copy`
+        b.innerHTML = '<span class="dot"></span>';
+        b.addEventListener('click', () => {
+          const top = track.getBoundingClientRect().top + window.scrollY + i * window.innerHeight + 2;
+          window.scrollTo({top, behavior: reduce.matches ? 'auto' : 'smooth'});
+        });
+        rail.appendChild(b); dots.push(b);
+      });
+    }
+    pinned = {track, sticky, copy, stepper, phoneWrap, screen, threads, mascot, rail, dots,
               status: phoneWrap.querySelector('.ph-status')};
     cur = -1;
     fitPhone();
@@ -1579,6 +1597,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     });
     Array.from(pinned.copy.children).forEach((c, i) => steps[i].querySelector('.wrap').prepend(c));
     pinned.track.remove();
+    if (pinned.rail){ pinned.rail.classList.remove('show'); pinned.rail.innerHTML = ''; }
     stepsWrap.style.display = '';
     pinned = null; cur = -1;
     window.proofActive = false; window.pillState && window.pillState();
@@ -1596,8 +1615,9 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     if (i === cur) return;
     const first = cur < 0;
     cur = i;
-    const {copy, stepper, sticky, threads, status, mascot} = pinned;
+    const {copy, stepper, sticky, threads, status, mascot, dots} = pinned;
     Array.from(copy.children).forEach((c, k) => c.classList.toggle('on', k === i));
+    dots.forEach((d, k) => k === i ? d.setAttribute('aria-current', 'true') : d.removeAttribute('aria-current'));
     Array.from(mascot.children).forEach((m, k) => m.classList.toggle('on', k === i));
     Array.from(stepper.querySelectorAll('button')).forEach((b, k) => k === i ? b.setAttribute('aria-current', 'step') : b.removeAttribute('aria-current'));
     sticky.className = 'proof-sticky ' + tints[i];
@@ -1619,6 +1639,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       const p = Math.min(1, Math.max(0, -r.top / span));
       const active = r.top <= 0 && r.bottom >= vh;
       if (active !== window.proofActive){ window.proofActive = active; window.pillState && window.pillState(); }
+      if (pinned.rail) pinned.rail.classList.toggle('show', active);
       setStep(Math.min(4, Math.floor(p * 5)));
     });
   }
@@ -1638,33 +1659,6 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   reduce.addEventListener('change', mode);
   window.addEventListener('resize', () => { if (pinned) fitPhone(); else fitStacked(); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (pinned) fitPhone(); });
-})();
-
-// === Progress rail (left edge) ===
-// One dot per [data-label] section; the section under the viewport's
-// vertical midpoint is current (works for the 500vh proof track too).
-// Click scrolls to the section.
-(function(){
-  const rail = document.getElementById('rail');
-  if (!rail) return;
-  const secs = Array.from(document.querySelectorAll('section[data-label]'));
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
-  const btns = secs.map(sec => {
-    const b = document.createElement('button');
-    b.type = 'button'; b.setAttribute('aria-label', sec.dataset.label);
-    b.innerHTML = '<span class="dot"></span>';
-    b.addEventListener('click', () => sec.scrollIntoView({behavior: reduce.matches ? 'auto' : 'smooth', block: 'start'}));
-    rail.appendChild(b);
-    return b;
-  });
-  const io = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (!e.isIntersecting) return;
-      const i = secs.indexOf(e.target);
-      btns.forEach((b, k) => k === i ? b.setAttribute('aria-current', 'true') : b.removeAttribute('aria-current'));
-    });
-  }, {rootMargin: '-50% 0px -50% 0px', threshold: 0});
-  secs.forEach(s => io.observe(s));
 })();
 
 // === Dark-mode toggle (bottom-right sun/moon button) ===
