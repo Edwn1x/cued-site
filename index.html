@@ -537,7 +537,7 @@ html.dark #proof .ph-status{background:var(--fill)}
 #signup{text-align:center;padding:clamp(120px,16vw,200px) 0;overflow:hidden}
 #signup .wrap{position:relative;z-index:1}
 .mascot{
-  display:block;width:clamp(340px,48vh,560px);height:auto;aspect-ratio:1;object-fit:cover;margin:-6vh auto -40px;
+  display:block;width:clamp(340px,52vh,600px);height:auto;aspect-ratio:462/365;object-fit:cover;margin:0 auto 4px;   /* no negative margins: the render's box must not reach the headline */
   -webkit-mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
           mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
   -webkit-mask-composite:source-in;mask-composite:intersect;
@@ -547,7 +547,7 @@ html.dark #proof .ph-status{background:var(--fill)}
 #signup .sub{margin:18px auto 0}
 #signup .btn{margin-top:28px}
 .campanile.r{left:0;right:auto;bottom:-2%;width:min(100vw,1560px);opacity:.3;transform:translateX(-5%)}   /* far left, big: the tower sits ~14% across the drawing; -5% parks it just inside the edge */
-@media(max-width:767.98px){.mascot{width:300px;margin:-20px auto -30px}.campanile.r{display:none}}
+@media(max-width:767.98px){.mascot{width:320px;margin:0 auto}.campanile.r{display:none}}
 
 /* ===== FAQ ===== */
 .faq-wrap{max-width:760px;margin:0 auto}
@@ -1095,7 +1095,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 <section id="signup" class="cream blend" style="--from:var(--cream-2)" data-label="text cued">
   <div class="campanile r" aria-hidden="true"><img src="images/hero-drawing.png" alt="" width="1920" height="650"></div>
   <div class="wrap">
-    <picture><source srcset="assets/mascot/v2/cued-dumbbell.webp" type="image/webp"><img class="mascot" src="assets/mascot/v2/cued-dumbbell.jpg" alt="cued, a round white mascot in a blue headband, lifting a dumbbell" width="900" height="900" loading="lazy"></picture>
+    <picture><source srcset="assets/mascot/v2/cued-dumbbell.webp" type="image/webp"><img class="mascot" src="assets/mascot/v2/cued-dumbbell.jpg" alt="cued, a round white mascot in a blue headband, lifting a dumbbell" width="1100" height="869" loading="lazy"></picture>
     <h2 data-io>your <span class="b">cue</span> to lock in.</h2>
     <p class="sub" data-io>nothing to open. ready when you are.</p>
     <div data-io><button type="button" class="btn lg" id="closeCta">text cued</button></div>
