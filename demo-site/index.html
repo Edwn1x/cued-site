@@ -520,15 +520,19 @@ html.dark #proof .ph-status{background:var(--fill)}
 .app img{display:block;width:56px;height:56px;border-radius:14px;margin:0 auto;object-fit:cover;background:#fff}
 .app span{display:block;font-size:13px;color:var(--gray-text);margin-top:8px;line-height:1.25}
 .apps.retired img{filter:saturate(.85)}
+.app .app-sub{display:inline;margin:0}   /* the nested span must not pick up .app span's block + margin */
 .apps-note{text-align:center;font-size:18px;color:var(--gray-text);margin-top:36px}
 @media(max-width:767.98px){
   .apps-row{grid-template-columns:1fr;gap:20px;padding:28px 0}
   .apps-row h3{font-size:26px}
-  .apps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 10px;justify-items:center}
-  .app{width:100%}
-  .app img{width:52px;height:52px;border-radius:13px}
-  .app span{font-size:12px}
-  .apps-note{font-size:16px;margin-top:28px}
+  /* phones: chips — the full icon + the name in one pill, wrapping; half the height of the tile grid */
+  .apps{display:flex;flex-wrap:wrap;gap:8px}
+  .app{display:inline-flex;align-items:center;gap:8px;width:auto;padding:5px 12px 5px 5px;background:var(--card);border-radius:999px;box-shadow:0 1px 0 var(--line)}
+  .app img{width:28px;height:28px;border-radius:8px;margin:0}
+  .app span{font-size:13.5px;color:var(--ink);line-height:1.2;margin:0;text-align:left}
+  .app .app-sub{display:none}
+  .apps-row{gap:16px;padding:24px 0}
+  .apps-note{font-size:16px;margin-top:24px}
 }
 
 /* ===== PRIVACY ===== */
@@ -558,8 +562,14 @@ html.dark #proof .ph-status{background:var(--fill)}
 /* ===== CLOSE ===== */
 #signup{text-align:center;padding:clamp(120px,16vw,200px) 0;overflow:hidden}
 #signup .wrap{position:relative;z-index:1}
+.mascot-wrap{position:relative;display:inline-block;margin:0 auto 4px;line-height:0;vertical-align:top}
+.mascot-wrap::before{
+  content:'';position:absolute;inset:-5% -6%;z-index:-1;pointer-events:none;
+  background:var(--cream);border-radius:30%;filter:blur(34px);   /* a blurred cream slab the render's shape: solid under the whole image, soft beyond it */
+}
+@media(max-width:767.98px){.mascot-wrap::before{filter:blur(22px)}}
 .mascot{
-  display:block;width:clamp(340px,52vh,600px);height:auto;aspect-ratio:462/365;object-fit:cover;margin:0 auto 4px;   /* no negative margins: the render's box must not reach the headline */
+  display:block;width:clamp(340px,52vh,600px);height:auto;aspect-ratio:462/365;object-fit:cover;margin:0;   /* no negative margins: the render's box must not reach the headline */
   -webkit-mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
           mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
   -webkit-mask-composite:source-in;mask-composite:intersect;
@@ -1122,7 +1132,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       <div class="apps">
         <div class="app"><img src="/images/app-icons/google-calendar.webp" alt=""><span>google calendar</span></div>
         <div class="app"><img src="/images/app-icons/canvas-student.jpg" alt=""><span>bcourses / canvas</span></div>
-        <div class="app"><img src="/images/app-icons/google-health.webp" alt=""><span>google health<br>(fitbit, pixel watch)</span></div>
+        <div class="app"><img src="/images/app-icons/google-health.webp" alt=""><span>google health<span class="app-sub"><br>(fitbit, pixel watch)</span></span></div>
         <div class="app"><img src="/images/app-icons/apple-watch.webp" alt=""><span>apple watch</span></div>
         <div class="app"><img src="/images/app-icons/strava.webp" alt=""><span>strava</span></div>
       </div>
@@ -1169,7 +1179,11 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 <section id="signup" class="blend" style="--from:var(--cream)" data-label="text cued">
   <div class="campanile r" aria-hidden="true"><img src="/images/hero-drawing.png" alt="" width="1920" height="650"></div>
   <div class="wrap">
-    <picture><source srcset="/assets/mascot/v2/cued-dumbbell-light.webp" type="image/webp"><img class="mascot" src="/assets/mascot/v2/cued-dumbbell-light.jpg" alt="cued, a round white mascot in a blue headband, lifting a dumbbell" width="1100" height="869" loading="lazy"></picture>
+    <!-- The render is flattened to --cream and the close sits on cream-2, so a
+         soft cream glow behind it (::before) carries the render's backdrop out
+         into the page — reads as a spotlight. (This render's backdrop texture
+         can't be re-flattened to cream-2 without eating the body's shading.) -->
+    <div class="mascot-wrap"><picture><source srcset="/assets/mascot/v2/cued-dumbbell.webp" type="image/webp"><img class="mascot" src="/assets/mascot/v2/cued-dumbbell.jpg" alt="cued, a round white mascot in a blue headband, lifting a dumbbell" width="1100" height="869" loading="lazy"></picture></div>
     <h2 data-io>your <span class="b">cue</span> to lock in.</h2>
     <p class="sub" data-io>nothing to open. ready when you are.</p>
     <div data-io><button type="button" class="btn lg" id="closeCta">text cued</button></div>
