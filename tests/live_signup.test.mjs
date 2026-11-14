@@ -8,7 +8,11 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { JSDOM } from 'jsdom';
 
-const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+// Both pages carry the same sign-up chat: the live root page and the
+// redesign at /demo-site. Every test below runs against each.
+const PAGES = [['index.html', ['floatCta', 'heroCta', 'heroCtaTop', 'closeCta']], ['demo-site/index.html', ['floatCta', 'heroCtaTop', 'closeCta']]];
+for (const [PAGE, CTA_IDS] of PAGES) {
+const html = readFileSync(new URL('../' + PAGE, import.meta.url), 'utf8');
 
 let lastDoc = null;
 async function until(cond, { timeout = 4000, step = 10 } = {}) {
@@ -89,16 +93,16 @@ async function walk(w, { referral = null } = {}) {
   return { d, success };
 }
 
-test('every CTA reads "text cued"', () => {
+test(PAGE + ' · every CTA reads "text cued"', () => {
   const w = boot([], () => ({}));
   const d = w.document;
-  for (const id of ['floatCta', 'heroCta', 'heroCtaTop', 'closeCta']) {
+  for (const id of CTA_IDS) {
     assert.equal(d.getElementById(id).textContent.trim(), 'text cued', id);
   }
   assert.doesNotMatch(d.body.innerHTML, /Join the waitlist/);
 });
 
-test('live + link: "you\'re in", the iMessage tap, and no-iPhone sends the first text by SMS now', async () => {
+test(PAGE + ' · live + link: "you\'re in", the iMessage tap, and no-iPhone sends the first text by SMS now', async () => {
   const posted = [];
   const w = boot(posted, (url) => url.endsWith('/signup/channel')
     ? { status: 'ok', channel: 'sms', hook_sent: true, waitlist: false }
@@ -120,7 +124,7 @@ test('live + link: "you\'re in", the iMessage tap, and no-iPhone sends the first
   assert.equal(posted[1].body.phone.replace(/\D/g, ''), '5105550123');
 });
 
-test('live, no link: the first text is already on its way', async () => {
+test(PAGE + ' · live, no link: the first text is already on its way', async () => {
   const w = boot([], () => ({ status: 'ok', live: true, hook_deferred: false, imessage_link: null }));
   const { success } = await walk(w);
   assert.equal(success.querySelector('h3').textContent, "you're in, Edwin.");
@@ -128,7 +132,7 @@ test('live, no link: the first text is already on its way', async () => {
   assert.equal(success.querySelector('a.co-imsg'), null);
 });
 
-test('live, already signed up: no re-pitch, just "text me whenever"', async () => {
+test(PAGE + ' · live, already signed up: no re-pitch, just "text me whenever"', async () => {
   const w = boot([], () => ({ status: 'exists', live: true, message: 'This number is already signed up.',
                               imessage_link: 'https://photon.test/users/ph-2/redirect' }));
   const { success } = await walk(w);
@@ -137,7 +141,7 @@ test('live, already signed up: no re-pitch, just "text me whenever"', async () =
   assert.ok(success.querySelector('a.co-imsg'));
 });
 
-test('older backend (no `live`): the waitlist copy still reads right', async () => {
+test(PAGE + ' · older backend (no `live`): the waitlist copy still reads right', async () => {
   const w = boot([], () => ({ status: 'ok', imessage_link: null }));
   const { success } = await walk(w);
   assert.equal(success.querySelector('h3').textContent, "you're on the list, Edwin.");
@@ -147,7 +151,7 @@ test('older backend (no `live`): the waitlist copy still reads right', async () 
 // The referral code (founder 2026-10-27): the last optional ask, after gmail. Typed → posted
 // upper-cased as `referral_code` and the success copy names who got the credit; skipped →
 // null, nothing said; an unknown code → a soft line, still in.
-test('referral code: typed → posted + credited line; skipped → null; unknown → soft line', async () => {
+test(PAGE + ' · referral code: typed → posted + credited line; skipped → null; unknown → soft line', async () => {
   let posted = [];
   let w = boot(posted, () => ({ status: 'ok', live: true, hook_deferred: false, imessage_link: null,
                                 referral: { credited: true, referrer: 'Jayden' } }));
@@ -168,3 +172,4 @@ test('referral code: typed → posted + credited line; skipped → null; unknown
   assert.equal(posted[0].body.referral_code, 'ZZZ9999');
   assert.match(success.querySelector('p').textContent, /didn't match anyone, but you're in/);
 });
+}
