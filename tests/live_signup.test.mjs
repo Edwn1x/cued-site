@@ -92,7 +92,7 @@ async function walk(w, { referral = null } = {}) {
 test('every CTA reads "text cued"', () => {
   const w = boot([], () => ({}));
   const d = w.document;
-  for (const id of ['floatCta', 'heroCtaTop', 'closeCta']) {
+  for (const id of ['floatCta', 'heroCta', 'heroCtaTop', 'closeCta']) {
     assert.equal(d.getElementById(id).textContent.trim(), 'text cued', id);
   }
   assert.doesNotMatch(d.body.innerHTML, /Join the waitlist/);

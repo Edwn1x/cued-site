@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <!--
-  VARIANT B of index.html (2026-11-08): same page, muse.ai-style hero — the
-  live avatar sits INLINE in the headline ("meet cued [avatar], the coach
-  that …") instead of above a kicker line. Keep in sync with index.html.
+  cued.fit/demo-site — the Nov 2026 redesign, served from /demo-site while the
+  root index.html stays the live design. All asset and page links are
+  root-absolute for that reason.
 
   cued.fit v2 (Nov 2026 rework) — single-file vanilla HTML/CSS/JS, GitHub Pages.
 
@@ -28,23 +28,23 @@
 -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>cued — the fitness coach that lives in your texts. (variant b)</title>
+<title>cued — the fitness coach that lives in your texts.</title>
 <meta name="description" content="Cued is an AI fitness coach for college students that works over iMessage or SMS: workouts, meals and check-ins planned around your real schedule. With your permission it reads your Google Calendar, bCourses and Fitbit/Pixel Watch (Google Health).">
 <meta property="og:title" content="cued — the fitness coach that lives in your texts.">
 <meta property="og:description" content="Cued is an AI fitness coach for college students that works over iMessage or SMS: workouts, meals and check-ins planned around your real schedule.">
-<meta property="og:image" content="images/og-image-cued-square.png">
+<meta property="og:image" content="/images/og-image-cued-square.png">
 <meta property="og:image:width" content="512">
 <meta property="og:image:height" content="512">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:alt" content="cued — the fitness coach that lives in your texts.">
-<meta property="og:image" content="images/og-image-cued.png">
+<meta property="og:image" content="/images/og-image-cued.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:type" content="image/png">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="images/og-image-cued.png">
-<link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+<meta name="twitter:image" content="/images/og-image-cued.png">
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hedvig+Letters+Serif:opsz@12..24&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
@@ -59,20 +59,22 @@
   --blue-ink:#FFFFFF;       /* text ON blue — the sign-up card reads this name */
   --black:#0B0B0C;
   --white:#FFFFFF;
-  --gray-bubble:#E9E9EB;
+  --gray-bubble:#ECE7E1;    /* iMessage gray, warmed a touch for the cream page */
   --gray-text:#5A5A60;
-  --tint-1:#F3F7FF;
-  --tint-2:#E9F1FF;
+  --cream:#F5EAE0;          /* the mascot renders' backdrop (sampled) — hero, proof, privacy, close */
+  --cream-2:#FBF6F1;        /* the lighter cream the other sections alternate with */
+  --tint-1:var(--cream-2);  /* the old blue tints now resolve to the creams */
+  --tint-2:var(--cream);
   --poll-fill:#FCEBD0;      /* iOS 26 Messages poll pill (kept) */
   --poll-ink:#E9902E;
   --poll-pick:#FADFB8;
   /* page surfaces + aliases the sign-up card (.co-*) depends on */
-  --bg:var(--white);
+  --bg:var(--cream-2);      /* page default: light cream, never white */
   --ink:var(--black);
   --ink-2:var(--gray-text);
   --ink-3:#8A8A92;
-  --line:#EEF2F8;
-  --fill:#F2F4F8;
+  --line:#E8DCCF;           /* warm hairlines */
+  --fill:#EFE3D7;           /* status pill, dark-mode button, composer plus */
   --card:#FFFFFF;
   --field:#FFFFFF;
   --gray:var(--gray-bubble);
@@ -102,14 +104,16 @@ html.dark{
   --ink:#F5F5F7;
   --ink-2:#A6A6AE;
   --ink-3:#6E6E76;
-  --line:#1E2229;
-  --fill:#15171B;
-  --card:#15171B;
+  --line:#2A241F;
+  --fill:#1F1A16;
+  --card:#1A1512;
   --field:#1C1E23;
   --gray-text:#A6A6AE;
   --black:#F5F5F7;          /* page text; bubbles below keep their own inks */
-  --tint-1:#0F131A;
-  --tint-2:#121A26;
+  --cream:#15110E;          /* dark: warm near-black; the renders stay cream cards */
+  --cream-2:#0F0C0A;
+  --tint-1:var(--cream-2);
+  --tint-2:var(--cream);
   --overlay:rgba(0,0,0,.6);
   --error:#FF7369;
   --bubble-coach:#E9E9EB;   /* bubbles stay the same colors in dark mode */
@@ -132,6 +136,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var
 section{position:relative;background:var(--bg);padding:clamp(72px,10vw,140px) 0}
 section.tint-1{background:var(--tint-1);--bg:var(--tint-1)}   /* --bg scoped so bubble tails carve the right color */
 section.tint-2{background:var(--tint-2);--bg:var(--tint-2)}
+section.cream{background:var(--cream);--bg:var(--cream)}
 /* Soft seams (tomo.ai-style): a section can fade IN from the previous
    section's color (.blend + --from) or OUT into the next one (.blend-to +
    --to). Sections isolate so the band paints above their background but
@@ -154,6 +159,7 @@ h2{font-size:clamp(34px,4.2vw,56px);line-height:1.08}
 }
 .btn:hover{background:var(--blue-hover)}
 .btn.lg{height:56px;padding:0 34px;font-size:20px}
+.btn.sq{border-radius:14px;height:50px;padding:0 26px;font-size:17px}   /* the hero's button keeps the squarish corners the chatbox had */
 /* scroll-in reveal for copy blocks (gated on html.js so a JS-less load is visible) */
 .js [data-io]{opacity:0;transform:translateY(12px);transition:opacity .5s var(--ease),transform .5s var(--ease)}
 .js [data-io].on{opacity:1;transform:none}
@@ -179,9 +185,15 @@ nav .btn{height:44px;padding:0 20px;font-size:16px}
 }
 
 /* ===== HERO ===== */
-#hero{padding:clamp(104px,13vh,150px) 0 clamp(80px,10vw,130px);overflow:hidden;min-height:100vh;display:flex;align-items:center}
-#hero .wrap{position:relative;z-index:1;text-align:center;width:100%}   /* flex item — without this it shrinks to its widest line */
-.hero-mark{--size:clamp(120px,14vw,200px);display:block;margin:0 auto 6px;line-height:0}
+#hero{padding:clamp(104px,13vh,150px) 0 clamp(64px,8vw,110px);overflow:hidden;min-height:100vh;display:flex;align-items:center}
+#hero .wrap{position:relative;z-index:1;width:100%}
+/* two columns: copy left, the mascot loop right (founder reference, 2026-11-14) */
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:clamp(24px,3vw,44px);align-items:center;text-align:left}
+.hero-copy{max-width:700px}
+.hero-video{position:relative;aspect-ratio:4/3;border-radius:28px;overflow:hidden;background:var(--cream);box-shadow:inset 0 0 0 1px rgba(11,11,12,.06),0 30px 60px -40px rgba(60,40,20,.35)}
+.hero-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .6s ease}
+.hero-video video.on{opacity:1}
+.hero-mark{--size:clamp(96px,10vw,140px);display:block;margin:0 auto 8px;line-height:0}
 /* ===== cued live avatar (founder prototype, copied verbatim; --size is the only knob) ===== */
 .cued-avatar{
   --blue:#006EFD;
@@ -217,13 +229,10 @@ nav .btn{height:44px;padding:0 20px;font-size:16px}
 @keyframes ca-boing{0%{transform:scale(1)}30%{transform:scale(1.06,.94) translateY(2%)}60%{transform:scale(.97,1.04) translateY(-3%)}100%{transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.cued-avatar .ca-body,.cued-avatar .ca-eye{transition:none!important}}
 .hero-h{
-  font-size:clamp(42px,6.2vw,88px);line-height:1.06;max-width:12em;margin:0 auto;
-  color:var(--ink);text-wrap:balance;
+  font-size:clamp(38px,4.4vw,60px);line-height:1.04;margin:0;   /* capped so every rotating phrase stays one line in the ~615px column at 1440 (measured) */
+  color:var(--ink);
 }
-.hero-h .line{display:block}
-.hero-h .nowrap{white-space:nowrap}
-.hero-h .cued-avatar{--size:1.08em;display:inline-block;vertical-align:-.16em;margin:0 .1em 0 .14em;line-height:0}
-.hero-h .cued-avatar .ca-clip{box-shadow:none}
+.hero-h .kicker{display:block;font-size:.5em;line-height:1.3;margin-bottom:.42em;color:var(--ink)}
 /* Rotating end of the headline: "the coach that" + one phrase at a time. The
    slot's height is set by JS to the tallest phrase so nothing below shifts. */
 .rot{display:block;position:relative;height:1.06em}
@@ -232,8 +241,8 @@ nav .btn{height:44px;padding:0 20px;font-size:16px}
 .rot-item.out{opacity:0;transform:translateY(-.3em)}
 .rot-icons{display:inline-flex;gap:.08em;vertical-align:-.06em;margin-left:.06em}
 .rot-icons img{width:.72em;height:.72em;border-radius:.18em;object-fit:cover}
-.hero-sub{font-size:clamp(17px,1.45vw,20px);line-height:1.5;color:var(--gray-text);max-width:52em;margin:36px auto 0}
-.hero-sub .b{color:var(--blue);white-space:nowrap}
+.hero-sub{font-size:clamp(17px,1.45vw,20px);line-height:1.5;color:var(--gray-text);max-width:30em;margin:28px 0 0}
+.hero-sub .b{color:var(--blue)}
 .hero-h .b{color:var(--blue)}
 .hero-h .g{color:var(--gray-text)}
 .ic{display:inline-block;width:1em;height:1em;border-radius:.22em;vertical-align:-.14em;margin:0 .15em;object-fit:cover}
@@ -242,36 +251,21 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 .ic.round,picture.ic.round{border-radius:50%}
 .ic.ic-svg{border-radius:.22em}
 .hero-cap{margin-top:14px;font-size:14px;color:var(--ink-3)}
-.hero-cta{margin-top:30px}
-/* hero chatbox: a white pill with the input on the left and the CTA inside at the right */
-.hero-box{
-  display:flex;align-items:center;gap:8px;
-  width:min(560px,100%);margin:30px auto 0;padding:6px 6px 6px 22px;
-  background:var(--card);border:1px solid var(--line);border-radius:18px;
-  box-shadow:0 10px 30px -18px rgba(0,110,253,.35);
-  transition:border-color .15s,box-shadow .15s;
-}
-.hero-box:focus-within{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
-.hero-input{
-  flex:1;min-width:0;height:44px;border:none;background:none;outline:none;
-  font-family:var(--f-ui);font-size:17px;color:var(--ink);
-}
-.hero-input::placeholder{color:var(--ink-3)}
-.hero-box .btn{flex:none;height:44px;padding:0 20px;font-size:16px;border-radius:13px}
-@media(max-width:767.98px){
-  .hero-box{padding-left:16px}
-  .hero-input{font-size:16px}   /* 16px on phones or iOS zooms on focus */
-  .hero-box .btn{padding:0 16px;font-size:15px}
-}
+.hero-cta{margin-top:28px}
 .js .hero-in{opacity:0;transition:opacity .4s ease}
 .js .hero-in.in{opacity:1}
+@media(max-width:1023.98px){
+  .hero-grid{grid-template-columns:1fr;gap:36px}
+  .hero-copy{max-width:640px}
+  .hero-video{aspect-ratio:16/11;max-width:640px}
+}
 .campanile{position:absolute;left:-6%;bottom:-4%;width:min(64vw,920px);opacity:.4;pointer-events:none;user-select:none;z-index:0}
 .campanile img{display:block;width:100%;height:auto}
 @media(max-width:767.98px){
-  #hero{min-height:0;padding-top:120px}
-  .hero-h{font-size:clamp(36px,10vw,42px);line-height:1.1}
-  .hero-h .cued-avatar{--size:1.05em}
+  #hero{min-height:0;padding-top:104px}
+  .hero-h{font-size:clamp(30px,8.4vw,34px);line-height:1.1}
   .hero-sub{font-size:17px;margin-top:20px}
+  .hero-video{border-radius:20px}
   .campanile{display:none}
   .hero-cap{font-size:14px;margin-top:16px}
 }
@@ -288,6 +282,7 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 .mq:hover .mq-track{animation-play-state:paused}
 @keyframes mq{to{transform:translateX(-50%)}}
 .mq .msg{flex:none;max-width:none;margin:0 0 0 .4em;font-size:20px;font-family:var(--f-phone)}
+@media(max-width:767.98px){.mq .msg{font-size:16px}.mq{margin-top:28px}}
 @media(prefers-reduced-motion:reduce){.mq-track{animation:none}}
 
 /* ===== BUBBLES (phone + thread cards + strip) ===== */
@@ -383,13 +378,13 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
   box-shadow:0 0 0 1px var(--phone-edge,transparent);
 }
 .phone-screen{
-  --bg:#fff;position:relative;height:100%;background:#fff;border-radius:44px;overflow:hidden;
+  --bg:var(--card);position:relative;height:100%;background:var(--card);border-radius:44px;overflow:hidden;
   display:flex;flex-direction:column;font-family:var(--f-phone);color:#0B0B0C;
 }
 .island{position:absolute;top:11px;left:50%;width:120px;height:34px;margin-left:-60px;background:#0B0B0C;border-radius:20px;z-index:3}
 .ph-head{
-  flex:none;padding:52px 16px 10px;border-bottom:1px solid #EEF2F8;
-  display:flex;flex-direction:column;align-items:center;position:relative;background:#fff;
+  flex:none;padding:52px 16px 10px;border-bottom:1px solid var(--line);
+  display:flex;flex-direction:column;align-items:center;position:relative;background:var(--card);
 }
 .ph-head .chev,.ph-head .vid{position:absolute;top:60px;color:var(--blue);width:22px;height:22px}
 .ph-head .chev{left:18px}
@@ -408,9 +403,9 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 .screen .thread{will-change:transform}
 .proof-sticky .screen .thread{display:none}
 .proof-sticky .screen .thread.active{display:flex}
-.ph-comp{flex:none;display:flex;align-items:center;gap:8px;padding:8px 14px 26px;background:#fff}
-.ph-comp .plus{width:30px;height:30px;border-radius:50%;background:#F2F4F8;display:flex;align-items:center;justify-content:center;color:#5A5A60;font-size:20px;line-height:1}
-.ph-comp .field{flex:1;height:34px;border:1px solid #DFE3EA;border-radius:17px;padding:0 12px;display:flex;align-items:center;color:#8A8A92;font-size:15px}
+.ph-comp{flex:none;display:flex;align-items:center;gap:8px;padding:8px 14px 26px;background:var(--card)}
+.ph-comp .plus{width:30px;height:30px;border-radius:50%;background:var(--fill);display:flex;align-items:center;justify-content:center;color:#5A5A60;font-size:20px;line-height:1}
+.ph-comp .field{flex:1;height:34px;border:1px solid var(--line);border-radius:17px;padding:0 12px;display:flex;align-items:center;color:#8A8A92;font-size:15px}
 .ph-comp .mic{color:#8A8A92;width:16px;height:22px}
 .ph-home{position:absolute;bottom:8px;left:50%;width:120px;height:5px;margin-left:-60px;border-radius:3px;background:#0B0B0C;opacity:.85}
 
@@ -443,6 +438,75 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 .stepper button[aria-current="step"]::before{width:48px}
 .proof-right{display:flex;align-items:center;justify-content:center;height:100vh}
 
+/* ===== PROOF, unframed (founder reference, 2026-11-14) =====
+   No phone slab: the thread floats on the hero's cream at reading size,
+   with the avatar / name / status pill above it. Left: headline + stepper
+   only (the sub-lines are gone — fewer words), and the texting mascot
+   render sits in the bottom-left corner on desktop. The DOM and the
+   thread engine are unchanged; these rules just take the frame off. */
+#proof,#proof .step,#proof .proof-sticky{background:var(--cream)!important;--bg:var(--cream)}
+#proof .step-copy .sub{display:none}
+#proof .proof-grid{grid-template-columns:1fr 1fr;gap:clamp(32px,5vw,80px)}
+#proof .proof-left{height:100vh;display:flex;flex-direction:column;justify-content:center;padding:calc(72px + 16vh) 0 clamp(220px,38vh,360px)}   /* extra top padding drops the headline ~8vh toward the mascot */   /* bottom padding reserves the mascot's corner so the stepper never sits under it */
+#proof .proof-copy{min-height:0}
+#proof .proof-copy .step-copy{position:static;display:none}
+#proof .proof-copy .step-copy.on{display:block}
+#proof .stepper{margin-top:28px}
+.proof-mascot{position:absolute;left:-8%;bottom:4%;width:clamp(340px,54vh,540px);aspect-ratio:462/365;pointer-events:none;user-select:none}   /* crops stay inside each render (its vignette seams against flat cream); the mask is a soft 9% edge on all four sides, not a circle, so corner props survive */
+/* the renders are JPEGs on their own cream; a radial mask feathers each one
+   into the section so no edge ever shows, and the floor shadow comes along */
+.proof-mascot img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+          mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+  -webkit-mask-composite:source-in;mask-composite:intersect;
+  opacity:0;transition:opacity .35s ease;
+}
+.proof-mascot img.on{opacity:1}
+#proof .phone-wrap{--ps:1!important;width:min(440px,100%);height:auto;margin:0 auto}
+#proof .phone{position:relative;left:auto;top:auto;transform:none;width:100%;height:auto;background:none;border-radius:0;padding:0;box-shadow:none}
+#proof .phone-screen{--bg:var(--cream);background:none;border-radius:0;height:auto;color:var(--ink);font-family:var(--f-ui)}
+#proof .island,#proof .ph-comp,#proof .ph-home,#proof .ph-head .chev,#proof .ph-head .vid{display:none}
+#proof .ph-head{padding:0 0 16px;border:none;background:none}
+#proof .ph-avatar{width:48px;height:48px}
+#proof .ph-name{font-family:var(--f-ui);font-size:14px;font-weight:500;margin-top:8px;color:var(--ink)}
+#proof .ph-status{margin-top:6px;height:26px;padding:0 12px;border-radius:13px;font-family:var(--f-ui);font-size:12.5px;background:var(--card);color:var(--gray-text)}
+#proof .screen{flex:none;height:min(520px,calc(100vh - 280px));padding:0 0 8px}   /* flex:none — the base .screen is flex:1, which lets content (the plate photo) override the height */
+#proof .thread{font-family:var(--f-ui);font-size:clamp(15px,1.15vw,16.5px)}
+#proof .msg{max-width:86%;padding:.7em .95em;border-radius:1.1em;line-height:1.38;text-align:left}
+#proof .msg.turn{margin-top:.6em}
+#proof .msg.t::before,#proof .msg.t::after{content:none}   /* plain rounded bubbles, no tails */
+#proof .poll,#proof .checklist{width:88%;font-size:.7em}
+#proof .msg.photo{max-width:70%}
+#proof .msg.chart svg{width:12em}
+html.dark #proof .ph-status{background:var(--fill)}
+/* stacked proof (<1024px): headline + small mascot in a row, the chat under it
+   at its natural height (no clipping, no empty box), one header per step */
+#proof .proof-copy .step-mascot{display:none}   /* desktop uses the big corner render */
+.step-mascot{display:none;line-height:0}
+.step-mascot img{
+  display:block;width:100%;height:auto;
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+          mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+  -webkit-mask-composite:source-in;mask-composite:intersect;
+}
+@media(max-width:1023.98px){
+  #proof .step{padding:40px 0 56px}
+  #proof .step .wrap{gap:20px;padding-top:0}
+  #proof .step-copy{display:flex;align-items:center;gap:14px;text-align:left;width:min(560px,100%)}
+  #proof .step-copy h2{font-size:clamp(28px,7.2vw,40px);line-height:1.04}
+  .step-mascot{display:block;flex:none;width:clamp(120px,32vw,170px)}
+  #proof .screen{height:auto;padding:0}
+  #proof .phone-wrap{width:min(560px,100%)}
+  #proof .ph-head{padding:0 0 14px}
+  #proof .ph-avatar{width:44px;height:44px}
+}
+@media(max-width:767.98px){
+  #proof .thread{font-size:16px}
+  #proof .msg{max-width:90%}
+  #proof .poll,#proof .checklist{width:92%}
+}
+
 /* ===== APPS ===== */
 .apps-row{display:grid;grid-template-columns:1fr 2fr;gap:40px;align-items:center;padding:36px 0;border-top:1px solid var(--line)}
 .apps-row:last-of-type{border-bottom:1px solid var(--line)}
@@ -456,22 +520,47 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 @media(max-width:767.98px){
   .apps-row{grid-template-columns:1fr;gap:20px;padding:28px 0}
   .apps-row h3{font-size:26px}
+  .apps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 10px;justify-items:center}
+  .app{width:100%}
+  .app img{width:52px;height:52px;border-radius:13px}
+  .app span{font-size:12px}
+  .apps-note{font-size:16px;margin-top:28px}
 }
 
 /* ===== PRIVACY ===== */
 .two{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
 .facts{list-style:none;margin-top:32px;display:flex;flex-direction:column;gap:24px}
 .facts li{font-size:20px;line-height:1.4;color:var(--ink)}
+/* a render beside/below copy: feathered into the cream like the proof corner */
+.side-mascot{display:block;width:min(380px,74%);margin:20px 0 0 -8%;line-height:0}
+.side-mascot img{
+  display:block;width:100%;height:auto;
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+          mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+  -webkit-mask-composite:source-in;mask-composite:intersect;
+}
 .thread-card{--bg:var(--card);background:var(--card);border-radius:24px;padding:22px;max-width:360px;margin:0 auto;box-shadow:0 1px 0 var(--line)}
 .thread-card .thread{font-size:16px}
 @media(max-width:1023.98px){
   .two{grid-template-columns:1fr;gap:40px}
 }
+@media(max-width:767.98px){
+  .photo-slot{aspect-ratio:1}
+  .side-mascot{width:min(300px,70%);margin:12px 0 0 -6%}
+  .facts{gap:16px}
+  .facts li{font-size:18px}
+  .founder p{font-size:18px}
+}
 
 /* ===== BERKELEY ===== */
-.photo-slot{position:relative;aspect-ratio:4/5;border-radius:16px;overflow:hidden;background:var(--tint-2)}
+.photo-slot{position:relative;aspect-ratio:4/5;border-radius:16px;overflow:hidden;background:var(--cream)}
 .photo-slot > img,.photo-slot > video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.photo-slot > img.placeholder{width:auto;height:72%;top:auto;bottom:-2%;left:-8%;max-width:none;object-fit:contain}
+.photo-slot img.placeholder{
+  position:absolute;left:50%;top:50%;width:100%;height:auto;max-width:none;transform:translate(-50%,-50%);object-fit:contain;
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+          mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+  -webkit-mask-composite:source-in;mask-composite:intersect;
+}   /* the graduation tile, zoomed a little so the character fills the 4:5 card, feathered so its edges never show */
 .founder p{font-size:20px;line-height:1.5;color:var(--gray-text);margin-top:18px}
 .founder .sig{font-size:16px;color:var(--gray-text);margin-top:26px}
 .founder .sig a{color:var(--blue);margin-left:10px}
@@ -479,12 +568,18 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 /* ===== CLOSE ===== */
 #signup{text-align:center;padding:clamp(120px,16vw,200px) 0;overflow:hidden}
 #signup .wrap{position:relative;z-index:1}
-.mascot{display:block;height:240px;width:auto;margin:0 auto 28px}
+.mascot{
+  display:block;width:clamp(340px,52vh,600px);height:auto;aspect-ratio:462/365;object-fit:cover;margin:0 auto 4px;   /* no negative margins: the render's box must not reach the headline */
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+          mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+  -webkit-mask-composite:source-in;mask-composite:intersect;
+}
 #signup h2{font-size:clamp(36px,6.2vw,92px);line-height:1.08}
+#signup h2 .b{color:var(--blue)}
 #signup .sub{margin:18px auto 0}
 #signup .btn{margin-top:28px}
-.campanile.r{left:auto;right:0;bottom:-6%;width:min(70vw,1100px);opacity:.25;transform:translateX(38%)}
-@media(max-width:767.98px){.mascot{height:160px}.campanile.r{display:none}}
+.campanile.r{left:0;right:auto;bottom:-2%;width:min(100vw,1560px);opacity:.3;transform:translateX(-5%)}   /* far left, big: the tower sits ~14% across the drawing; -5% parks it just inside the edge */
+@media(max-width:767.98px){.mascot{width:320px;margin:0 auto}.campanile.r{display:none}}
 
 /* ===== FAQ ===== */
 .faq-wrap{max-width:760px;margin:0 auto}
@@ -517,12 +612,36 @@ footer{border-top:1px solid var(--line);padding:28px var(--pad);font-size:14px;c
   position:fixed;left:50%;bottom:24px;z-index:45;transform:translate(-50%,0);
   height:44px;padding:0 22px;border:none;border-radius:999px;
   background:var(--blue);color:#fff;font-family:var(--f-ui);font-size:15px;
-  box-shadow:0 0 0 2px #fff,0 8px 24px rgba(11,11,12,.18);
+  box-shadow:0 0 0 2px var(--cream-2),0 8px 24px rgba(60,40,20,.18);
   transition:opacity .25s,transform .25s var(--ease),background .15s;
 }
 .float-cta:hover{background:var(--blue-hover)}
 .float-cta.hide{opacity:0;transform:translate(-50%,8px);pointer-events:none}
 @media(max-width:767.98px){.float-cta{bottom:calc(16px + env(safe-area-inset-bottom,0px))}}
+
+/* ===== PROGRESS RAIL (left edge) ===== */
+.rail{
+  position:fixed;left:22px;top:50%;transform:translateY(-50%);z-index:40;
+  display:none;flex-direction:column;gap:6px;
+  opacity:0;pointer-events:none;transition:opacity .3s ease;
+}
+.rail.show{opacity:1;pointer-events:auto}
+@media(min-width:1024px){.rail{display:flex}}
+.rail button{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  width:18px;height:18px;padding:0;background:transparent;border:none;cursor:pointer;
+}
+.rail .dot{display:block;width:5px;height:5px;border-radius:50%;background:var(--ink-3);opacity:.45;transition:transform .25s ease,opacity .25s ease,background .25s ease}
+.rail button:hover .dot{opacity:.9}
+.rail button[aria-current="true"] .dot{background:var(--blue);opacity:1;transform:scale(1.5)}
+/* label on hover: a small tag to the right of the dot */
+.rail button::after{
+  content:attr(aria-label);position:absolute;left:24px;top:50%;transform:translate(-4px,-50%);
+  white-space:nowrap;font-family:var(--f-ui);font-size:12px;color:var(--ink);
+  background:var(--card);padding:3px 8px;border-radius:8px;box-shadow:0 1px 0 var(--line);
+  opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;
+}
+.rail button:hover::after,.rail button:focus-visible::after{opacity:1;transform:translate(0,-50%)}
 
 /* ===== DARK MODE TOGGLE ===== */
 .mode-btn{
@@ -543,7 +662,7 @@ html.dark .mode-btn .ico-sun{display:block}
   .thread[data-play]{transition:none!important;transform:none!important}
   .poll-row,.poll-row i,.poll-row i::after{transition:none!important;animation:none!important}
   .ph-status::before{animation:none}
-  .float-cta,.hero-in,.rot-item{transition:none}
+  .float-cta,.hero-in,.rot-item,.rail,.rail .dot,.rail button::after{transition:none}
   .js .hero-in{opacity:1}
 }
 
@@ -732,6 +851,13 @@ html.dark .co-bg{--co-glass:rgba(28,28,30,.8);--co-opt-line:rgba(255,255,255,.09
 document.documentElement.classList.add('js');
 try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}
 </script>
+<!-- Preview path (cued.fit/demo-site): keep it out of search results while the
+     root page is still the live design. -->
+<meta name="robots" content="noindex, nofollow">
+<!-- Umami Cloud analytics: cookieless page views, referrers, devices, UTM campaigns, and the
+     sign-up funnel events this page fires (signup-open/-step/-submit/-imessage/-sms). Nothing
+     stored in the browser, no fingerprinting. One website id for all of cued.fit. -->
+<script defer src="https://cloud.umami.is/script.js" data-website-id="ddb5f65b-1a10-4c50-a155-46ba8095639f"></script>
 </head>
 <body>
 
@@ -742,7 +868,6 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="currentColor"/><circle cx="63" cy="61" r="8.6" fill="#fff"/></svg>
     <span>cued</span>
   </a>
-  <button type="button" class="btn" id="navCta">text cued</button>
 </nav>
 
 <button type="button" class="float-cta hide" id="floatCta" aria-label="text cued">text cued</button>
@@ -752,34 +877,35 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   <svg class="ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7L7 17M17 7l1.7-1.7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
 </button>
 
+<!-- Progress rail — one dot per [data-label] section, down the left edge (desktop). -->
+<div class="rail" id="rail" role="navigation" aria-label="steps"></div>   <!-- one dot per proof step; only shown while the proof is pinned. A div, not <nav>: the page's nav rule is a full-width bar -->
+
 <main>
 
 <!-- ===== HERO ===== -->
-<section id="hero" class="tint-2">
-  <div class="wrap hero-in" id="heroIn">
-    <h1 class="hero-h"><span class="line"><span class="nowrap">meet cued<div class="cued-avatar ca-inline" id="cuedAvatar" role="img" aria-label="cued">
-<div class="ca-clip">
-  <picture><source srcset="assets/mascot/cued-avatar-arm.webp" type="image/webp"><img class="ca-arm" src="assets/mascot/cued-avatar-arm.png" alt="" width="162" height="175"></picture>
-  <picture><source srcset="assets/mascot/cued-avatar-body.webp" type="image/webp"><img class="ca-body" src="assets/mascot/cued-avatar-body.png" alt="" width="512" height="389"></picture>
-  <div class="ca-eye ca-l"></div>
-  <div class="ca-eye ca-r"></div>
-  <svg class="ca-wink" viewBox="0 0 20 10" aria-hidden="true"><path d="M1 7.5 Q10 -1.5 19 7.5" fill="none" stroke="#0B0B0C" stroke-width="3" stroke-linecap="round"/></svg>
-</div></div>,</span> the coach that</span><span class="sr-only"> lives in your texts.</span><span class="rot" id="heroRot" aria-hidden="true"><span class="rot-item on">lives in your texts.</span><span class="rot-item">replaces <span class="rot-icons"><img src="images/app-icons/hevy.png" alt="Hevy"><img src="images/app-icons/MyFitnessPal%20Review.jpg" alt="MyFitnessPal"><img src="images/app-icons/MacroFactor-MacroTracker_icon.png" alt="MacroFactor"><img src="images/app-icons/notes.png" alt="Notes"><img src="images/app-icons/reminders_app.webp" alt="Reminders"><img src="images/app-icons/pen_paper.png" alt="pen and paper"></span></span><span class="rot-item">builds your workouts.</span><span class="rot-item">tracks your food.</span><span class="rot-item">knows the college life.</span><span class="rot-item">knows your schedule.</span></span></h1>
-    <p class="hero-sub">it knows your classes, replaces your lift and meal apps, and texts first. <span class="b">nothing to download.</span></p>
-    <!-- "Chatbox" — for show: a composer row where the button used to be.
-         Typing does nothing by itself; the button (or Enter) opens the
-         sign-up chat, same as every other CTA. -->
-    <form class="hero-box" id="heroBox" autocomplete="off">
-      <label class="sr-only" for="heroInput">message</label>
-      <input class="hero-input" id="heroInput" type="text" placeholder="say anything…" maxlength="140" enterkeyhint="send">
-      <button type="button" class="btn" id="heroCtaTop">text cued</button>
-    </form>
-    <p class="hero-cap">free during beta · made in berkeley</p>
+<section id="hero" class="cream" data-label="meet cued">
+  <div class="wrap hero-in hero-grid" id="heroIn">
+    <div class="hero-copy">
+      <h1 class="hero-h"><span class="kicker">meet cued</span>the coach that<span class="sr-only"> lives in your texts.</span><span class="rot" id="heroRot" aria-hidden="true"><span class="rot-item on">lives in your texts.</span><span class="rot-item">replaces <span class="rot-icons"><img src="/images/app-icons/hevy.png" alt="Hevy"><img src="/images/app-icons/MyFitnessPal%20Review.jpg" alt="MyFitnessPal"><img src="/images/app-icons/MacroFactor-MacroTracker_icon.png" alt="MacroFactor"><img src="/images/app-icons/notes.png" alt="Notes"><img src="/images/app-icons/reminders_app.webp" alt="Reminders"><img src="/images/app-icons/pen_paper.png" alt="pen and paper"></span></span><span class="rot-item">builds your workouts.</span><span class="rot-item">tracks your food.</span><span class="rot-item">knows the college life.</span><span class="rot-item">knows your schedule.</span></span></h1>
+      <p class="hero-sub">it knows your classes, replaces your lift and meal apps, and texts first. <span class="b">nothing to download.</span></p>
+      <div class="hero-cta"><button type="button" class="btn sq" id="heroCtaTop">text cued</button></div>
+    </div>
+    <!-- The mascot: two locked-off render clips (founder, 2026-11-14) played
+         back to back with a short crossfade, forever — muted and inline so
+         they autoplay everywhere; the poster is clip 1's first frame. The
+         script runs the handoff, pauses off screen, and leaves the poster
+         under reduced motion. The first clip keeps autoplay+loop as the
+         no-JS fallback. Not in LFS on purpose — GitHub Pages serves LFS
+         pointers, not the file. -->
+    <div class="hero-video" id="heroVideo" aria-hidden="true">
+      <video class="on" src="/assets/hero/cued-hero.mp4" poster="/assets/hero/cued-hero-poster.jpg" autoplay muted loop playsinline preload="auto" disablepictureinpicture></video>
+      <video src="/assets/hero/cued-hero-2.mp4" muted playsinline preload="auto" disablepictureinpicture></video>
+    </div>
   </div>
 </section>
 
 <!-- ===== SAY ANYTHING ===== -->
-<section id="say" class="blend blend-to" style="--from:var(--tint-2);--to:var(--tint-2)">
+<section id="say" class="blend blend-to" style="--from:var(--cream);--to:var(--cream)" data-label="say anything">
   <div class="wrap">
     <h2 data-io>say anything.</h2>
     <p class="sub" data-io>it's a text thread. so text it like one.</p>
@@ -795,12 +921,13 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 <!-- ===== PROOF — five steps, one phone. The markup is the stacked (mobile /
      reduced-motion / JS-off) form; at ≥1024px with motion the script moves
      the step copy and the five threads into one sticky phone (see pinProof). ===== -->
-<section id="proof" class="proof" aria-label="what cued does">
+<section id="proof" class="proof" aria-label="what cued does" data-label="what i do">
   <div class="proof-steps" id="proofSteps">
 
     <article class="step tint-2" data-status="reading your calendar…">
       <div class="wrap">
         <div class="step-copy">
+          <picture class="step-mascot"><source srcset="/assets/mascot/v2/cued-week.webp" type="image/webp"><img src="/assets/mascot/v2/cued-week.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
           <h2>i know your week</h2>
           <p class="sub">calendar, canvas, class times, the rsf line. i plan around all of it.</p>
         </div>
@@ -810,7 +937,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
               <div class="island" aria-hidden="true"></div>
               <div class="ph-head">
                 <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <picture><source srcset="assets/mascot/cued-avatar-256.webp" type="image/webp"><img class="ph-avatar" src="assets/mascot/cued-avatar-256.png" alt="" width="44" height="44"></picture>
+                <picture><source srcset="/assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="/assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
                 <div class="ph-name">cued</div>
                 <div class="ph-status">reading your calendar…</div>
                 <svg class="vid" viewBox="0 0 26 18" aria-hidden="true"><rect x="1" y="2" width="16" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M17 7l7-3v10l-7-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
@@ -839,10 +966,16 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     <article class="step" data-status="logging your sets…">
       <div class="wrap">
         <div class="step-copy">
+          <picture class="step-mascot"><source srcset="/assets/mascot/v2/cued-sets.webp" type="image/webp"><img src="/assets/mascot/v2/cued-sets.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
           <h2>i log your sets</h2>
           <p class="sub">tap a set to log it. text me when it goes different.</p>
         </div>
         <div class="phone-wrap"><div class="phone"><div class="phone-screen">
+          <div class="ph-head">
+            <picture><source srcset="/assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="/assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
+            <div class="ph-name">cued</div>
+            <div class="ph-status">logging your sets…</div>
+          </div>
           <div class="screen">
             <div class="thread coach-left" data-play>
               <div class="msg coach t">push day. 4 sets bench, then the usual. tap as you go — text me if a set goes different.</div>
@@ -871,15 +1004,21 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     <article class="step tint-1" data-status="checking crossroads menu…">
       <div class="wrap">
         <div class="step-copy">
+          <picture class="step-mascot"><source srcset="/assets/mascot/v2/cued-dinner.webp" type="image/webp"><img src="/assets/mascot/v2/cued-dinner.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
           <h2>i know what's for dinner</h2>
           <p class="sub">dining hall menus, receipts, photos. no logging.</p>
         </div>
         <div class="phone-wrap"><div class="phone"><div class="phone-screen">
+          <div class="ph-head">
+            <picture><source srcset="/assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="/assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
+            <div class="ph-name">cued</div>
+            <div class="ph-status">checking crossroads menu…</div>
+          </div>
           <div class="screen">
             <div class="thread coach-left" data-play>
               <div class="msg user t">what's good at crossroads rn</div>
               <div class="msg coach t turn">chimichurri tri-tip tonight. grab the roasted sweet potatoes, pile on the veg — that's ~45g protein, you're at 80 for the day.</div>
-              <div class="msg user photo turn"><img src="images/dinner-plate.jpg" width="1000" height="855" loading="lazy" alt="photo of a dinner plate: sliced tri-tip with chimichurri, roasted sweet potatoes, broccoli and cauliflower"></div>
+              <div class="msg user photo turn"><img src="/images/dinner-plate.jpg" width="1000" height="855" loading="lazy" alt="photo of a dinner plate: sliced tri-tip with chimichurri, roasted sweet potatoes, broccoli and cauliflower"></div>
               <div class="msg coach t turn">logged. you went heavy on the steak — closer to 55. nice.</div>
             </div>
           </div>
@@ -890,10 +1029,16 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     <article class="step" data-status="pulling up your week…">
       <div class="wrap">
         <div class="step-copy">
+          <picture class="step-mascot"><source srcset="/assets/mascot/v2/cued-remember.webp" type="image/webp"><img src="/assets/mascot/v2/cued-remember.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
           <h2>i remember</h2>
           <p class="sub">the midterm, the week, the lift we moved. i don't start over every text.</p>
         </div>
         <div class="phone-wrap"><div class="phone"><div class="phone-screen">
+          <div class="ph-head">
+            <picture><source srcset="/assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="/assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
+            <div class="ph-name">cued</div>
+            <div class="ph-status">pulling up your week…</div>
+          </div>
           <div class="screen">
             <div class="thread coach-left" data-play>
               <div class="msg coach t">how'd the ochem midterm go</div>
@@ -919,10 +1064,16 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     <article class="step tint-2" data-status="reading last night's sleep…">
       <div class="wrap">
         <div class="step-copy">
+          <picture class="step-mascot"><source srcset="/assets/mascot/v2/cued-watch.webp" type="image/webp"><img src="/assets/mascot/v2/cued-watch.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
           <h2>i read your watch. or your texts.</h2>
           <p class="sub">fitbit, pixel watch, google health. no watch? "slept like garbage" works too.</p>
         </div>
         <div class="phone-wrap"><div class="phone"><div class="phone-screen">
+          <div class="ph-head">
+            <picture><source srcset="/assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="/assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
+            <div class="ph-name">cued</div>
+            <div class="ph-status">reading last night's sleep…</div>
+          </div>
           <div class="screen">
             <div class="thread coach-left" data-play>
               <div class="msg coach t">your watch says you slept 4 hours. not the day for heavy squats. moved leg day to thursday — tonight: walk, protein, early bed.</div>
@@ -938,27 +1089,27 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== APPS ===== -->
-<section id="apps" class="blend" style="--from:var(--tint-2)">
+<section id="apps" class="blend" style="--from:var(--cream)" data-label="works with">
   <div class="wrap">
     <div class="apps-row" data-io>
       <h3>plugs into what you already use.</h3>
       <div class="apps">
-        <div class="app"><img src="images/app-icons/google-calendar.webp" alt=""><span>google calendar</span></div>
-        <div class="app"><img src="images/app-icons/canvas-student.jpg" alt=""><span>bcourses / canvas</span></div>
-        <div class="app"><img src="images/app-icons/google-health.webp" alt=""><span>google health<br>(fitbit, pixel watch)</span></div>
-        <div class="app"><img src="images/app-icons/apple-watch.webp" alt=""><span>apple watch</span></div>
-        <div class="app"><img src="images/app-icons/strava.webp" alt=""><span>strava</span></div>
+        <div class="app"><img src="/images/app-icons/google-calendar.webp" alt=""><span>google calendar</span></div>
+        <div class="app"><img src="/images/app-icons/canvas-student.jpg" alt=""><span>bcourses / canvas</span></div>
+        <div class="app"><img src="/images/app-icons/google-health.webp" alt=""><span>google health<br>(fitbit, pixel watch)</span></div>
+        <div class="app"><img src="/images/app-icons/apple-watch.webp" alt=""><span>apple watch</span></div>
+        <div class="app"><img src="/images/app-icons/strava.webp" alt=""><span>strava</span></div>
       </div>
     </div>
     <div class="apps-row" data-io>
       <h3>replaces what you don't need.</h3>
       <div class="apps retired">
-        <div class="app"><img src="images/app-icons/MyFitnessPal%20Review.jpg" alt=""><span>myfitnesspal</span></div>
-        <div class="app"><img src="images/app-icons/MacroFactor-MacroTracker_icon.png" alt=""><span>macrofactor</span></div>
-        <div class="app"><img src="images/app-icons/hevy.png" alt=""><span>hevy</span></div>
-        <div class="app"><img src="images/app-icons/notes.png" alt=""><span>notes</span></div>
-        <div class="app"><img src="images/app-icons/reminders_app.webp" alt=""><span>reminders</span></div>
-        <div class="app"><img src="images/app-icons/pen_paper.png" alt=""><span>pen &amp; paper</span></div>
+        <div class="app"><img src="/images/app-icons/MyFitnessPal%20Review.jpg" alt=""><span>myfitnesspal</span></div>
+        <div class="app"><img src="/images/app-icons/MacroFactor-MacroTracker_icon.png" alt=""><span>macrofactor</span></div>
+        <div class="app"><img src="/images/app-icons/hevy.png" alt=""><span>hevy</span></div>
+        <div class="app"><img src="/images/app-icons/notes.png" alt=""><span>notes</span></div>
+        <div class="app"><img src="/images/app-icons/reminders_app.webp" alt=""><span>reminders</span></div>
+        <div class="app"><img src="/images/app-icons/pen_paper.png" alt=""><span>pen &amp; paper</span></div>
       </div>
     </div>
     <p class="apps-note" data-io>everything optional. the only thing i need is your number.</p>
@@ -966,7 +1117,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== PRIVACY ===== -->
-<section id="privacy" class="tint-1 blend" style="--from:var(--card)">
+<section id="privacy" class="cream blend" style="--from:var(--cream-2)" data-label="privacy">
   <div class="wrap two">
     <div data-io>
       <h2>it stays between us</h2>
@@ -975,6 +1126,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
         <li>connections are read-only and optional: calendar (next 60 days), canvas feed, google health.</li>
         <li>text "delete me" and everything's gone within 30 days.</li>
       </ul>
+      <picture class="side-mascot"><source srcset="/assets/mascot/v2/cued-lock.webp" type="image/webp"><img src="/assets/mascot/v2/cued-lock.jpg" alt="" width="465" height="365" loading="lazy"></picture>
     </div>
     <div class="thread-card" data-io>
       <div class="thread coach-left" data-play>
@@ -988,13 +1140,13 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== BERKELEY ===== -->
-<section id="berkeley" class="blend" style="--from:var(--tint-1)">
+<section id="berkeley" class="blend" style="--from:var(--cream)" data-label="made in berkeley">
   <div class="wrap two">
     <!-- [FOUNDER PHOTO: the founder or the team at the RSF or on Sproul,
          daylight, no logos needed]. Until then, the Campanile drawing in a
          tint-2 card. The slot takes an <img> or a muted autoplay <video>. -->
     <div class="photo-slot" data-io>
-      <img class="placeholder" src="images/hero-drawing.png" alt="" width="1920" height="650">
+      <picture><source srcset="/assets/mascot/v2/cued-grad.webp" type="image/webp"><img class="placeholder" src="/assets/mascot/v2/cued-grad.jpg" alt="cued in a graduation cap, holding a diploma, with sather gate behind" width="459" height="365" loading="lazy"></picture>
     </div>
     <div class="founder" data-io>
       <h2>made in berkeley, by a berkeley student.</h2>
@@ -1006,18 +1158,18 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== CLOSE ===== -->
-<section id="signup" class="tint-2 blend" style="--from:var(--card)">
-  <div class="campanile r" aria-hidden="true"><img src="images/hero-drawing.png" alt="" width="1920" height="650"></div>
+<section id="signup" class="cream blend" style="--from:var(--cream-2)" data-label="text cued">
+  <div class="campanile r" aria-hidden="true"><img src="/images/hero-drawing.png" alt="" width="1920" height="650"></div>
   <div class="wrap">
-    <picture><source srcset="assets/mascot/cued-mascot-flex.webp" type="image/webp"><img class="mascot" src="assets/mascot/cued-mascot-flex.png" alt="cued, a round white mascot in a blue headband, raising a dumbbell" width="720" height="550" loading="lazy"></picture>
-    <h2 data-io>your cue to lock in.</h2>
+    <picture><source srcset="/assets/mascot/v2/cued-dumbbell.webp" type="image/webp"><img class="mascot" src="/assets/mascot/v2/cued-dumbbell.jpg" alt="cued, a round white mascot in a blue headband, lifting a dumbbell" width="1100" height="869" loading="lazy"></picture>
+    <h2 data-io>your <span class="b">cue</span> to lock in.</h2>
     <p class="sub" data-io>nothing to open. ready when you are.</p>
     <div data-io><button type="button" class="btn lg" id="closeCta">text cued</button></div>
   </div>
 </section>
 
 <!-- ===== FAQ ===== -->
-<section id="faq" class="blend" style="--from:var(--tint-2)">
+<section id="faq" class="blend" style="--from:var(--cream)" data-label="faq">
   <div class="wrap faq-wrap">
     <h2 data-io>the stuff people ask.</h2>
     <div class="faq-list" data-io>
@@ -1034,10 +1186,10 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 
 <footer>
   <div class="foot">
-    <a href="#hero" class="fb"><img src="images/cued-logo.svg" alt="" width="24" height="24"><span>cued</span></a>
+    <a href="#hero" class="fb"><img src="/images/cued-logo.svg" alt="" width="24" height="24"><span>cued</span></a>
     <div class="fl">
-      <a href="privacy.html">privacy</a>
-      <a href="terms.html">terms</a>
+      <a href="/privacy.html">privacy</a>
+      <a href="/terms.html">terms</a>
       <a href="mailto:hello@cued.fit">contact</a>
       <a href="https://instagram.com/cued.fit" target="_blank" rel="noopener">instagram</a>
     </div>
@@ -1051,7 +1203,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     <div class="co-handle"></div>
     <div class="co-head">
       <div class="co-head-info">
-        <div class="co-avatar" aria-hidden="true"><picture><source srcset="assets/mascot/cued-avatar-256.webp" type="image/webp"><img src="assets/mascot/cued-avatar-256.png" alt="" width="36" height="36"></picture></div>
+        <div class="co-avatar" aria-hidden="true"><picture><source srcset="/assets/mascot/v2/cued-face-256.webp" type="image/webp"><img src="/assets/mascot/v2/cued-face-256.png" alt="" width="36" height="36"></picture></div>
         <div>
           <div class="co-head-name">cued</div>
           <div class="co-head-sub">Text Message</div>
@@ -1072,6 +1224,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   const hero = document.getElementById('hero');
   const close = document.getElementById('signup');
   const faq = document.getElementById('faq');
+  const proofSec = document.getElementById('proof');
   const pill = document.getElementById('floatCta');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -1110,9 +1263,37 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     }
   }
 
-  // Hero chatbox: Enter submits → the sign-up chat (the button has its own click binding).
-  const heroBox = document.getElementById('heroBox');
-  if (heroBox) heroBox.addEventListener('submit', e => { e.preventDefault(); if (window.openWaitlist) window.openWaitlist('hero'); });
+  // Hero video: the mascot clips play back to back with a 0.6s crossfade,
+  // round and round. Paused while off screen; left on the poster under
+  // reduced motion.
+  const heroVideo = document.getElementById('heroVideo');
+  const clips = heroVideo ? Array.from(heroVideo.querySelectorAll('video')) : [];
+  if (clips.length){
+    const XF = 0.6, LEAD = 1.0;   // fade length; start the handoff this far from the end so the outgoing clip never hits 'ended'
+    let cur = 0, swapping = false;
+    const play = v => { const p = v.play(); if (p && p.catch) p.catch(() => {}); };
+    const swap = () => {
+      if (swapping || clips.length < 2) return;
+      swapping = true;
+      const a = clips[cur], b = clips[(cur + 1) % clips.length];
+      b.currentTime = 0; play(b);
+      b.classList.add('on'); a.classList.remove('on');
+      cur = (cur + 1) % clips.length;
+      setTimeout(() => { a.pause(); a.currentTime = 0; swapping = false; }, XF * 1000 + 80);
+    };
+    if (reduce.matches){
+      clips.forEach(v => { v.removeAttribute('autoplay'); v.pause(); });
+    } else {
+      if (clips.length > 1) clips[0].removeAttribute('loop');   // the script hands off instead
+      clips.forEach(v => {
+        v.addEventListener('timeupdate', () => { if (v === clips[cur] && v.duration && v.duration - v.currentTime <= LEAD) swap(); });
+        v.addEventListener('ended', () => { if (v === clips[cur]) swap(); });
+      });
+      new IntersectionObserver(es => es.forEach(e => {
+        if (e.isIntersecting) play(clips[cur]); else clips.forEach(v => v.pause());
+      }), {threshold: 0}).observe(heroVideo);
+    }
+  }
 
   // Nav: transparent over the hero, white with a hairline once past it.
   function navState(){
@@ -1130,20 +1311,21 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 
   // Floating pill: hidden while the hero or the close is in view (both carry
   // their own CTA); under 480px also hidden while the pinned proof is active.
-  const vis = {hero: true, close: false, faq: false};
+  const vis = {hero: true, close: false, faq: false, proof: false};
   window.proofActive = false;
   function pillState(){
-    const narrow = window.innerWidth < 480;
-    pill.classList.toggle('hide', vis.hero || vis.close || vis.faq || (narrow && window.proofActive));
+    const narrow = window.innerWidth < 1024;   // stacked layouts: the chat sits in the main column, so no pill over it
+    pill.classList.toggle('hide', vis.hero || vis.close || vis.faq || (narrow && (window.proofActive || vis.proof)));
   }
   window.pillState = pillState;
   const ioPill = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.target === hero) vis.hero = e.isIntersecting; if (e.target === close) vis.close = e.isIntersecting; if (e.target === faq) vis.faq = e.isIntersecting; });
+    entries.forEach(e => { if (e.target === hero) vis.hero = e.isIntersecting; if (e.target === close) vis.close = e.isIntersecting; if (e.target === faq) vis.faq = e.isIntersecting; if (e.target === proofSec) vis.proof = e.isIntersecting; });
     pillState();
   }, {threshold: 0.05});
   hero && ioPill.observe(hero);
   close && ioPill.observe(close);
   faq && ioPill.observe(faq);   // past the close there's nothing left to sell — no pill over the FAQ/footer
+  proofSec && ioPill.observe(proofSec);   // narrow screens: no pill over the stacked chat either
 })();
 
 // === cued live avatar (founder prototype, 2026-11-08) ===
@@ -1400,7 +1582,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   const mqPin = matchMedia('(min-width: 1024px)');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   const shouldPin = () => mqPin.matches && !reduce.matches;
-  const tints = ['tint-2', '', 'tint-1', '', 'tint-2'];
+  const tints = ['', '', '', '', ''];   // the proof stays on the hero's cream (was tint-2 / white / tint-1 / white / tint-2)
   let pinned = null, cur = -1, raf = 0;
 
   function pinProof(){
@@ -1431,13 +1613,40 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       });
       li.appendChild(b); stepper.appendChild(li);
     });
-    left.appendChild(copy); left.appendChild(stepper);
+    left.appendChild(copy);   // the stepper is built (setStep still marks it) but not shown — founder, 2026-11-14
+    // one render per step (founder's contact sheets, 2026-11-14): calendar wink
+    // (week), dumbbell + PR + clipboard (sets), bowl (dinner), head-tap + chart
+    // phone (remember), watch (watch) — see assets/mascot/v2
+    const mascot = document.createElement('div'); mascot.className = 'proof-mascot';
+    const poses = ['week', 'sets', 'dinner', 'remember', 'watch'];
+    poses.forEach(n => {
+      const im = document.createElement('img'); im.alt = ''; im.loading = 'lazy';
+      im.src = '/assets/mascot/v2/cued-' + n + '.jpg'; im.srcset = '/assets/mascot/v2/cued-' + n + '.webp';
+      mascot.appendChild(im);
+    });
+    left.appendChild(mascot);
     right.appendChild(phoneWrap);
     grid.appendChild(left); grid.appendChild(right);
     sticky.appendChild(grid); track.appendChild(sticky);
     stepsWrap.style.display = 'none';
     section.appendChild(track);
-    pinned = {track, sticky, copy, stepper, phoneWrap, screen, threads,
+    // step dots on the left edge (#rail): shown only while the proof is pinned
+    const rail = document.getElementById('rail');
+    const dots = [];
+    if (rail){
+      rail.innerHTML = '';
+      steps.forEach((s, i) => {
+        const b = document.createElement('button'); b.type = 'button';
+        b.setAttribute('aria-label', copy.children[i].querySelector('h2').textContent);   // the step copy already moved into `copy`
+        b.innerHTML = '<span class="dot"></span>';
+        b.addEventListener('click', () => {
+          const top = track.getBoundingClientRect().top + window.scrollY + i * window.innerHeight + 2;
+          window.scrollTo({top, behavior: reduce.matches ? 'auto' : 'smooth'});
+        });
+        rail.appendChild(b); dots.push(b);
+      });
+    }
+    pinned = {track, sticky, copy, stepper, phoneWrap, screen, threads, mascot, rail, dots,
               status: phoneWrap.querySelector('.ph-status')};
     cur = -1;
     fitPhone();
@@ -1454,6 +1663,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     });
     Array.from(pinned.copy.children).forEach((c, i) => steps[i].querySelector('.wrap').prepend(c));
     pinned.track.remove();
+    if (pinned.rail){ pinned.rail.classList.remove('show'); pinned.rail.innerHTML = ''; }
     stepsWrap.style.display = '';
     pinned = null; cur = -1;
     window.proofActive = false; window.pillState && window.pillState();
@@ -1471,8 +1681,10 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     if (i === cur) return;
     const first = cur < 0;
     cur = i;
-    const {copy, stepper, sticky, threads, status} = pinned;
+    const {copy, stepper, sticky, threads, status, mascot, dots} = pinned;
     Array.from(copy.children).forEach((c, k) => c.classList.toggle('on', k === i));
+    dots.forEach((d, k) => k === i ? d.setAttribute('aria-current', 'true') : d.removeAttribute('aria-current'));
+    Array.from(mascot.children).forEach((m, k) => m.classList.toggle('on', k === i));
     Array.from(stepper.querySelectorAll('button')).forEach((b, k) => k === i ? b.setAttribute('aria-current', 'step') : b.removeAttribute('aria-current'));
     sticky.className = 'proof-sticky ' + tints[i];
     threads.forEach((t, k) => t.classList.toggle('active', k === i));
@@ -1493,6 +1705,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       const p = Math.min(1, Math.max(0, -r.top / span));
       const active = r.top <= 0 && r.bottom >= vh;
       if (active !== window.proofActive){ window.proofActive = active; window.pillState && window.pillState(); }
+      if (pinned.rail) pinned.rail.classList.toggle('show', active);
       setStep(Math.min(4, Math.floor(p * 5)));
     });
   }
@@ -1574,7 +1787,45 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   let sdata = {};
   let step = 0;
 
-  function setProgress(n){ step = n; if (progress) progress.style.setProperty('--p', Math.min(100, Math.round(n / STEPS * 100)) + '%'); }
+  // ── analytics (Umami, head tag) ──
+  // Funnel events so the dashboard shows where readers stop, split by which CTA
+  // opened the card (`source`). Page views are automatic; these are the only
+  // custom events on the site. Every call is a no-op when the tracker hasn't
+  // loaded (blocked, offline, jsdom) — the chat must never depend on it.
+  // Names: signup-open {source} · signup-step {step, name, source} · signup-submit
+  // {result, source} · signup-imessage {source} · signup-sms {source}.
+  // Printed QR codes / shared links carry `?src=<label>` (or utm_source). That
+  // label is `ref` on every event above, so a flyer's scans can be followed into
+  // sign-ups, and it fires one `qr-scan {src}` per landing. The label is kept in
+  // a variable only (nothing stored in the browser) and never leaves this load.
+  const STEP_NAMES = ['', 'name', 'age', 'gender', 'goals', 'obstacle', 'experience', 'equipment', 'stats', 'days', 'time', 'diet', 'restrictions', 'apps', 'phone', 'consent'];
+  const ref = (() => {
+    try {
+      const q = new URLSearchParams(location.search);
+      const v = (q.get('src') || q.get('utm_source') || '').trim().toLowerCase().replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '');
+      return v ? v.slice(0, 50) : null;
+    } catch (e) { return null; }
+  })();
+  function track(name, data){
+    try {
+      if (!(window.umami && typeof window.umami.track === 'function')) return false;
+      window.umami.track(name, ref ? Object.assign({}, data, { ref }) : data);
+      return true;
+    } catch (e) { return false; }
+  }
+  if (ref){
+    // The tracker is a deferred head script; it may land after this runs. Retry
+    // briefly, then give up quietly (blocked / offline / jsdom).
+    let tries = 0;
+    (function scan(){ if (!track('qr-scan', { src: ref }) && tries++ < 20) setTimeout(scan, 250); })();
+  }
+  const ctaSource = () => overlay.dataset.source || 'unknown';
+
+  function setProgress(n){
+    if (n > step && STEP_NAMES[n]) track('signup-step', { step: n, name: STEP_NAMES[n], source: ctaSource() });
+    step = n;
+    if (progress) progress.style.setProperty('--p', Math.min(100, Math.round(n / STEPS * 100)) + '%');
+  }
   function scrollBottom(){ msgs.scrollTop = msgs.scrollHeight; requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight; }); }
   // The thread is a real scroller now (earlier bubbles are reachable), so it
   // has to be re-pinned to the bottom whenever its box changes — the composer
@@ -1856,7 +2107,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   // Consent: the fine print is cued's bubble (terms + privacy inline); the
   // reader's "i agree" is their bubble, sent from the one chip on offer.
   async function consentStep(){
-    await coachSay('by joining you agree to get recurring automated texts from cued — workouts, meals, check-ins. 5–8 msgs/day, msg &amp; data rates may apply, reply STOP to cancel or HELP for help. <a href="terms.html" target="_blank" rel="noopener">terms</a> · <a href="privacy.html" target="_blank" rel="noopener">privacy</a>', 320, 'fine');
+    await coachSay('by joining you agree to get recurring automated texts from cued — workouts, meals, check-ins. 5–8 msgs/day, msg &amp; data rates may apply, reply STOP to cancel or HELP for help. <a href="/terms.html" target="_blank" rel="noopener">terms</a> · <a href="/privacy.html" target="_blank" rel="noopener">privacy</a>', 320, 'fine');
     await chips([{label: 'i agree', value: true}], false, 'tap to agree');
     return true;
   }
@@ -1913,11 +2164,13 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       a.className = 'co-confirm co-imsg';
       a.href = link;
       a.textContent = 'text me on iMessage';
+      a.addEventListener('click', () => track('signup-imessage', { source: ctaSource() }));
       const alt = document.createElement('button');
       alt.type = 'button';
       alt.className = 'co-alt';
       alt.textContent = "i don't have an iPhone";
       alt.addEventListener('click', async () => {
+        track('signup-sms', { source: ctaSource() });
         alt.disabled = true;
         alt.textContent = 'one sec…';
         try {
@@ -1990,6 +2243,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
         const already = data.status === 'exists';
         const live = data.live === true;   // absent → an older backend: still the waitlist
         setProgress(STEPS);
+        track('signup-submit', { result: (live ? 'live' : 'waitlist') + (already ? '-exists' : ''), source: ctaSource() });
         let title, body;
         if (live && !already){
           // Signed up for real. With a link, their tap IS what brings the first
@@ -2012,10 +2266,12 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
         }
         successScreen(title, body, linkOk ? link : null);
       } else {
+        track('signup-submit', { result: 'rejected', source: ctaSource() });
         await coachSay((data && data.message) || 'something went wrong — try again?', 320);
         showRetry();
       }
     } catch (err) {
+      track('signup-submit', { result: 'error', source: ctaSource() });
       await coachSay('connection error — check your internet and try again.', 320);
       showRetry();
     }
@@ -2102,7 +2358,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     overlay.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
     if (vv){ vv.addEventListener('resize', fitViewport); vv.addEventListener('scroll', fitViewport); fitViewport(); }
-    if (!msgs.children.length) runChat();   // re-opening resumes where they left off
+    if (!msgs.children.length){ track('signup-open', { source: ctaSource() }); runChat(); }   // re-opening resumes where they left off
     else { const inp = inputArea.querySelector('.co-input'); inp && inp.focus(); }
   }
   window.openWaitlist = open;
