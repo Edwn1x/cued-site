@@ -148,6 +148,7 @@ section.blend::before,section.blend-to::after{
 }
 section.blend::before{top:0;background:linear-gradient(to bottom,var(--from),transparent)}
 section.blend-to::after{bottom:0;background:linear-gradient(to bottom,transparent,var(--to))}
+@media(max-width:767.98px){section.blend::before,section.blend-to::after{height:24px}}   /* phones: short seams — a 72px fade on a 390px screen erased the edges */
 h1,h2{font-family:var(--f-head);font-weight:400;color:var(--ink);letter-spacing:-.01em}
 h2{font-size:clamp(34px,4.2vw,56px);line-height:1.08}
 .sub{font-size:clamp(18px,1.6vw,22px);line-height:1.5;color:var(--gray-text);margin-top:18px;max-width:34em}
@@ -491,7 +492,10 @@ html.dark #proof .ph-status{background:var(--fill)}
   -webkit-mask-composite:source-in;mask-composite:intersect;
 }
 @media(max-width:1023.98px){
-  #proof .step{padding:40px 0 56px}
+  /* phones/tablets: each step gets its own screen — alternating creams so a
+     boundary reads as one, and ~2× the room between conversations */
+  #proof .step{padding:88px 0}
+  #proof .step:nth-child(even){background:var(--cream-2)!important;--bg:var(--cream-2)}
   #proof .step .wrap{gap:20px;padding-top:0}
   #proof .step-copy{display:flex;align-items:center;gap:14px;text-align:left;width:min(560px,100%)}
   #proof .step-copy h2{font-size:clamp(28px,7.2vw,40px);line-height:1.04}
@@ -1575,6 +1579,51 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     }
     setTimeout(step, 250);
   }
+  // Stacked layouts (<1024px): the reader sets the pace. Each bubble reveals
+  // as it scrolls into view (in order — a fast scroll catches earlier ones up
+  // with a short stagger), with a brief typing beat only on the bubble the
+  // reader is actually waiting at. No push-up: bubbles hold their place and
+  // appear in it. Pinned desktop keeps the timed playThread.
+  const mqStacked = matchMedia('(max-width: 1023.98px)');
+  function playByScroll(thread){
+    if (thread.dataset.played) return;
+    thread.dataset.played = '1';
+    if (reduce.matches){ revealAll(thread); return; }
+    thread.style.transform = '';
+    const list = items(thread);
+    const typing = mkTyping(thread);
+    let next = 0, target = 0, busy = false;
+    function pump(){
+      if (busy || next >= target) return;
+      busy = true;
+      const el = list[next], prev = list[next - 1];
+      const waiting = next === target - 1;          // the bubble the reader is looking at
+      const lead = waiting ? 320 : 90;
+      if (waiting){
+        typing.className = 'typing ' + sideOf(el);
+        typing.style.top = (prev ? prev.offsetTop + prev.offsetHeight + 6 : 0) + 'px';
+        typing.classList.add('show');
+      }
+      setTimeout(() => {
+        typing.classList.remove('show');
+        el.classList.add('on');
+        choreo(el);
+        next++; busy = false;
+        if (next >= list.length) typing.remove();
+        pump();
+      }, lead);
+    }
+    const io = new IntersectionObserver(es => {
+      es.forEach(e => {
+        if (!e.isIntersecting) return;
+        io.unobserve(e.target);
+        target = Math.max(target, list.indexOf(e.target) + 1);
+        pump();
+      });
+    }, {threshold: 0.5, rootMargin: '0px 0px -12% 0px'});   // the bottom 12% sits under the phone CTA bar
+    list.forEach(el => io.observe(el));
+  }
+  function startThread(t){ (mqStacked.matches ? playByScroll : playThread)(t); }
   window.playThread = playThread;
   window.layoutThread = layout;
 
@@ -1599,12 +1648,17 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     entries.forEach(e => {
       if (!e.isIntersecting) return;
       const t = e.target.classList.contains('thread') ? e.target : e.target.querySelector('.thread[data-play]');
-      if (t && !t.closest('.proof-sticky')) playThread(t);
+      if (t && !t.closest('.proof-sticky')) startThread(t);
       io.unobserve(e.target);
     });
   }, {threshold: 0.35});
-  window.watchThread = (container) => io.observe(container);
-  document.querySelectorAll('.thread-card, .step .phone-wrap').forEach(c => io.observe(c));
+  // Stacked: arm the per-bubble observers right away (the container threshold
+  // would otherwise delay the first bubbles); pinned desktop waits for the container.
+  window.watchThread = (container) => {
+    const t = container.querySelector('.thread[data-play]') || (container.classList.contains('thread') ? container : null);
+    if (t && mqStacked.matches && !t.closest('.proof-sticky')) playByScroll(t); else io.observe(container);
+  };
+  document.querySelectorAll('.thread-card, .step .phone-wrap').forEach(c => window.watchThread(c));
 })();
 
 // === Proof: five steps, one pinned phone (≥1024px, motion OK) ===
