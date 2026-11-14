@@ -440,7 +440,7 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 #proof,#proof .step,#proof .proof-sticky{background:var(--cream)!important;--bg:var(--cream)}
 #proof .step-copy .sub{display:none}
 #proof .proof-grid{grid-template-columns:1fr 1fr;gap:clamp(32px,5vw,80px)}
-#proof .proof-left{height:100vh;display:flex;flex-direction:column;justify-content:center;padding:72px 0 clamp(220px,38vh,360px)}   /* bottom padding reserves the mascot's corner so the stepper never sits under it */
+#proof .proof-left{height:100vh;display:flex;flex-direction:column;justify-content:center;padding:calc(72px + 16vh) 0 clamp(220px,38vh,360px)}   /* extra top padding drops the headline ~8vh toward the mascot */   /* bottom padding reserves the mascot's corner so the stepper never sits under it */
 #proof .proof-copy{min-height:0}
 #proof .proof-copy .step-copy{position:static;display:none}
 #proof .proof-copy .step-copy.on{display:block}
