@@ -1503,7 +1503,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       });
       li.appendChild(b); stepper.appendChild(li);
     });
-    left.appendChild(copy); left.appendChild(stepper);
+    left.appendChild(copy);   // the stepper is built (setStep still marks it) but not shown — founder, 2026-11-14
     // one render per step: whistle (week), trophy (sets), bottle (dinner),
     // texting (remember), asleep (watch) — see assets/mascot/v2
     const mascot = document.createElement('div'); mascot.className = 'proof-mascot';
