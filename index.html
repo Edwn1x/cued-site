@@ -185,7 +185,8 @@ nav .btn{height:44px;padding:0 20px;font-size:16px}
 .hero-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(32px,5vw,72px);align-items:center;text-align:left}
 .hero-copy{max-width:640px}
 .hero-video{position:relative;aspect-ratio:4/3;border-radius:28px;overflow:hidden;background:var(--cream);box-shadow:inset 0 0 0 1px rgba(11,11,12,.06),0 30px 60px -40px rgba(60,40,20,.35)}
-.hero-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.hero-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .6s ease}
+.hero-video video.on{opacity:1}
 .hero-mark{--size:clamp(96px,10vw,140px);display:block;margin:0 auto 8px;line-height:0}
 /* ===== cued live avatar (founder prototype, copied verbatim; --size is the only knob) ===== */
 .cued-avatar{
@@ -750,12 +751,16 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       <div class="hero-cta"><button type="button" class="btn lg sq" id="heroCtaTop">text cued</button></div>
       <p class="hero-cap">free during beta · made in berkeley</p>
     </div>
-    <!-- The mascot: a locked-off render loop (founder, 2026-11-14), muted and
-         inline so it autoplays everywhere; the poster is its first frame.
-         Paused off screen and under reduced motion (script). Not in LFS on
-         purpose — GitHub Pages serves LFS pointers, not the file. -->
-    <div class="hero-video" aria-hidden="true">
-      <video id="heroVideo" src="assets/hero/cued-hero.mp4" poster="assets/hero/cued-hero-poster.jpg" autoplay muted loop playsinline preload="auto" disablepictureinpicture></video>
+    <!-- The mascot: two locked-off render clips (founder, 2026-11-14) played
+         back to back with a short crossfade, forever — muted and inline so
+         they autoplay everywhere; the poster is clip 1's first frame. The
+         script runs the handoff, pauses off screen, and leaves the poster
+         under reduced motion. The first clip keeps autoplay+loop as the
+         no-JS fallback. Not in LFS on purpose — GitHub Pages serves LFS
+         pointers, not the file. -->
+    <div class="hero-video" id="heroVideo" aria-hidden="true">
+      <video class="on" src="assets/hero/cued-hero.mp4" poster="assets/hero/cued-hero-poster.jpg" autoplay muted loop playsinline preload="auto" disablepictureinpicture></video>
+      <video src="assets/hero/cued-hero-2.mp4" muted playsinline preload="auto" disablepictureinpicture></video>
     </div>
   </div>
 </section>
@@ -1092,15 +1097,36 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     }
   }
 
-  // Hero video: a decorative loop — paused while off screen, and left on its
-  // poster under reduced motion.
+  // Hero video: the mascot clips play back to back with a 0.6s crossfade,
+  // round and round. Paused while off screen; left on the poster under
+  // reduced motion.
   const heroVideo = document.getElementById('heroVideo');
-  if (heroVideo){
-    if (reduce.matches){ heroVideo.removeAttribute('autoplay'); heroVideo.pause(); }
-    else new IntersectionObserver(es => es.forEach(e => {
-      if (e.isIntersecting){ const p = heroVideo.play(); if (p && p.catch) p.catch(() => {}); }
-      else heroVideo.pause();
-    }), {threshold: 0}).observe(heroVideo);
+  const clips = heroVideo ? Array.from(heroVideo.querySelectorAll('video')) : [];
+  if (clips.length){
+    const XF = 0.6, LEAD = 1.0;   // fade length; start the handoff this far from the end so the outgoing clip never hits 'ended'
+    let cur = 0, swapping = false;
+    const play = v => { const p = v.play(); if (p && p.catch) p.catch(() => {}); };
+    const swap = () => {
+      if (swapping || clips.length < 2) return;
+      swapping = true;
+      const a = clips[cur], b = clips[(cur + 1) % clips.length];
+      b.currentTime = 0; play(b);
+      b.classList.add('on'); a.classList.remove('on');
+      cur = (cur + 1) % clips.length;
+      setTimeout(() => { a.pause(); a.currentTime = 0; swapping = false; }, XF * 1000 + 80);
+    };
+    if (reduce.matches){
+      clips.forEach(v => { v.removeAttribute('autoplay'); v.pause(); });
+    } else {
+      if (clips.length > 1) clips[0].removeAttribute('loop');   // the script hands off instead
+      clips.forEach(v => {
+        v.addEventListener('timeupdate', () => { if (v === clips[cur] && v.duration && v.duration - v.currentTime <= LEAD) swap(); });
+        v.addEventListener('ended', () => { if (v === clips[cur]) swap(); });
+      });
+      new IntersectionObserver(es => es.forEach(e => {
+        if (e.isIntersecting) play(clips[cur]); else clips.forEach(v => v.pause());
+      }), {threshold: 0}).observe(heroVideo);
+    }
   }
 
   // Nav: transparent over the hero, white with a hairline once past it.
