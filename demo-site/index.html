@@ -575,6 +575,7 @@ html.dark #proof .ph-status{background:var(--fill)}
 @media(min-width:768px){
   section#signup{background:var(--cream);--bg:var(--cream)}
   section#signup .mascot-wrap::before{display:none}
+  section#faq{--from:var(--cream)!important}   /* the close above it is cream here, so the seam band must be too (inline --from says cream-2 for phones) */
 }
 .mascot{
   display:block;width:clamp(340px,52vh,600px);height:auto;aspect-ratio:462/365;object-fit:cover;margin:0;   /* no negative margins: the render's box must not reach the headline */
