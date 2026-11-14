@@ -587,6 +587,28 @@ footer{border-top:1px solid var(--line);padding:28px var(--pad);font-size:14px;c
 .float-cta.hide{opacity:0;transform:translate(-50%,8px);pointer-events:none}
 @media(max-width:767.98px){.float-cta{bottom:calc(16px + env(safe-area-inset-bottom,0px))}}
 
+/* ===== PROGRESS RAIL (left edge) ===== */
+.rail{
+  position:fixed;left:22px;top:50%;transform:translateY(-50%);z-index:40;
+  display:none;flex-direction:column;gap:6px;
+}
+@media(min-width:1024px){.rail{display:flex}}
+.rail button{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  width:18px;height:18px;padding:0;background:transparent;border:none;cursor:pointer;
+}
+.rail .dot{display:block;width:5px;height:5px;border-radius:50%;background:var(--ink-3);opacity:.45;transition:transform .25s ease,opacity .25s ease,background .25s ease}
+.rail button:hover .dot{opacity:.9}
+.rail button[aria-current="true"] .dot{background:var(--blue);opacity:1;transform:scale(1.5)}
+/* label on hover: a small tag to the right of the dot */
+.rail button::after{
+  content:attr(aria-label);position:absolute;left:24px;top:50%;transform:translate(-4px,-50%);
+  white-space:nowrap;font-family:var(--f-ui);font-size:12px;color:var(--ink);
+  background:var(--card);padding:3px 8px;border-radius:8px;box-shadow:0 1px 0 var(--line);
+  opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;
+}
+.rail button:hover::after,.rail button:focus-visible::after{opacity:1;transform:translate(0,-50%)}
+
 /* ===== DARK MODE TOGGLE ===== */
 .mode-btn{
   position:fixed;right:24px;bottom:24px;z-index:45;width:38px;height:38px;border-radius:50%;
@@ -606,7 +628,7 @@ html.dark .mode-btn .ico-sun{display:block}
   .thread[data-play]{transition:none!important;transform:none!important}
   .poll-row,.poll-row i,.poll-row i::after{transition:none!important;animation:none!important}
   .ph-status::before{animation:none}
-  .float-cta,.hero-in,.rot-item{transition:none}
+  .float-cta,.hero-in,.rot-item,.rail .dot,.rail button::after{transition:none}
   .js .hero-in{opacity:1}
 }
 
@@ -814,10 +836,13 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   <svg class="ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7L7 17M17 7l1.7-1.7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
 </button>
 
+<!-- Progress rail — one dot per [data-label] section, down the left edge (desktop). -->
+<div class="rail" id="rail" role="navigation" aria-label="page sections"></div>   <!-- a div, not <nav>: the page's nav rule is a full-width bar -->
+
 <main>
 
 <!-- ===== HERO ===== -->
-<section id="hero" class="cream">
+<section id="hero" class="cream" data-label="meet cued">
   <div class="wrap hero-in hero-grid" id="heroIn">
     <div class="hero-copy">
       <h1 class="hero-h"><span class="kicker">meet cued</span>the coach that<span class="sr-only"> lives in your texts.</span><span class="rot" id="heroRot" aria-hidden="true"><span class="rot-item on">lives in your texts.</span><span class="rot-item">replaces <span class="rot-icons"><img src="images/app-icons/hevy.png" alt="Hevy"><img src="images/app-icons/MyFitnessPal%20Review.jpg" alt="MyFitnessPal"><img src="images/app-icons/MacroFactor-MacroTracker_icon.png" alt="MacroFactor"><img src="images/app-icons/notes.png" alt="Notes"><img src="images/app-icons/reminders_app.webp" alt="Reminders"><img src="images/app-icons/pen_paper.png" alt="pen and paper"></span></span><span class="rot-item">builds your workouts.</span><span class="rot-item">tracks your food.</span><span class="rot-item">knows the college life.</span><span class="rot-item">knows your schedule.</span></span></h1>
@@ -839,7 +864,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== SAY ANYTHING ===== -->
-<section id="say" class="blend blend-to" style="--from:var(--cream);--to:var(--cream)">
+<section id="say" class="blend blend-to" style="--from:var(--cream);--to:var(--cream)" data-label="say anything">
   <div class="wrap">
     <h2 data-io>say anything.</h2>
     <p class="sub" data-io>it's a text thread. so text it like one.</p>
@@ -855,7 +880,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 <!-- ===== PROOF — five steps, one phone. The markup is the stacked (mobile /
      reduced-motion / JS-off) form; at ≥1024px with motion the script moves
      the step copy and the five threads into one sticky phone (see pinProof). ===== -->
-<section id="proof" class="proof" aria-label="what cued does">
+<section id="proof" class="proof" aria-label="what cued does" data-label="what i do">
   <div class="proof-steps" id="proofSteps">
 
     <article class="step tint-2" data-status="reading your calendar…">
@@ -998,7 +1023,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== APPS ===== -->
-<section id="apps" class="blend" style="--from:var(--cream)">
+<section id="apps" class="blend" style="--from:var(--cream)" data-label="works with">
   <div class="wrap">
     <div class="apps-row" data-io>
       <h3>plugs into what you already use.</h3>
@@ -1026,7 +1051,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== PRIVACY ===== -->
-<section id="privacy" class="cream blend" style="--from:var(--cream-2)">
+<section id="privacy" class="cream blend" style="--from:var(--cream-2)" data-label="privacy">
   <div class="wrap two">
     <div data-io>
       <h2>it stays between us</h2>
@@ -1049,7 +1074,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== BERKELEY ===== -->
-<section id="berkeley" class="blend" style="--from:var(--cream)">
+<section id="berkeley" class="blend" style="--from:var(--cream)" data-label="made in berkeley">
   <div class="wrap two">
     <!-- [FOUNDER PHOTO: the founder or the team at the RSF or on Sproul,
          daylight, no logos needed]. Until then, the Campanile drawing in a
@@ -1067,7 +1092,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== CLOSE ===== -->
-<section id="signup" class="cream blend" style="--from:var(--cream-2)">
+<section id="signup" class="cream blend" style="--from:var(--cream-2)" data-label="text cued">
   <div class="campanile r" aria-hidden="true"><img src="images/hero-drawing.png" alt="" width="1920" height="650"></div>
   <div class="wrap">
     <picture><source srcset="assets/mascot/v2/cued-dumbbell.webp" type="image/webp"><img class="mascot" src="assets/mascot/v2/cued-dumbbell.jpg" alt="cued, a round white mascot in a blue headband, lifting a dumbbell" width="900" height="900" loading="lazy"></picture>
@@ -1078,7 +1103,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== FAQ ===== -->
-<section id="faq" class="blend" style="--from:var(--cream)">
+<section id="faq" class="blend" style="--from:var(--cream)" data-label="faq">
   <div class="wrap faq-wrap">
     <h2 data-io>the stuff people ask.</h2>
     <div class="faq-list" data-io>
@@ -1613,6 +1638,33 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   reduce.addEventListener('change', mode);
   window.addEventListener('resize', () => { if (pinned) fitPhone(); else fitStacked(); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (pinned) fitPhone(); });
+})();
+
+// === Progress rail (left edge) ===
+// One dot per [data-label] section; the section under the viewport's
+// vertical midpoint is current (works for the 500vh proof track too).
+// Click scrolls to the section.
+(function(){
+  const rail = document.getElementById('rail');
+  if (!rail) return;
+  const secs = Array.from(document.querySelectorAll('section[data-label]'));
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const btns = secs.map(sec => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.setAttribute('aria-label', sec.dataset.label);
+    b.innerHTML = '<span class="dot"></span>';
+    b.addEventListener('click', () => sec.scrollIntoView({behavior: reduce.matches ? 'auto' : 'smooth', block: 'start'}));
+    rail.appendChild(b);
+    return b;
+  });
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const i = secs.indexOf(e.target);
+      btns.forEach((b, k) => k === i ? b.setAttribute('aria-current', 'true') : b.removeAttribute('aria-current'));
+    });
+  }, {rootMargin: '-50% 0px -50% 0px', threshold: 0});
+  secs.forEach(s => io.observe(s));
 })();
 
 // === Dark-mode toggle (bottom-right sun/moon button) ===
