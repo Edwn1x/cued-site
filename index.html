@@ -153,6 +153,7 @@ h2{font-size:clamp(34px,4.2vw,56px);line-height:1.08}
 }
 .btn:hover{background:var(--blue-hover)}
 .btn.lg{height:56px;padding:0 34px;font-size:20px}
+.btn.sq{border-radius:16px}   /* the hero's button keeps the squarish corners the chatbox had */
 /* scroll-in reveal for copy blocks (gated on html.js so a JS-less load is visible) */
 .js [data-io]{opacity:0;transform:translateY(12px);transition:opacity .5s var(--ease),transform .5s var(--ease)}
 .js [data-io].on{opacity:1;transform:none}
@@ -243,27 +244,7 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 .ic.round,picture.ic.round{border-radius:50%}
 .ic.ic-svg{border-radius:.22em}
 .hero-cap{margin-top:14px;font-size:14px;color:var(--ink-3)}
-.hero-cta{margin-top:30px}
-/* hero chatbox: a white pill with the input on the left and the CTA inside at the right */
-.hero-box{
-  display:flex;align-items:center;gap:8px;
-  width:min(520px,100%);margin:28px 0 0;padding:6px 6px 6px 22px;
-  background:var(--card);border:1px solid var(--line);border-radius:18px;
-  box-shadow:0 10px 30px -18px rgba(0,110,253,.35);
-  transition:border-color .15s,box-shadow .15s;
-}
-.hero-box:focus-within{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
-.hero-input{
-  flex:1;min-width:0;height:44px;border:none;background:none;outline:none;
-  font-family:var(--f-ui);font-size:17px;color:var(--ink);
-}
-.hero-input::placeholder{color:var(--ink-3)}
-.hero-box .btn{flex:none;height:44px;padding:0 20px;font-size:16px;border-radius:13px}
-@media(max-width:767.98px){
-  .hero-box{padding-left:16px}
-  .hero-input{font-size:16px}   /* 16px on phones or iOS zooms on focus */
-  .hero-box .btn{padding:0 16px;font-size:15px}
-}
+.hero-cta{margin-top:28px}
 .js .hero-in{opacity:0;transition:opacity .4s ease}
 .js .hero-in.in{opacity:1}
 @media(max-width:1023.98px){
@@ -766,13 +747,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     <div class="hero-copy">
       <h1 class="hero-h"><span class="kicker">meet cued</span>the coach that<span class="sr-only"> lives in your texts.</span><span class="rot" id="heroRot" aria-hidden="true"><span class="rot-item on">lives in your texts.</span><span class="rot-item">replaces <span class="rot-icons"><img src="images/app-icons/hevy.png" alt="Hevy"><img src="images/app-icons/MyFitnessPal%20Review.jpg" alt="MyFitnessPal"><img src="images/app-icons/MacroFactor-MacroTracker_icon.png" alt="MacroFactor"><img src="images/app-icons/notes.png" alt="Notes"><img src="images/app-icons/reminders_app.webp" alt="Reminders"><img src="images/app-icons/pen_paper.png" alt="pen and paper"></span></span><span class="rot-item">builds your workouts.</span><span class="rot-item">tracks your food.</span><span class="rot-item">knows the college life.</span><span class="rot-item">knows your schedule.</span></span></h1>
       <p class="hero-sub">it knows your classes, replaces your lift and meal apps, and texts first. <span class="b">nothing to download.</span></p>
-      <!-- "Chatbox" — for show: a composer row. Typing does nothing by itself;
-           the button (or Enter) opens the sign-up chat, same as every other CTA. -->
-      <form class="hero-box" id="heroBox" autocomplete="off">
-        <label class="sr-only" for="heroInput">message</label>
-        <input class="hero-input" id="heroInput" type="text" placeholder="say anything…" maxlength="140" enterkeyhint="send">
-        <button type="button" class="btn" id="heroCtaTop">text cued</button>
-      </form>
+      <div class="hero-cta"><button type="button" class="btn lg sq" id="heroCtaTop">text cued</button></div>
       <p class="hero-cap">free during beta · made in berkeley</p>
     </div>
     <!-- The mascot: a locked-off render loop (founder, 2026-11-14), muted and
@@ -1127,10 +1102,6 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       else heroVideo.pause();
     }), {threshold: 0}).observe(heroVideo);
   }
-
-  // Hero chatbox: Enter submits → the sign-up chat (the button has its own click binding).
-  const heroBox = document.getElementById('heroBox');
-  if (heroBox) heroBox.addEventListener('submit', e => { e.preventDefault(); if (window.openWaitlist) window.openWaitlist('hero'); });
 
   // Nav: transparent over the hero, white with a hairline once past it.
   function navState(){
