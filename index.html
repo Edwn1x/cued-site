@@ -528,9 +528,10 @@ html.dark #proof .ph-status{background:var(--fill)}
           mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 70%,transparent 96%);
 }
 #signup h2{font-size:clamp(36px,6.2vw,92px);line-height:1.08}
+#signup h2 .b{color:var(--blue)}
 #signup .sub{margin:18px auto 0}
 #signup .btn{margin-top:28px}
-.campanile.r{left:auto;right:0;bottom:-6%;width:min(70vw,1100px);opacity:.25;transform:translateX(38%)}
+.campanile.r{left:0;right:auto;bottom:-2%;width:min(100vw,1560px);opacity:.3;transform:translateX(-5%)}   /* far left, big: the tower sits ~14% across the drawing; -5% parks it just inside the edge */
 @media(max-width:767.98px){.mascot{width:300px;margin:-20px auto -30px}.campanile.r{display:none}}
 
 /* ===== FAQ ===== */
@@ -1054,7 +1055,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   <div class="campanile r" aria-hidden="true"><img src="images/hero-drawing.png" alt="" width="1920" height="650"></div>
   <div class="wrap">
     <picture><source srcset="assets/mascot/v2/cued-dumbbell.webp" type="image/webp"><img class="mascot" src="assets/mascot/v2/cued-dumbbell.jpg" alt="cued, a round white mascot in a blue headband, lifting a dumbbell" width="900" height="900" loading="lazy"></picture>
-    <h2 data-io>your cue to lock in.</h2>
+    <h2 data-io>your <span class="b">cue</span> to lock in.</h2>
     <p class="sub" data-io>nothing to open. ready when you are.</p>
     <div data-io><button type="button" class="btn lg" id="closeCta">text cued</button></div>
   </div>
