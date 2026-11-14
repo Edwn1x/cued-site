@@ -278,6 +278,7 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 .mq:hover .mq-track{animation-play-state:paused}
 @keyframes mq{to{transform:translateX(-50%)}}
 .mq .msg{flex:none;max-width:none;margin:0 0 0 .4em;font-size:20px;font-family:var(--f-phone)}
+@media(max-width:767.98px){.mq .msg{font-size:16px}.mq{margin-top:28px}}
 @media(prefers-reduced-motion:reduce){.mq-track{animation:none}}
 
 /* ===== BUBBLES (phone + thread cards + strip) ===== */
@@ -475,16 +476,31 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 #proof .msg.photo{max-width:70%}
 #proof .msg.chart svg{width:12em}
 html.dark #proof .ph-status{background:var(--fill)}
+/* stacked proof (<1024px): headline + small mascot in a row, the chat under it
+   at its natural height (no clipping, no empty box), one header per step */
+#proof .proof-copy .step-mascot{display:none}   /* desktop uses the big corner render */
+.step-mascot{display:none;line-height:0}
+.step-mascot img{
+  display:block;width:100%;height:auto;
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+          mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+  -webkit-mask-composite:source-in;mask-composite:intersect;
+}
 @media(max-width:1023.98px){
-  #proof .step .wrap{gap:28px}
-  #proof .screen{height:520px}
-  #proof .step .wrap{padding-top:16px}
+  #proof .step{padding:40px 0 56px}
+  #proof .step .wrap{gap:20px;padding-top:0}
+  #proof .step-copy{display:flex;align-items:center;gap:14px;text-align:left;width:min(560px,100%)}
+  #proof .step-copy h2{font-size:clamp(28px,7.2vw,40px);line-height:1.04}
+  .step-mascot{display:block;flex:none;width:clamp(120px,32vw,170px)}
+  #proof .screen{height:auto;padding:0}
   #proof .phone-wrap{width:min(560px,100%)}
+  #proof .ph-head{padding:0 0 14px}
+  #proof .ph-avatar{width:44px;height:44px}
 }
 @media(max-width:767.98px){
-  #proof .thread{font-size:17px}
-  #proof .screen{height:460px}
-  #proof .ph-avatar{width:52px;height:52px}
+  #proof .thread{font-size:16px}
+  #proof .msg{max-width:90%}
+  #proof .poll,#proof .checklist{width:92%}
 }
 
 /* ===== APPS ===== */
@@ -500,6 +516,11 @@ html.dark #proof .ph-status{background:var(--fill)}
 @media(max-width:767.98px){
   .apps-row{grid-template-columns:1fr;gap:20px;padding:28px 0}
   .apps-row h3{font-size:26px}
+  .apps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 10px;justify-items:center}
+  .app{width:100%}
+  .app img{width:52px;height:52px;border-radius:13px}
+  .app span{font-size:12px}
+  .apps-note{font-size:16px;margin-top:28px}
 }
 
 /* ===== PRIVACY ===== */
@@ -518,6 +539,13 @@ html.dark #proof .ph-status{background:var(--fill)}
 .thread-card .thread{font-size:16px}
 @media(max-width:1023.98px){
   .two{grid-template-columns:1fr;gap:40px}
+}
+@media(max-width:767.98px){
+  .photo-slot{aspect-ratio:1}
+  .side-mascot{width:min(300px,70%);margin:12px 0 0 -6%}
+  .facts{gap:16px}
+  .facts li{font-size:18px}
+  .founder p{font-size:18px}
 }
 
 /* ===== BERKELEY ===== */
@@ -888,6 +916,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     <article class="step tint-2" data-status="reading your calendar…">
       <div class="wrap">
         <div class="step-copy">
+          <picture class="step-mascot"><source srcset="assets/mascot/v2/cued-week.webp" type="image/webp"><img src="assets/mascot/v2/cued-week.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
           <h2>i know your week</h2>
           <p class="sub">calendar, canvas, class times, the rsf line. i plan around all of it.</p>
         </div>
@@ -926,10 +955,16 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     <article class="step" data-status="logging your sets…">
       <div class="wrap">
         <div class="step-copy">
+          <picture class="step-mascot"><source srcset="assets/mascot/v2/cued-sets.webp" type="image/webp"><img src="assets/mascot/v2/cued-sets.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
           <h2>i log your sets</h2>
           <p class="sub">tap a set to log it. text me when it goes different.</p>
         </div>
         <div class="phone-wrap"><div class="phone"><div class="phone-screen">
+          <div class="ph-head">
+            <picture><source srcset="assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
+            <div class="ph-name">cued</div>
+            <div class="ph-status">logging your sets…</div>
+          </div>
           <div class="screen">
             <div class="thread coach-left" data-play>
               <div class="msg coach t">push day. 4 sets bench, then the usual. tap as you go — text me if a set goes different.</div>
@@ -958,10 +993,16 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     <article class="step tint-1" data-status="checking crossroads menu…">
       <div class="wrap">
         <div class="step-copy">
+          <picture class="step-mascot"><source srcset="assets/mascot/v2/cued-dinner.webp" type="image/webp"><img src="assets/mascot/v2/cued-dinner.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
           <h2>i know what's for dinner</h2>
           <p class="sub">dining hall menus, receipts, photos. no logging.</p>
         </div>
         <div class="phone-wrap"><div class="phone"><div class="phone-screen">
+          <div class="ph-head">
+            <picture><source srcset="assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
+            <div class="ph-name">cued</div>
+            <div class="ph-status">checking crossroads menu…</div>
+          </div>
           <div class="screen">
             <div class="thread coach-left" data-play>
               <div class="msg user t">what's good at crossroads rn</div>
@@ -977,10 +1018,16 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     <article class="step" data-status="pulling up your week…">
       <div class="wrap">
         <div class="step-copy">
+          <picture class="step-mascot"><source srcset="assets/mascot/v2/cued-remember.webp" type="image/webp"><img src="assets/mascot/v2/cued-remember.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
           <h2>i remember</h2>
           <p class="sub">the midterm, the week, the lift we moved. i don't start over every text.</p>
         </div>
         <div class="phone-wrap"><div class="phone"><div class="phone-screen">
+          <div class="ph-head">
+            <picture><source srcset="assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
+            <div class="ph-name">cued</div>
+            <div class="ph-status">pulling up your week…</div>
+          </div>
           <div class="screen">
             <div class="thread coach-left" data-play>
               <div class="msg coach t">how'd the ochem midterm go</div>
@@ -1006,10 +1053,16 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
     <article class="step tint-2" data-status="reading last night's sleep…">
       <div class="wrap">
         <div class="step-copy">
+          <picture class="step-mascot"><source srcset="assets/mascot/v2/cued-watch.webp" type="image/webp"><img src="assets/mascot/v2/cued-watch.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
           <h2>i read your watch. or your texts.</h2>
           <p class="sub">fitbit, pixel watch, google health. no watch? "slept like garbage" works too.</p>
         </div>
         <div class="phone-wrap"><div class="phone"><div class="phone-screen">
+          <div class="ph-head">
+            <picture><source srcset="assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
+            <div class="ph-name">cued</div>
+            <div class="ph-status">reading last night's sleep…</div>
+          </div>
           <div class="screen">
             <div class="thread coach-left" data-play>
               <div class="msg coach t">your watch says you slept 4 hours. not the day for heavy squats. moved leg day to thursday — tonight: walk, protein, early bed.</div>
@@ -1160,6 +1213,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   const hero = document.getElementById('hero');
   const close = document.getElementById('signup');
   const faq = document.getElementById('faq');
+  const proofSec = document.getElementById('proof');
   const pill = document.getElementById('floatCta');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -1246,20 +1300,21 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 
   // Floating pill: hidden while the hero or the close is in view (both carry
   // their own CTA); under 480px also hidden while the pinned proof is active.
-  const vis = {hero: true, close: false, faq: false};
+  const vis = {hero: true, close: false, faq: false, proof: false};
   window.proofActive = false;
   function pillState(){
-    const narrow = window.innerWidth < 480;
-    pill.classList.toggle('hide', vis.hero || vis.close || vis.faq || (narrow && window.proofActive));
+    const narrow = window.innerWidth < 1024;   // stacked layouts: the chat sits in the main column, so no pill over it
+    pill.classList.toggle('hide', vis.hero || vis.close || vis.faq || (narrow && (window.proofActive || vis.proof)));
   }
   window.pillState = pillState;
   const ioPill = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.target === hero) vis.hero = e.isIntersecting; if (e.target === close) vis.close = e.isIntersecting; if (e.target === faq) vis.faq = e.isIntersecting; });
+    entries.forEach(e => { if (e.target === hero) vis.hero = e.isIntersecting; if (e.target === close) vis.close = e.isIntersecting; if (e.target === faq) vis.faq = e.isIntersecting; if (e.target === proofSec) vis.proof = e.isIntersecting; });
     pillState();
   }, {threshold: 0.05});
   hero && ioPill.observe(hero);
   close && ioPill.observe(close);
   faq && ioPill.observe(faq);   // past the close there's nothing left to sell — no pill over the FAQ/footer
+  proofSec && ioPill.observe(proofSec);   // narrow screens: no pill over the stacked chat either
 })();
 
 // === cued live avatar (founder prototype, 2026-11-08) ===
