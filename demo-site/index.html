@@ -550,25 +550,10 @@ html.dark #proof .ph-status{background:var(--fill)}
 }
 @media(max-width:767.98px){
   #privacy .thread-card{display:none}   /* phones: the three facts + the lock carry the section; the thread card is desktop */
-  .photo-slot{aspect-ratio:1}
   .side-mascot{width:min(300px,70%);margin:12px 0 0 -6%}
   .facts{gap:16px}
   .facts li{font-size:18px}
-  .founder p{font-size:18px}
 }
-
-/* ===== BERKELEY ===== */
-.photo-slot{position:relative;aspect-ratio:4/5;border-radius:16px;overflow:hidden;background:var(--cream)}
-.photo-slot > img,.photo-slot > video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.photo-slot img.placeholder{
-  position:absolute;left:50%;top:50%;width:100%;height:auto;max-width:none;transform:translate(-50%,-50%);object-fit:contain;
-  -webkit-mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
-          mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
-  -webkit-mask-composite:source-in;mask-composite:intersect;
-}   /* the graduation tile, zoomed a little so the character fills the 4:5 card, feathered so its edges never show */
-.founder p{font-size:20px;line-height:1.5;color:var(--gray-text);margin-top:18px}
-.founder .sig{font-size:16px;color:var(--gray-text);margin-top:26px}
-.founder .sig a{color:var(--blue);margin-left:10px}
 
 /* ===== CLOSE ===== */
 #signup{text-align:center;padding:clamp(120px,16vw,200px) 0;overflow:hidden}
@@ -601,7 +586,20 @@ html.dark #proof .ph-status{background:var(--fill)}
 .faq-list details[open] summary::after{content:'–';color:var(--blue)}
 .faq-list details[open] summary{color:var(--blue)}
 .faq-body{padding:0 0 22px;color:var(--gray-text);font-size:18px;line-height:1.55;max-width:640px}
-@media(max-width:767.98px){#faq h2{font-size:36px}.faq-list summary{font-size:18px}.faq-body{font-size:16px}}
+/* "who built this?" carries the founder story: a small render beside two short paragraphs */
+.faq-founder{display:flex;gap:20px;align-items:flex-start;max-width:none}
+.faq-mascot{flex:none;width:150px;line-height:0;margin:-6px 0 0 -10px}
+.faq-mascot img{
+  display:block;width:100%;height:auto;
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+          mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+  -webkit-mask-composite:source-in;mask-composite:intersect;
+}
+.faq-founder p+p{margin-top:10px}
+.faq-founder strong{color:var(--ink);font-weight:500}
+.faq-founder .sig{font-size:15px;margin-top:14px}
+.faq-founder .sig a{color:var(--blue);margin-left:8px}
+@media(max-width:767.98px){#faq h2{font-size:36px}.faq-list summary{font-size:18px}.faq-body{font-size:16px}.faq-mascot{width:104px;margin:0 0 0 -6px}.faq-founder{gap:14px}}
 
 /* ===== FOOTER ===== */
 footer{border-top:1px solid var(--line);padding:28px var(--pad);font-size:14px;color:var(--gray-text)}
@@ -1167,29 +1165,11 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   </div>
 </section>
 
-<!-- ===== BERKELEY ===== -->
-<section id="berkeley" class="blend" style="--from:var(--cream)" data-label="made in berkeley">
-  <div class="wrap two">
-    <!-- [FOUNDER PHOTO: the founder or the team at the RSF or on Sproul,
-         daylight, no logos needed]. Until then, the Campanile drawing in a
-         tint-2 card. The slot takes an <img> or a muted autoplay <video>. -->
-    <div class="photo-slot" data-io>
-      <picture><source srcset="/assets/mascot/v2/cued-grad.webp" type="image/webp"><img class="placeholder" src="/assets/mascot/v2/cued-grad.jpg" alt="cued in a graduation cap, holding a diploma, with sather gate behind" width="459" height="365" loading="lazy"></picture>
-    </div>
-    <div class="founder" data-io>
-      <h2>made in berkeley, by a berkeley student.</h2>
-      <p>i'm a junior at cal. i built cued because i was running six apps and a notes file to stay in shape between classes, and none of them knew i had a midterm.</p>
-      <p>cued does. text it like a friend who happens to know the rsf line, your calendar and your lifts.</p>
-      <p class="sig">— the founder <a href="https://instagram.com/cued.fit" target="_blank" rel="noopener">@cued.fit</a></p>
-    </div>
-  </div>
-</section>
-
 <!-- ===== CLOSE ===== -->
-<section id="signup" class="cream blend" style="--from:var(--cream-2)" data-label="text cued">
+<section id="signup" class="blend" style="--from:var(--cream)" data-label="text cued">
   <div class="campanile r" aria-hidden="true"><img src="/images/hero-drawing.png" alt="" width="1920" height="650"></div>
   <div class="wrap">
-    <picture><source srcset="/assets/mascot/v2/cued-dumbbell.webp" type="image/webp"><img class="mascot" src="/assets/mascot/v2/cued-dumbbell.jpg" alt="cued, a round white mascot in a blue headband, lifting a dumbbell" width="1100" height="869" loading="lazy"></picture>
+    <picture><source srcset="/assets/mascot/v2/cued-dumbbell-light.webp" type="image/webp"><img class="mascot" src="/assets/mascot/v2/cued-dumbbell-light.jpg" alt="cued, a round white mascot in a blue headband, lifting a dumbbell" width="1100" height="869" loading="lazy"></picture>
     <h2 data-io>your <span class="b">cue</span> to lock in.</h2>
     <p class="sub" data-io>nothing to open. ready when you are.</p>
     <div data-io><button type="button" class="btn lg" id="closeCta">text cued</button></div>
@@ -1197,7 +1177,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== FAQ ===== -->
-<section id="faq" class="blend" style="--from:var(--cream)" data-label="faq">
+<section id="faq" class="cream blend" style="--from:var(--cream-2)" data-label="faq">
   <div class="wrap faq-wrap">
     <h2 data-io>the stuff people ask.</h2>
     <div class="faq-list" data-io>
@@ -1205,7 +1185,15 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       <details><summary>how much does it cost?</summary><div class="faq-body">free during the open beta. founding-member pricing comes later, and you'll hear about it from me first.</div></details>
       <details><summary>what data does cued use?</summary><div class="faq-body">your texts, plus anything you choose to connect: calendar (next 60 days), canvas, google health. all read-only, all optional, all deletable with one text.</div></details>
       <details><summary>do i need a watch?</summary><div class="faq-body">no. a watch makes the sleep and recovery stuff automatic. without one, just tell me how you slept.</div></details>
-      <details><summary>who built this?</summary><div class="faq-body">a berkeley student. see "made in berkeley" above.</div></details>
+      <details><summary>who built this?</summary><div class="faq-body faq-founder">
+        <picture class="faq-mascot"><source srcset="/assets/mascot/v2/cued-grad.webp" type="image/webp"><img src="/assets/mascot/v2/cued-grad.jpg" alt="cued in a graduation cap, holding a diploma, with sather gate behind" width="459" height="365" loading="lazy"></picture>
+        <div>
+          <p><strong>made in berkeley, by a berkeley student.</strong></p>
+          <p>i'm a junior at cal. i built cued because i was running six apps and a notes file to stay in shape between classes, and none of them knew i had a midterm.</p>
+          <p>cued does. text it like a friend who happens to know the rsf line, your calendar and your lifts.</p>
+          <p class="sig">— the founder <a href="https://instagram.com/cued.fit" target="_blank" rel="noopener">@cued.fit</a></p>
+        </div>
+      </div></details>
     </div>
   </div>
 </section>
