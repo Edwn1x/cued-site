@@ -29,7 +29,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>cued — the fitness coach that lives in your texts.</title>
-<meta name="description" content="Cued is an AI fitness coach for college students that works over iMessage or SMS: workouts, meals and check-ins planned around your real schedule. With your permission it reads your Google Calendar, bCourses and Fitbit/Pixel Watch (Google Health).">
+<meta name="description" content="Cued is an AI fitness coach for college students that works over iMessage or SMS: workouts, meals and check-ins planned around your real schedule. With your permission it reads your Google Calendar, Canvas and Fitbit/Pixel Watch (Google Health).">
 <meta property="og:title" content="cued — the fitness coach that lives in your texts.">
 <meta property="og:description" content="Cued is an AI fitness coach for college students that works over iMessage or SMS: workouts, meals and check-ins planned around your real schedule.">
 <meta property="og:image" content="/images/og-image-cued-square.png">
@@ -596,13 +596,29 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 @media(max-width:767.98px){#faq h2{font-size:36px}.faq-list summary{font-size:18px}.faq-body{font-size:16px}.faq-mascot{width:104px;margin:0 0 0 -6px}.faq-founder{gap:14px}}
 
 /* ===== FOOTER ===== */
-footer{border-top:1px solid var(--line);padding:28px var(--pad);font-size:14px;color:var(--gray-text)}
-.foot{max-width:var(--wrap);margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
-.foot .fb{display:flex;align-items:center;gap:8px;color:var(--ink)}
-.foot .fb img{width:24px;height:24px;display:block}
-.foot .fl{display:flex;gap:20px}
-.foot a:hover{color:var(--ink)}
-@media(max-width:767.98px){.foot{flex-direction:column;align-items:flex-start;gap:14px}}
+/* footer: on the page cream; bracketed column headers over link lists (conductor.build reference) */
+footer{position:relative;overflow:hidden;isolation:isolate;background:var(--cream);--bg:var(--cream);border-top:1px solid var(--line);padding:90px var(--pad) 81px;font-size:16px;color:var(--gray-text)}   /* 350px tall at desktop (founder) */
+.foot{position:relative;z-index:1;max-width:var(--wrap);margin:0 auto}
+.foot-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.foot-col{display:flex;flex-direction:column;gap:12px}
+.foot-h{font-size:15px;color:var(--ink-3);margin-bottom:4px}
+.foot-col a{color:var(--ink);width:max-content}
+.foot a:hover{color:var(--blue)}
+.foot-meta{display:flex;flex-wrap:wrap;gap:24px;margin-top:40px;font-size:15px;color:var(--gray-text)}
+/* the wordmark: a watermark behind the columns — bottom-left, out of the flow,
+   so it adds no height; the links and meta overlap it (founder: overlap is fine) */
+.foot-mark{position:absolute;left:0;bottom:-.06em;z-index:0;color:var(--blue);line-height:0;pointer-events:none;font-size:clamp(96px,24vw,360px)}
+.foot-word{display:block;font-family:var(--f-ui);font-weight:700;font-size:1em;line-height:.78;letter-spacing:-.03em;color:var(--blue);opacity:.07}
+.foot-cols,.foot-meta{position:relative;z-index:1}
+/* the ball, embedded: oversized, bleeding off the bottom-right, same opacity as the word */
+.foot-ball{position:absolute;right:-6%;bottom:-38%;width:min(44vw,620px);height:auto;color:var(--blue);opacity:.07;pointer-events:none;z-index:0}
+@media(max-width:767.98px){
+  footer{padding-top:40px;padding-bottom:28px}
+  .foot-cols{grid-template-columns:1fr 1fr;gap:28px 16px}
+  .foot-meta{margin-top:32px;gap:12px 20px}
+  .foot-mark{font-size:30vw}
+  .foot-ball{width:70vw;right:-18%;bottom:-24%}
+}
 
 /* ===== FLOATING PILL ===== */
 .float-cta{
@@ -913,7 +929,7 @@ footer{border-top:1px solid var(--line);padding:28px var(--pad);font-size:14px;c
   <div class="mq" aria-hidden="true"><div class="mq-track thread" id="mq1"></div></div>
   <div class="mq rev" aria-hidden="true"><div class="mq-track thread" id="mq2"></div></div>
   <ul class="sr-only" id="mqList">
-    <li>rsf line rn?</li><li>190 x4</li><li>slept like garbage</li><li>what's good at crossroads</li><li>move leg day to thurs</li><li>im sore af</li><li>how much protein am i at</li><li>book me a moffitt room</li><li>pull or push today</li>
+    <li>gym line rn?</li><li>190 x4</li><li>slept like garbage</li><li>what's good at the dining hall</li><li>move leg day to thurs</li><li>im sore af</li><li>how much protein am i at</li><li>book me a library room</li><li>pull or push today</li>
     <li>how'd my week go</li><li>new pr 225</li><li>skipping today ngl</li><li>what's due this week</li><li>remind me to meal prep sunday</li><li>is the gym packed</li><li>what should i eat before class</li><li>logged my trader joe's run</li><li>when's my next lift</li>
   </ul>
 </section>
@@ -929,7 +945,7 @@ footer{border-top:1px solid var(--line);padding:28px var(--pad);font-size:14px;c
         <div class="step-copy">
           <picture class="step-mascot"><source srcset="/assets/mascot/v2/cued-week.webp" type="image/webp"><img src="/assets/mascot/v2/cued-week.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
           <h2>i know your week</h2>
-          <p class="sub">calendar, canvas, class times, the rsf line. i plan around all of it.</p>
+          <p class="sub">calendar, canvas, class times, the gym line. i plan around all of it.</p>
         </div>
         <div class="phone-wrap">
           <div class="phone" aria-hidden="false">
@@ -944,8 +960,8 @@ footer{border-top:1px solid var(--line);padding:28px var(--pad);font-size:14px;c
               </div>
               <div class="screen">
                 <div class="thread coach-left" data-play>
-                  <div class="msg coach">rsf's dead right now and you're out of class till 3. quick upper push? in and out before the rush.</div>
-                  <div class="msg coach">also saw the ochem midterm on your calendar tues. moving leg day to wednesday.</div>
+                  <div class="msg coach">gym's dead right now and you're out of class till 3. quick upper push? in and out before the rush.</div>
+                  <div class="msg coach">also saw the chem midterm on your calendar tues. moving leg day to wednesday.</div>
                   <div class="msg coach t">you've got class 2–5 wednesday. when do you want it?</div>
                   <div class="poll" aria-label="poll: pick a workout time">
                     <button type="button" class="poll-row pick" data-t="5:30" aria-pressed="true"><span>5:30pm – 7pm</span><i aria-hidden="true"></i></button>
@@ -1001,7 +1017,7 @@ footer{border-top:1px solid var(--line);padding:28px var(--pad);font-size:14px;c
       </div>
     </article>
 
-    <article class="step tint-1" data-status="checking crossroads menu…">
+    <article class="step tint-1" data-status="checking the dining hall menu…">
       <div class="wrap">
         <div class="step-copy">
           <picture class="step-mascot"><source srcset="/assets/mascot/v2/cued-dinner.webp" type="image/webp"><img src="/assets/mascot/v2/cued-dinner.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
@@ -1012,11 +1028,11 @@ footer{border-top:1px solid var(--line);padding:28px var(--pad);font-size:14px;c
           <div class="ph-head">
             <picture><source srcset="/assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="/assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
             <div class="ph-name">cued</div>
-            <div class="ph-status">checking crossroads menu…</div>
+            <div class="ph-status">checking the dining hall menu…</div>
           </div>
           <div class="screen">
             <div class="thread coach-left" data-play>
-              <div class="msg user t">what's good at crossroads rn</div>
+              <div class="msg user t">what's good at the dining hall rn</div>
               <div class="msg coach t turn">chimichurri tri-tip tonight. grab the roasted sweet potatoes, pile on the veg — that's ~45g protein, you're at 80 for the day.</div>
               <div class="msg user photo turn"><img src="/images/dinner-plate.jpg" width="1000" height="855" loading="lazy" alt="photo of a dinner plate: sliced tri-tip with chimichurri, roasted sweet potatoes, broccoli and cauliflower"></div>
               <div class="msg coach t turn">logged. you went heavy on the steak — closer to 55. nice.</div>
@@ -1041,7 +1057,7 @@ footer{border-top:1px solid var(--line);padding:28px var(--pad);font-size:14px;c
           </div>
           <div class="screen">
             <div class="thread coach-left" data-play>
-              <div class="msg coach t">how'd the ochem midterm go</div>
+              <div class="msg coach t">how'd the chem midterm go</div>
               <div class="msg user turn">brutal but done</div>
               <div class="msg user t">how'd my week go</div>
               <div class="msg coach chart turn">
@@ -1095,7 +1111,7 @@ footer{border-top:1px solid var(--line);padding:28px var(--pad);font-size:14px;c
       <h3>plugs into what you already use.</h3>
       <div class="apps">
         <div class="app"><img src="/images/app-icons/google-calendar.webp" alt=""><span>google calendar</span></div>
-        <div class="app"><img src="/images/app-icons/canvas-student.jpg" alt=""><span>bcourses / canvas</span></div>
+        <div class="app"><img src="/images/app-icons/canvas-student.jpg" alt=""><span>canvas</span></div>
         <div class="app"><img src="/images/app-icons/google-health.webp" alt=""><span>google health<span class="app-sub"><br>(fitbit, pixel watch)</span></span></div>
         <div class="app"><img src="/images/app-icons/apple-watch.webp" alt=""><span>apple watch</span></div>
         <div class="app"><img src="/images/app-icons/strava.webp" alt=""><span>strava</span></div>
@@ -1166,9 +1182,9 @@ footer{border-top:1px solid var(--line);padding:28px var(--pad);font-size:14px;c
       <details><summary>who built this?</summary><div class="faq-body faq-founder">
         <picture class="faq-mascot"><source srcset="/assets/mascot/v2/cued-grad.webp" type="image/webp"><img src="/assets/mascot/v2/cued-grad.jpg" alt="cued in a graduation cap, holding a diploma, with sather gate behind" width="459" height="365" loading="lazy"></picture>
         <div>
-          <p><strong>made in berkeley, by a berkeley student.</strong></p>
-          <p>i'm a junior at cal. i built cued because i was running six apps and a notes file to stay in shape between classes, and none of them knew i had a midterm.</p>
-          <p>cued does. text it like a friend who happens to know the rsf line, your calendar and your lifts.</p>
+          <p><strong>made in berkeley, for everyone.</strong></p>
+          <p>i'm a college junior. i built cued because i was running six apps and a notes file to stay in shape between classes, and none of them knew i had a midterm.</p>
+          <p>cued does. text it like a friend who happens to know the gym line, your calendar and your lifts.</p>
           <p class="sig">— the founder <a href="https://instagram.com/cued.fit" target="_blank" rel="noopener">@cued.fit</a></p>
         </div>
       </div></details>
@@ -1178,17 +1194,35 @@ footer{border-top:1px solid var(--line);padding:28px var(--pad);font-size:14px;c
 
 </main>
 
+<!-- Footer: links + legal on top, then the wordmark set huge in Outfit 700
+     and the cue ball embedded oversized in the corner — both at the same low
+     opacity, a watermark pair (founder, 2026-11-14). -->
 <footer>
   <div class="foot">
-    <a href="#hero" class="fb"><img src="/images/cued-logo.svg" alt="" width="24" height="24"><span>cued</span></a>
-    <div class="fl">
-      <a href="/privacy.html">privacy</a>
-      <a href="/terms.html">terms</a>
-      <a href="mailto:hello@cued.fit">contact</a>
-      <a href="https://instagram.com/cued.fit" target="_blank" rel="noopener">instagram</a>
+    <div class="foot-cols">
+      <div class="foot-col">
+        <div class="foot-h">[product]</div>
+        <a href="#proof">what i do</a>
+        <a href="#apps">works with</a>
+        <a href="#faq">faq</a>
+      </div>
+      <div class="foot-col">
+        <div class="foot-h">[legal]</div>
+        <a href="/privacy.html">privacy</a>
+        <a href="/terms.html">terms</a>
+      </div>
+      <div class="foot-col">
+        <div class="foot-h">[connect]</div>
+        <a href="https://instagram.com/cued.fit" target="_blank" rel="noopener">instagram</a>
+        <a href="mailto:hello@cued.fit">email</a>
+      </div>
     </div>
-    <div>made in berkeley, for berkeley · © 2026</div>
+    <div class="foot-meta"><span>cued</span><span>© 2026</span><span>made in berkeley, for everyone</span></div>
+    <div class="foot-mark" aria-hidden="true">
+      <span class="foot-word">cued</span>
+    </div>
   </div>
+  <svg class="foot-ball" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="currentColor"/><circle cx="63" cy="61" r="8.6" fill="var(--cream)"/></svg>
 </footer>
 
 <!-- ===== WAITLIST — the sign-up chat (script at the bottom of the page) ===== -->
