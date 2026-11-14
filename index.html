@@ -431,6 +431,50 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 .stepper button[aria-current="step"]::before{width:48px}
 .proof-right{display:flex;align-items:center;justify-content:center;height:100vh}
 
+/* ===== PROOF, unframed (founder reference, 2026-11-14) =====
+   No phone slab: the thread floats on the hero's cream at reading size,
+   with the avatar / name / status pill above it. Left: headline + stepper
+   only (the sub-lines are gone — fewer words), and the texting mascot
+   render sits in the bottom-left corner on desktop. The DOM and the
+   thread engine are unchanged; these rules just take the frame off. */
+#proof,#proof .step,#proof .proof-sticky{background:var(--cream)!important;--bg:var(--cream)}
+#proof .step-copy .sub{display:none}
+#proof .proof-grid{grid-template-columns:42fr 58fr;gap:clamp(32px,5vw,80px)}
+#proof .proof-left{height:100vh;display:flex;flex-direction:column;justify-content:center;padding:72px 0 clamp(200px,34vh,320px)}   /* bottom padding reserves the mascot's corner so the stepper never sits under it */
+#proof .proof-copy{min-height:0}
+#proof .proof-copy .step-copy{position:static;display:none}
+#proof .proof-copy .step-copy.on{display:block}
+#proof .stepper{margin-top:28px}
+.proof-mascot{position:absolute;left:-2%;bottom:0;width:auto;height:clamp(180px,32vh,300px);max-width:100%;pointer-events:none;user-select:none}
+#proof .phone-wrap{--ps:1!important;width:min(600px,100%);height:auto;margin:0 auto}
+#proof .phone{position:relative;left:auto;top:auto;transform:none;width:100%;height:auto;background:none;border-radius:0;padding:0;box-shadow:none}
+#proof .phone-screen{--bg:var(--cream);background:none;border-radius:0;height:auto;color:var(--ink);font-family:var(--f-ui)}
+#proof .island,#proof .ph-comp,#proof .ph-home,#proof .ph-head .chev,#proof .ph-head .vid{display:none}
+#proof .ph-head{padding:0 0 22px;border:none;background:none}
+#proof .ph-avatar{width:64px;height:64px}
+#proof .ph-name{font-family:var(--f-ui);font-size:16px;font-weight:500;margin-top:10px;color:var(--ink)}
+#proof .ph-status{margin-top:8px;height:30px;padding:0 14px;border-radius:15px;font-family:var(--f-ui);font-size:14px;background:var(--fill);color:var(--gray-text)}
+#proof .screen{flex:none;height:min(560px,calc(100vh - 320px));padding:0 0 8px}   /* flex:none — the base .screen is flex:1, which lets content (the plate photo) override the height */
+#proof .thread{font-family:var(--f-ui);font-size:clamp(17px,1.5vw,21px)}
+#proof .msg{max-width:88%;padding:.78em 1.05em;border-radius:1.15em;line-height:1.38;text-align:left}
+#proof .msg.turn{margin-top:.6em}
+#proof .msg.t::before,#proof .msg.t::after{content:none}   /* plain rounded bubbles, no tails */
+#proof .poll,#proof .checklist{width:88%;font-size:.7em}
+#proof .msg.photo{max-width:70%}
+#proof .msg.chart svg{width:12em}
+html.dark #proof .ph-status{background:var(--fill)}
+@media(max-width:1023.98px){
+  #proof .step .wrap{gap:28px}
+  #proof .screen{height:520px}
+  #proof .step .wrap{padding-top:16px}
+  #proof .phone-wrap{width:min(560px,100%)}
+}
+@media(max-width:767.98px){
+  #proof .thread{font-size:17px}
+  #proof .screen{height:460px}
+  #proof .ph-avatar{width:52px;height:52px}
+}
+
 /* ===== APPS ===== */
 .apps-row{display:grid;grid-template-columns:1fr 2fr;gap:40px;align-items:center;padding:36px 0;border-top:1px solid var(--line)}
 .apps-row:last-of-type{border-bottom:1px solid var(--line)}
@@ -766,7 +810,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== SAY ANYTHING ===== -->
-<section id="say" class="blend blend-to" style="--from:var(--cream);--to:var(--tint-2)">
+<section id="say" class="blend blend-to" style="--from:var(--cream);--to:var(--cream)">
   <div class="wrap">
     <h2 data-io>say anything.</h2>
     <p class="sub" data-io>it's a text thread. so text it like one.</p>
@@ -925,7 +969,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </section>
 
 <!-- ===== APPS ===== -->
-<section id="apps" class="blend" style="--from:var(--tint-2)">
+<section id="apps" class="blend" style="--from:var(--cream)">
   <div class="wrap">
     <div class="apps-row" data-io>
       <h3>plugs into what you already use.</h3>
@@ -1415,7 +1459,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   const mqPin = matchMedia('(min-width: 1024px)');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   const shouldPin = () => mqPin.matches && !reduce.matches;
-  const tints = ['tint-2', '', 'tint-1', '', 'tint-2'];
+  const tints = ['', '', '', '', ''];   // the proof stays on the hero's cream (was tint-2 / white / tint-1 / white / tint-2)
   let pinned = null, cur = -1, raf = 0;
 
   function pinProof(){
@@ -1447,6 +1491,11 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
       li.appendChild(b); stepper.appendChild(li);
     });
     left.appendChild(copy); left.appendChild(stepper);
+    const mascot = document.createElement('img');
+    mascot.className = 'proof-mascot'; mascot.alt = ''; mascot.loading = 'lazy';
+    mascot.src = 'assets/mascot/cued-mascot-texting.png';
+    mascot.srcset = 'assets/mascot/cued-mascot-texting.webp';
+    left.appendChild(mascot);
     right.appendChild(phoneWrap);
     grid.appendChild(left); grid.appendChild(right);
     sticky.appendChild(grid); track.appendChild(sticky);
