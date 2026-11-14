@@ -569,13 +569,12 @@ html.dark #proof .ph-status{background:var(--fill)}
 }
 @media(max-width:767.98px){.mascot-wrap::before{filter:blur(22px)}}
 /* Desktop / tablet: the close sits on the normal cream like the rest of the page
-   (founder, 2026-11-14) — the render matches it, so no glow; the FAQ takes the
-   lighter cream so the end of the page still alternates. Phones keep the close
-   on cream-2 (+ glow) because the stacked steps alternate up to it. */
+   (founder, 2026-11-14) — the render matches it, so no glow; the FAQ stays on
+   cream too (founder). Phones keep the close on cream-2 (+ glow) because the
+   stacked steps alternate up to it. */
 @media(min-width:768px){
   section#signup{background:var(--cream);--bg:var(--cream)}
   section#signup .mascot-wrap::before{display:none}
-  section#faq.cream{background:var(--cream-2);--bg:var(--cream-2);--from:var(--cream)!important}
 }
 .mascot{
   display:block;width:clamp(340px,52vh,600px);height:auto;aspect-ratio:462/365;object-fit:cover;margin:0;   /* no negative margins: the render's box must not reach the headline */
