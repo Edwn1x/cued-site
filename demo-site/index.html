@@ -255,14 +255,14 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 .js .hero-in{opacity:0;transition:opacity .4s ease}
 .js .hero-in.in{opacity:1}
 @media(max-width:1023.98px){
-  .hero-grid{grid-template-columns:1fr;gap:36px}
+  .hero-grid{grid-template-columns:1fr;gap:24px}
   .hero-copy{max-width:640px}
   .hero-video{aspect-ratio:16/11;max-width:640px}
 }
 .campanile{position:absolute;left:-6%;bottom:-4%;width:min(64vw,920px);opacity:.4;pointer-events:none;user-select:none;z-index:0}
 .campanile img{display:block;width:100%;height:auto}
 @media(max-width:767.98px){
-  #hero{min-height:0;padding-top:104px}
+  #hero{min-height:0;padding:92px 0 56px}
   .hero-h{font-size:clamp(30px,8.4vw,34px);line-height:1.1}
   .hero-sub{font-size:17px;margin-top:20px}
   .hero-video{border-radius:20px}
@@ -617,7 +617,22 @@ footer{border-top:1px solid var(--line);padding:28px var(--pad);font-size:14px;c
 }
 .float-cta:hover{background:var(--blue-hover)}
 .float-cta.hide{opacity:0;transform:translate(-50%,8px);pointer-events:none}
-@media(max-width:767.98px){.float-cta{bottom:calc(16px + env(safe-area-inset-bottom,0px))}}
+/* ===== PHONE CTA BAR ===== */
+.m-cta{display:none}
+@media(max-width:767.98px){
+  .float-cta,.hero-cta{display:none}
+  .m-cta{
+    --bar-bg:var(--cream);
+    display:block;position:fixed;left:0;right:0;bottom:0;z-index:45;
+    padding:22px 20px calc(14px + env(safe-area-inset-bottom,0px));
+    background:linear-gradient(to top,var(--bar-bg) 70%,transparent);
+    transition:opacity .25s ease,transform .25s ease,padding .25s ease;
+  }
+  .m-cta .btn{width:100%;height:54px;font-size:17px;border-radius:14px;transition:height .25s ease,font-size .25s ease,border-radius .25s ease}
+  .m-cta.thin{padding:10px 20px calc(10px + env(safe-area-inset-bottom,0px))}
+  .m-cta.thin .btn{height:42px;font-size:15px;border-radius:12px}
+  .m-cta.hide{opacity:0;transform:translateY(10px);pointer-events:none}
+}
 
 /* ===== PROGRESS RAIL (left edge) ===== */
 .rail{
@@ -662,7 +677,7 @@ html.dark .mode-btn .ico-sun{display:block}
   .thread[data-play]{transition:none!important;transform:none!important}
   .poll-row,.poll-row i,.poll-row i::after{transition:none!important;animation:none!important}
   .ph-status::before{animation:none}
-  .float-cta,.hero-in,.rot-item,.rail,.rail .dot,.rail button::after{transition:none}
+  .float-cta,.hero-in,.rot-item,.rail,.rail .dot,.rail button::after,.m-cta,.m-cta .btn{transition:none}
   .js .hero-in{opacity:1}
 }
 
@@ -871,6 +886,14 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
 </nav>
 
 <button type="button" class="float-cta hide" id="floatCta" aria-label="text cued">text cued</button>
+
+<!-- Phones: a full-width "text cued" bar pinned to the bottom (the floating
+     pill and the hero's in-flow button are desktop). Full height on the hero,
+     thinner once the reader scrolls, hidden while the close / FAQ are in view.
+     Its fade takes the colour of the section under it (--bar-bg, set by JS). -->
+<div class="m-cta" id="mCta">
+  <button type="button" class="btn sq" id="heroCta">text cued</button>
+</div>
 
 <button type="button" class="mode-btn" id="modeBtn" role="switch" aria-checked="false" aria-label="dark mode" title="dark mode">
   <svg class="ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1226,6 +1249,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   const faq = document.getElementById('faq');
   const proofSec = document.getElementById('proof');
   const pill = document.getElementById('floatCta');
+  const mCta = document.getElementById('mCta');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 
   // Hero: fade the block in on load (400ms).
@@ -1296,12 +1320,24 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   }
 
   // Nav: transparent over the hero, white with a hairline once past it.
+  const bands = Array.from(document.querySelectorAll('main > section, footer'));
+  let barRaf = 0;
+  function barState(){
+    if (!mCta) return;
+    mCta.classList.toggle('thin', window.scrollY > 80);
+    // the fade under the button takes the colour of whatever section is at the bottom edge
+    const y = window.innerHeight - 1;
+    const under = bands.find(b => { const r = b.getBoundingClientRect(); return r.top <= y && r.bottom > y; });
+    if (under) mCta.style.setProperty('--bar-bg', getComputedStyle(under).backgroundColor);
+  }
   function navState(){
     if (!hero) return;
     nav.classList.toggle('scrolled', window.scrollY > hero.offsetHeight - 80);
+    if (!barRaf) barRaf = requestAnimationFrame(() => { barRaf = 0; barState(); });
   }
   navState();
   window.addEventListener('scroll', navState, {passive: true});
+  window.addEventListener('resize', barState);
 
   // Copy blocks fade up as they enter view.
   const io = new IntersectionObserver(entries => {
@@ -1316,6 +1352,7 @@ try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.clas
   function pillState(){
     const narrow = window.innerWidth < 1024;   // stacked layouts: the chat sits in the main column, so no pill over it
     pill.classList.toggle('hide', vis.hero || vis.close || vis.faq || (narrow && (window.proofActive || vis.proof)));
+    if (mCta) mCta.classList.toggle('hide', vis.close || vis.faq);   // the close has the same button; nothing to sell past it
   }
   window.pillState = pillState;
   const ioPill = new IntersectionObserver(entries => {
