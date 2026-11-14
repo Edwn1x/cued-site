@@ -6,7 +6,11 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { JSDOM } from 'jsdom';
 
-const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+// Both pages carry the same sign-up chat: the live root page and the
+// redesign at /demo-site. Every test below runs against each.
+const PAGES = [['index.html', ['floatCta', 'heroCta', 'heroCtaTop', 'closeCta']], ['demo-site/index.html', ['floatCta', 'heroCtaTop', 'closeCta']]];
+for (const [PAGE, CTA_IDS] of PAGES) {
+const html = readFileSync(new URL('../' + PAGE, import.meta.url), 'utf8');
 
 let lastDoc = null;
 async function until(cond, { timeout = 4000, step = 10 } = {}) {
@@ -46,7 +50,7 @@ async function type(d, value, { skip = false } = {}) {
   btn.click();
 }
 
-test('training time is multi-select and posts first pick + list', async () => {
+test(PAGE + ' · training time is multi-select and posts first pick + list', async () => {
   const posted = [];
   const w = boot(posted); const d = w.document; lastDoc = d;
   await until(() => typeof w.openWaitlist === 'function');
@@ -82,7 +86,7 @@ test('training time is multi-select and posts first pick + list', async () => {
   assert.equal(p.workout_days, '4');
 });
 
-test('a single pick posts no workout_times', async () => {
+test(PAGE + ' · a single pick posts no workout_times', async () => {
   const posted = [];
   const w = boot(posted); const d = w.document; lastDoc = d;
   await until(() => typeof w.openWaitlist === 'function');
@@ -102,3 +106,4 @@ test('a single pick posts no workout_times', async () => {
   assert.equal(p.workout_time, 'evening');
   assert.equal(p.workout_times, null);
 });
+}

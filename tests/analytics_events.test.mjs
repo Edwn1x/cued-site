@@ -8,7 +8,11 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { JSDOM } from 'jsdom';
 
-const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+// Both pages carry the same sign-up chat: the live root page and the
+// redesign at /demo-site. Every test below runs against each.
+const PAGES = [['index.html', ['floatCta', 'heroCta', 'heroCtaTop', 'closeCta']], ['demo-site/index.html', ['floatCta', 'heroCtaTop', 'closeCta']]];
+for (const [PAGE, CTA_IDS] of PAGES) {
+const html = readFileSync(new URL('../' + PAGE, import.meta.url), 'utf8');
 
 async function until(cond, { timeout = 4000, step = 10 } = {}) {
   const t0 = Date.now();
@@ -85,7 +89,7 @@ async function walk(w, source = 'close') {
 
 const STEP_NAMES = ['name', 'age', 'gender', 'goals', 'obstacle', 'experience', 'equipment', 'stats', 'days', 'time', 'diet', 'restrictions', 'apps', 'phone', 'consent'];
 
-test('full live sign-up: open → 15 steps → submit live → iMessage tap and SMS tap, all tagged with the CTA source', async () => {
+test(PAGE + ' · full live sign-up: open → 15 steps → submit live → iMessage tap and SMS tap, all tagged with the CTA source', async () => {
   const { w, events } = boot((url) => url.endsWith('/signup/channel')
     ? { status: 'ok', channel: 'sms', hook_sent: true }
     : { status: 'ok', live: true, hook_deferred: true, imessage_link: 'https://photon.test/users/ph-1/redirect' });
@@ -115,7 +119,7 @@ test('full live sign-up: open → 15 steps → submit live → iMessage tap and 
   for (const pii of ['Edwin', 'Ruiz', PHONE, '510']) assert.doesNotMatch(blob, new RegExp(pii), pii);
 });
 
-test('submit outcomes: already signed up → live-exists; old backend → waitlist; rejected and network error are named', async () => {
+test(PAGE + ' · submit outcomes: already signed up → live-exists; old backend → waitlist; rejected and network error are named', async () => {
   for (const [respond, result] of [
     [() => ({ status: 'exists', live: true }), 'live-exists'],
     [() => ({ status: 'ok' }), 'waitlist'],
@@ -130,7 +134,7 @@ test('submit outcomes: already signed up → live-exists; old backend → waitli
   }
 });
 
-test('re-opening the card resumes the chat without a second signup-open', async () => {
+test(PAGE + ' · re-opening the card resumes the chat without a second signup-open', async () => {
   const { w, events } = boot(() => ({ status: 'ok', live: true }));
   const d = w.document;
   await until(() => typeof w.openWaitlist === 'function');
@@ -142,7 +146,7 @@ test('re-opening the card resumes the chat without a second signup-open', async 
   assert.deepEqual(events.filter(e => e.name === 'signup-open'), [{ name: 'signup-open', data: { source: 'hero' } }]);
 });
 
-test('without the tracker the chat runs to the success screen untouched', async () => {
+test(PAGE + ' · without the tracker the chat runs to the success screen untouched', async () => {
   const { w, events } = boot(() => ({ status: 'ok', live: true }), { tracker: false });
   const d = await walk(w, 'nav');
   await until(() => d.querySelector('#coMsgs .co-success'));
@@ -151,7 +155,7 @@ test('without the tracker the chat runs to the success screen untouched', async 
 
 // Printed QR codes / shared links: `?src=<label>` fires one qr-scan and rides as
 // `ref` on every funnel event, so a flyer's scans can be followed into sign-ups.
-test('?src=flyer: one qr-scan on landing, and ref on every funnel event through to submit', async () => {
+test(PAGE + ' · ?src=flyer: one qr-scan on landing, and ref on every funnel event through to submit', async () => {
   const { w, events } = boot(() => ({ status: 'ok', live: true }), { url: 'https://cued.fit/?src=Flyer%20Moffitt' });
   await until(() => events.some(e => e.name === 'qr-scan'));
   const d = await walk(w, 'hero');
@@ -164,14 +168,14 @@ test('?src=flyer: one qr-scan on landing, and ref on every funnel event through 
   assert.equal(rest.at(-1).name, 'signup-submit');
 });
 
-test('?utm_source works as the label too; the tracker loading late still gets the scan', async () => {
+test(PAGE + ' · ?utm_source works as the label too; the tracker loading late still gets the scan', async () => {
   const { events } = boot(() => ({}), { url: 'https://cued.fit/?utm_source=poster', lateTracker: 600 });
   assert.equal(events.length, 0);
   await until(() => events.length, { timeout: 3000 });
   assert.deepEqual(events, [{ name: 'qr-scan', data: { src: 'poster', ref: 'poster' } }]);
 });
 
-test('a plain URL fires no qr-scan and adds no ref', async () => {
+test(PAGE + ' · a plain URL fires no qr-scan and adds no ref', async () => {
   const { w, events } = boot(() => ({ status: 'ok', live: true }));
   await until(() => typeof w.openWaitlist === 'function');
   await new Promise(r => setTimeout(r, 300));
@@ -181,7 +185,7 @@ test('a plain URL fires no qr-scan and adds no ref', async () => {
 });
 
 // The six printed flyers (2026-11-12). Their labels must reach the dashboard exactly as printed.
-test('the six printed flyer labels arrive exactly as printed', async () => {
+test(PAGE + ' · the six printed flyer labels arrive exactly as printed', async () => {
   for (const name of ['gym', 'partner', 'food', 'school', 'plan', 'weights']) {
     const label = `poster-${name}`;
     const { events } = boot(() => ({}), { url: `https://cued.fit/?src=${label}` });
@@ -189,3 +193,4 @@ test('the six printed flyer labels arrive exactly as printed', async () => {
     assert.deepEqual(events, [{ name: 'qr-scan', data: { src: label, ref: label } }], label);
   }
 });
+}

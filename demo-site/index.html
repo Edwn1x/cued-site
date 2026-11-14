@@ -1,0 +1,2395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+  cued.fit/demo-site — the Nov 2026 redesign, served from /demo-site while the
+  root index.html stays the live design. All asset and page links are
+  root-absolute for that reason.
+
+  cued.fit v2 (Nov 2026 rework) — single-file vanilla HTML/CSS/JS, GitHub Pages.
+
+  One hero (the inline-icon headline), a "say anything." strip, five proof
+  steps beside ONE pinned phone whose thread swaps per step (#proof), the
+  plugs-into / replaces rows (#apps), privacy facts beside a thread card
+  (#privacy), the founder block (#berkeley), the close with the full-body
+  mascot (#signup), five FAQs, footer.
+
+  Inside the phone the bubbles follow the standard screen-recording
+  convention: the coach is GRAY on the LEFT, the reader is BLUE on the
+  RIGHT. The colors are --bubble-coach / --bubble-user; the sides come from
+  the .thread's side class (.coach-left is the default; add .flip to a
+  thread to mirror it) — one change to revert. The sign-up chat (.co-*)
+  is the previous generation's card, carried over verbatim.
+
+  The mascot appears in exactly three places: inline in the hero headline
+  (and as the nav mark), as the phone's contact avatar, and at the close.
+
+  Reduced motion: no pinning, every step stacked, everything visible.
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>cued — the fitness coach that lives in your texts.</title>
+<meta name="description" content="Cued is an AI fitness coach for college students that works over iMessage or SMS: workouts, meals and check-ins planned around your real schedule. With your permission it reads your Google Calendar, bCourses and Fitbit/Pixel Watch (Google Health).">
+<meta property="og:title" content="cued — the fitness coach that lives in your texts.">
+<meta property="og:description" content="Cued is an AI fitness coach for college students that works over iMessage or SMS: workouts, meals and check-ins planned around your real schedule.">
+<meta property="og:image" content="/images/og-image-cued-square.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:alt" content="cued — the fitness coach that lives in your texts.">
+<meta property="og:image" content="/images/og-image-cued.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="/images/og-image-cued.png">
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hedvig+Letters+Serif:opsz@12..24&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ===== TOKENS ===== */
+:root{
+  color-scheme:light;
+  --blue:#006EFD;
+  --blue-hover:#0052BD;     /* the spec calls this --blue-ink; that name is taken below */
+  --blue-deep:var(--blue-hover);
+  --blue-soft:#E9F1FF;
+  --blue-ink:#FFFFFF;       /* text ON blue — the sign-up card reads this name */
+  --black:#0B0B0C;
+  --white:#FFFFFF;
+  --gray-bubble:#ECE7E1;    /* iMessage gray, warmed a touch for the cream page */
+  --gray-text:#5A5A60;
+  --cream:#F5EAE0;          /* the mascot renders' backdrop (sampled) — hero, proof, privacy, close */
+  --cream-2:#FBF6F1;        /* the lighter cream the other sections alternate with */
+  --tint-1:var(--cream-2);  /* the old blue tints now resolve to the creams */
+  --tint-2:var(--cream);
+  --poll-fill:#FCEBD0;      /* iOS 26 Messages poll pill (kept) */
+  --poll-ink:#E9902E;
+  --poll-pick:#FADFB8;
+  /* page surfaces + aliases the sign-up card (.co-*) depends on */
+  --bg:var(--cream-2);      /* page default: light cream, never white */
+  --ink:var(--black);
+  --ink-2:var(--gray-text);
+  --ink-3:#8A8A92;
+  --line:#E8DCCF;           /* warm hairlines */
+  --fill:#EFE3D7;           /* status pill, dark-mode button, composer plus */
+  --card:#FFFFFF;
+  --field:#FFFFFF;
+  --gray:var(--gray-bubble);
+  --gray-ink:var(--black);
+  --overlay:rgba(11,11,12,.5);
+  --error:#C03030;
+  /* bubble roles — colors here, sides via the thread's side class */
+  --bubble-coach:var(--gray-bubble);
+  --bubble-coach-ink:var(--black);
+  --bubble-user:var(--blue);
+  --bubble-user-ink:#FFFFFF;
+  /* type */
+  --f-head:'Hedvig Letters Serif', Georgia, 'Times New Roman', serif;
+  --f-ui:'Outfit', -apple-system, sans-serif;
+  --f-phone:-apple-system, "SF Pro Text", "Helvetica Neue", Helvetica, sans-serif;
+  --f-header:var(--f-head);   /* aliases read by the sign-up card */
+  --f-msg:var(--f-phone);
+  --f-brand:var(--f-ui);
+  --ease:cubic-bezier(.22,1,.36,1);
+  --wrap:1200px;
+  --pad:24px;
+}
+@media(min-width:1024px){:root{--pad:64px}}
+html.dark{
+  color-scheme:dark;
+  --bg:#0B0B0C;
+  --ink:#F5F5F7;
+  --ink-2:#A6A6AE;
+  --ink-3:#6E6E76;
+  --line:#2A241F;
+  --fill:#1F1A16;
+  --card:#1A1512;
+  --field:#1C1E23;
+  --gray-text:#A6A6AE;
+  --black:#F5F5F7;          /* page text; bubbles below keep their own inks */
+  --cream:#15110E;          /* dark: warm near-black; the renders stay cream cards */
+  --cream-2:#0F0C0A;
+  --tint-1:var(--cream-2);
+  --tint-2:var(--cream);
+  --overlay:rgba(0,0,0,.6);
+  --error:#FF7369;
+  --bubble-coach:#E9E9EB;   /* bubbles stay the same colors in dark mode */
+  --bubble-coach-ink:#0B0B0C;
+  --blue-soft:#123A63;
+  --phone-edge:rgba(255,255,255,.14);   /* the black slab needs an edge on a near-black page */
+}
+
+/* ===== BASE ===== */
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{font-family:var(--f-ui);font-weight:400;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:6px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 var(--pad)}
+section{position:relative;background:var(--bg);padding:clamp(72px,10vw,140px) 0}
+section.tint-1{background:var(--tint-1);--bg:var(--tint-1)}   /* --bg scoped so bubble tails carve the right color */
+section.tint-2{background:var(--tint-2);--bg:var(--tint-2)}
+section.cream{background:var(--cream);--bg:var(--cream)}
+/* Soft seams (tomo.ai-style): a section can fade IN from the previous
+   section's color (.blend + --from) or OUT into the next one (.blend-to +
+   --to). Sections isolate so the band paints above their background but
+   under their content. */
+section{isolation:isolate}
+section.blend::before,section.blend-to::after{
+  content:'';position:absolute;left:0;right:0;z-index:-1;pointer-events:none;
+  height:clamp(72px,12vh,150px);
+}
+section.blend::before{top:0;background:linear-gradient(to bottom,var(--from),transparent)}
+section.blend-to::after{bottom:0;background:linear-gradient(to bottom,transparent,var(--to))}
+h1,h2{font-family:var(--f-head);font-weight:400;color:var(--ink);letter-spacing:-.01em}
+h2{font-size:clamp(34px,4.2vw,56px);line-height:1.08}
+.sub{font-size:clamp(18px,1.6vw,22px);line-height:1.5;color:var(--gray-text);margin-top:18px;max-width:34em}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  height:48px;padding:0 24px;border:none;border-radius:999px;
+  background:var(--blue);color:#fff;font-family:var(--f-ui);font-weight:400;font-size:17px;
+  transition:background .15s;
+}
+.btn:hover{background:var(--blue-hover)}
+.btn.lg{height:56px;padding:0 34px;font-size:20px}
+.btn.sq{border-radius:14px;height:50px;padding:0 26px;font-size:17px}   /* the hero's button keeps the squarish corners the chatbox had */
+/* scroll-in reveal for copy blocks (gated on html.js so a JS-less load is visible) */
+.js [data-io]{opacity:0;transform:translateY(12px);transition:opacity .5s var(--ease),transform .5s var(--ease)}
+.js [data-io].on{opacity:1;transform:none}
+
+/* ===== NAV ===== */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  height:72px;padding:0 var(--pad);
+  background:transparent;border-bottom:1px solid transparent;
+  transition:background .25s,border-color .25s;
+}
+/* transparent all the way down (founder, 2026-11-08); .scrolled is still toggled but styles nothing */
+nav.scrolled{background:transparent;border-bottom-color:transparent}
+.brand{display:flex;align-items:center;gap:9px;font-family:var(--f-ui);font-weight:400;font-size:22px;color:var(--blue);letter-spacing:-.2px}
+.brand svg{display:block;width:28px;height:28px}
+nav .btn{height:44px;padding:0 20px;font-size:16px}
+@media(max-width:767.98px){
+  nav{height:64px}
+  .brand{font-size:20px}
+  .brand svg{width:26px;height:26px}
+  nav .btn{height:40px;padding:0 16px;font-size:15px}
+}
+
+/* ===== HERO ===== */
+#hero{padding:clamp(104px,13vh,150px) 0 clamp(64px,8vw,110px);overflow:hidden;min-height:100vh;display:flex;align-items:center}
+#hero .wrap{position:relative;z-index:1;width:100%}
+/* two columns: copy left, the mascot loop right (founder reference, 2026-11-14) */
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:clamp(24px,3vw,44px);align-items:center;text-align:left}
+.hero-copy{max-width:700px}
+.hero-video{position:relative;aspect-ratio:4/3;border-radius:28px;overflow:hidden;background:var(--cream);box-shadow:inset 0 0 0 1px rgba(11,11,12,.06),0 30px 60px -40px rgba(60,40,20,.35)}
+.hero-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .6s ease}
+.hero-video video.on{opacity:1}
+.hero-mark{--size:clamp(96px,10vw,140px);display:block;margin:0 auto 8px;line-height:0}
+/* ===== cued live avatar (founder prototype, copied verbatim; --size is the only knob) ===== */
+.cued-avatar{
+  --blue:#006EFD;
+  --rest:0deg;              /* as rendered: the short arm at the side */
+  --up:-118deg;             /* how far it swings up to wave */
+  position:relative;width:var(--size);height:var(--size);cursor:pointer;user-select:none;-webkit-user-select:none;
+}
+.cued-avatar .ca-clip{position:absolute;inset:0;border-radius:50%;background:var(--blue);overflow:hidden;z-index:1;box-shadow:0 18px 40px -18px rgba(0,110,253,.45)}
+.cued-avatar picture{display:contents}
+.cued-avatar .ca-body{position:absolute;left:2%;bottom:-5%;width:96%;height:auto;display:block;pointer-events:none;-webkit-user-drag:none;transform-origin:50% 100%;will-change:transform;z-index:1}
+.cued-avatar .ca-arm{position:absolute;z-index:0;pointer-events:none;-webkit-user-drag:none;will-change:transform;transform:rotate(var(--rest))}
+.cued-avatar.is-waving .ca-arm{animation:ca-wave 2.1s cubic-bezier(.3,.9,.3,1) both}
+@keyframes ca-wave{
+  0%{transform:rotate(var(--rest))}
+  24%{transform:rotate(var(--up))}
+  38%{transform:rotate(calc(var(--up) + 22deg))}
+  52%{transform:rotate(calc(var(--up) - 8deg))}
+  66%{transform:rotate(calc(var(--up) + 20deg))}
+  78%{transform:rotate(var(--up))}
+  100%{transform:rotate(var(--rest))}
+}
+.cued-avatar .ca-eye{
+  position:absolute;z-index:2;border-radius:50%;pointer-events:none;transform-origin:center;will-change:transform;
+  background:radial-gradient(circle at 36% 32%,#3B86FF 0%,#0A4ED6 42%,#062E7A 100%);
+  box-shadow:inset 0 -1px 2px rgba(255,255,255,.25);
+}
+.cued-avatar .ca-eye::after{content:"";position:absolute;left:22%;top:14%;width:34%;height:26%;border-radius:50%;background:#fff}
+.cued-avatar .ca-wink{position:absolute;z-index:2;pointer-events:none;display:none;overflow:visible}
+.cued-avatar.is-winking .ca-eye.ca-l{display:none}
+.cued-avatar.is-winking .ca-wink{display:block}
+.cued-avatar.is-blinking .ca-eye{transform:scaleY(.08)!important}
+.cued-avatar.is-poked .ca-body{animation:ca-boing .55s cubic-bezier(.2,1.6,.4,1)}
+@keyframes ca-boing{0%{transform:scale(1)}30%{transform:scale(1.06,.94) translateY(2%)}60%{transform:scale(.97,1.04) translateY(-3%)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.cued-avatar .ca-body,.cued-avatar .ca-eye{transition:none!important}}
+.hero-h{
+  font-size:clamp(38px,4.4vw,60px);line-height:1.04;margin:0;   /* capped so every rotating phrase stays one line in the ~615px column at 1440 (measured) */
+  color:var(--ink);
+}
+.hero-h .kicker{display:block;font-size:.5em;line-height:1.3;margin-bottom:.42em;color:var(--ink)}
+/* Rotating end of the headline: "the coach that" + one phrase at a time. The
+   slot's height is set by JS to the tallest phrase so nothing below shifts. */
+.rot{display:block;position:relative;height:1.06em}
+.rot-item{position:absolute;left:0;right:0;top:0;color:var(--blue);opacity:0;transform:translateY(.3em);transition:opacity .45s var(--ease),transform .45s var(--ease);pointer-events:none}
+.rot-item.on{opacity:1;transform:none}
+.rot-item.out{opacity:0;transform:translateY(-.3em)}
+.rot-icons{display:inline-flex;gap:.08em;vertical-align:-.06em;margin-left:.06em}
+.rot-icons img{width:.72em;height:.72em;border-radius:.18em;object-fit:cover}
+.hero-sub{font-size:clamp(17px,1.45vw,20px);line-height:1.5;color:var(--gray-text);max-width:30em;margin:28px 0 0}
+.hero-sub .b{color:var(--blue)}
+.hero-h .b{color:var(--blue)}
+.hero-h .g{color:var(--gray-text)}
+.ic{display:inline-block;width:1em;height:1em;border-radius:.22em;vertical-align:-.14em;margin:0 .15em;object-fit:cover}
+picture.ic{display:inline-block;width:1em;height:1em;margin:0 .15em;vertical-align:-.14em;line-height:0;border-radius:.22em;overflow:hidden}
+picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radius:0;margin:0;vertical-align:baseline}
+.ic.round,picture.ic.round{border-radius:50%}
+.ic.ic-svg{border-radius:.22em}
+.hero-cap{margin-top:14px;font-size:14px;color:var(--ink-3)}
+.hero-cta{margin-top:28px}
+.js .hero-in{opacity:0;transition:opacity .4s ease}
+.js .hero-in.in{opacity:1}
+@media(max-width:1023.98px){
+  .hero-grid{grid-template-columns:1fr;gap:36px}
+  .hero-copy{max-width:640px}
+  .hero-video{aspect-ratio:16/11;max-width:640px}
+}
+.campanile{position:absolute;left:-6%;bottom:-4%;width:min(64vw,920px);opacity:.4;pointer-events:none;user-select:none;z-index:0}
+.campanile img{display:block;width:100%;height:auto}
+@media(max-width:767.98px){
+  #hero{min-height:0;padding-top:104px}
+  .hero-h{font-size:clamp(30px,8.4vw,34px);line-height:1.1}
+  .hero-sub{font-size:17px;margin-top:20px}
+  .hero-video{border-radius:20px}
+  .campanile{display:none}
+  .hero-cap{font-size:14px;margin-top:16px}
+}
+
+/* ===== SAY ANYTHING ===== */
+#say{text-align:center;overflow:hidden}
+#say .sub{margin:14px auto 0}
+.mq{overflow:hidden;margin-top:40px;padding:6px 0;
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent);
+          mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent)}
+.mq + .mq{margin-top:18px}
+.mq .mq-track{display:flex;flex-direction:row;align-items:center;gap:16px;width:max-content;animation:mq 40s linear infinite;will-change:transform}
+.mq.rev .mq-track{animation-direction:reverse}
+.mq:hover .mq-track{animation-play-state:paused}
+@keyframes mq{to{transform:translateX(-50%)}}
+.mq .msg{flex:none;max-width:none;margin:0 0 0 .4em;font-size:20px;font-family:var(--f-phone)}
+@media(max-width:767.98px){.mq .msg{font-size:16px}.mq{margin-top:28px}}
+@media(prefers-reduced-motion:reduce){.mq-track{animation:none}}
+
+/* ===== BUBBLES (phone + thread cards + strip) ===== */
+.thread{display:flex;flex-direction:column;font-family:var(--f-phone);font-size:16px;position:relative}
+.msg{
+  position:relative;max-width:78%;
+  padding:.52em .82em;border-radius:1.05em;
+  line-height:1.3;margin-top:.3em;overflow-wrap:break-word;
+}
+.msg.turn{margin-top:.85em}
+.thread > :first-child{margin-top:0}
+.msg.coach{align-self:flex-start;background:var(--bubble-coach);color:var(--bubble-coach-ink);transform-origin:0 100%}
+.msg.user{align-self:flex-end;background:var(--bubble-user);color:var(--bubble-user-ink);transform-origin:100% 100%}
+/* Tail — last bubble of a run, outer edge. Color extension + page-colored carve. */
+.msg.t::before,.msg.t::after{content:'';position:absolute;bottom:-.1em;height:1em}
+.msg.coach.t::before{left:-.35em;width:1em;background:var(--bubble-coach);border-bottom-right-radius:.8em .7em}
+.msg.coach.t::after{left:-1.3em;width:1.3em;background:var(--bg);border-bottom-right-radius:.5em}
+.msg.user.t::before{right:-.35em;width:1em;background:var(--bubble-user);border-bottom-left-radius:.8em .7em}
+.msg.user.t::after{right:-1.3em;width:1.3em;background:var(--bg);border-bottom-left-radius:.5em}
+/* .flip mirrors a thread (coach right, user left) — the one-change revert. */
+.thread.flip .msg.coach{align-self:flex-end;transform-origin:100% 100%}
+.thread.flip .msg.user{align-self:flex-start;transform-origin:0 100%}
+.thread.flip .msg.coach.t::before{left:auto;right:-.35em;border-radius:0;border-bottom-left-radius:.8em .7em}
+.thread.flip .msg.coach.t::after{left:auto;right:-1.3em;border-radius:0;border-bottom-left-radius:.5em}
+.thread.flip .msg.user.t::before{right:auto;left:-.35em;border-radius:0;border-bottom-right-radius:.8em .7em}
+.thread.flip .msg.user.t::after{right:auto;left:-1.3em;border-radius:0;border-bottom-right-radius:.5em}
+.thread.flip .poll,.thread.flip .checklist{align-self:flex-end}
+/* reveal states inside a playable thread */
+.js .thread[data-play] > .msg,.js .thread[data-play] > .poll,.js .thread[data-play] > .checklist{
+  opacity:0;transform:translateY(10px) scale(.97);
+  transition:opacity 380ms var(--ease),transform 380ms var(--ease);
+}
+.js .thread[data-play] > .on{opacity:1;transform:none}
+.anim .thread[data-play]{transition:transform 380ms var(--ease)}
+/* typing pill — three dots in the incoming bubble's spot */
+.typing{
+  position:absolute;display:flex;gap:.28em;align-items:center;
+  padding:.62em .8em;border-radius:1.05em;
+  opacity:0;transform:translateY(10px) scale(.97);
+  transition:opacity 200ms var(--ease),transform 200ms var(--ease);
+  pointer-events:none;
+}
+.typing.show{opacity:1;transform:none}
+.typing.coach{left:0;background:var(--bubble-coach)}
+.typing.user{right:0;background:var(--bubble-user)}
+.thread.flip .typing.coach{left:auto;right:0}
+.thread.flip .typing.user{right:auto;left:0}
+.typing i{width:.44em;height:.44em;border-radius:50%;animation:typeDot 1.1s ease-in-out infinite}
+.typing.coach i{background:var(--ink-3)}
+.typing.user i{background:var(--bubble-user-ink)}
+.typing i:nth-child(2){animation-delay:.15s}
+.typing i:nth-child(3){animation-delay:.3s}
+@keyframes typeDot{0%,60%,100%{opacity:.35;transform:none}30%{opacity:1;transform:translateY(-.12em)}}
+/* photo attachment (user) */
+.msg.photo{background:none;padding:0;max-width:62%;border-radius:1.05em;overflow:hidden;line-height:0}
+.msg.photo img{display:block;width:100%;height:auto;border-radius:1.05em}
+/* chart bubble (coach) — bars in brand blue on the gray bubble */
+.msg.chart svg{display:block;width:11em;max-width:100%;height:auto;margin:.15em 0 .05em;color:var(--blue)}
+.msg.chart svg .lbl{fill:var(--gray-text)}
+/* poll + checklist (iOS 26 Messages pills) */
+.poll,.checklist{
+  align-self:flex-start;display:flex;flex-direction:column;gap:.4em;width:78%;
+  margin-top:.48em;font-size:.62em;font-weight:600;color:var(--poll-ink);
+}
+.poll-row{
+  display:flex;align-items:center;justify-content:space-between;gap:1em;
+  background:var(--poll-fill);border-radius:999px;padding:.8em 1em .8em 1.35em;
+  font:inherit;color:inherit;border:none;text-align:left;cursor:pointer;width:100%;
+  transition:background .25s ease;
+}
+.poll-row i{
+  flex:none;width:1.5em;height:1.5em;border:2px solid var(--poll-ink);border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;transition:background .25s ease;
+}
+.poll-row i::after{content:'✓';color:#fff;font-size:.8em;font-weight:700;line-height:1;transform:scale(0);transition:transform .28s var(--ease)}
+.poll.chosen .poll-row.pick,.poll-row.done{background:var(--poll-pick)}
+.poll.chosen .poll-row.pick i,.poll-row.done i{background:var(--poll-ink)}
+.poll.chosen .poll-row.pick i::after,.poll-row.done i::after{transform:scale(1)}
+.anim .poll.chosen .poll-row.pick,.anim .poll-row.done{animation:pollPick .45s var(--ease)}
+@keyframes pollPick{0%{transform:scale(1)}35%{transform:scale(1.04)}100%{transform:scale(1)}}
+/* workout card (coach) */
+.msg.card .wc-head{font-size:.72em;font-weight:600;opacity:.85;margin-bottom:.45em}
+.msg.card .wc-row{font-size:.68em;line-height:1.6;opacity:.92;white-space:nowrap}
+.msg.card .wc-pr{font-weight:700;opacity:1}
+.msg.card .wc-foot{font-size:.68em;font-weight:600;margin-top:.5em;padding-top:.5em;border-top:1px solid color-mix(in srgb,currentColor 30%,transparent)}
+
+/* ===== PHONE ===== */
+.phone-wrap{--ps:1;--ph:844px;width:calc(390px * var(--ps));height:calc(var(--ph) * var(--ps));position:relative;margin:0 auto}
+.phone{
+  position:absolute;left:0;top:0;width:390px;height:var(--ph);
+  transform:scale(var(--ps));transform-origin:0 0;
+  background:#0B0B0C;border-radius:56px;padding:12px;
+  box-shadow:0 0 0 1px var(--phone-edge,transparent);
+}
+.phone-screen{
+  --bg:var(--card);position:relative;height:100%;background:var(--card);border-radius:44px;overflow:hidden;
+  display:flex;flex-direction:column;font-family:var(--f-phone);color:#0B0B0C;
+}
+.island{position:absolute;top:11px;left:50%;width:120px;height:34px;margin-left:-60px;background:#0B0B0C;border-radius:20px;z-index:3}
+.ph-head{
+  flex:none;padding:52px 16px 10px;border-bottom:1px solid var(--line);
+  display:flex;flex-direction:column;align-items:center;position:relative;background:var(--card);
+}
+.ph-head .chev,.ph-head .vid{position:absolute;top:60px;color:var(--blue);width:22px;height:22px}
+.ph-head .chev{left:18px}
+.ph-head .vid{right:18px;width:26px}
+.ph-avatar{width:44px;height:44px;border-radius:50%;display:block;object-fit:cover}
+.ph-name{font-size:13px;font-weight:600;margin-top:4px;color:#0B0B0C}
+.ph-name::after{content:'›';color:#8A8A92;font-weight:400;margin-left:3px}
+.ph-status{
+  margin-top:6px;height:24px;padding:0 10px;border-radius:12px;background:#F2F4F8;color:#5A5A60;
+  font-size:12px;display:inline-flex;align-items:center;gap:6px;transition:opacity .25s;
+}
+.ph-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--blue);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35}}
+.ph-status.swap{opacity:0}
+.screen{flex:1;min-height:0;overflow:hidden;padding:14px 14px 10px;display:flex;flex-direction:column;justify-content:flex-end}
+.screen .thread{will-change:transform}
+.proof-sticky .screen .thread{display:none}
+.proof-sticky .screen .thread.active{display:flex}
+.ph-comp{flex:none;display:flex;align-items:center;gap:8px;padding:8px 14px 26px;background:var(--card)}
+.ph-comp .plus{width:30px;height:30px;border-radius:50%;background:var(--fill);display:flex;align-items:center;justify-content:center;color:#5A5A60;font-size:20px;line-height:1}
+.ph-comp .field{flex:1;height:34px;border:1px solid var(--line);border-radius:17px;padding:0 12px;display:flex;align-items:center;color:#8A8A92;font-size:15px}
+.ph-comp .mic{color:#8A8A92;width:16px;height:22px}
+.ph-home{position:absolute;bottom:8px;left:50%;width:120px;height:5px;margin-left:-60px;border-radius:3px;background:#0B0B0C;opacity:.85}
+
+/* ===== PROOF ===== */
+#proof{padding:0;background:var(--bg);transition:background .3s}
+.step{padding:clamp(64px,9vw,120px) 0;transition:background .3s}
+.step.tint-1{background:var(--tint-1)}
+.step.tint-2{background:var(--tint-2)}
+.step .wrap{display:flex;flex-direction:column;gap:36px;align-items:center;text-align:center}
+.step .sub{margin-left:auto;margin-right:auto}
+.step .phone-wrap{--ph:720px}
+.step .ph-comp{display:none}
+/* pinned layout (built by JS at ≥1024px, motion OK) */
+.proof-track{position:relative;height:500vh}
+.proof-sticky{position:sticky;top:0;height:100vh;overflow:hidden;transition:background .3s;background:var(--bg)}
+.proof-sticky.tint-1{background:var(--tint-1);--bg:var(--tint-1)}
+.proof-sticky.tint-2{background:var(--tint-2);--bg:var(--tint-2)}
+.proof-grid{display:grid;grid-template-columns:45fr 55fr;gap:48px;height:100vh;align-items:center}
+.proof-left{position:relative;padding:72px 0 0}
+.proof-copy{position:relative;min-height:220px}
+.proof-copy .step-copy{position:absolute;left:0;right:0;top:0;opacity:0;transition:opacity .2s;pointer-events:none}
+.proof-copy .step-copy.on{opacity:1;pointer-events:auto}
+.stepper{list-style:none;margin-top:36px;display:flex;flex-direction:column;gap:12px}
+.stepper button{
+  display:flex;align-items:center;gap:14px;background:none;border:none;padding:4px 0;
+  font-family:var(--f-ui);font-size:18px;color:var(--gray-text);text-align:left;
+}
+.stepper button::before{content:'';height:1px;width:16px;background:currentColor;transition:width .25s var(--ease)}
+.stepper button[aria-current="step"]{color:var(--ink)}
+.stepper button[aria-current="step"]::before{width:48px}
+.proof-right{display:flex;align-items:center;justify-content:center;height:100vh}
+
+/* ===== PROOF, unframed (founder reference, 2026-11-14) =====
+   No phone slab: the thread floats on the hero's cream at reading size,
+   with the avatar / name / status pill above it. Left: headline + stepper
+   only (the sub-lines are gone — fewer words), and the texting mascot
+   render sits in the bottom-left corner on desktop. The DOM and the
+   thread engine are unchanged; these rules just take the frame off. */
+#proof,#proof .step,#proof .proof-sticky{background:var(--cream)!important;--bg:var(--cream)}
+#proof .step-copy .sub{display:none}
+#proof .proof-grid{grid-template-columns:1fr 1fr;gap:clamp(32px,5vw,80px)}
+#proof .proof-left{height:100vh;display:flex;flex-direction:column;justify-content:center;padding:calc(72px + 16vh) 0 clamp(220px,38vh,360px)}   /* extra top padding drops the headline ~8vh toward the mascot */   /* bottom padding reserves the mascot's corner so the stepper never sits under it */
+#proof .proof-copy{min-height:0}
+#proof .proof-copy .step-copy{position:static;display:none}
+#proof .proof-copy .step-copy.on{display:block}
+#proof .stepper{margin-top:28px}
+.proof-mascot{position:absolute;left:-8%;bottom:4%;width:clamp(340px,54vh,540px);aspect-ratio:462/365;pointer-events:none;user-select:none}   /* crops stay inside each render (its vignette seams against flat cream); the mask is a soft 9% edge on all four sides, not a circle, so corner props survive */
+/* the renders are JPEGs on their own cream; a radial mask feathers each one
+   into the section so no edge ever shows, and the floor shadow comes along */
+.proof-mascot img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+          mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+  -webkit-mask-composite:source-in;mask-composite:intersect;
+  opacity:0;transition:opacity .35s ease;
+}
+.proof-mascot img.on{opacity:1}
+#proof .phone-wrap{--ps:1!important;width:min(440px,100%);height:auto;margin:0 auto}
+#proof .phone{position:relative;left:auto;top:auto;transform:none;width:100%;height:auto;background:none;border-radius:0;padding:0;box-shadow:none}
+#proof .phone-screen{--bg:var(--cream);background:none;border-radius:0;height:auto;color:var(--ink);font-family:var(--f-ui)}
+#proof .island,#proof .ph-comp,#proof .ph-home,#proof .ph-head .chev,#proof .ph-head .vid{display:none}
+#proof .ph-head{padding:0 0 16px;border:none;background:none}
+#proof .ph-avatar{width:48px;height:48px}
+#proof .ph-name{font-family:var(--f-ui);font-size:14px;font-weight:500;margin-top:8px;color:var(--ink)}
+#proof .ph-status{margin-top:6px;height:26px;padding:0 12px;border-radius:13px;font-family:var(--f-ui);font-size:12.5px;background:var(--card);color:var(--gray-text)}
+#proof .screen{flex:none;height:min(520px,calc(100vh - 280px));padding:0 0 8px}   /* flex:none — the base .screen is flex:1, which lets content (the plate photo) override the height */
+#proof .thread{font-family:var(--f-ui);font-size:clamp(15px,1.15vw,16.5px)}
+#proof .msg{max-width:86%;padding:.7em .95em;border-radius:1.1em;line-height:1.38;text-align:left}
+#proof .msg.turn{margin-top:.6em}
+#proof .msg.t::before,#proof .msg.t::after{content:none}   /* plain rounded bubbles, no tails */
+#proof .poll,#proof .checklist{width:88%;font-size:.7em}
+#proof .msg.photo{max-width:70%}
+#proof .msg.chart svg{width:12em}
+html.dark #proof .ph-status{background:var(--fill)}
+/* stacked proof (<1024px): headline + small mascot in a row, the chat under it
+   at its natural height (no clipping, no empty box), one header per step */
+#proof .proof-copy .step-mascot{display:none}   /* desktop uses the big corner render */
+.step-mascot{display:none;line-height:0}
+.step-mascot img{
+  display:block;width:100%;height:auto;
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+          mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+  -webkit-mask-composite:source-in;mask-composite:intersect;
+}
+@media(max-width:1023.98px){
+  #proof .step{padding:40px 0 56px}
+  #proof .step .wrap{gap:20px;padding-top:0}
+  #proof .step-copy{display:flex;align-items:center;gap:14px;text-align:left;width:min(560px,100%)}
+  #proof .step-copy h2{font-size:clamp(28px,7.2vw,40px);line-height:1.04}
+  .step-mascot{display:block;flex:none;width:clamp(120px,32vw,170px)}
+  #proof .screen{height:auto;padding:0}
+  #proof .phone-wrap{width:min(560px,100%)}
+  #proof .ph-head{padding:0 0 14px}
+  #proof .ph-avatar{width:44px;height:44px}
+}
+@media(max-width:767.98px){
+  #proof .thread{font-size:16px}
+  #proof .msg{max-width:90%}
+  #proof .poll,#proof .checklist{width:92%}
+}
+
+/* ===== APPS ===== */
+.apps-row{display:grid;grid-template-columns:1fr 2fr;gap:40px;align-items:center;padding:36px 0;border-top:1px solid var(--line)}
+.apps-row:last-of-type{border-bottom:1px solid var(--line)}
+.apps-row h3{font-family:var(--f-head);font-weight:400;font-size:32px;line-height:1.15;color:var(--ink)}
+.apps{display:flex;flex-wrap:wrap;gap:20px}
+.app{width:68px;text-align:center}
+.app img{display:block;width:56px;height:56px;border-radius:14px;margin:0 auto;object-fit:cover;background:#fff}
+.app span{display:block;font-size:13px;color:var(--gray-text);margin-top:8px;line-height:1.25}
+.apps.retired img{filter:saturate(.85)}
+.apps-note{text-align:center;font-size:18px;color:var(--gray-text);margin-top:36px}
+@media(max-width:767.98px){
+  .apps-row{grid-template-columns:1fr;gap:20px;padding:28px 0}
+  .apps-row h3{font-size:26px}
+  .apps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 10px;justify-items:center}
+  .app{width:100%}
+  .app img{width:52px;height:52px;border-radius:13px}
+  .app span{font-size:12px}
+  .apps-note{font-size:16px;margin-top:28px}
+}
+
+/* ===== PRIVACY ===== */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.facts{list-style:none;margin-top:32px;display:flex;flex-direction:column;gap:24px}
+.facts li{font-size:20px;line-height:1.4;color:var(--ink)}
+/* a render beside/below copy: feathered into the cream like the proof corner */
+.side-mascot{display:block;width:min(380px,74%);margin:20px 0 0 -8%;line-height:0}
+.side-mascot img{
+  display:block;width:100%;height:auto;
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+          mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+  -webkit-mask-composite:source-in;mask-composite:intersect;
+}
+.thread-card{--bg:var(--card);background:var(--card);border-radius:24px;padding:22px;max-width:360px;margin:0 auto;box-shadow:0 1px 0 var(--line)}
+.thread-card .thread{font-size:16px}
+@media(max-width:1023.98px){
+  .two{grid-template-columns:1fr;gap:40px}
+}
+@media(max-width:767.98px){
+  .photo-slot{aspect-ratio:1}
+  .side-mascot{width:min(300px,70%);margin:12px 0 0 -6%}
+  .facts{gap:16px}
+  .facts li{font-size:18px}
+  .founder p{font-size:18px}
+}
+
+/* ===== BERKELEY ===== */
+.photo-slot{position:relative;aspect-ratio:4/5;border-radius:16px;overflow:hidden;background:var(--cream)}
+.photo-slot > img,.photo-slot > video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.photo-slot img.placeholder{
+  position:absolute;left:50%;top:50%;width:100%;height:auto;max-width:none;transform:translate(-50%,-50%);object-fit:contain;
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+          mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+  -webkit-mask-composite:source-in;mask-composite:intersect;
+}   /* the graduation tile, zoomed a little so the character fills the 4:5 card, feathered so its edges never show */
+.founder p{font-size:20px;line-height:1.5;color:var(--gray-text);margin-top:18px}
+.founder .sig{font-size:16px;color:var(--gray-text);margin-top:26px}
+.founder .sig a{color:var(--blue);margin-left:10px}
+
+/* ===== CLOSE ===== */
+#signup{text-align:center;padding:clamp(120px,16vw,200px) 0;overflow:hidden}
+#signup .wrap{position:relative;z-index:1}
+.mascot{
+  display:block;width:clamp(340px,52vh,600px);height:auto;aspect-ratio:462/365;object-fit:cover;margin:0 auto 4px;   /* no negative margins: the render's box must not reach the headline */
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+          mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
+  -webkit-mask-composite:source-in;mask-composite:intersect;
+}
+#signup h2{font-size:clamp(36px,6.2vw,92px);line-height:1.08}
+#signup h2 .b{color:var(--blue)}
+#signup .sub{margin:18px auto 0}
+#signup .btn{margin-top:28px}
+.campanile.r{left:0;right:auto;bottom:-2%;width:min(100vw,1560px);opacity:.3;transform:translateX(-5%)}   /* far left, big: the tower sits ~14% across the drawing; -5% parks it just inside the edge */
+@media(max-width:767.98px){.mascot{width:320px;margin:0 auto}.campanile.r{display:none}}
+
+/* ===== FAQ ===== */
+.faq-wrap{max-width:760px;margin:0 auto}
+#faq h2{font-size:48px;margin-bottom:28px}
+.faq-list details{border-top:1px solid var(--line)}
+.faq-list details:last-child{border-bottom:1px solid var(--line)}
+.faq-list summary{
+  list-style:none;cursor:pointer;padding:22px 0;
+  display:flex;justify-content:space-between;align-items:center;gap:20px;
+  font-size:20px;color:var(--ink);
+}
+.faq-list summary::-webkit-details-marker{display:none}
+.faq-list summary::after{content:'+';font-size:24px;font-weight:300;color:var(--ink-3);flex-shrink:0;transition:color .15s}
+.faq-list details[open] summary::after{content:'–';color:var(--blue)}
+.faq-list details[open] summary{color:var(--blue)}
+.faq-body{padding:0 0 22px;color:var(--gray-text);font-size:18px;line-height:1.55;max-width:640px}
+@media(max-width:767.98px){#faq h2{font-size:36px}.faq-list summary{font-size:18px}.faq-body{font-size:16px}}
+
+/* ===== FOOTER ===== */
+footer{border-top:1px solid var(--line);padding:28px var(--pad);font-size:14px;color:var(--gray-text)}
+.foot{max-width:var(--wrap);margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.foot .fb{display:flex;align-items:center;gap:8px;color:var(--ink)}
+.foot .fb img{width:24px;height:24px;display:block}
+.foot .fl{display:flex;gap:20px}
+.foot a:hover{color:var(--ink)}
+@media(max-width:767.98px){.foot{flex-direction:column;align-items:flex-start;gap:14px}}
+
+/* ===== FLOATING PILL ===== */
+.float-cta{
+  position:fixed;left:50%;bottom:24px;z-index:45;transform:translate(-50%,0);
+  height:44px;padding:0 22px;border:none;border-radius:999px;
+  background:var(--blue);color:#fff;font-family:var(--f-ui);font-size:15px;
+  box-shadow:0 0 0 2px var(--cream-2),0 8px 24px rgba(60,40,20,.18);
+  transition:opacity .25s,transform .25s var(--ease),background .15s;
+}
+.float-cta:hover{background:var(--blue-hover)}
+.float-cta.hide{opacity:0;transform:translate(-50%,8px);pointer-events:none}
+@media(max-width:767.98px){.float-cta{bottom:calc(16px + env(safe-area-inset-bottom,0px))}}
+
+/* ===== PROGRESS RAIL (left edge) ===== */
+.rail{
+  position:fixed;left:22px;top:50%;transform:translateY(-50%);z-index:40;
+  display:none;flex-direction:column;gap:6px;
+  opacity:0;pointer-events:none;transition:opacity .3s ease;
+}
+.rail.show{opacity:1;pointer-events:auto}
+@media(min-width:1024px){.rail{display:flex}}
+.rail button{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  width:18px;height:18px;padding:0;background:transparent;border:none;cursor:pointer;
+}
+.rail .dot{display:block;width:5px;height:5px;border-radius:50%;background:var(--ink-3);opacity:.45;transition:transform .25s ease,opacity .25s ease,background .25s ease}
+.rail button:hover .dot{opacity:.9}
+.rail button[aria-current="true"] .dot{background:var(--blue);opacity:1;transform:scale(1.5)}
+/* label on hover: a small tag to the right of the dot */
+.rail button::after{
+  content:attr(aria-label);position:absolute;left:24px;top:50%;transform:translate(-4px,-50%);
+  white-space:nowrap;font-family:var(--f-ui);font-size:12px;color:var(--ink);
+  background:var(--card);padding:3px 8px;border-radius:8px;box-shadow:0 1px 0 var(--line);
+  opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;
+}
+.rail button:hover::after,.rail button:focus-visible::after{opacity:1;transform:translate(0,-50%)}
+
+/* ===== DARK MODE TOGGLE ===== */
+.mode-btn{
+  position:fixed;right:24px;bottom:24px;z-index:45;width:38px;height:38px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;background:var(--fill);color:var(--ink);border:none;padding:0;
+}
+.mode-btn:hover{color:var(--blue)}
+.mode-btn svg{display:block;width:18px;height:18px}
+.mode-btn .ico-sun{display:none}
+html.dark .mode-btn .ico-moon{display:none}
+html.dark .mode-btn .ico-sun{display:block}
+@media(max-width:767.98px){.mode-btn{display:none}}
+
+/* ===== REDUCED MOTION ===== */
+@media(prefers-reduced-motion:reduce){
+  [data-io]{opacity:1!important;transform:none!important;transition:none!important}
+  .js .thread[data-play] > .msg,.js .thread[data-play] > .poll,.js .thread[data-play] > .checklist{opacity:1;transform:none;transition:none}
+  .thread[data-play]{transition:none!important;transform:none!important}
+  .poll-row,.poll-row i,.poll-row i::after{transition:none!important;animation:none!important}
+  .ph-status::before{animation:none}
+  .float-cta,.hero-in,.rot-item,.rail,.rail .dot,.rail button::after{transition:none}
+  .js .hero-in{opacity:1}
+}
+
+/* ===== WAITLIST — the sign-up chat =====
+   Every CTA opens this card (window.openWaitlist). Not a form: the same
+   conversational sign-up as legacy/js/signup.js, seen from the reader's
+   phone — their sends blue on the right, Cued's replies gray on the left,
+   tails on the last bubble of each run, a typing pill before every reply.
+   Every color is a --co-* token mapped from the page's, so html.dark flips
+   it to real Messages dark for free. The sheet is frosted glass (translucent
+   over a heavy backdrop blur, hairline edge) so the page bleeds through —
+   the old modal's feel, on the card itself. Bottom sheet under 768px, sized from
+   the visual viewport by JS so the keyboard never pushes the compose row
+   off-screen; a fixed-height card on desktop capped to the viewport. A
+   hairline under the header fills as the steps complete; "Delivered" sits
+   under the reader's latest bubble. Nothing here needs scrolling to see. */
+.co-bg{
+  --co-blue:var(--blue);--co-blue-deep:var(--blue-deep);--co-blue-soft:var(--blue-soft);--co-blue-ink:var(--blue-ink);
+  --co-gray:var(--gray);--co-gray-ink:var(--gray-ink);
+  --co-card:var(--card);--co-fill:var(--fill);--co-line:var(--line);
+  --co-glass:rgba(255,255,255,.82);--co-glass-edge:rgba(255,255,255,.55);   /* the frosted sheet + its rim */
+  --co-opt-line:rgba(0,0,0,.07);--co-opt-hover:rgba(0,0,0,.035);              /* rows inside the options bubble */
+  --co-field:rgba(255,255,255,.62);                                       /* inputs, chips, consent box sit on the glass */
+  --co-ink:var(--ink);--co-ink-2:var(--ink-2);--co-ink-3:var(--ink-3);--co-error:var(--error);
+  --co-shadow:0 24px 80px rgba(10,22,40,.28);
+  position:fixed;inset:0;z-index:1000;background:var(--overlay);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  opacity:0;pointer-events:none;transition:opacity .25s ease;
+  display:flex;align-items:center;justify-content:center;padding:24px;
+  font-family:var(--f-msg);font-size:15px;line-height:1.5;color:var(--co-ink);text-align:left;
+}
+html.dark .co-bg{--co-glass:rgba(28,28,30,.8);--co-opt-line:rgba(255,255,255,.09);--co-opt-hover:rgba(255,255,255,.05);--co-glass-edge:rgba(255,255,255,.09);--co-field:rgba(44,44,46,.66);--co-shadow:0 24px 80px rgba(0,0,0,.6)}
+.co-bg *{margin:0;padding:0;box-sizing:border-box}
+.co-bg button,.co-bg input{font:inherit;color:inherit}
+.co-bg.open{opacity:1;pointer-events:all}
+
+/* Card */
+.co-sheet{width:100%;max-width:420px;height:min(560px,100% - 48px);background:var(--co-glass);backdrop-filter:blur(28px) saturate(1.6);-webkit-backdrop-filter:blur(28px) saturate(1.6);border-radius:24px;box-shadow:var(--co-shadow),inset 0 0 0 1px var(--co-glass-edge);display:flex;flex-direction:column;overflow:hidden;transform:translateY(12px);transition:transform .3s var(--ease)}
+.co-bg.open .co-sheet{transform:translateY(0)}
+.co-handle{display:none}
+
+/* Header — Messages contact bar */
+.co-head{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 10px 20px;flex-shrink:0}
+.co-head-info{display:flex;align-items:center;gap:11px}
+.co-avatar{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:block}
+.co-avatar svg{display:block;width:100%;height:100%}
+.co-head-name{font-size:15px;font-weight:500;color:var(--co-ink);line-height:1.2}
+.co-head-sub{font-size:12px;color:var(--co-ink-3);margin-top:2px}
+.co-close{width:32px;height:32px;border-radius:50%;background:transparent;border:none;cursor:pointer;font-size:18px;color:var(--co-ink-3);display:inline-flex;align-items:center;justify-content:center;transition:color .15s,background .15s}
+.co-close:hover{color:var(--co-ink);background:var(--co-fill)}
+/* Progress hairline — fills a step at a time (9 steps), sits on the header's bottom edge */
+.co-progress{height:2px;background:var(--co-line);flex-shrink:0;overflow:hidden}
+.co-progress i{display:block;height:100%;width:var(--p,0%);background:var(--co-blue);transition:width .45s var(--ease)}
+/* "Delivered" under the reader's latest bubble — the Messages detail */
+.co-meta{align-self:flex-end;font-size:11px;font-weight:500;color:var(--co-ink-3);margin:.25em .35em 0 0}
+
+/* Thread */
+.co-msgs{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;scrollbar-width:none;overscroll-behavior:contain;
+  -webkit-mask-image:linear-gradient(to bottom,transparent,#000 18px);mask-image:linear-gradient(to bottom,transparent,#000 18px)}  /* earlier bubbles fade out under the header instead of clipping */
+.co-msgs::-webkit-scrollbar{display:none}
+.co-msgs > *{flex-shrink:0}
+.co-msg{position:relative;max-width:78%;padding:.52em .82em;border-radius:1.05em;font-size:15px;line-height:1.3;font-weight:400;margin-top:.25em;overflow-wrap:break-word;opacity:0;transform:translateY(6px) scale(.98);transition:opacity .2s var(--ease),transform .2s var(--ease)}
+.co-msg.turn{margin-top:.85em}
+/* Bottom-aligned via the first child's auto margin, NOT justify-content:flex-end —
+   a flex-end column makes everything overflowing at the top unscrollable. */
+.co-msgs > :first-child{margin-top:auto}
+.co-msg.show{opacity:1;transform:none}
+.co-msg.coach{align-self:flex-start;background:var(--co-gray);color:var(--co-gray-ink);transform-origin:0 100%}
+.co-msg.user{align-self:flex-end;background:var(--co-blue);color:var(--co-blue-ink);transform-origin:100% 100%}
+/* Tails — last bubble of a run only. One color extension per bubble, shaped by
+   a mask (the page's tails use a card-colored carve, which would sit as an
+   opaque notch on the frosted sheet). The mask keeps the part inside the
+   bubble plus the curved tip; the carve's quarter-circle is subtracted. */
+.co-msg.t::before{content:'';position:absolute;bottom:-.1em;height:1em;width:1em}
+.co-msg.user.t::before{right:-.35em;background:var(--co-blue);border-bottom-left-radius:.8em .7em;
+  -webkit-mask:linear-gradient(#000,#000) 0 0/.65em 100% no-repeat,radial-gradient(circle .5em at .5em 0,transparent 97%,#000 100%) .65em .5em/.35em .5em no-repeat;
+          mask:linear-gradient(#000,#000) 0 0/.65em 100% no-repeat,radial-gradient(circle .5em at .5em 0,transparent 97%,#000 100%) .65em .5em/.35em .5em no-repeat}
+.co-msg.coach.t::before{left:-.35em;background:var(--co-gray);border-bottom-right-radius:.8em .7em;
+  -webkit-mask:linear-gradient(#000,#000) .35em 0/.65em 100% no-repeat,radial-gradient(circle .5em at -.15em 0,transparent 97%,#000 100%) 0 .5em/.35em .5em no-repeat;
+          mask:linear-gradient(#000,#000) .35em 0/.65em 100% no-repeat,radial-gradient(circle .5em at -.15em 0,transparent 97%,#000 100%) 0 .5em/.35em .5em no-repeat}
+
+/* Typing pill — Cued is typing (received side) */
+.co-typing{align-self:flex-start;display:inline-flex;gap:.28em;align-items:center;padding:.62em .8em;border-radius:1.05em;background:var(--co-gray);margin-top:.85em;font-size:15px;transform-origin:0 100%;animation:coPop .2s var(--ease)}
+.co-typing .co-dot{width:.44em;height:.44em;border-radius:50%;background:var(--co-ink-3);animation:coTypeDot 1.1s ease-in-out infinite}
+.co-typing .co-dot:nth-child(2){animation-delay:.15s}
+.co-typing .co-dot:nth-child(3){animation-delay:.3s}
+@keyframes coTypeDot{0%,60%,100%{opacity:.35;transform:none}30%{opacity:1;transform:translateY(-.12em)}}
+@keyframes coPop{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
+
+/* Compose area — a constant composer (field + send) with, when a question
+   has fixed answers, a slim strip of suggestion chips above it, like the
+   suggestions over an iPhone keyboard. Tapping a chip drops it into the field
+   and sends it; multi-select accumulates in the field and the arrow sends. */
+.co-input-area{flex-shrink:0;padding:10px 14px 14px;border-top:1px solid var(--co-line);display:flex;flex-direction:column;gap:8px}
+.co-input-area:empty{display:none}
+.co-input-row{display:flex;gap:8px;align-items:center}
+.co-input{flex:1;min-width:0;padding:10px 16px;border:1px solid var(--co-line);border-radius:999px;font-size:15px;color:var(--co-ink);background:var(--co-field);outline:none;transition:border-color .15s,box-shadow .15s}
+.co-input:focus{border-color:var(--co-blue);box-shadow:0 0 0 3px var(--co-blue-soft)}
+.co-input::placeholder{color:var(--co-ink-3)}
+.co-input[readonly]{cursor:default;caret-color:transparent}
+.co-skip{flex:none;background:none;border:none;padding:6px 6px;font-size:13.5px;font-weight:500;color:var(--co-ink-3);cursor:pointer;transition:color .15s}
+.co-skip:hover{color:var(--co-blue)}
+/* Height + weight composer: a unit toggle above two or three short number
+   fields. Same pills as the composer; the toggle is a pair of small chips. */
+.co-stats{display:flex;flex-direction:column;gap:8px}
+.co-units{display:flex;gap:6px;justify-content:flex-end}
+.co-unit{background:none;border:1px solid var(--co-line);border-radius:999px;padding:4px 10px;font:inherit;font-size:12.5px;font-weight:500;color:var(--co-ink-3);cursor:pointer;transition:color .15s,border-color .15s,background .15s}
+.co-unit.sel{color:var(--co-blue);border-color:var(--co-blue);background:var(--co-blue-soft)}
+.co-input.co-num{flex:1 1 0;min-width:0;padding-left:14px;padding-right:14px;text-align:center}
+.co-input.co-num::placeholder{text-align:center}
+@keyframes co-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.co-shake{animation:co-shake .28s var(--ease)}
+.co-bg .co-send{width:36px;height:36px;border-radius:50%;background:var(--co-blue);border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--co-blue-ink);/* class+element so it outranks `.co-bg button{color:inherit}` — otherwise the arrow inherits the page ink and sits black on blue */transition:background .15s,opacity .15s}
+.co-send:hover:not(:disabled){background:var(--co-blue-deep)}
+.co-send:disabled{opacity:.35;cursor:default}
+.co-send svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+
+/* Answer options — a list bubble IN the thread, sent by cued right after
+   the question: one gray received bubble, rows stacked with hairlines, a
+   ring at the right that fills blue with a check when picked (the tour
+   poll's ring, in the thread's own palette). Every option is visible, the
+   composer below stays its one slim row. Once answered the bubble locks:
+   picks stay checked, the rest dim. */
+.co-msg.co-opts{padding:0;max-width:86%;min-width:62%;overflow:hidden}
+.co-opt{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:.62em .85em .62em .95em;border:none;background:transparent;font:inherit;line-height:1.25;color:var(--co-gray-ink);text-align:left;cursor:pointer;transition:background .15s}
+.co-opt + .co-opt{border-top:1px solid var(--co-opt-line)}
+.co-opt:hover{background:var(--co-opt-hover)}
+.co-opt i{flex:none;width:1.25em;height:1.25em;border-radius:50%;border:1.5px solid var(--co-ink-3);display:inline-flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s}
+.co-opt i::after{content:'';width:.42em;height:.24em;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:translateY(-.06em) rotate(-45deg) scale(0);transition:transform .22s var(--ease)}
+.co-opt.sel i{background:var(--co-blue);border-color:var(--co-blue)}
+.co-opt.sel i::after{transform:translateY(-.06em) rotate(-45deg) scale(1)}
+.co-opts.done .co-opt{cursor:default;pointer-events:none}
+.co-opts.done .co-opt:not(.sel){opacity:.45}
+
+/* Primary pill button (Confirm / Put me on the list / Try again) */
+.co-confirm{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 22px;border-radius:999px;border:none;cursor:pointer;background:var(--co-blue);color:#fff;font-size:15px;font-weight:500;transition:background .15s}
+.co-confirm:hover{background:var(--co-blue-deep)}
+.co-confirm:disabled{opacity:.55;cursor:not-allowed}
+
+/* SMS consent — cued's fine-print bubble (terms + privacy inline); the
+   reader answers with the "i agree" chip, which sends as their bubble. */
+.co-msg.fine{font-size:12.5px;line-height:1.4;color:var(--co-ink-2);max-width:88%}
+.co-msg.fine a{color:var(--co-blue);text-decoration:none}
+.co-msg.fine a:hover{text-decoration:underline}
+
+/* Success */
+.co-success{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 20px;gap:10px}
+.co-success-icon{font-size:38px;margin-bottom:2px}
+.co-success h3{font-family:var(--f-header);font-weight:400;font-size:clamp(1.5rem,2.2vw,1.9rem);letter-spacing:-.4px;line-height:1.1;color:var(--co-ink)}
+.co-success p{font-size:15px;color:var(--co-ink-2);line-height:1.55;max-width:300px}
+/* iMessage-first choice (shown only when the backend returned a link) */
+.co-success .co-imsg{width:auto;min-width:240px;margin-top:8px;text-decoration:none}
+.co-success .co-alt{background:none;border:none;cursor:pointer;padding:8px 12px;font-size:14px;color:var(--co-ink-3);text-decoration:underline;text-underline-offset:3px}
+.co-success .co-alt:hover{color:var(--co-ink-2)}
+.co-success .co-alt:disabled{cursor:default;text-decoration:none}
+.co-success .co-imsg-note{font-size:13px;color:var(--co-ink-3);max-width:300px}
+
+/* Phones: a bottom sheet. The overlay's height/top are set from
+   window.visualViewport by the script while the sheet is open, so an open
+   keyboard shrinks the sheet instead of covering the compose row; the sheet
+   itself is a fixed share of that height (no growing, no jumping) and the
+   thread scrolls inside it. */
+@media (max-width:767.98px){
+  .co-bg{align-items:flex-end;padding:0;height:100dvh}
+  .co-sheet{max-width:none;height:calc(100% - 40px);max-height:none;border-radius:24px 24px 0 0;transform:translateY(100%)}
+  .co-bg.open .co-sheet{transform:translateY(0)}
+  .co-handle{display:block;width:36px;height:4px;border-radius:2px;background:var(--co-line);margin:8px auto 0;flex-shrink:0}
+  .co-head{padding-top:6px}
+  .co-msgs{padding:14px 16px;min-height:0}
+  .co-input-area{padding:10px 14px calc(12px + env(safe-area-inset-bottom))}
+  .co-bg .co-input{font-size:16px}/* prevent iOS auto-zoom on focus — needs to outrank `.co-bg input{font:inherit}` (class+element), or it computes to the sheet's 15px and iOS zooms 16/15 and never zooms back, leaving the sheet wider than the screen */
+  .co-msg{font-size:16px}
+  .co-opt{padding:.66em .85em .66em .95em}
+  .co-input.co-num{padding-left:10px;padding-right:10px}/* three fields + send on a 320px screen: room for the "weight" placeholder at 16px */
+}
+@media (prefers-reduced-motion:reduce){
+  .co-bg,.co-sheet,.co-msg,.co-progress i{transition:none}
+  .co-typing{animation:none}
+  .co-typing .co-dot{animation:none;opacity:.6}
+  .co-opt,.co-opt i,.co-opt i::after{transition:none}
+}
+
+</style>
+<!-- Gate reveal-hiding synchronously so a JS-less load renders fully visible.
+     Also apply the saved theme pre-paint so dark mode doesn't flash white. -->
+<script>
+document.documentElement.classList.add('js');
+try{if(localStorage.getItem('cued-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}
+</script>
+<!-- Preview path (cued.fit/demo-site): keep it out of search results while the
+     root page is still the live design. -->
+<meta name="robots" content="noindex, nofollow">
+<!-- Umami Cloud analytics: cookieless page views, referrers, devices, UTM campaigns, and the
+     sign-up funnel events this page fires (signup-open/-step/-submit/-imessage/-sms). Nothing
+     stored in the browser, no fingerprinting. One website id for all of cued.fit. -->
+<script defer src="https://cloud.umami.is/script.js" data-website-id="ddb5f65b-1a10-4c50-a155-46ba8095639f"></script>
+</head>
+<body>
+
+<nav id="nav">
+  <!-- The live site's brand: blue wordmark, flat circle-and-dot mark after it
+       (inline so the ball takes --blue exactly). -->
+  <a href="#hero" class="brand" aria-label="cued, back to top">
+    <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="currentColor"/><circle cx="63" cy="61" r="8.6" fill="#fff"/></svg>
+    <span>cued</span>
+  </a>
+</nav>
+
+<button type="button" class="float-cta hide" id="floatCta" aria-label="text cued">text cued</button>
+
+<button type="button" class="mode-btn" id="modeBtn" role="switch" aria-checked="false" aria-label="dark mode" title="dark mode">
+  <svg class="ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <svg class="ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7L7 17M17 7l1.7-1.7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+</button>
+
+<!-- Progress rail — one dot per [data-label] section, down the left edge (desktop). -->
+<div class="rail" id="rail" role="navigation" aria-label="steps"></div>   <!-- one dot per proof step; only shown while the proof is pinned. A div, not <nav>: the page's nav rule is a full-width bar -->
+
+<main>
+
+<!-- ===== HERO ===== -->
+<section id="hero" class="cream" data-label="meet cued">
+  <div class="wrap hero-in hero-grid" id="heroIn">
+    <div class="hero-copy">
+      <h1 class="hero-h"><span class="kicker">meet cued</span>the coach that<span class="sr-only"> lives in your texts.</span><span class="rot" id="heroRot" aria-hidden="true"><span class="rot-item on">lives in your texts.</span><span class="rot-item">replaces <span class="rot-icons"><img src="/images/app-icons/hevy.png" alt="Hevy"><img src="/images/app-icons/MyFitnessPal%20Review.jpg" alt="MyFitnessPal"><img src="/images/app-icons/MacroFactor-MacroTracker_icon.png" alt="MacroFactor"><img src="/images/app-icons/notes.png" alt="Notes"><img src="/images/app-icons/reminders_app.webp" alt="Reminders"><img src="/images/app-icons/pen_paper.png" alt="pen and paper"></span></span><span class="rot-item">builds your workouts.</span><span class="rot-item">tracks your food.</span><span class="rot-item">knows the college life.</span><span class="rot-item">knows your schedule.</span></span></h1>
+      <p class="hero-sub">it knows your classes, replaces your lift and meal apps, and texts first. <span class="b">nothing to download.</span></p>
+      <div class="hero-cta"><button type="button" class="btn sq" id="heroCtaTop">text cued</button></div>
+    </div>
+    <!-- The mascot: two locked-off render clips (founder, 2026-11-14) played
+         back to back with a short crossfade, forever — muted and inline so
+         they autoplay everywhere; the poster is clip 1's first frame. The
+         script runs the handoff, pauses off screen, and leaves the poster
+         under reduced motion. The first clip keeps autoplay+loop as the
+         no-JS fallback. Not in LFS on purpose — GitHub Pages serves LFS
+         pointers, not the file. -->
+    <div class="hero-video" id="heroVideo" aria-hidden="true">
+      <video class="on" src="/assets/hero/cued-hero.mp4" poster="/assets/hero/cued-hero-poster.jpg" autoplay muted loop playsinline preload="auto" disablepictureinpicture></video>
+      <video src="/assets/hero/cued-hero-2.mp4" muted playsinline preload="auto" disablepictureinpicture></video>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SAY ANYTHING ===== -->
+<section id="say" class="blend blend-to" style="--from:var(--cream);--to:var(--cream)" data-label="say anything">
+  <div class="wrap">
+    <h2 data-io>say anything.</h2>
+    <p class="sub" data-io>it's a text thread. so text it like one.</p>
+  </div>
+  <div class="mq" aria-hidden="true"><div class="mq-track thread" id="mq1"></div></div>
+  <div class="mq rev" aria-hidden="true"><div class="mq-track thread" id="mq2"></div></div>
+  <ul class="sr-only" id="mqList">
+    <li>rsf line rn?</li><li>190 x4</li><li>slept like garbage</li><li>what's good at crossroads</li><li>move leg day to thurs</li><li>im sore af</li><li>how much protein am i at</li><li>book me a moffitt room</li><li>pull or push today</li>
+    <li>how'd my week go</li><li>new pr 225</li><li>skipping today ngl</li><li>what's due this week</li><li>remind me to meal prep sunday</li><li>is the gym packed</li><li>what should i eat before class</li><li>logged my trader joe's run</li><li>when's my next lift</li>
+  </ul>
+</section>
+
+<!-- ===== PROOF — five steps, one phone. The markup is the stacked (mobile /
+     reduced-motion / JS-off) form; at ≥1024px with motion the script moves
+     the step copy and the five threads into one sticky phone (see pinProof). ===== -->
+<section id="proof" class="proof" aria-label="what cued does" data-label="what i do">
+  <div class="proof-steps" id="proofSteps">
+
+    <article class="step tint-2" data-status="reading your calendar…">
+      <div class="wrap">
+        <div class="step-copy">
+          <picture class="step-mascot"><source srcset="/assets/mascot/v2/cued-week.webp" type="image/webp"><img src="/assets/mascot/v2/cued-week.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
+          <h2>i know your week</h2>
+          <p class="sub">calendar, canvas, class times, the rsf line. i plan around all of it.</p>
+        </div>
+        <div class="phone-wrap">
+          <div class="phone" aria-hidden="false">
+            <div class="phone-screen">
+              <div class="island" aria-hidden="true"></div>
+              <div class="ph-head">
+                <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <picture><source srcset="/assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="/assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
+                <div class="ph-name">cued</div>
+                <div class="ph-status">reading your calendar…</div>
+                <svg class="vid" viewBox="0 0 26 18" aria-hidden="true"><rect x="1" y="2" width="16" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M17 7l7-3v10l-7-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+              </div>
+              <div class="screen">
+                <div class="thread coach-left" data-play>
+                  <div class="msg coach">rsf's dead right now and you're out of class till 3. quick upper push? in and out before the rush.</div>
+                  <div class="msg coach">also saw the ochem midterm on your calendar tues. moving leg day to wednesday.</div>
+                  <div class="msg coach t">you've got class 2–5 wednesday. when do you want it?</div>
+                  <div class="poll" aria-label="poll: pick a workout time">
+                    <button type="button" class="poll-row pick" data-t="5:30" aria-pressed="true"><span>5:30pm – 7pm</span><i aria-hidden="true"></i></button>
+                    <button type="button" class="poll-row" data-t="12:30" aria-pressed="false"><span>12:30pm – 1:30pm</span><i aria-hidden="true"></i></button>
+                    <button type="button" class="poll-row" data-t="9am" aria-pressed="false"><span>9am – 11am</span><i aria-hidden="true"></i></button>
+                  </div>
+                  <div class="msg coach t poll-lock">locked. 5:30 it is.</div>
+                </div>
+              </div>
+              <div class="ph-comp" aria-hidden="true"><div class="plus">+</div><div class="field">iMessage</div><svg class="mic" viewBox="0 0 16 22"><rect x="5" y="1" width="6" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M2 10a6 6 0 0 0 12 0M8 16v4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+              <div class="ph-home" aria-hidden="true"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="step" data-status="logging your sets…">
+      <div class="wrap">
+        <div class="step-copy">
+          <picture class="step-mascot"><source srcset="/assets/mascot/v2/cued-sets.webp" type="image/webp"><img src="/assets/mascot/v2/cued-sets.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
+          <h2>i log your sets</h2>
+          <p class="sub">tap a set to log it. text me when it goes different.</p>
+        </div>
+        <div class="phone-wrap"><div class="phone"><div class="phone-screen">
+          <div class="ph-head">
+            <picture><source srcset="/assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="/assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
+            <div class="ph-name">cued</div>
+            <div class="ph-status">logging your sets…</div>
+          </div>
+          <div class="screen">
+            <div class="thread coach-left" data-play>
+              <div class="msg coach t">push day. 4 sets bench, then the usual. tap as you go — text me if a set goes different.</div>
+              <div class="checklist" aria-label="today's sets — tap a set when it's done">
+                <button type="button" class="poll-row" aria-pressed="false"><span>bench 185 × 5</span><i aria-hidden="true"></i></button>
+                <button type="button" class="poll-row" aria-pressed="false"><span>bench 185 × 5</span><i aria-hidden="true"></i></button>
+                <button type="button" class="poll-row" aria-pressed="false"><span>bench 185 × 5</span><i aria-hidden="true"></i></button>
+                <button type="button" class="poll-row" aria-pressed="false"><span>bench 185 × 5</span><i aria-hidden="true"></i></button>
+              </div>
+              <div class="msg user t turn">190 x4</div>
+              <div class="msg coach turn cl-swap">swapped it in. 190 × 4 is a PR 🎉 last time was 185 × 3.</div>
+              <div class="msg coach t card">
+                <div class="wc-head">push · wed · 48 min</div>
+                <div class="wc-row">bench press — 185×5 · 185×5 · <b class="wc-pr">190×4</b> · 185×5</div>
+                <div class="wc-row">incline db press — 65×10 · 65×9 · 65×8</div>
+                <div class="wc-row">cable fly — 30×12 · 30×12 · 30×11</div>
+                <div class="wc-row">tricep pushdown — 50×12 · 50×12 · 50×10</div>
+                <div class="wc-foot">9,240 lb total · 1 PR</div>
+              </div>
+            </div>
+          </div>
+        </div></div></div>
+      </div>
+    </article>
+
+    <article class="step tint-1" data-status="checking crossroads menu…">
+      <div class="wrap">
+        <div class="step-copy">
+          <picture class="step-mascot"><source srcset="/assets/mascot/v2/cued-dinner.webp" type="image/webp"><img src="/assets/mascot/v2/cued-dinner.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
+          <h2>i know what's for dinner</h2>
+          <p class="sub">dining hall menus, receipts, photos. no logging.</p>
+        </div>
+        <div class="phone-wrap"><div class="phone"><div class="phone-screen">
+          <div class="ph-head">
+            <picture><source srcset="/assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="/assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
+            <div class="ph-name">cued</div>
+            <div class="ph-status">checking crossroads menu…</div>
+          </div>
+          <div class="screen">
+            <div class="thread coach-left" data-play>
+              <div class="msg user t">what's good at crossroads rn</div>
+              <div class="msg coach t turn">chimichurri tri-tip tonight. grab the roasted sweet potatoes, pile on the veg — that's ~45g protein, you're at 80 for the day.</div>
+              <div class="msg user photo turn"><img src="/images/dinner-plate.jpg" width="1000" height="855" loading="lazy" alt="photo of a dinner plate: sliced tri-tip with chimichurri, roasted sweet potatoes, broccoli and cauliflower"></div>
+              <div class="msg coach t turn">logged. you went heavy on the steak — closer to 55. nice.</div>
+            </div>
+          </div>
+        </div></div></div>
+      </div>
+    </article>
+
+    <article class="step" data-status="pulling up your week…">
+      <div class="wrap">
+        <div class="step-copy">
+          <picture class="step-mascot"><source srcset="/assets/mascot/v2/cued-remember.webp" type="image/webp"><img src="/assets/mascot/v2/cued-remember.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
+          <h2>i remember</h2>
+          <p class="sub">the midterm, the week, the lift we moved. i don't start over every text.</p>
+        </div>
+        <div class="phone-wrap"><div class="phone"><div class="phone-screen">
+          <div class="ph-head">
+            <picture><source srcset="/assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="/assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
+            <div class="ph-name">cued</div>
+            <div class="ph-status">pulling up your week…</div>
+          </div>
+          <div class="screen">
+            <div class="thread coach-left" data-play>
+              <div class="msg coach t">how'd the ochem midterm go</div>
+              <div class="msg user turn">brutal but done</div>
+              <div class="msg user t">how'd my week go</div>
+              <div class="msg coach chart turn">
+                <svg viewBox="0 0 900 265" role="img" aria-label="chart: workout volume by day, monday to sunday — low on monday and tuesday around the midterm, peaking wednesday">
+                  <g fill="currentColor" opacity=".9">
+                    <rect x="24" y="145" width="80" height="60" rx="20"/><rect x="153" y="157" width="80" height="48" rx="20"/><rect x="281" y="0" width="80" height="205" rx="20"/><rect x="410" y="20" width="80" height="185" rx="20"/><rect x="539" y="77" width="80" height="128" rx="20"/><rect x="667" y="55" width="80" height="150" rx="20"/><rect x="796" y="110" width="80" height="95" rx="20"/>
+                  </g>
+                  <g class="lbl" font-size="42" font-weight="500" text-anchor="middle">
+                    <text x="64" y="258">M</text><text x="193" y="258">T</text><text x="321" y="258">W</text><text x="450" y="258">T</text><text x="579" y="258">F</text><text x="707" y="258">S</text><text x="836" y="258">S</text>
+                  </g>
+                </svg>
+              </div>
+              <div class="msg coach t">solid week considering. you're back on normal sched now — pull day tonight, the one we pushed.</div>
+            </div>
+          </div>
+        </div></div></div>
+      </div>
+    </article>
+
+    <article class="step tint-2" data-status="reading last night's sleep…">
+      <div class="wrap">
+        <div class="step-copy">
+          <picture class="step-mascot"><source srcset="/assets/mascot/v2/cued-watch.webp" type="image/webp"><img src="/assets/mascot/v2/cued-watch.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
+          <h2>i read your watch. or your texts.</h2>
+          <p class="sub">fitbit, pixel watch, google health. no watch? "slept like garbage" works too.</p>
+        </div>
+        <div class="phone-wrap"><div class="phone"><div class="phone-screen">
+          <div class="ph-head">
+            <picture><source srcset="/assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="/assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
+            <div class="ph-name">cued</div>
+            <div class="ph-status">reading last night's sleep…</div>
+          </div>
+          <div class="screen">
+            <div class="thread coach-left" data-play>
+              <div class="msg coach t">your watch says you slept 4 hours. not the day for heavy squats. moved leg day to thursday — tonight: walk, protein, early bed.</div>
+              <div class="msg user t turn">i don't have a watch lol</div>
+              <div class="msg coach t turn">then text me "slept like garbage" and i'll do the same thing. apple watch, whoop, oura, garmin — great if you have one, never required.</div>
+            </div>
+          </div>
+        </div></div></div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ===== APPS ===== -->
+<section id="apps" class="blend" style="--from:var(--cream)" data-label="works with">
+  <div class="wrap">
+    <div class="apps-row" data-io>
+      <h3>plugs into what you already use.</h3>
+      <div class="apps">
+        <div class="app"><img src="/images/app-icons/google-calendar.webp" alt=""><span>google calendar</span></div>
+        <div class="app"><img src="/images/app-icons/canvas-student.jpg" alt=""><span>bcourses / canvas</span></div>
+        <div class="app"><img src="/images/app-icons/google-health.webp" alt=""><span>google health<br>(fitbit, pixel watch)</span></div>
+        <div class="app"><img src="/images/app-icons/apple-watch.webp" alt=""><span>apple watch</span></div>
+        <div class="app"><img src="/images/app-icons/strava.webp" alt=""><span>strava</span></div>
+      </div>
+    </div>
+    <div class="apps-row" data-io>
+      <h3>replaces what you don't need.</h3>
+      <div class="apps retired">
+        <div class="app"><img src="/images/app-icons/MyFitnessPal%20Review.jpg" alt=""><span>myfitnesspal</span></div>
+        <div class="app"><img src="/images/app-icons/MacroFactor-MacroTracker_icon.png" alt=""><span>macrofactor</span></div>
+        <div class="app"><img src="/images/app-icons/hevy.png" alt=""><span>hevy</span></div>
+        <div class="app"><img src="/images/app-icons/notes.png" alt=""><span>notes</span></div>
+        <div class="app"><img src="/images/app-icons/reminders_app.webp" alt=""><span>reminders</span></div>
+        <div class="app"><img src="/images/app-icons/pen_paper.png" alt=""><span>pen &amp; paper</span></div>
+      </div>
+    </div>
+    <p class="apps-note" data-io>everything optional. the only thing i need is your number.</p>
+  </div>
+</section>
+
+<!-- ===== PRIVACY ===== -->
+<section id="privacy" class="cream blend" style="--from:var(--cream-2)" data-label="privacy">
+  <div class="wrap two">
+    <div data-io>
+      <h2>it stays between us</h2>
+      <ul class="facts">
+        <li>only used to coach you. never sold, never used for ads.</li>
+        <li>connections are read-only and optional: calendar (next 60 days), canvas feed, google health.</li>
+        <li>text "delete me" and everything's gone within 30 days.</li>
+      </ul>
+      <picture class="side-mascot"><source srcset="/assets/mascot/v2/cued-lock.webp" type="image/webp"><img src="/assets/mascot/v2/cued-lock.jpg" alt="" width="465" height="365" loading="lazy"></picture>
+    </div>
+    <div class="thread-card" data-io>
+      <div class="thread coach-left" data-play>
+        <div class="msg user t">wait who else sees all this</div>
+        <div class="msg coach turn">nobody. it's used to coach you, that's it. no ads, nothing sold.</div>
+        <div class="msg coach t">and if you ever want out, text "delete me" and it's gone within 30 days.</div>
+        <div class="msg user t turn">ok good</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== BERKELEY ===== -->
+<section id="berkeley" class="blend" style="--from:var(--cream)" data-label="made in berkeley">
+  <div class="wrap two">
+    <!-- [FOUNDER PHOTO: the founder or the team at the RSF or on Sproul,
+         daylight, no logos needed]. Until then, the Campanile drawing in a
+         tint-2 card. The slot takes an <img> or a muted autoplay <video>. -->
+    <div class="photo-slot" data-io>
+      <picture><source srcset="/assets/mascot/v2/cued-grad.webp" type="image/webp"><img class="placeholder" src="/assets/mascot/v2/cued-grad.jpg" alt="cued in a graduation cap, holding a diploma, with sather gate behind" width="459" height="365" loading="lazy"></picture>
+    </div>
+    <div class="founder" data-io>
+      <h2>made in berkeley, by a berkeley student.</h2>
+      <p>i'm a junior at cal. i built cued because i was running six apps and a notes file to stay in shape between classes, and none of them knew i had a midterm.</p>
+      <p>cued does. text it like a friend who happens to know the rsf line, your calendar and your lifts.</p>
+      <p class="sig">— the founder <a href="https://instagram.com/cued.fit" target="_blank" rel="noopener">@cued.fit</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CLOSE ===== -->
+<section id="signup" class="cream blend" style="--from:var(--cream-2)" data-label="text cued">
+  <div class="campanile r" aria-hidden="true"><img src="/images/hero-drawing.png" alt="" width="1920" height="650"></div>
+  <div class="wrap">
+    <picture><source srcset="/assets/mascot/v2/cued-dumbbell.webp" type="image/webp"><img class="mascot" src="/assets/mascot/v2/cued-dumbbell.jpg" alt="cued, a round white mascot in a blue headband, lifting a dumbbell" width="1100" height="869" loading="lazy"></picture>
+    <h2 data-io>your <span class="b">cue</span> to lock in.</h2>
+    <p class="sub" data-io>nothing to open. ready when you are.</p>
+    <div data-io><button type="button" class="btn lg" id="closeCta">text cued</button></div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section id="faq" class="blend" style="--from:var(--cream)" data-label="faq">
+  <div class="wrap faq-wrap">
+    <h2 data-io>the stuff people ask.</h2>
+    <div class="faq-list" data-io>
+      <details><summary>is this an app?</summary><div class="faq-body">no. it's a number. you text it like you text anyone. there's an optional imessage extension that adds the workout card, nothing to install otherwise.</div></details>
+      <details><summary>how much does it cost?</summary><div class="faq-body">free during the open beta. founding-member pricing comes later, and you'll hear about it from me first.</div></details>
+      <details><summary>what data does cued use?</summary><div class="faq-body">your texts, plus anything you choose to connect: calendar (next 60 days), canvas, google health. all read-only, all optional, all deletable with one text.</div></details>
+      <details><summary>do i need a watch?</summary><div class="faq-body">no. a watch makes the sleep and recovery stuff automatic. without one, just tell me how you slept.</div></details>
+      <details><summary>who built this?</summary><div class="faq-body">a berkeley student. see "made in berkeley" above.</div></details>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="foot">
+    <a href="#hero" class="fb"><img src="/images/cued-logo.svg" alt="" width="24" height="24"><span>cued</span></a>
+    <div class="fl">
+      <a href="/privacy.html">privacy</a>
+      <a href="/terms.html">terms</a>
+      <a href="mailto:hello@cued.fit">contact</a>
+      <a href="https://instagram.com/cued.fit" target="_blank" rel="noopener">instagram</a>
+    </div>
+    <div>made in berkeley, for berkeley · © 2026</div>
+  </div>
+</footer>
+
+<!-- ===== WAITLIST — the sign-up chat (script at the bottom of the page) ===== -->
+<div class="co-bg" id="waitlistOverlay" role="dialog" aria-modal="true" aria-label="Text cued" aria-hidden="true">
+  <div class="co-sheet" role="document">
+    <div class="co-handle"></div>
+    <div class="co-head">
+      <div class="co-head-info">
+        <div class="co-avatar" aria-hidden="true"><picture><source srcset="/assets/mascot/v2/cued-face-256.webp" type="image/webp"><img src="/assets/mascot/v2/cued-face-256.png" alt="" width="36" height="36"></picture></div>
+        <div>
+          <div class="co-head-name">cued</div>
+          <div class="co-head-sub">Text Message</div>
+        </div>
+      </div>
+      <button type="button" class="co-close" id="waitlistClose" aria-label="Close">✕</button>
+    </div>
+    <div class="co-progress" aria-hidden="true"><i id="coProgress"></i></div>
+    <div class="co-msgs" id="coMsgs" aria-live="polite"></div>
+    <div class="co-input-area" id="coInputArea"></div>
+  </div>
+</div>
+
+<script>
+// === Page chrome: nav, hero fade, reveals, floating pill ===
+(function(){
+  const nav = document.getElementById('nav');
+  const hero = document.getElementById('hero');
+  const close = document.getElementById('signup');
+  const faq = document.getElementById('faq');
+  const proofSec = document.getElementById('proof');
+  const pill = document.getElementById('floatCta');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+
+  // Hero: fade the block in on load (400ms).
+  const heroIn = document.getElementById('heroIn');
+  requestAnimationFrame(() => requestAnimationFrame(() => heroIn && heroIn.classList.add('in')));
+  requestAnimationFrame(() => document.body.classList.add('anim'));
+
+  // Headline rotation: one phrase at a time after "the coach that". The slot
+  // is sized to the tallest phrase (re-measured on resize / font load) so the
+  // sub-line and button never move. Paused while the hero is off screen;
+  // static under reduced motion.
+  const rot = document.getElementById('heroRot');
+  if (rot){
+    const items = Array.from(rot.children);
+    const size = () => { rot.style.height = Math.max(...items.map(i => i.offsetHeight)) + 'px'; };
+    size();
+    window.addEventListener('resize', size);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(size);
+    if (!reduce.matches && items.length > 1){
+      let i = 0, timer = 0, visible = true;
+      const tick = () => {
+        if (!visible) return;
+        const cur = items[i]; i = (i + 1) % items.length; const nxt = items[i];
+        cur.classList.remove('on'); cur.classList.add('out');
+        nxt.classList.add('on');
+        setTimeout(() => cur.classList.remove('out'), 500);
+        timer = setTimeout(tick, 2600);
+      };
+      timer = setTimeout(tick, 2600);
+      new IntersectionObserver(es => es.forEach(e => {
+        visible = e.isIntersecting;
+        clearTimeout(timer);
+        if (visible) timer = setTimeout(tick, 1800);
+      }), {threshold: 0}).observe(hero);
+    }
+  }
+
+  // Hero video: the mascot clips play back to back with a 0.6s crossfade,
+  // round and round. Paused while off screen; left on the poster under
+  // reduced motion.
+  const heroVideo = document.getElementById('heroVideo');
+  const clips = heroVideo ? Array.from(heroVideo.querySelectorAll('video')) : [];
+  if (clips.length){
+    const XF = 0.6, LEAD = 1.0;   // fade length; start the handoff this far from the end so the outgoing clip never hits 'ended'
+    let cur = 0, swapping = false;
+    const play = v => { const p = v.play(); if (p && p.catch) p.catch(() => {}); };
+    const swap = () => {
+      if (swapping || clips.length < 2) return;
+      swapping = true;
+      const a = clips[cur], b = clips[(cur + 1) % clips.length];
+      b.currentTime = 0; play(b);
+      b.classList.add('on'); a.classList.remove('on');
+      cur = (cur + 1) % clips.length;
+      setTimeout(() => { a.pause(); a.currentTime = 0; swapping = false; }, XF * 1000 + 80);
+    };
+    if (reduce.matches){
+      clips.forEach(v => { v.removeAttribute('autoplay'); v.pause(); });
+    } else {
+      if (clips.length > 1) clips[0].removeAttribute('loop');   // the script hands off instead
+      clips.forEach(v => {
+        v.addEventListener('timeupdate', () => { if (v === clips[cur] && v.duration && v.duration - v.currentTime <= LEAD) swap(); });
+        v.addEventListener('ended', () => { if (v === clips[cur]) swap(); });
+      });
+      new IntersectionObserver(es => es.forEach(e => {
+        if (e.isIntersecting) play(clips[cur]); else clips.forEach(v => v.pause());
+      }), {threshold: 0}).observe(heroVideo);
+    }
+  }
+
+  // Nav: transparent over the hero, white with a hairline once past it.
+  function navState(){
+    if (!hero) return;
+    nav.classList.toggle('scrolled', window.scrollY > hero.offsetHeight - 80);
+  }
+  navState();
+  window.addEventListener('scroll', navState, {passive: true});
+
+  // Copy blocks fade up as they enter view.
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting){ e.target.classList.add('on'); io.unobserve(e.target); } });
+  }, {threshold: 0.2});
+  document.querySelectorAll('[data-io]').forEach(el => reduce.matches ? el.classList.add('on') : io.observe(el));
+
+  // Floating pill: hidden while the hero or the close is in view (both carry
+  // their own CTA); under 480px also hidden while the pinned proof is active.
+  const vis = {hero: true, close: false, faq: false, proof: false};
+  window.proofActive = false;
+  function pillState(){
+    const narrow = window.innerWidth < 1024;   // stacked layouts: the chat sits in the main column, so no pill over it
+    pill.classList.toggle('hide', vis.hero || vis.close || vis.faq || (narrow && (window.proofActive || vis.proof)));
+  }
+  window.pillState = pillState;
+  const ioPill = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.target === hero) vis.hero = e.isIntersecting; if (e.target === close) vis.close = e.isIntersecting; if (e.target === faq) vis.faq = e.isIntersecting; if (e.target === proofSec) vis.proof = e.isIntersecting; });
+    pillState();
+  }, {threshold: 0.05});
+  hero && ioPill.observe(hero);
+  close && ioPill.observe(close);
+  faq && ioPill.observe(faq);   // past the close there's nothing left to sell — no pill over the FAQ/footer
+  proofSec && ioPill.observe(proofSec);   // narrow screens: no pill over the stacked chat either
+})();
+
+// === cued live avatar (founder prototype, 2026-11-08) ===
+// Eyes follow the cursor, the body leans a touch, the arm waves on hover /
+// click / now and then; blinks and winks on a loose timer. The frame loop
+// only runs while the hero is on screen. Reduced motion: no motion at all.
+(function cuedAvatar(){
+  const root = document.getElementById('cuedAvatar'); if (!root) return;
+  const body = root.querySelector('.ca-body'), arm = root.querySelector('.ca-arm'), eyeL = root.querySelector('.ca-l'), eyeR = root.querySelector('.ca-r'), wink = root.querySelector('.ca-wink');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // eye anchors as fractions of the body image (measured from the 3D render)
+  const A = { L:[0.3907, 0.5875], R:[0.6463, 0.5818], r:0.3930, mouth:{ left:0.4033, top:0.6407, width:0.1901, height:0.1742 }, arm:{ left:0.7959, top:0.5628, width:0.2025, height:0.2879, pivotX:0.2877, pivotY:0.2712 } };
+  const T = { eyeShift:0.05, eyeShiftY:0.03, lean:3, parallax:0.012, blinkMin:2.6, blinkMax:6.2, glanceEvery:[5,10], winkEvery:[14,26], waveEvery:[18,36], ease:0.14 };
+  const now = () => performance.now()/1000;
+  const rnd = (a,b) => a + Math.random()*(b-a);
+
+  function layout(){
+    const bw = body.offsetWidth, bh = body.offsetHeight, bl = body.offsetLeft, bt = body.offsetTop;
+    if (!bw) return;
+    const ew = 2*0.088*A.r*bw, eh = 2*0.128*A.r*bw;
+    for (const [el, p, rot] of [[eyeL, A.L, -6], [eyeR, A.R, 6]]) {
+      el.style.width = ew+'px'; el.style.height = eh+'px';
+      el.style.left = (bl + p[0]*bw - ew/2)+'px'; el.style.top = (bt + p[1]*bh - eh/2)+'px'; el.dataset.rot = rot;
+    }
+    const ww = 0.2*A.r*bw, wh = ww*0.5;
+    wink.style.width = ww+'px'; wink.style.height = wh+'px';
+    wink.style.left = (bl + A.L[0]*bw - ww/2)+'px'; wink.style.top = (bt + A.L[1]*bh - wh/2)+'px';
+    const a = A.arm;
+    arm.style.width = (a.width*bw)+'px'; arm.style.height = (a.height*bh)+'px';
+    arm.style.left = (bl + a.left*bw)+'px'; arm.style.top = (bt + a.top*bh)+'px';
+    arm.style.transformOrigin = (a.pivotX*100)+'% '+(a.pivotY*100)+'%';
+  }
+  let tx = 0, ty = 0, cx = 0, cy = 0, mouse = null, lastMove = 0, glanceAt = 0, hovering = false, winkT = 0, nextWink = 0, nextWave = 1e9, raf = 0, visible = false;
+  function wave(){ if (reduce) return; root.classList.remove('is-waving'); void root.offsetWidth; root.classList.add('is-waving'); nextWave = now() + rnd(...T.waveEvery); }
+  arm.addEventListener('animationend', () => root.classList.remove('is-waving'));
+  if (body.complete) layout(); else body.addEventListener('load', layout);
+  addEventListener('resize', layout);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
+
+  function aim(px, py){
+    const r = root.getBoundingClientRect(), ox = r.left + r.width/2, oy = r.top + r.height*0.55;
+    const dx = px - ox, dy = py - oy, d = Math.hypot(dx, dy) || 1, k = Math.min(1, d/(r.width*1.6));
+    tx = dx/d*k; ty = dy/d*k;
+  }
+  addEventListener('mousemove', e => { mouse = [e.clientX, e.clientY]; lastMove = now(); aim(e.clientX, e.clientY); });
+  addEventListener('mouseleave', () => { mouse = null; });
+  root.addEventListener('mouseenter', () => { hovering = true; root.classList.add('is-winking'); if (!root.classList.contains('is-waving')) wave(); });
+  root.addEventListener('mouseleave', () => { hovering = false; setTimeout(() => { if (!hovering && winkT <= 0) root.classList.remove('is-winking'); }, 400); });
+  root.addEventListener('click', () => {
+    root.classList.remove('is-poked'); void root.offsetWidth; root.classList.add('is-poked'); wave();
+    root.dispatchEvent(new CustomEvent('cued:poke'));          // hook: listen for this to open the text flow, etc.
+  });
+  body.addEventListener('animationend', () => { root.classList.remove('is-poked'); });
+
+  // Everything periodic starts on the first "in view" signal, so an
+  // environment without a real IntersectionObserver (jsdom) never spins.
+  let started = false;
+  function blink(){
+    if (!reduce && !root.classList.contains('is-winking')) {
+      root.classList.add('is-blinking'); setTimeout(() => root.classList.remove('is-blinking'), 120);
+      if (Math.random() < 0.18) setTimeout(() => { root.classList.add('is-blinking'); setTimeout(() => root.classList.remove('is-blinking'), 110); }, 220);
+    }
+    setTimeout(blink, rnd(T.blinkMin, T.blinkMax)*1000);
+  }
+
+  function frame(){
+    if (!visible){ raf = 0; return; }
+    raf = requestAnimationFrame(frame);
+    const t = now();
+    if ((!mouse || t - lastMove > 4) && t > glanceAt) {
+      const settle = Math.random() < 0.45;
+      tx = settle ? 0 : rnd(-0.7, 0.7); ty = settle ? 0 : rnd(-0.3, 0.35);
+      glanceAt = t + rnd(...T.glanceEvery) * (settle ? 0.4 : 1);
+    }
+    if (!hovering && !reduce) {
+      if (winkT <= 0 && t > nextWink) { winkT = 0.5; root.classList.add('is-winking'); }
+      if (winkT > 0) { winkT -= 1/60; if (winkT <= 0) { root.classList.remove('is-winking'); nextWink = t + rnd(...T.winkEvery); } }
+    }
+    if (!hovering && t > nextWave && !root.classList.contains('is-waving')) wave();
+    if (reduce) return;
+    cx += (tx - cx) * T.ease; cy += (ty - cy) * T.ease;
+    const S = root.offsetWidth;
+    const bx = cx*T.parallax*S, by = cy*T.parallax*0.6*S;            // head shift
+    const ex = bx + cx * T.eyeShift * S, ey = by + cy * T.eyeShiftY * S; // eyes: head shift + their own
+    eyeL.style.transform = `translate(${ex}px, ${ey}px) rotate(${eyeL.dataset.rot}deg)`;
+    eyeR.style.transform = `translate(${ex}px, ${ey}px) rotate(${eyeR.dataset.rot}deg)`;
+    wink.style.transform = `translate(${ex}px, ${ey}px)`;
+    if (!root.classList.contains('is-poked')) body.style.transform = `translate(${bx}px, ${by}px) rotate(${cx*T.lean}deg)`;
+  }
+  new IntersectionObserver(es => es.forEach(e => {
+    visible = e.isIntersecting;
+    if (visible && !started){
+      started = true;
+      layout();
+      nextWink = now() + rnd(...T.winkEvery);
+      setTimeout(wave, 900);   // say hi on arrival
+      blink();
+    }
+    if (visible && !raf) frame();
+  }), {threshold: 0}).observe(root);
+})();
+
+// === "say anything." strip — two rows, opposite directions, duplicated for a seamless loop ===
+(function(){
+  const items = Array.from(document.querySelectorAll('#mqList li')).map(li => li.textContent);
+  const rows = [items.slice(0, 9), items.slice(9)];
+  ['mq1', 'mq2'].forEach((id, i) => {
+    const track = document.getElementById(id);
+    if (!track) return;
+    const html = rows[i].map(t => '<div class="msg user t">' + t.replace(/</g, '&lt;') + '</div>').join('');
+    track.innerHTML = html + html;   // duplicated: translateX(-50%) lands on the copy
+  });
+})();
+
+// === Thread engine ===
+// playThread(thread): reveals the bubbles in order with a typing lead-in on
+// the incoming side, pushing the thread up like real Messages (the thread is
+// bottom-anchored; it sits translated down by the height of what hasn't
+// arrived yet). Polls and checklists carry their own choreography. Reduced
+// motion: everything revealed at once, poll picked, sets logged.
+(function(){
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const TYPE_LEAD = 520, GAP = 560;
+
+  function mkTyping(thread){
+    const t = document.createElement('div');
+    t.className = 'typing'; t.setAttribute('aria-hidden', 'true');
+    t.innerHTML = '<i></i><i></i><i></i>';
+    thread.appendChild(t);
+    return t;
+  }
+  function items(thread){
+    return Array.from(thread.children).filter(el => !el.classList.contains('typing'));
+  }
+  // Bottom-anchor math: translate the thread down by the unrevealed height
+  // (plus the typing pill's room while it shows).
+  function layout(thread, lift){
+    const list = items(thread);
+    const last = list.filter(el => el.classList.contains('on')).pop();
+    const revealedBottom = last ? last.offsetTop + last.offsetHeight : 0;
+    const shift = Math.max(0, thread.offsetHeight - revealedBottom) - (lift || 0);
+    thread.style.transform = 'translateY(' + Math.round(shift) + 'px)';
+  }
+  function sideOf(el){
+    if (el.classList.contains('user')) return 'user';
+    return 'coach';   // polls and checklists come from the coach
+  }
+  function clCheck(row, delay){
+    if (!row || row.classList.contains('done')) return;
+    setTimeout(() => { row.classList.add('done'); row.setAttribute('aria-pressed', 'true'); }, delay);
+  }
+  function choreo(el){
+    if (el.classList.contains('poll')){
+      setTimeout(() => { if (!el.classList.contains('chosen')) el.classList.add('chosen'); }, 800);
+    }
+    if (el.classList.contains('checklist')){
+      const rows = el.querySelectorAll('.poll-row');
+      clCheck(rows[0], 600); clCheck(rows[1], 1200);
+    }
+    if (el.classList.contains('cl-swap')){
+      const list = el.parentElement.querySelector('.checklist');
+      if (list){
+        const rows = list.querySelectorAll('.poll-row');
+        const sp = rows[2] && rows[2].querySelector('span');
+        if (sp) sp.textContent = 'bench 190 × 4';
+        clCheck(rows[2], 150); clCheck(rows[3], 750);
+      }
+    }
+  }
+  function revealAll(thread){
+    items(thread).forEach(el => {
+      el.classList.add('on');
+      if (el.classList.contains('poll')) el.classList.add('chosen');
+      if (el.classList.contains('checklist')){
+        const sp = el.querySelectorAll('.poll-row span')[2];
+        if (sp) sp.textContent = 'bench 190 × 4';
+        el.querySelectorAll('.poll-row').forEach(r => { r.classList.add('done'); r.setAttribute('aria-pressed', 'true'); });
+      }
+    });
+    thread.style.transform = '';
+    thread.dataset.played = '1';
+  }
+  function playThread(thread){
+    if (thread.dataset.played) return;
+    thread.dataset.played = '1';
+    if (reduce.matches){ revealAll(thread); return; }
+    const list = items(thread);
+    const typing = mkTyping(thread);
+    let i = 0;
+    layout(thread, 0);
+    function step(){
+      if (i >= list.length){ typing.remove(); return; }
+      const el = list[i];
+      // typing beat on the incoming side, parked just under the last bubble
+      const prev = list[i - 1];
+      typing.className = 'typing ' + sideOf(el);
+      typing.style.top = (prev ? prev.offsetTop + prev.offsetHeight + 6 : 0) + 'px';
+      typing.classList.add('show');
+      layout(thread, typing.offsetHeight + 6);
+      setTimeout(() => {
+        typing.classList.remove('show');
+        el.classList.add('on');
+        layout(thread, 0);
+        choreo(el);
+        i++;
+        setTimeout(step, GAP);
+      }, TYPE_LEAD);
+    }
+    setTimeout(step, 250);
+  }
+  window.playThread = playThread;
+  window.layoutThread = layout;
+
+  // Poll rows: clicking retargets the pick and rewrites the "locked" reply.
+  document.querySelectorAll('.poll').forEach(poll => {
+    const rows = Array.from(poll.querySelectorAll('.poll-row'));
+    const lock = poll.parentElement.querySelector('.poll-lock');
+    rows.forEach(row => row.addEventListener('click', () => {
+      rows.forEach(r => { r.classList.toggle('pick', r === row); r.setAttribute('aria-pressed', r === row ? 'true' : 'false'); });
+      poll.classList.add('chosen');
+      if (lock) lock.textContent = 'locked. ' + row.dataset.t + ' it is.';
+    }));
+  });
+  // Checklist rows: tapping logs a set; the story skips rows already tapped.
+  document.querySelectorAll('.checklist .poll-row').forEach(row => {
+    row.addEventListener('click', () => { row.classList.add('done'); row.setAttribute('aria-pressed', 'true'); });
+  });
+
+  // Stacked threads (every thread not inside the pinned phone) play when
+  // their container scrolls into view.
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const t = e.target.classList.contains('thread') ? e.target : e.target.querySelector('.thread[data-play]');
+      if (t && !t.closest('.proof-sticky')) playThread(t);
+      io.unobserve(e.target);
+    });
+  }, {threshold: 0.35});
+  window.watchThread = (container) => io.observe(container);
+  document.querySelectorAll('.thread-card, .step .phone-wrap').forEach(c => io.observe(c));
+})();
+
+// === Proof: five steps, one pinned phone (≥1024px, motion OK) ===
+// The markup is the stacked form. pinProof() moves each step's copy into a
+// sticky left column (with a stepper) and the five threads into one sticky
+// phone; the 500vh track drives which step is active. unpinProof() puts
+// everything back. Switched live on media-query change.
+(function(){
+  const section = document.getElementById('proof');
+  const stepsWrap = document.getElementById('proofSteps');
+  if (!section || !stepsWrap) return;
+  const steps = Array.from(stepsWrap.querySelectorAll('.step'));
+  const mqPin = matchMedia('(min-width: 1024px)');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const shouldPin = () => mqPin.matches && !reduce.matches;
+  const tints = ['', '', '', '', ''];   // the proof stays on the hero's cream (was tint-2 / white / tint-1 / white / tint-2)
+  let pinned = null, cur = -1, raf = 0;
+
+  function pinProof(){
+    if (pinned) return;
+    const track = document.createElement('div'); track.className = 'proof-track';
+    const sticky = document.createElement('div'); sticky.className = 'proof-sticky';
+    const grid = document.createElement('div'); grid.className = 'wrap proof-grid';
+    const left = document.createElement('div'); left.className = 'proof-left';
+    const copy = document.createElement('div'); copy.className = 'proof-copy';
+    const stepper = document.createElement('ol'); stepper.className = 'stepper';
+    const right = document.createElement('div'); right.className = 'proof-right';
+    // one phone: step 1's chrome, every thread moved into its screen
+    const phoneWrap = steps[0].querySelector('.phone-wrap').cloneNode(true);
+    phoneWrap.style.removeProperty('--ph');
+    const screen = phoneWrap.querySelector('.screen');
+    screen.innerHTML = '';
+    const threads = steps.map(s => s.querySelector('.thread[data-play]'));
+    threads.forEach(t => { t.classList.remove('active'); screen.appendChild(t); });
+    steps.forEach((s, i) => {
+      const c = s.querySelector('.step-copy');
+      copy.appendChild(c);
+      const li = document.createElement('li');
+      const b = document.createElement('button'); b.type = 'button';
+      b.textContent = c.querySelector('h2').textContent;
+      b.addEventListener('click', () => {
+        const top = track.getBoundingClientRect().top + window.scrollY + i * window.innerHeight + 2;
+        window.scrollTo({top, behavior: 'smooth'});
+      });
+      li.appendChild(b); stepper.appendChild(li);
+    });
+    left.appendChild(copy);   // the stepper is built (setStep still marks it) but not shown — founder, 2026-11-14
+    // one render per step (founder's contact sheets, 2026-11-14): calendar wink
+    // (week), dumbbell + PR + clipboard (sets), bowl (dinner), head-tap + chart
+    // phone (remember), watch (watch) — see assets/mascot/v2
+    const mascot = document.createElement('div'); mascot.className = 'proof-mascot';
+    const poses = ['week', 'sets', 'dinner', 'remember', 'watch'];
+    poses.forEach(n => {
+      const im = document.createElement('img'); im.alt = ''; im.loading = 'lazy';
+      im.src = '/assets/mascot/v2/cued-' + n + '.jpg'; im.srcset = '/assets/mascot/v2/cued-' + n + '.webp';
+      mascot.appendChild(im);
+    });
+    left.appendChild(mascot);
+    right.appendChild(phoneWrap);
+    grid.appendChild(left); grid.appendChild(right);
+    sticky.appendChild(grid); track.appendChild(sticky);
+    stepsWrap.style.display = 'none';
+    section.appendChild(track);
+    // step dots on the left edge (#rail): shown only while the proof is pinned
+    const rail = document.getElementById('rail');
+    const dots = [];
+    if (rail){
+      rail.innerHTML = '';
+      steps.forEach((s, i) => {
+        const b = document.createElement('button'); b.type = 'button';
+        b.setAttribute('aria-label', copy.children[i].querySelector('h2').textContent);   // the step copy already moved into `copy`
+        b.innerHTML = '<span class="dot"></span>';
+        b.addEventListener('click', () => {
+          const top = track.getBoundingClientRect().top + window.scrollY + i * window.innerHeight + 2;
+          window.scrollTo({top, behavior: reduce.matches ? 'auto' : 'smooth'});
+        });
+        rail.appendChild(b); dots.push(b);
+      });
+    }
+    pinned = {track, sticky, copy, stepper, phoneWrap, screen, threads, mascot, rail, dots,
+              status: phoneWrap.querySelector('.ph-status')};
+    cur = -1;
+    fitPhone();
+    onScroll();
+    window.addEventListener('scroll', onScroll, {passive: true});
+  }
+  function unpinProof(){
+    if (!pinned) return;
+    window.removeEventListener('scroll', onScroll);
+    pinned.threads.forEach((t, i) => {
+      t.classList.add('active');
+      steps[i].querySelector('.screen').appendChild(t);
+      t.style.transform = '';
+    });
+    Array.from(pinned.copy.children).forEach((c, i) => steps[i].querySelector('.wrap').prepend(c));
+    pinned.track.remove();
+    if (pinned.rail){ pinned.rail.classList.remove('show'); pinned.rail.innerHTML = ''; }
+    stepsWrap.style.display = '';
+    pinned = null; cur = -1;
+    window.proofActive = false; window.pillState && window.pillState();
+    // threads that already played stay revealed; the rest play on intersection
+    steps.forEach(s => window.watchThread && window.watchThread(s.querySelector('.phone-wrap')));
+  }
+  function fitPhone(){
+    if (!pinned) return;
+    const col = pinned.phoneWrap.parentElement.getBoundingClientRect().width || 600;
+    const ps = Math.min(1, (window.innerHeight * 0.8) / 844, (col - 24) / 390);
+    pinned.phoneWrap.style.setProperty('--ps', ps.toFixed(4));
+    if (cur >= 0) window.layoutThread && window.layoutThread(pinned.threads[cur], 0);
+  }
+  function setStep(i){
+    if (i === cur) return;
+    const first = cur < 0;
+    cur = i;
+    const {copy, stepper, sticky, threads, status, mascot, dots} = pinned;
+    Array.from(copy.children).forEach((c, k) => c.classList.toggle('on', k === i));
+    dots.forEach((d, k) => k === i ? d.setAttribute('aria-current', 'true') : d.removeAttribute('aria-current'));
+    Array.from(mascot.children).forEach((m, k) => m.classList.toggle('on', k === i));
+    Array.from(stepper.querySelectorAll('button')).forEach((b, k) => k === i ? b.setAttribute('aria-current', 'step') : b.removeAttribute('aria-current'));
+    sticky.className = 'proof-sticky ' + tints[i];
+    threads.forEach((t, k) => t.classList.toggle('active', k === i));
+    const t = threads[i];
+    if (t.dataset.played){ t.style.transform = ''; }
+    else { window.layoutThread && window.layoutThread(t, 0); setTimeout(() => window.playThread(t), first ? 150 : 350); }
+    const label = steps[i].dataset.status;
+    status.classList.add('swap');
+    setTimeout(() => { status.textContent = label; status.classList.remove('swap'); }, 250);
+  }
+  function onScroll(){
+    if (raf || !pinned) return;
+    raf = requestAnimationFrame(() => {
+      raf = 0;
+      const r = pinned.track.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const span = Math.max(1, r.height - vh);
+      const p = Math.min(1, Math.max(0, -r.top / span));
+      const active = r.top <= 0 && r.bottom >= vh;
+      if (active !== window.proofActive){ window.proofActive = active; window.pillState && window.pillState(); }
+      if (pinned.rail) pinned.rail.classList.toggle('show', active);
+      setStep(Math.min(4, Math.floor(p * 5)));
+    });
+  }
+  function fitStacked(){
+    steps.forEach(s => {
+      const w = s.querySelector('.phone-wrap');
+      const col = s.querySelector('.wrap').getBoundingClientRect().width || 360;
+      const ps = Math.min(1, Math.min(360, col) / 390);
+      w.style.setProperty('--ps', ps.toFixed(4));
+    });
+  }
+  function mode(){
+    if (shouldPin()) pinProof(); else { unpinProof(); fitStacked(); }
+  }
+  mode();
+  mqPin.addEventListener('change', mode);
+  reduce.addEventListener('change', mode);
+  window.addEventListener('resize', () => { if (pinned) fitPhone(); else fitStacked(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (pinned) fitPhone(); });
+})();
+
+// === Dark-mode toggle (bottom-right sun/moon button) ===
+(function(){
+  const sw = document.getElementById('modeBtn');
+  if (!sw) return;
+  const root = document.documentElement;
+  const sync = () => sw.setAttribute('aria-checked', root.classList.contains('dark') ? 'true' : 'false');
+  sw.addEventListener('click', () => {
+    root.classList.toggle('dark');
+    try{ localStorage.setItem('cued-theme', root.classList.contains('dark') ? 'dark' : 'light'); }catch(e){}
+    sync();
+  });
+  sync();
+})();
+
+// === Waitlist — the sign-up chat ===
+// Every CTA calls open(source) → window.openWaitlist. The same conversational
+// sign-up the legacy pages run (legacy/js/signup.js), posting to /waitlist
+// instead of /signup. LIVE since 2026-10-15 (the route name is historical):
+// the backend creates a live account, provisions their iMessage line and
+// returns `imessage_link` + `live: true` + `hook_deferred`. With a link the
+// coach's first text WAITS for the one tap that opens the line ("text me on
+// iMessage" → Messages pre-addressed with "hey cued"; their send gets the
+// coach's first text back, blue) or "i don't have an iPhone" → /signup/channel
+// sends it by SMS now; without a link it's already on its way. An older
+// backend (no `live` in the response) still means the waitlist, and the
+// success copy says so. Payload keeps the original waitlist keys
+//   { name, phone, email, source, ts, timezone, active:false, status:'waitlist' }
+// and adds
+//   { full_name, age, gender, goal:[…], biggest_obstacle, experience, equipment, sms_consent:true }
+// and, since 2026-10-01 (backend #155), the objective stats the coach would
+// otherwise have to ask for over text — a user who texted "168 cm" to an
+// extractor that only knew feet sat in onboarding for 27 turns:
+//   { height_cm, weight_kg } or { height_ft, height_in, weight_lbs },
+//   workout_days (2–6), workout_time (morning|afternoon|evening — the first pick),
+//   workout_times ([…] of those when they picked more than one; since 2026-10-09),
+//   diet, restrictions (optional free text), existing_tools:[…] }
+// and, since 2026-10-27, the friend's referral code (the last optional ask, after the
+// gmail one — the founder's frat sign-up challenge): { referral_code } — the backend
+// credits the friend when it matches and the success screen says so.
+// — `name` is the FIRST name (it's what the coach's hook and prompts inject);
+// the full name rides along in `full_name` for the admin side only.
+// Phone is validated as a 10-digit US number before it's accepted (the backend
+// is strict too). Never run this against the real backend in tests.
+(function(){
+  const API = 'https://web-production-90171c.up.railway.app';
+  const WAITLIST_ENDPOINT = API + '/waitlist';
+  const CHANNEL_ENDPOINT  = API + '/signup/channel';
+
+  const overlay   = document.getElementById('waitlistOverlay');
+  const closeBtn  = document.getElementById('waitlistClose');
+  const msgs      = document.getElementById('coMsgs');
+  const inputArea = document.getElementById('coInputArea');
+  const progress  = document.getElementById('coProgress');
+  if (!overlay || !msgs || !inputArea) return;
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const STEPS = 15;  // name, age, gender, goals, obstacle, experience, equipment, stats, days, time, diet, restrictions, apps, phone, email, referral code, consent (email+code+consent share the last tick)
+  let sdata = {};
+  let step = 0;
+
+  // ── analytics (Umami, head tag) ──
+  // Funnel events so the dashboard shows where readers stop, split by which CTA
+  // opened the card (`source`). Page views are automatic; these are the only
+  // custom events on the site. Every call is a no-op when the tracker hasn't
+  // loaded (blocked, offline, jsdom) — the chat must never depend on it.
+  // Names: signup-open {source} · signup-step {step, name, source} · signup-submit
+  // {result, source} · signup-imessage {source} · signup-sms {source}.
+  // Printed QR codes / shared links carry `?src=<label>` (or utm_source). That
+  // label is `ref` on every event above, so a flyer's scans can be followed into
+  // sign-ups, and it fires one `qr-scan {src}` per landing. The label is kept in
+  // a variable only (nothing stored in the browser) and never leaves this load.
+  const STEP_NAMES = ['', 'name', 'age', 'gender', 'goals', 'obstacle', 'experience', 'equipment', 'stats', 'days', 'time', 'diet', 'restrictions', 'apps', 'phone', 'consent'];
+  const ref = (() => {
+    try {
+      const q = new URLSearchParams(location.search);
+      const v = (q.get('src') || q.get('utm_source') || '').trim().toLowerCase().replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '');
+      return v ? v.slice(0, 50) : null;
+    } catch (e) { return null; }
+  })();
+  function track(name, data){
+    try {
+      if (!(window.umami && typeof window.umami.track === 'function')) return false;
+      window.umami.track(name, ref ? Object.assign({}, data, { ref }) : data);
+      return true;
+    } catch (e) { return false; }
+  }
+  if (ref){
+    // The tracker is a deferred head script; it may land after this runs. Retry
+    // briefly, then give up quietly (blocked / offline / jsdom).
+    let tries = 0;
+    (function scan(){ if (!track('qr-scan', { src: ref }) && tries++ < 20) setTimeout(scan, 250); })();
+  }
+  const ctaSource = () => overlay.dataset.source || 'unknown';
+
+  function setProgress(n){
+    if (n > step && STEP_NAMES[n]) track('signup-step', { step: n, name: STEP_NAMES[n], source: ctaSource() });
+    step = n;
+    if (progress) progress.style.setProperty('--p', Math.min(100, Math.round(n / STEPS * 100)) + '%');
+  }
+  function scrollBottom(){ msgs.scrollTop = msgs.scrollHeight; requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight; }); }
+  // The thread is a real scroller now (earlier bubbles are reachable), so it
+  // has to be re-pinned to the bottom whenever its box changes — the composer
+  // appearing/disappearing, a chip row landing, the keyboard opening.
+  if (window.ResizeObserver) new ResizeObserver(scrollBottom).observe(msgs);
+
+  function addMsg(text, who, extraClass = ''){
+    const m = document.createElement('div');
+    m.className = 'co-msg ' + who + ' t' + (extraClass ? ' ' + extraClass : '');
+    if (text instanceof Node) m.appendChild(text);
+    else if (who === 'user') m.textContent = text; else m.innerHTML = text;
+    // Tail only on the last bubble of a run; a gap when the sender changes.
+    const all = msgs.querySelectorAll('.co-msg');
+    const prev = all[all.length - 1];
+    if (prev){
+      if (prev.classList.contains(who)) prev.classList.remove('t');
+      else m.classList.add('turn');
+    }
+    msgs.appendChild(m);
+    if (who === 'user'){
+      // "Delivered" under the reader's latest bubble, like Messages (it stays
+      // through the reply; it moves when they send again).
+      const oldMeta = msgs.querySelector('.co-meta');
+      if (oldMeta) oldMeta.remove();
+      const meta = document.createElement('div');
+      meta.className = 'co-meta';
+      meta.textContent = 'Delivered';
+      msgs.appendChild(meta);
+    }
+    requestAnimationFrame(() => { m.classList.add('show'); scrollBottom(); });
+    return m;
+  }
+
+  function showTyping(){
+    const t = document.createElement('div');
+    t.className = 'co-typing';
+    t.innerHTML = '<div class="co-dot"></div><div class="co-dot"></div><div class="co-dot"></div>';
+    msgs.appendChild(t);
+    scrollBottom();
+    return t;
+  }
+
+  function coachSay(text, typingMs = 320, extraClass = ''){
+    return new Promise(resolve => {
+      const ms = reduced.matches ? 0 : typingMs;
+      const t = showTyping();
+      setTimeout(() => { t.remove(); addMsg(text, 'coach', extraClass); resolve(); }, ms);
+    });
+  }
+
+  function clearInput(){ inputArea.innerHTML = ''; }
+
+  function composer(placeholder, type = 'text', readonly = false, optional = false){
+    const row = document.createElement('div');
+    row.className = 'co-input-row';
+    const inp = document.createElement('input');
+    inp.className = 'co-input';
+    inp.placeholder = placeholder;
+    inp.type = type;
+    if (readonly){ inp.readOnly = true; inp.setAttribute('inputmode', 'none'); inp.setAttribute('aria-label', placeholder); }
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'co-send';
+    btn.setAttribute('aria-label', 'Send');
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>';
+    row.appendChild(inp);
+    let skip = null;
+    if (optional){
+      skip = document.createElement('button');
+      skip.type = 'button';
+      skip.className = 'co-skip';
+      skip.textContent = 'skip';
+      row.appendChild(skip);
+    }
+    row.appendChild(btn);
+    return { row, inp, btn, skip };
+  }
+
+  // optional=true: a "skip" button sits in the row (an empty send skips too);
+  // the skip is echoed as the reader's bubble and resolves ''.
+  function textInput(placeholder, type = 'text', optional = false){
+    const kind = type;
+    if (type === 'code') type = 'text';   // a referral code: text, but no name autocomplete, caps
+    return new Promise(resolve => {
+      clearInput();
+      const { row, inp, btn, skip } = composer(placeholder, type, false, optional);
+      inp.setAttribute('inputmode', type === 'tel' ? 'tel' : type === 'number' ? 'numeric' : type === 'email' ? 'email' : 'text');
+      inp.setAttribute('autocomplete', type === 'tel' ? 'tel' : type === 'email' ? 'email' : type === 'text' ? 'name' : 'off');
+      if (type === 'email'){ inp.autocapitalize = 'off'; inp.spellcheck = false; }
+      if (kind === 'code'){ inp.setAttribute('autocomplete', 'off'); inp.autocapitalize = 'characters'; inp.spellcheck = false; }
+      inp.setAttribute('enterkeyhint', 'send');
+      if (type === 'tel'){
+        // Formats as they type — (510) 555-1234 — so the number reads back like a contact card.
+        inp.addEventListener('input', () => {
+          let d = inp.value.replace(/\D/g, '');
+          if (d.length === 11 && d[0] === '1') d = d.slice(1);
+          d = d.slice(0, 10);
+          inp.value = d.length > 6 ? `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`
+                    : d.length > 3 ? `(${d.slice(0,3)}) ${d.slice(3)}`
+                    : d;
+        });
+      }
+      function submit(){
+        const val = inp.value.trim();
+        if (!val){
+          if (!optional) return;
+          addMsg('skip', 'user');
+          clearInput();
+          resolve('');
+          return;
+        }
+        addMsg(val, 'user');
+        clearInput();
+        resolve(val);
+      }
+      btn.addEventListener('click', submit);
+      skip && skip.addEventListener('click', () => { inp.value = ''; submit(); });
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+      inputArea.appendChild(row);
+      scrollBottom();
+      inp.focus();
+    });
+  }
+
+  // Fixed answers: cued sends a list bubble right after the question; the
+  // composer below is read-only and mirrors the pick. Single-select rows send
+  // themselves; multi-select rows toggle, the field shows the running answer,
+  // the arrow sends. The bubble then locks in place with the picks checked.
+  function chips(options, multi = false, placeholder){
+    return new Promise(resolve => {
+      clearInput();
+      const list = document.createElement('div');
+      list.setAttribute('role', multi ? 'group' : 'radiogroup');
+      const bubble = addMsg(list, 'coach', 'co-opts');
+      const { row, inp, btn } = composer(placeholder || (multi ? 'tap all that apply' : 'tap one'), 'text', true);
+      btn.disabled = true;
+      const selected = new Set();
+      const labelsOf = () => options.filter(o => selected.has(o.value)).map(o => o.label).join(', ');
+      function send(){
+        if (!selected.size) return;
+        bubble.classList.add('done');
+        addMsg(labelsOf(), 'user');
+        clearInput();
+        resolve([...selected]);
+      }
+      options.forEach(opt => {
+        const r = document.createElement('button');
+        r.type = 'button';
+        r.className = 'co-opt';
+        r.setAttribute('role', multi ? 'checkbox' : 'radio');
+        r.setAttribute('aria-checked', 'false');
+        r.innerHTML = '<span></span><i aria-hidden="true"></i>';
+        r.firstChild.textContent = opt.label;
+        r.addEventListener('click', () => {
+          if (bubble.classList.contains('done')) return;
+          if (!multi){
+            list.querySelectorAll('.co-opt').forEach(x => { x.classList.remove('sel'); x.setAttribute('aria-checked', 'false'); });
+            selected.clear(); selected.add(opt.value);
+            r.classList.add('sel'); r.setAttribute('aria-checked', 'true');
+            inp.value = opt.label;
+            btn.disabled = false;
+            setTimeout(send, reduced.matches ? 0 : 220);   // the check lands, then it sends
+          } else {
+            const on = r.classList.toggle('sel');
+            r.setAttribute('aria-checked', String(on));
+            on ? selected.add(opt.value) : selected.delete(opt.value);
+            inp.value = labelsOf();
+            btn.disabled = !selected.size;
+          }
+        });
+        list.appendChild(r);
+      });
+      btn.addEventListener('click', send);
+      inputArea.appendChild(row);
+      scrollBottom();
+    });
+  }
+
+  // Height + weight in one composer: a unit toggle (ft/lb ↔ cm/kg) and two or
+  // three small number fields. The backend takes either system (signup_stats);
+  // nothing is converted here. Resolves the keys to post, and echoes the
+  // reader's bubble as they'd type it ("5'6, 120 lbs" / "168 cm, 50 kg").
+  function statsInput(){
+    return new Promise(resolve => {
+      clearInput();
+      // Default unit by locale: en-US → ft/lb, everyone else → cm/kg.
+      let metric = !/^en-US$/i.test((navigator.language || 'en-US'));
+      const wrap = document.createElement('div');
+      wrap.className = 'co-stats';
+      const units = document.createElement('div');
+      units.className = 'co-units';
+      units.setAttribute('role', 'radiogroup');
+      units.setAttribute('aria-label', 'units');
+      const row = document.createElement('div');
+      row.className = 'co-input-row';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'co-send';
+      btn.setAttribute('aria-label', 'Send');
+      btn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>';
+      let fields = {};
+      function num(name, placeholder, maxlen){
+        const i = document.createElement('input');
+        i.className = 'co-input co-num';
+        i.type = 'text';
+        i.inputMode = 'decimal';
+        i.autocomplete = 'off';
+        i.placeholder = placeholder;
+        i.maxLength = maxlen;
+        i.setAttribute('aria-label', placeholder);
+        i.setAttribute('enterkeyhint', 'send');
+        i.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+        fields[name] = i;
+        return i;
+      }
+      function build(){
+        row.innerHTML = '';
+        fields = {};
+        if (metric){
+          row.appendChild(num('cm', 'height (cm)', 3));
+          row.appendChild(num('kg', 'weight (kg)', 5));
+        } else {
+          row.appendChild(num('ft', 'ft', 1));
+          row.appendChild(num('in', 'in', 2));
+          row.appendChild(num('lbs', 'weight (lbs)', 5));
+        }
+        row.appendChild(btn);
+        units.querySelectorAll('.co-unit').forEach(u => {
+          const on = (u.dataset.metric === '1') === metric;
+          u.classList.toggle('sel', on);
+          u.setAttribute('aria-checked', String(on));
+        });
+        const firstField = row.querySelector('.co-input');
+        firstField && firstField.focus();
+      }
+      [['ft / lb', '0'], ['cm / kg', '1']].forEach(([label, m]) => {
+        const u = document.createElement('button');
+        u.type = 'button';
+        u.className = 'co-unit';
+        u.dataset.metric = m;
+        u.setAttribute('role', 'radio');
+        u.textContent = label;
+        u.addEventListener('click', () => { metric = m === '1'; build(); });
+        units.appendChild(u);
+      });
+      const n = el => { const v = parseFloat(String(el.value).replace(',', '.')); return Number.isFinite(v) ? v : NaN; };
+      function submit(){
+        let out, echo;
+        if (metric){
+          const cm = n(fields.cm), kg = n(fields.kg);
+          if (!(cm >= 120 && cm <= 230 && kg >= 30 && kg <= 270)) return shake();
+          out = { height_cm: Math.round(cm), weight_kg: Math.round(kg * 10) / 10 };
+          echo = `${out.height_cm} cm, ${out.weight_kg} kg`;
+        } else {
+          const ft = n(fields.ft), inch = fields.in.value.trim() === '' ? 0 : n(fields.in), lbs = n(fields.lbs);
+          if (!(ft >= 4 && ft <= 7 && inch >= 0 && inch <= 11 && lbs >= 60 && lbs <= 600)) return shake();
+          out = { height_ft: Math.round(ft), height_in: Math.round(inch), weight_lbs: Math.round(lbs) };
+          echo = `${out.height_ft}'${out.height_in}, ${out.weight_lbs} lbs`;
+        }
+        addMsg(echo, 'user');
+        clearInput();
+        resolve(out);
+      }
+      function shake(){
+        row.classList.remove('co-shake');
+        requestAnimationFrame(() => row.classList.add('co-shake'));
+        const empty = [...row.querySelectorAll('.co-input')].find(i => !i.value.trim());
+        (empty || row.querySelector('.co-input')).focus();
+      }
+      btn.addEventListener('click', submit);
+      wrap.appendChild(units);
+      wrap.appendChild(row);
+      inputArea.appendChild(wrap);
+      build();
+      scrollBottom();
+    });
+  }
+
+  // Consent: the fine print is cued's bubble (terms + privacy inline); the
+  // reader's "i agree" is their bubble, sent from the one chip on offer.
+  async function consentStep(){
+    await coachSay('by joining you agree to get recurring automated texts from cued — workouts, meals, check-ins. 5–8 msgs/day, msg &amp; data rates may apply, reply STOP to cancel or HELP for help. <a href="/terms.html" target="_blank" rel="noopener">terms</a> · <a href="/privacy.html" target="_blank" rel="noopener">privacy</a>', 320, 'fine');
+    await chips([{label: 'i agree', value: true}], false, 'tap to agree');
+    return true;
+  }
+
+  function validPhone(v){
+    const d = v.replace(/\D/g, '');
+    return d.length === 10 || (d.length === 11 && d[0] === '1');
+  }
+
+  async function askPhone(){
+    let v = await textInput('(510) 555-1234', 'tel');
+    while (!validPhone(v)){
+      await coachSay("hmm, that's not a 10-digit US number — try again?", 320);
+      v = await textInput('(510) 555-1234', 'tel');
+    }
+    return v;
+  }
+
+  function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()); }
+
+  async function askEmail(){
+    let v = await textInput('gmail (optional)', 'email', true);
+    while (v && !validEmail(v)){
+      await coachSay("hmm, that email doesn't look right — try again, or skip it?", 320);
+      v = await textInput('gmail (optional)', 'email', true);
+    }
+    return v ? v.trim().toLowerCase() : null;
+  }
+
+  async function askAge(){
+    let v = await textInput('Your age', 'number');
+    while (!/^\d{1,3}$/.test(v)){
+      await coachSay('just the number is fine — how old are you?', 320);
+      v = await textInput('Your age', 'number');
+    }
+    return Number(v);
+  }
+
+  function successScreen(title, body, link){
+    msgs.innerHTML = '';
+    clearInput();
+    const s = document.createElement('div');
+    s.className = 'co-success';
+    s.innerHTML = '<div class="co-success-icon">🎉</div><h3></h3><p></p>';
+    s.querySelector('h3').textContent = title;
+    s.querySelector('p').textContent = body;
+    if (link){
+      // iMessage-first (Photon shared pool): Cued can't text a new number in
+      // blue until that number texts Cued's line once. The link opens Messages
+      // pre-addressed with "hey cued" typed in; their send opens the line and
+      // (live) the coach's first text is the reply. Secondary: "i don't have an
+      // iPhone" → /signup/channel → the first text by SMS, right away.
+      const a = document.createElement('a');
+      a.className = 'co-confirm co-imsg';
+      a.href = link;
+      a.textContent = 'text me on iMessage';
+      a.addEventListener('click', () => track('signup-imessage', { source: ctaSource() }));
+      const alt = document.createElement('button');
+      alt.type = 'button';
+      alt.className = 'co-alt';
+      alt.textContent = "i don't have an iPhone";
+      alt.addEventListener('click', async () => {
+        track('signup-sms', { source: ctaSource() });
+        alt.disabled = true;
+        alt.textContent = 'one sec…';
+        try {
+          const r = await fetch(CHANNEL_ENDPOINT, { method: 'POST', headers: {'Content-Type': 'application/json'},
+                                                  body: JSON.stringify({ phone: sdata.phone, channel: 'sms' }) });
+          const d = await r.json().catch(() => ({}));
+          if (r.ok && d.status === 'ok'){
+            a.remove(); alt.remove();
+            const note = document.createElement('p');
+            note.className = 'co-imsg-note';
+            note.textContent = d.hook_sent ? "got it — just texted you by SMS. check your messages."
+                                           : "got it — i'll text you by SMS the second your spot opens.";
+            s.appendChild(note);
+          } else { alt.disabled = false; alt.textContent = "i don't have an iPhone"; }
+        } catch { alt.disabled = false; alt.textContent = "i don't have an iPhone"; }
+      });
+      s.appendChild(a);
+      s.appendChild(alt);
+    }
+    msgs.appendChild(s);
+  }
+
+  function showRetry(){
+    clearInput();
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'co-confirm';
+    btn.textContent = 'try again';
+    btn.addEventListener('click', submitProfile);
+    inputArea.appendChild(btn);
+  }
+
+  async function submitProfile(){
+    clearInput();
+    await coachSay('setting you up…', 260);
+    const payload = {
+      name: first(),          // what the coach says — first name only, never the full name
+      full_name: sdata.name,  // for us (admin, email later); the backend keeps it aside
+      phone: sdata.phone,
+      email: sdata.email || null,
+      source: overlay.dataset.source || 'unknown',
+      ts: new Date().toISOString(),
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      active: false,
+      status: 'waitlist',
+      age: sdata.age,
+      gender: sdata.gender,
+      goal: sdata.goal,
+      biggest_obstacle: sdata.biggest_obstacle,
+      experience: sdata.experience,
+      equipment: sdata.equipment,
+      // the objective stats (backend #155) — either unit system, backend converts
+      ...(sdata.stats || {}),
+      workout_days: sdata.workout_days || null,
+      workout_time: sdata.workout_time || null,
+      workout_times: sdata.workout_times && sdata.workout_times.length > 1 ? sdata.workout_times : null,
+      diet: sdata.diet || null,
+      restrictions: sdata.restrictions || null,
+      existing_tools: sdata.existing_tools && sdata.existing_tools.length ? sdata.existing_tools : null,
+      referral_code: sdata.referral_code || null,   // a friend's code (backend referrals.py credits them)
+      sms_consent: true,
+    };
+    try {
+      const res = await fetch(WAITLIST_ENDPOINT, { method: 'POST', headers: {'Content-Type': 'application/json'},
+                                                 body: JSON.stringify(payload) });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && (data.status === 'ok' || data.status === 'exists')){
+        const link = data.imessage_link;
+        const linkOk = typeof link === 'string' && /^https:\/\//.test(link);
+        const already = data.status === 'exists';
+        const live = data.live === true;   // absent → an older backend: still the waitlist
+        setProgress(STEPS);
+        track('signup-submit', { result: (live ? 'live' : 'waitlist') + (already ? '-exists' : ''), source: ctaSource() });
+        let title, body;
+        if (live && !already){
+          // Signed up for real. With a link, their tap IS what brings the first
+          // text (backend: hook deferred until their first blue text, or until
+          // "i don't have an iPhone"); without one it's already on its way.
+          title = `you're in, ${first()}.`;
+          body = linkOk ? "one more thing — text me once from the number you just gave me so i can reach you on iMessage. i'll text you right back and we'll get going."
+                        : "just texted you. keep an eye on your messages — that's where everything happens.";
+          // The friend's code matched (backend `referral`): say who got the credit.
+          const ref = data.referral;
+          if (ref && ref.credited && ref.referrer) body += ` ${String(ref.referrer).toLowerCase()} gets the referral credit.`;
+          else if (sdata.referral_code && ref && ref.credited === false) body += " that referral code didn't match anyone, but you're in all the same.";
+        } else if (live && already){
+          title = "you're already signed up.";
+          body = linkOk ? "i'm right here — text me whenever." : "nothing else to do here — text me whenever.";
+        } else {
+          title = already ? (data.message || "you're already on the list.").toLowerCase() : `you're on the list, ${first()}.`;
+          body = linkOk ? "one more thing — text me once so i can reach you on iMessage the second your spot opens. from the number you just gave me."
+                        : (already ? 'nothing else to do here.' : "i'll text you the second your spot opens. keep an eye on your messages.");
+        }
+        successScreen(title, body, linkOk ? link : null);
+      } else {
+        track('signup-submit', { result: 'rejected', source: ctaSource() });
+        await coachSay((data && data.message) || 'something went wrong — try again?', 320);
+        showRetry();
+      }
+    } catch (err) {
+      track('signup-submit', { result: 'error', source: ctaSource() });
+      await coachSay('connection error — check your internet and try again.', 320);
+      showRetry();
+    }
+  }
+
+  // Fifteen quick steps, one bubble each, in the coach's texting voice. Only
+  // name (full — the backend keeps it), age, height/weight, the optional
+  // allergies line, phone and email are typed; the coach greets by first name.
+  // The email ask is framed as the GOOGLE account on purpose (2026-10-02): while the
+  // OAuth app is in Testing, that address has to be allowlisted before the coach can
+  // read their calendar or fitbit, and a reason is what gets people to fill it in.
+  const first = () => (sdata.name || '').trim().split(/\s+/)[0];
+  async function runChat(){
+    msgs.innerHTML = '';
+    clearInput();
+    sdata = {};
+    setProgress(0);
+
+    await coachSay("hey, i'm cued. what's your full name?", 450);
+    sdata.name = await textInput('full name');                                    setProgress(1);
+    await coachSay(`nice to meet you, ${first()}. how old are you?`);
+    sdata.age = await askAge();                                                   setProgress(2);
+    await coachSay('and your gender?');
+    [sdata.gender] = await chips([{label:'male',value:'male'},{label:'female',value:'female'},{label:'non-binary',value:'non_binary'},{label:'rather not say',value:'prefer_not_to_say'}]);  setProgress(3);
+    await coachSay('what are you training for? pick all that apply');
+    sdata.goal = await chips([{label:'lose fat',value:'fat_loss'},{label:'build muscle',value:'muscle_building'},{label:'get stronger',value:'strength'},{label:'general fitness',value:'general_fitness'},{label:'endurance',value:'endurance'}], true);  setProgress(4);
+    await coachSay('what gets in the way most?');
+    [sdata.biggest_obstacle] = await chips([{label:'consistency',value:'consistency'},{label:'nutrition',value:'nutrition'},{label:'knowing what to do',value:'knowledge'},{label:'time',value:'time'},{label:'motivation',value:'motivation'},{label:'injuries',value:'injuries'}]);  setProgress(5);
+    await coachSay('how long have you been training?');
+    [sdata.experience] = await chips([{label:'just starting',value:'none'},{label:'under 6 months',value:'beginner'},{label:'6 months – 2 years',value:'intermediate'},{label:'2+ years',value:'advanced'}]);  setProgress(6);
+    await coachSay('what do you have access to?');
+    [sdata.equipment] = await chips([{label:'full gym',value:'full_gym'},{label:'limited gym',value:'limited_gym'},{label:'home gym',value:'home_gym'},{label:'bodyweight only',value:'bodyweight'}]);  setProgress(7);
+    // The objective stats (backend #155). Numbers on a form, not over text —
+    // the coach never has to ask for any of these.
+    await coachSay('how tall are you, and what do you weigh? ballpark is fine');
+    sdata.stats = await statsInput();                                             setProgress(8);
+    await coachSay('how many days a week can you realistically train?');
+    [sdata.workout_days] = await chips([{label:'2',value:'2'},{label:'3',value:'3'},{label:'4',value:'4'},{label:'5',value:'5'},{label:'6',value:'6'}]);  setProgress(9);
+    // Multi-select (founder 2026-10-09): different days, different times. The first
+    // pick rides in workout_time (what every backend reads); the whole list rides in
+    // workout_times (backend restructure PR 4 reads it; older backends ignore it).
+    await coachSay('and when do you usually get to it? pick all that apply');
+    sdata.workout_times = await chips([{label:'mornings',value:'morning'},{label:'afternoons',value:'afternoon'},{label:'evenings',value:'evening'}], true);
+    sdata.workout_time = sdata.workout_times[0];                                  setProgress(10);
+    await coachSay('how do you eat?');
+    [sdata.diet] = await chips([{label:'no restrictions',value:'omnivore'},{label:'vegetarian',value:'vegetarian'},{label:'vegan',value:'vegan'},{label:'pescatarian',value:'pescatarian'},{label:'halal',value:'halal'},{label:'kosher',value:'kosher'}]);  setProgress(11);
+    await coachSay("any allergies, or foods you just won't eat? skip if nothing comes to mind");
+    sdata.restrictions = (await textInput('e.g. peanuts, mushrooms (optional)', 'text', true)).trim() || null;  setProgress(12);
+    await coachSay('track anything already? pick all that apply');
+    sdata.existing_tools = await chips([{label:'nothing yet',value:'none'},{label:'apple watch',value:'apple_watch'},{label:'fitbit / google',value:'fitbit'},{label:'garmin',value:'garmin'},{label:'whoop',value:'whoop'},{label:'oura',value:'oura'},{label:'strava',value:'strava'},{label:'myfitnesspal',value:'myfitnesspal'}], true);
+    if (sdata.existing_tools.includes('none')) sdata.existing_tools = ['none'];   setProgress(13);
+    await coachSay("almost there — your number? that's where i'll text you");
+    sdata.phone = await askPhone();                                               setProgress(14);
+    await coachSay("and ur gmail? optional, but it's what i need to read ur google calendar or fitbit later");
+    sdata.email = await askEmail();
+    await coachSay("did a friend send you? drop their referral code and they get the credit — skip if not");
+    sdata.referral_code = (await textInput('Alex1234', 'code', true)).trim().toUpperCase() || null;
+    await coachSay('last thing — the fine print:');
+    await consentStep();                                                          setProgress(15);
+    await submitProfile();
+  }
+
+  // ── open / close ──
+  // While open, the overlay is sized to the VISUAL viewport (window.visualViewport):
+  // on phones an open keyboard shrinks it, so the sheet shrinks with it and the
+  // compose row stays on screen instead of sliding under the keys.
+  const vv = window.visualViewport;
+  function fitViewport(){
+    if (!vv || !overlay.classList.contains('open')) return;
+    overlay.style.height = Math.round(vv.height) + 'px';
+    overlay.style.top = Math.round(vv.offsetTop) + 'px';
+    // width/left too: if the page is zoomed (pinch, or an earlier focus zoom),
+    // the layout viewport is wider than what's on screen — fit the sheet to
+    // the visible part instead of letting its right side run off the edge.
+    overlay.style.width = Math.round(vv.width) + 'px';
+    overlay.style.left = Math.round(vv.offsetLeft) + 'px';
+    scrollBottom();
+  }
+  let lastFocus = null;
+  function open(source){
+    lastFocus = document.activeElement;
+    overlay.dataset.source = source || 'unknown';
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    if (vv){ vv.addEventListener('resize', fitViewport); vv.addEventListener('scroll', fitViewport); fitViewport(); }
+    if (!msgs.children.length){ track('signup-open', { source: ctaSource() }); runChat(); }   // re-opening resumes where they left off
+    else { const inp = inputArea.querySelector('.co-input'); inp && inp.focus(); }
+  }
+  window.openWaitlist = open;
+
+  function close(){
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    if (vv){ vv.removeEventListener('resize', fitViewport); vv.removeEventListener('scroll', fitViewport); }
+    overlay.style.height = ''; overlay.style.top = ''; overlay.style.width = ''; overlay.style.left = '';
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  const navCta = document.getElementById('navCta');
+  const closeCta = document.getElementById('closeCta');
+  const floatCta = document.getElementById('floatCta');
+  const heroCta = document.getElementById('heroCta');
+  const heroCtaTop = document.getElementById('heroCtaTop');
+  navCta && navCta.addEventListener('click', () => open('nav'));
+  heroCta && heroCta.addEventListener('click', () => open('hero'));
+  heroCtaTop && heroCtaTop.addEventListener('click', () => open('hero'));
+  closeCta && closeCta.addEventListener('click', () => open('close'));
+  floatCta && floatCta.addEventListener('click', () => open('floating'));
+
+  closeBtn && closeBtn.addEventListener('click', close);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('open')) close();
+  });
+})();
+</script>
+
+</body>
+</html>
