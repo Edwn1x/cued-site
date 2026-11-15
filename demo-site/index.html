@@ -412,7 +412,19 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 .gy-v{font-size:1.5em;font-weight:600;letter-spacing:-.02em;color:var(--ink);margin:0 0 .4em}
 .gy-v small{font-size:.5em;font-weight:400;color:var(--gray-text);margin-left:.3em}
 /* set sheet (the extension's "tap to start" sheet, inline) */
-.msg.card.sheet{width:min(100%,21em)}
+.msg.card.sheet{width:auto;max-width:76%;cursor:pointer;transition:none}
+.msg.card.sheet.open{width:min(100%,21em);max-width:88%;cursor:default}
+/* compact state: the small "tap to start" card the extension sends; .open swaps in the sheet */
+.sh-compact{display:flex;align-items:center;gap:.6em}
+.sh-compact .wk-dot{width:1.9em;height:1.9em}
+.sh-ct{font-size:.95em;font-weight:600;color:var(--ink)}
+.sh-cs{font-size:.7em;color:var(--gray-text);margin-top:.1em}
+.sh-body{display:none}
+.msg.card.sheet.open .sh-compact{display:none}
+.msg.card.sheet.open .sh-body{display:block;animation:shIn .35s var(--ease)}
+@keyframes shIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#proof .msg.card.sheet{max-width:76%}
+#proof .msg.card.sheet.open{max-width:88%}
 .sh-top{display:flex;align-items:baseline;justify-content:space-between}
 .sh-title{font-family:var(--f-head);font-size:1.3em;color:var(--ink)}
 .sh-count{font-size:.68em;color:var(--gray-text)}
@@ -1126,7 +1138,9 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
           <div class="screen">
             <div class="thread coach-left" data-play>
               <div class="msg coach t">push day. bench 110 for 4×5, if it all moves easy we jump next time.</div>
-              <div class="msg coach card sheet" aria-label="workout sheet: push, saturday, bench press, three sets">
+              <div class="msg coach card sheet" role="button" tabindex="0" aria-expanded="false" aria-label="workout card: push, saturday — tap to open the set sheet">
+                <div class="sh-compact"><i class="wk-dot"></i><div><div class="sh-ct">push · sat</div><div class="sh-cs">bench press — tap to start</div></div></div>
+                <div class="sh-body">
                 <div class="sh-top"><span class="sh-title">push · sat</span><span class="sh-count"><b>2</b> / 13 sets</span></div>
                 <div class="sh-sub">tap a set when you did it as planned. tap the numbers if it went different.</div>
                 <div class="sh-ex"><span>bench press</span><span class="sh-act">swap &nbsp; remove</span></div>
@@ -1140,6 +1154,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
                 </div>
                 <button type="button" class="sh-row" aria-pressed="false"><span>110 × 5</span><i></i></button>
                 <div class="sh-foot"><span><b class="sh-total">1,100 lb</b> so far</span><span class="sh-save">save</span></div>
+                </div>
               </div>
               <div class="msg user t turn">felt easy</div>
               <div class="msg coach t turn cl-swap">noted. 115 next time 🎉</div>
@@ -1687,16 +1702,32 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     if (el.classList.contains('user')) return 'user';
     return 'coach';   // polls and checklists come from the coach
   }
-  function sheetPlay(sheet){
-    if (sheet.dataset.played) return; sheet.dataset.played = '1';
+  // The workout card arrives compact ("push · sat — tap to start"); a tap —
+  // or 1.2s on its own — opens it into the set sheet in place, the way the
+  // extension takes over the thread. Then the set choreography runs.
+  function sheetOpen(sheet){
+    if (sheet.classList.contains('open')) return;
+    sheet.classList.add('open'); sheet.setAttribute('aria-expanded', 'true');
+    const th = sheet.closest('.thread'); if (th && !mqStacked.matches) layout(th, 0);
     const edit = sheet.querySelector('.sh-edit'), st = sheet.querySelector('.sh-stepper'), lb = sheet.querySelector('.sh-lb'), total = sheet.querySelector('.sh-total'), count = sheet.querySelector('.sh-count b');
     const rows = sheet.querySelectorAll('.sh-row');
-    if (reduce.matches){ edit.querySelector('span').textContent = '115 × 5'; rows.forEach(r => { r.classList.add('done'); r.setAttribute('aria-pressed','true'); }); total.textContent = '2,275 lb'; count.textContent = '4'; return; }
-    setTimeout(() => st.classList.add('open'), 900);
+    const relayout = () => { if (th && !mqStacked.matches) layout(th, 0); };
+    if (reduce.matches){ edit.querySelector('span').textContent = '115 × 5'; rows.forEach(r => { r.classList.add('done'); r.setAttribute('aria-pressed','true'); }); total.textContent = '2,225 lb'; count.textContent = '4'; return; }
+    setTimeout(() => { st.classList.add('open'); relayout(); }, 900);
     setTimeout(() => { lb.textContent = '115'; lb.classList.add('bump'); }, 1700);
-    setTimeout(() => { st.classList.remove('open'); edit.querySelector('span').textContent = '115 × 5'; edit.classList.add('done'); edit.setAttribute('aria-pressed','true'); total.textContent = '1,675 lb'; count.textContent = '3'; }, 2600);
+    setTimeout(() => { st.classList.remove('open'); edit.querySelector('span').textContent = '115 × 5'; edit.classList.add('done'); edit.setAttribute('aria-pressed','true'); total.textContent = '1,675 lb'; count.textContent = '3'; relayout(); }, 2600);
     setTimeout(() => { rows[3].classList.add('done'); rows[3].setAttribute('aria-pressed','true'); total.textContent = '2,225 lb'; count.textContent = '4'; }, 3400);
   }
+  function sheetPlay(sheet){
+    if (sheet.dataset.played) return; sheet.dataset.played = '1';
+    if (reduce.matches){ sheetOpen(sheet); return; }
+    setTimeout(() => sheetOpen(sheet), 1200);
+  }
+  document.querySelectorAll('.msg.card.sheet').forEach(sheet => {
+    const go = () => sheetOpen(sheet);
+    sheet.addEventListener('click', e => { if (!sheet.classList.contains('open')) go(); });
+    sheet.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && !sheet.classList.contains('open')){ e.preventDefault(); go(); } });
+  });
   function choreo(el){
     if (el.classList.contains('poll')){
       setTimeout(() => { if (!el.classList.contains('chosen')) el.classList.add('chosen'); }, 800);
