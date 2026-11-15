@@ -176,7 +176,8 @@ nav .btn{height:44px;padding:0 20px;font-size:16px}
 .hero-video{position:relative;aspect-ratio:4/3;border-radius:28px;overflow:hidden;background:var(--cream);box-shadow:inset 0 0 0 1px rgba(11,11,12,.06),0 30px 60px -40px rgba(60,40,20,.35)}
 .hero-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .6s ease}
 .hero-video video.on{opacity:1}
-.hero-still{position:absolute;inset:0;display:none;line-height:0}
+.hero-still{position:absolute;inset:0;display:none;line-height:0;opacity:0;transition:opacity .8s ease}
+.hero-still.on{opacity:1}
 .hero-still img{width:100%;height:100%;object-fit:cover;display:block}
 .hero-video.still video{display:none}
 .hero-video.still .hero-still{display:block}
@@ -928,7 +929,8 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
       <!-- The still: shown instead of the clips whenever autoplay is refused
            (iOS Low Power Mode, Reduce Motion, a browser policy) — otherwise iOS
            paints a paused player with controls over the hero. -->
-      <picture class="hero-still"><source srcset="/assets/hero/cued-hero-still.webp" type="image/webp"><img src="/assets/hero/cued-hero-still.jpg" alt="" width="1200" height="900"></picture>
+      <picture class="hero-still on"><source srcset="/assets/hero/cued-hero-still.webp" type="image/webp"><img src="/assets/hero/cued-hero-still.jpg" alt="" width="1200" height="900"></picture>
+      <picture class="hero-still"><source srcset="/assets/hero/cued-hero-still-2.webp" type="image/webp"><img src="/assets/hero/cued-hero-still-2.jpg" alt="" width="1200" height="900" loading="lazy"></picture>
     </div>
   </div>
 </section>
@@ -1325,7 +1327,19 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     };
     // Any refusal to autoplay → the still, not a paused player. Reduce Motion
     // is treated the same way (a paused <video> on iOS shows its controls).
-    const useStill = () => { heroVideo.classList.add('still'); clips.forEach(v => { v.removeAttribute('autoplay'); v.pause(); v.removeAttribute('src'); v.load(); }); };
+    // The stills alternate (dumbbell ↔ ball) on a slow crossfade while the
+    // video isn't playing; held still under reduced motion.
+    let stillTimer = 0;
+    const useStill = () => {
+      if (heroVideo.classList.contains('still')) return;
+      heroVideo.classList.add('still');
+      clips.forEach(v => { v.removeAttribute('autoplay'); v.pause(); v.removeAttribute('src'); v.load(); });
+      const stills = Array.from(heroVideo.querySelectorAll('.hero-still'));
+      if (stills.length > 1 && !reduce.matches){
+        let k = 0;
+        stillTimer = setInterval(() => { stills[k].classList.remove('on'); k = (k + 1) % stills.length; stills[k].classList.add('on'); }, 5000);
+      }
+    };
     if (reduce.matches){
       useStill();
     } else {
