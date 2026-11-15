@@ -72,6 +72,7 @@ async function walk(w, d, { source = 'hero', referral = '', email = '', times = 
   w.openWaitlist(source);
   type(d, 'name', 'Edwin Ruiz');
   type(d, 'phone', '5105550123');
+  pick(d, 'occupation', 'student'); type(d, 'occupation', 'uc berkeley', '#foSchool');
   type(d, 'age', '20');
   pick(d, 'gender', 'male');
   stats(d);
@@ -91,7 +92,7 @@ async function walk(w, d, { source = 'hero', referral = '', email = '', times = 
 
 test('every CTA reads "text cued"; the card is a form, not a chat; name and phone lead', () => {
   const { d } = boot(() => ({}));
-  assert.deepEqual([...d.querySelectorAll('#coForm .fo-field')].slice(0, 2).map(f => f.dataset.f), ['name', 'phone']);
+  assert.deepEqual([...d.querySelectorAll('#coForm .fo-field')].slice(0, 3).map(f => f.dataset.f), ['name', 'phone', 'occupation']);
   assert.match(d.querySelector('#hero h1').textContent, /the fitness coach that/);
   for (const id of CTA_IDS) assert.equal(d.getElementById(id).textContent.trim(), 'text cued', id);
   assert.doesNotMatch(d.body.innerHTML, /Join the waitlist/);
@@ -124,6 +125,7 @@ test('live + link: the payload, "you\'re in", the iMessage tap, and no-iPhone se
   assert.equal(p.workout_days, '4'); assert.equal(p.workout_time, 'evening'); assert.equal(p.workout_times, null);
   assert.equal(p.diet, 'omnivore'); assert.equal(p.restrictions, null); assert.deepEqual(p.existing_tools, ['none']);
   assert.equal(p.referral_code, null); assert.equal(p.sms_consent, true);
+  assert.equal(p.occupation, 'student at uc berkeley'); assert.equal(p.occupation_kind, 'student'); assert.equal(p.school, 'uc berkeley'); assert.equal(p.job, null);
   assert.ok(typeof p.ts === 'string' && typeof p.timezone === 'string');
   assert.equal(s.querySelector('h3').textContent, "you're in, Edwin.");
   const body = s.querySelector('p').textContent;
@@ -203,7 +205,7 @@ test('metric units post height_cm / weight_kg; the toggle defaults from the loca
   await until(() => typeof w.openWaitlist === 'function');
   assert.ok(field(d, 'stats').classList.contains('metric'), 'en-GB → cm/kg');
   w.openWaitlist('hero');
-  type(d, 'name', 'Pat Lee'); type(d, 'phone', '5105550124'); type(d, 'age', '22'); pick(d, 'gender', 'female');
+  type(d, 'name', 'Pat Lee'); type(d, 'phone', '5105550124'); pick(d, 'occupation', 'i work'); type(d, 'age', '22'); pick(d, 'gender', 'female');
   type(d, 'stats', '168', '.fo-in[data-k=cm]'); type(d, 'stats', '63.5', '.fo-in[data-k=kg]');
   pick(d, 'goals', 'build muscle'); pick(d, 'obstacle', 'consistency'); pick(d, 'experience', 'just starting'); pick(d, 'equipment', 'home gym');
   pick(d, 'days', '3'); pick(d, 'time', 'evenings'); pick(d, 'diet', 'vegan'); pick(d, 'apps', 'nothing yet');
@@ -228,6 +230,9 @@ test('nothing posts until name, number and consent are in: the first gap is flag
   type(d, 'phone', '510555012'); submit(d); await new Promise(r => setTimeout(r, 20));
   assert.ok(field(d, 'phone').classList.contains('bad'), 'a 9-digit number is refused, and phone is the second row'); assert.equal(posted.length, 0);
   type(d, 'phone', '5105550123');
+  submit(d); await new Promise(r => setTimeout(r, 20));
+  assert.ok(field(d, 'occupation').classList.contains('bad') && isOpen(d, 'occupation'), 'occupation is required, the third row'); assert.equal(posted.length, 0);
+  pick(d, 'occupation', 'something else');
   // a half-typed height & weight is refused (never a wrong fact), an empty one is fine
   type(d, 'stats', '5', '.fo-in[data-k=ft]'); submit(d); await new Promise(r => setTimeout(r, 20));
   assert.ok(field(d, 'stats').classList.contains('bad') && isOpen(d, 'stats')); assert.equal(posted.length, 0);
@@ -283,7 +288,14 @@ test('accordion: the first row opens; a single pick folds it and opens the next;
   assert.equal(summary(d, 'name'), 'Edwin Ruiz');
   assert.ok(field(d, 'name').classList.contains('done'));
   type(d, 'phone', '5105550123'); field(d, 'phone').querySelector('.fo-next').click();
-  assert.ok(isOpen(d, 'age') && !isOpen(d, 'phone')); assert.equal(summary(d, 'phone'), '(510) 555-0123');
+  assert.ok(isOpen(d, 'occupation') && !isOpen(d, 'phone')); assert.equal(summary(d, 'phone'), '(510) 555-0123');
+  // occupation: the pick stays open for its detail box instead of folding
+  pick(d, 'occupation', 'student');
+  await new Promise(r => setTimeout(r, 30));
+  assert.ok(isOpen(d, 'occupation') && field(d, 'occupation').classList.contains('student'));
+  type(d, 'occupation', 'uc berkeley', '#foSchool');
+  d.getElementById('foSchool').dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+  assert.ok(isOpen(d, 'age') && !isOpen(d, 'occupation')); assert.equal(summary(d, 'occupation'), 'student · uc berkeley');
   type(d, 'age', '20'); field(d, 'age').querySelector('.fo-next').click();
   assert.ok(isOpen(d, 'gender') && !isOpen(d, 'age'));
   pick(d, 'gender', 'male');
@@ -343,8 +355,9 @@ test('minimal sign-up: name + number + consent posts with the rest null; the but
   w.openWaitlist('hero');
   assert.equal(d.getElementById('coSubmit').textContent, 'sign up');
   type(d, 'name', 'Edwin Ruiz'); type(d, 'phone', '5105550123');
-  assert.equal(d.getElementById('coSubmit').textContent, 'sign up', 'not until consent');
   consent(d);
+  assert.equal(d.getElementById('coSubmit').textContent, 'sign up', 'not until occupation');
+  pick(d, 'occupation', 'i work');
   assert.equal(d.getElementById('coSubmit').textContent, "sign up now, i'll ask the rest over text");
   for (const n of ['age', 'stats', 'goals', 'time', 'restrictions', 'apps', 'email', 'referral']) assert.equal(field(d, n).querySelector('.fo-next').textContent, 'skip', n);
   assert.equal(field(d, 'name').querySelector('.fo-next').textContent, 'next');
@@ -353,6 +366,7 @@ test('minimal sign-up: name + number + consent posts with the rest null; the but
   assert.equal(s.querySelector('h3').textContent, "you're in, Edwin.");
   const p = posted[0].body;
   assert.equal(p.name, 'Edwin'); assert.equal(p.phone, '(510) 555-0123'); assert.equal(p.sms_consent, true);
+  assert.equal(p.occupation, 'working'); assert.equal(p.occupation_kind, 'working'); assert.equal(p.school, null); assert.equal(p.job, null);
   for (const k of ['age', 'gender', 'goal', 'biggest_obstacle', 'experience', 'equipment', 'workout_days', 'workout_time', 'workout_times', 'diet', 'restrictions', 'existing_tools', 'email', 'referral_code']) assert.equal(p[k], null, k);
   for (const k of ['height_ft', 'height_in', 'weight_lbs', 'height_cm', 'weight_kg']) assert.ok(!(k in p), k);
 });
@@ -364,7 +378,7 @@ test('the button goes back to "sign up" once every question is answered', async 
   const r = boot(() => ({ status: 'ok', live: true }));
   await until(() => typeof r.w.openWaitlist === 'function');
   r.w.openWaitlist('hero');
-  type(r.d, 'name', 'Edwin Ruiz'); type(r.d, 'phone', '5105550123'); consent(r.d);
+  type(r.d, 'name', 'Edwin Ruiz'); type(r.d, 'phone', '5105550123'); pick(r.d, 'occupation', 'student'); consent(r.d);
   assert.match(r.d.getElementById('coSubmit').textContent, /ask the rest/);
   type(r.d, 'age', '20'); pick(r.d, 'gender', 'male'); stats(r.d); pick(r.d, 'goals', 'lose fat'); pick(r.d, 'obstacle', 'time');
   pick(r.d, 'experience', '2+ years'); pick(r.d, 'equipment', 'full gym'); pick(r.d, 'days', '3'); pick(r.d, 'time', 'evenings'); pick(r.d, 'diet', 'vegan');
@@ -373,10 +387,42 @@ test('the button goes back to "sign up" once every question is answered', async 
   assert.equal(r.d.getElementById('coSubmit').textContent, 'sign up', 'gmail / referral / allergies do not count');
 });
 
-// ── analytics ──
-const STEP_NAMES = ['name', 'phone', 'age', 'gender', 'stats', 'goals', 'obstacle', 'experience', 'equipment', 'days', 'time', 'diet', 'restrictions', 'apps', 'consent'];
+test('occupation: what goes up for each kind — the free text starts with "student" when they study, school and job ride on their own keys', async () => {
+  const cases = [
+    [['student'], 'uc berkeley', '', { occupation: 'student at uc berkeley', occupation_kind: 'student', school: 'uc berkeley', job: null }],
+    [['student'], '', '', { occupation: 'student', occupation_kind: 'student', school: null, job: null }],
+    [['i work'], '', 'nurse', { occupation: 'nurse', occupation_kind: 'working', school: null, job: 'nurse' }],
+    [['both'], 'sjsu', 'barista', { occupation: 'student at sjsu, works as barista', occupation_kind: 'both', school: 'sjsu', job: 'barista' }],
+    [['something else'], '', '', { occupation: 'other', occupation_kind: 'other', school: null, job: null }],
+  ];
+  for (const [kind, school, job, want] of cases) {
+    const { w, d, posted } = boot(() => ({ status: 'ok', live: true }));
+    await until(() => typeof w.openWaitlist === 'function');
+    w.openWaitlist('hero');
+    type(d, 'name', 'Edwin Ruiz'); type(d, 'phone', '5105550123'); pick(d, 'occupation', ...kind);
+    if (school) type(d, 'occupation', school, '#foSchool');
+    if (job) type(d, 'occupation', job, '#foJob');
+    consent(d); submit(d);
+    await success(d);
+    for (const k of Object.keys(want)) assert.equal(posted[0].body[k], want[k], `${kind}: ${k}`);
+  }
+  // switching kind drops the other kind's detail
+  const { w, d, posted } = boot(() => ({ status: 'ok', live: true }));
+  await until(() => typeof w.openWaitlist === 'function');
+  w.openWaitlist('hero');
+  type(d, 'name', 'Edwin Ruiz'); type(d, 'phone', '5105550123');
+  pick(d, 'occupation', 'student'); type(d, 'occupation', 'uc berkeley', '#foSchool');
+  assert.ok(field(d, 'occupation').classList.contains('student') && !field(d, 'occupation').classList.contains('working'));
+  pick(d, 'occupation', 'i work');
+  assert.ok(!field(d, 'occupation').classList.contains('student') && field(d, 'occupation').classList.contains('working'));
+  consent(d); submit(d); await success(d);
+  assert.equal(posted[0].body.school, null); assert.equal(posted[0].body.occupation, 'working');
+});
 
-test('funnel: open → 15 steps in form order (restrictions counted as passed) → submit live → iMessage tap and SMS tap, tagged with the source; no PII', async () => {
+// ── analytics ──
+const STEP_NAMES = ['name', 'phone', 'occupation', 'age', 'gender', 'stats', 'goals', 'obstacle', 'experience', 'equipment', 'days', 'time', 'diet', 'restrictions', 'apps', 'consent'];
+
+test('funnel: open → 16 steps in form order (restrictions counted as passed) → submit live → iMessage tap and SMS tap, tagged with the source; no PII', async () => {
   const { w, d, events } = boot((url) => url.endsWith('/signup/channel')
     ? { status: 'ok', channel: 'sms', hook_sent: true }
     : { status: 'ok', live: true, hook_deferred: true, imessage_link: 'https://photon.test/users/ph-1/redirect' }, { tracker: true });
@@ -388,7 +434,7 @@ test('funnel: open → 15 steps in form order (restrictions counted as passed) �
   assert.deepEqual(steps.map(e => e.data.name), STEP_NAMES);
   assert.ok(steps.every(e => e.data.source === 'close'));
   assert.deepEqual(events.filter(e => e.name === 'signup-submit'), [{ name: 'signup-submit', data: { result: 'live', source: 'close' } }]);
-  assert.equal(events.length, 1 + 15 + 1, 'nothing else fired before the success taps');
+  assert.equal(events.length, 1 + STEP_NAMES.length + 1, 'nothing else fired before the success taps');
   s.querySelector('a.co-imsg').addEventListener('click', e => e.preventDefault());
   s.querySelector('a.co-imsg').click();
   s.querySelector('button.co-alt').click();
@@ -398,15 +444,15 @@ test('funnel: open → 15 steps in form order (restrictions counted as passed) �
   for (const pii of ['Edwin', 'Ruiz', '5105550123', '510', '139']) assert.doesNotMatch(blob, new RegExp(pii), pii);
 });
 
-test('a step fires once even if the answer changes; the hairline tracks required fields', () => {
+test('a step fires once even if the answer changes; the hairline tracks rows answered', () => {
   const { d, events } = boot(() => ({}), { tracker: true });
   d.defaultView.openWaitlist('hero');
   pick(d, 'gender', 'male'); pick(d, 'gender', 'female'); pick(d, 'gender', 'male');
   assert.equal(events.filter(e => e.name === 'signup-step').length, 1);
   type(d, 'name', 'E'); type(d, 'name', 'Ed'); type(d, 'name', '');
   assert.equal(events.filter(e => e.name === 'signup-step').length, 2);
-  // 1 of 14 required answered (gender) → 7%
-  assert.equal(d.getElementById('coProgress').style.getPropertyValue('--p'), '7%');
+  // 1 of 16 rows answered (gender) → 6%
+  assert.equal(d.getElementById('coProgress').style.getPropertyValue('--p'), '6%');
 });
 
 test('submit outcomes: already signed up → live-exists; old backend → waitlist; rejected and network error are named', async () => {

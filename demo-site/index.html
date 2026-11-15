@@ -931,6 +931,10 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
 .fo-ai{overflow:hidden;min-height:0}
 .fo-body{padding:0 0 18px}
 .fo-tools{display:flex;justify-content:flex-end;margin-bottom:8px}
+/* occupation: the detail field for the kind they picked (school / work) */
+.fo-sub{display:none;margin-top:12px}
+.fo-field.student .fo-sub.school,.fo-field.working .fo-sub.job{display:block}
+.fo-sub-l{display:block;font-size:13px;color:var(--co-ink-2);margin-bottom:6px}
 .fo-foot{display:flex;justify-content:flex-end;margin-top:12px}
 .fo-next{height:36px;padding:0 16px;border-radius:10px;border:1px solid var(--co-line);background:var(--co-field);font-size:14px;color:var(--co-ink);cursor:pointer;transition:border-color .15s,background .15s}
 .fo-next:hover{border-color:var(--co-ink-3)}
@@ -1465,6 +1469,21 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
             <div class="fo-a" id="foA-phone" role="region" aria-labelledby="foQ-phone"><div class="fo-ai"><div class="fo-body">
             <input class="fo-in" id="foPhone" name="phone" type="tel" placeholder="(510) 555-1234" inputmode="tel" autocomplete="tel" enterkeyhint="next">
             <div class="fo-hint">that's not a 10-digit US number</div>
+            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
+            </div></div></div>
+          </div>
+          <div class="fo-field" data-f="occupation">
+            <button type="button" class="fo-q" id="foQ-occupation" aria-expanded="false" aria-controls="foA-occupation"><span class="fo-qt">what do you do? <small>so i can fit around your days</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-a" id="foA-occupation" role="region" aria-labelledby="foQ-occupation"><div class="fo-ai"><div class="fo-body">
+            <div class="fo-chips" role="radiogroup" aria-labelledby="foQ-occupation" data-stay="1">
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="student">student</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="working">i work</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="both">both</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="other">something else</button>
+            </div>
+            <div class="fo-sub school"><label class="fo-sub-l" for="foSchool">which school?</label><input class="fo-in" id="foSchool" name="school" type="text" autocomplete="organization" placeholder="e.g. uc berkeley" enterkeyhint="next"></div>
+            <div class="fo-sub job"><label class="fo-sub-l" for="foJob">what kind of work?</label><input class="fo-in" id="foJob" name="job" type="text" autocomplete="organization-title" placeholder="e.g. nurse, software, retail" enterkeyhint="next"></div>
+            <div class="fo-hint">pick one — it's how i know what your week looks like</div>
             <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
             </div></div></div>
           </div>
@@ -2373,7 +2392,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   // can be followed into sign-ups, and it fires one `qr-scan {src}` per landing.
   // The label is kept in a variable only (nothing stored in the browser) and
   // never leaves this load. Never put a typed answer in an event.
-  const STEP_NAMES = ['', 'name', 'phone', 'age', 'gender', 'stats', 'goals', 'obstacle', 'experience', 'equipment', 'days', 'time', 'diet', 'restrictions', 'apps', 'consent'];
+  const STEP_NAMES = ['', 'name', 'phone', 'occupation', 'age', 'gender', 'stats', 'goals', 'obstacle', 'experience', 'equipment', 'days', 'time', 'diet', 'restrictions', 'apps', 'consent'];
   const OPTIONAL = new Set(['restrictions']);
   const REQUIRED = STEP_NAMES.slice(1).filter(n => !OPTIONAL.has(n));
   const ref = (() => {
@@ -2419,7 +2438,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   // What the backend needs to create the account and text (app.py /waitlist): a
   // name, a number, consent. Every other row is optional — the coach's
   // onboarding asks over text for whatever arrives null (founder, 2026-11-14).
-  const MUST = ['name', 'phone', 'consent'];
+  const MUST = ['name', 'phone', 'occupation', 'consent'];   // occupation (founder, 2026-11-14): profiles by occupation and school are coming; the backend's User.occupation is free text it reads with startswith("student")
   const stats = fieldOf('stats');
   const isMetricRow = el => { const row = el.closest('.fo-us, .fo-metric'); return !row || (stats.classList.contains('metric') === row.classList.contains('fo-metric')); };
   const num = el => { const v = parseFloat(String(el.value).replace(',', '.')); return Number.isFinite(v) ? v : NaN; };
@@ -2457,6 +2476,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   const VALID = {
     name: v => v.length > 0,
     phone: validPhone,
+    occupation: some,
     consent: v => v === true,
     age: v => v === '' || /^\d{1,3}$/.test(v),
     stats: v => !!v || !statsTouched(),
@@ -2486,9 +2506,26 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     if (!answered(name)) return '';
     if (name === 'stats') return v.height_cm != null ? `${v.height_cm} cm, ${v.weight_kg} kg` : `${v.height_ft}'${v.height_in}, ${v.weight_lbs} lbs`;
     if (name === 'days') return `${v[0]} days`;
+    if (name === 'occupation'){ const o = occupationOf(); return [o.kind === 'other' ? 'something else' : o.kind === 'working' ? 'i work' : o.kind, o.school, o.job].filter(Boolean).join(' · '); }
     if (name === 'referral') return v.toUpperCase();
     if (Array.isArray(v)) return v.map(x => LABELS[name + ':' + x] || x).join(', ');
     return v;
+  }
+  // What goes up for occupation: a free-text `occupation` the backend already
+  // reads ("student" first when they study, so its startswith("student") checks
+  // hold), `school` and `job` on their own keys for the profiles to come, and the
+  // picked `occupation_kind`.
+  function occupationOf(){
+    const kind = read('occupation')[0] || null;
+    const field = fieldOf('occupation');
+    const school = (kind === 'student' || kind === 'both') ? field.querySelector('#foSchool').value.trim() : '';
+    const job = (kind === 'working' || kind === 'both') ? field.querySelector('#foJob').value.trim() : '';
+    let occupation = null;
+    if (kind === 'student') occupation = school ? `student at ${school}` : 'student';
+    else if (kind === 'working') occupation = job || 'working';
+    else if (kind === 'both') occupation = `student${school ? ' at ' + school : ''}${job ? ', works as ' + job : ''}`;
+    else if (kind === 'other') occupation = job || 'other';
+    return { kind, school: school || null, job: job || null, occupation };
   }
   const passed = new Set();   // answered, or skipped on purpose
   function setOpen(name, on){
@@ -2597,7 +2634,16 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
         group.querySelectorAll('.fo-chip').forEach(c => { c.classList.remove('sel'); c.setAttribute('aria-checked', 'false'); });
         chip.classList.add('sel'); chip.setAttribute('aria-checked', 'true');
         changed(name);
-        setTimeout(() => advance(name), reduced.matches ? 0 : 240);   // the pick lands, then the row folds
+        if (group.dataset.stay === '1'){
+          // occupation: the pick reveals its detail box (school / work) and stays open for it
+          const f = group.closest('.fo-field'), k = chip.dataset.v;
+          f.classList.toggle('student', k === 'student' || k === 'both');
+          f.classList.toggle('working', k === 'working' || k === 'both');
+          const sub = f.querySelector(k === 'working' ? '#foJob' : (k === 'other' ? null : '#foSchool'));
+          if (sub) sub.focus({ preventScroll: true });
+        } else {
+          setTimeout(() => advance(name), reduced.matches ? 0 : 240);   // the pick lands, then the row folds
+        }
       }
     }));
   });
@@ -2678,6 +2724,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       active: false,
       status: 'waitlist',
+      ...(() => { const o = occupationOf(); return { occupation: o.occupation, occupation_kind: o.kind, school: o.school, job: o.job }; })(),
       // Optional rows post null when blank: the backend fills its defaults and the
       // coach's onboarding asks over text for what's missing.
       age: read('age') ? Number(read('age')) : null,
