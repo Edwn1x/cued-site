@@ -466,13 +466,13 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 #proof .ph-avatar{width:48px;height:48px}
 #proof .ph-name{font-family:var(--f-ui);font-size:14px;font-weight:500;margin-top:8px;color:var(--ink)}
 #proof .ph-status{margin-top:6px;height:26px;padding:0 12px;border-radius:13px;font-family:var(--f-ui);font-size:12.5px;background:var(--card);color:var(--gray-text)}
-#proof .screen{flex:none;height:min(520px,calc(100vh - 280px));padding:0 0 8px}   /* flex:none — the base .screen is flex:1, which lets content (the plate photo) override the height */
+#proof .screen{flex:none;height:auto;max-height:min(560px,calc(100vh - 240px));padding:0 0 8px}   /* sized to the active thread (capped) so the header sits right above the first bubble; flex:none — the base .screen is flex:1 */
 #proof .thread{font-family:var(--f-ui);font-size:clamp(15px,1.15vw,16.5px)}
 #proof .msg{max-width:86%;padding:.7em .95em;border-radius:1.1em;line-height:1.38;text-align:left}
 #proof .msg.turn{margin-top:.6em}
 #proof .msg.t::before,#proof .msg.t::after{content:none}   /* plain rounded bubbles, no tails */
 #proof .poll,#proof .checklist{width:88%;font-size:.7em}
-#proof .msg.photo{max-width:70%}
+#proof .msg.photo{max-width:46%}
 #proof .msg.chart svg{width:12em}
 /* stacked proof (<1024px): headline + small mascot in a row, the chat under it
    at its natural height (no clipping, no empty box), one header per step */
@@ -1024,22 +1024,21 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
           </div>
           <div class="screen">
             <div class="thread coach-left" data-play>
-              <div class="msg coach t">push day. 4 sets bench, then the usual. tap as you go — text me if a set goes different.</div>
+              <div class="msg coach t">push day. 3 sets bench, then the usual. tap as you go — text me if a set goes different.</div>
               <div class="checklist" aria-label="today's sets — tap a set when it's done">
-                <button type="button" class="poll-row" aria-pressed="false"><span>bench 185 × 5</span><i aria-hidden="true"></i></button>
-                <button type="button" class="poll-row" aria-pressed="false"><span>bench 185 × 5</span><i aria-hidden="true"></i></button>
-                <button type="button" class="poll-row" aria-pressed="false"><span>bench 185 × 5</span><i aria-hidden="true"></i></button>
-                <button type="button" class="poll-row" aria-pressed="false"><span>bench 185 × 5</span><i aria-hidden="true"></i></button>
+                <button type="button" class="poll-row" aria-pressed="false"><span>bench 185 × 6</span><i aria-hidden="true"></i></button>
+                <button type="button" class="poll-row" aria-pressed="false"><span>bench 185 × 6</span><i aria-hidden="true"></i></button>
+                <button type="button" class="poll-row" aria-pressed="false"><span>bench 185 × 6</span><i aria-hidden="true"></i></button>
               </div>
-              <div class="msg user t turn">190 x4</div>
-              <div class="msg coach turn cl-swap">swapped it in. 190 × 4 is a PR 🎉 last time was 185 × 3.</div>
+              <div class="msg user t turn">190 x5</div>
+              <div class="msg coach turn cl-swap">swapped it in. 190 × 5 is a PR 🎉 last time was 190 × 3.</div>
               <div class="msg coach t card">
                 <div class="wc-head">push · wed · 48 min</div>
-                <div class="wc-row">bench press — 185×5 · 185×5 · <b class="wc-pr">190×4</b> · 185×5</div>
+                <div class="wc-row">bench press — 185×6 · 185×6 · <b class="wc-pr">190×5</b></div>
                 <div class="wc-row">incline db press — 65×10 · 65×9 · 65×8</div>
                 <div class="wc-row">cable fly — 30×12 · 30×12 · 30×11</div>
                 <div class="wc-row">tricep pushdown — 50×12 · 50×12 · 50×10</div>
-                <div class="wc-foot">9,240 lb total · 1 PR</div>
+                <div class="wc-foot">7,675 lb total · 1 PR</div>
               </div>
             </div>
           </div>
@@ -1585,8 +1584,8 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
       if (list){
         const rows = list.querySelectorAll('.poll-row');
         const sp = rows[2] && rows[2].querySelector('span');
-        if (sp) sp.textContent = 'bench 190 × 4';
-        clCheck(rows[2], 150); clCheck(rows[3], 750);
+        if (sp) sp.textContent = 'bench 190 × 5';
+        clCheck(rows[2], 150);
       }
     }
   }
@@ -1596,7 +1595,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
       if (el.classList.contains('poll')) el.classList.add('chosen');
       if (el.classList.contains('checklist')){
         const sp = el.querySelectorAll('.poll-row span')[2];
-        if (sp) sp.textContent = 'bench 190 × 4';
+        if (sp) sp.textContent = 'bench 190 × 5';
         el.querySelectorAll('.poll-row').forEach(r => { r.classList.add('done'); r.setAttribute('aria-pressed', 'true'); });
       }
     });
