@@ -436,9 +436,13 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 .sheet-overlay .sh-row{font-size:1em}
 .sheet-overlay .sh-stepper.open{display:grid}
 @media(max-width:1023.98px){
-  /* stacked chats are natural height: the overlay sits in flow under the thread instead */
-  .sheet-overlay{position:static;transform:none;border-radius:1.4em;margin-top:1em;box-shadow:0 8px 30px rgba(60,40,20,.1);opacity:0;transition:opacity .5s ease}
-  .sheet-overlay.up{opacity:1}
+  #proof .phone-wrap::before{display:none}   /* the desktop halo's -140px inset overflowed the phone viewport */
+  /* stacked: same takeover — the sheet rises over the step's chat column; the
+     column is given room (min-height on .screen, set by JS) so it isn't clipped */
+  #proof .screen{overflow:hidden;border-radius:1.4em;max-height:none}   /* no cap: stacked chats show every bubble */
+  .sheet-overlay{font-size:15px;padding:.5em .9em .9em;border-radius:1.4em 1.4em 0 0}
+  .sheet-overlay .sh-title{font-size:1.35em}
+  .sheet-overlay .sh-sub{text-align:left}
 }
 .sh-top{display:flex;align-items:baseline;justify-content:space-between}
 .sh-title{font-family:var(--f-head);font-size:1.3em;color:var(--ink)}
@@ -474,6 +478,8 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 .msg.sticker svg{width:3.6em;height:3.6em;display:block;margin:0 auto .5em}
 .msg.sticker span{font-size:.78em;font-weight:500}
 .msg.sticker::before,.msg.sticker::after{content:none!important}
+/* timestamp divider inside a thread (Messages' "Sunday 9:14 PM") */
+.tsd{align-self:center;font-size:.72em;color:var(--ink-3);margin:.9em 0 .3em;letter-spacing:.01em}
 /* tapback on a reader bubble (the pseudo-element must out-rank the
    `#proof .msg.t::after{content:none}` tail-stripper, hence the id) */
 .msg.tap{position:relative;overflow:visible}
@@ -593,7 +599,9 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 #proof .ph-avatar{width:48px;height:48px}
 #proof .ph-name{font-family:var(--f-ui);font-size:14px;font-weight:500;margin-top:8px;color:var(--ink)}
 #proof .ph-status{margin-top:6px;height:26px;padding:0 12px;border-radius:13px;font-family:var(--f-ui);font-size:12.5px;background:var(--card);color:var(--gray-text)}
-#proof .screen{flex:none;height:auto;max-height:min(560px,calc(100vh - 240px));padding:0 0 8px}   /* sized to the active thread (capped) so the header sits right above the first bubble; flex:none — the base .screen is flex:1 */
+#proof .screen{flex:none;height:auto;max-height:min(560px,calc(100vh - 240px));padding:0 0 8px}
+/* short laptop viewports: a slightly smaller thread so the longest step (i remember) fits the box */
+@media(min-width:1024px) and (max-height:780px){#proof .thread{font-size:15px}#proof .screen{max-height:calc(100vh - 220px)}}   /* sized to the active thread (capped) so the header sits right above the first bubble; flex:none — the base .screen is flex:1 */
 #proof .thread{font-family:var(--f-ui);font-size:clamp(15px,1.15vw,16.5px)}
 #proof .msg{max-width:86%;padding:.7em .95em;border-radius:1.1em;line-height:1.38;text-align:left}
 #proof .msg.turn{margin-top:.6em}
@@ -1213,31 +1221,32 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
         </div></div></div>
       </div>
     </article>
-    <article class="step" data-status="remembering that…">
+    <article class="step" data-status="picking up where we left off…">
       <div class="wrap">
         <div class="step-copy">
           <picture class="step-mascot"><source srcset="/assets/mascot/v2/cued-remember.webp" type="image/webp"><img src="/assets/mascot/v2/cued-remember.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
           <h2>i remember</h2>
-          <p class="sub">the weekend away, the lift we moved, what you'd rather hit. i don't start over every text.</p>
+          <p class="sub">the weekend away, the birthday, the lift you'd rather hit. i pick up where we left off.</p>
         </div>
         <div class="phone-wrap"><div class="phone"><div class="phone-screen">
           <div class="ph-head">
             <picture><source srcset="/assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="/assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
             <div class="ph-name">cued</div>
-            <div class="ph-status">remembering that…</div>
+            <div class="ph-status">picking up where we left off…</div>
           </div>
           <div class="screen">
             <div class="thread coach-left" data-play>
-              <div class="msg user">i'm going home this weekend, my mom's bday is tmrw</div>
-              <div class="msg user t tap">when's a good time to lift</div>
-              <div class="msg coach turn">tell ur mom happy bday. when u back</div>
-              <div class="msg user t turn">prolly sunday night</div>
-              <div class="msg coach turn">alr, i'll hold the gym pings till ur back. legs monday after class then</div>
-              <div class="msg user t turn">i'll prolly hit back instead ngl</div>
-              <div class="msg coach turn">alr, back monday then. it's all here if u ever want to check:</div>
+              <div class="msg user t">heading home for the weekend, back sunday night</div>
+              <div class="msg coach turn">got it, i'll hold the gym pings till you're back. legs is next whenever you are</div>
+              <div class="msg user t turn tap">my mom's bday is tmrw btw</div>
+              <div class="msg coach t turn">tell her happy bday from me</div>
+              <div class="tsd" aria-label="sunday 9:14 pm">sunday 9:14 pm</div>
+              <div class="msg coach">welcome back. legs tomorrow after class, or back like last time?</div>
+              <div class="msg user t turn">back. and too much cake lol</div>
+              <div class="msg coach turn">worth it. back monday then. it's all here if u ever want to check:</div>
               <div class="msg coach card link" aria-label="what i remember, your profile on cued.fit">
                 <div class="lk-t">what i remember</div>
-                <div class="lk-s">who you are · 2 notes · cued.fit</div>
+                <div class="lk-s">who you are · 3 notes · cued.fit</div>
                 <svg class="lk-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 8.5l-2 5-5 2 2-5z" fill="currentColor"/></svg>
               </div>
             </div>
@@ -1732,7 +1741,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     if (!ov || ov.classList.contains('up')) return;
     const card = thread.querySelector('.sheet-card'); if (card) card.setAttribute('aria-expanded', 'true');
     ov.setAttribute('aria-hidden', 'false');
-    if (!mqStacked.matches) screen.style.minHeight = Math.max(screen.offsetHeight, 520) + 'px';
+    screen.style.minHeight = Math.max(screen.offsetHeight, ov.scrollHeight + 28) + 'px';   // room for the sheet to rise into, no more
     setTimeout(() => ov.classList.add('up'), 30);   // a tick after display/min-height land so the slide actually transitions
   }
   document.querySelectorAll('.step .screen').forEach(sc => { const t = sc.querySelector('.thread[data-play]'), o = sc.querySelector('.sheet-overlay'); if (t) t._overlay = o || null; });
@@ -1767,7 +1776,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     let i = 0;
     layout(thread, 0);
     function step(){
-      if (i >= list.length){ typing.remove(); setTimeout(() => sheetUp(thread), 500); return; }
+      if (i >= list.length){ typing.remove(); setTimeout(() => sheetUp(thread), 2600); return; }
       const el = list[i];
       // typing beat on the incoming side, parked just under the last bubble
       const prev = list[i - 1];
@@ -1816,7 +1825,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
         el.classList.add('on');
         choreo(el);
         next++; busy = false;
-        if (next >= list.length){ typing.remove(); setTimeout(() => sheetUp(thread), 500); }
+        if (next >= list.length){ typing.remove(); setTimeout(() => sheetUp(thread), 2600); }
         pump();
       }, lead);
     }
@@ -1861,7 +1870,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
         layout(thread, 0);
         choreo(el);
         next++; busy = false;
-        if (next >= n){ typing.remove(); setTimeout(() => sheetUp(thread), 500); }
+        if (next >= n){ typing.remove(); setTimeout(() => sheetUp(thread), 2600); }
         pump();
       }, waiting ? 380 : 90);
     }
