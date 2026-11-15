@@ -181,6 +181,14 @@ nav .btn{height:44px;padding:0 20px;font-size:16px}
 .hero-still img{width:100%;height:100%;object-fit:cover;display:block}
 .hero-video.still video{display:none}
 .hero-video.still .hero-still{display:block}
+/* stills: no card — the render's cream IS the hero's cream, so drop the
+   rounded frame and inset shadow and feather the edges into the page */
+.hero-video.still{background:transparent;box-shadow:none;border-radius:0;overflow:visible}
+.hero-video.still .hero-still img{
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 12%,#000 88%,transparent),linear-gradient(to bottom,transparent,#000 12%,#000 88%,transparent);
+          mask-image:linear-gradient(to right,transparent,#000 12%,#000 88%,transparent),linear-gradient(to bottom,transparent,#000 12%,#000 88%,transparent);
+  -webkit-mask-composite:source-in;mask-composite:intersect;
+}
 .hero-mark{--size:clamp(96px,10vw,140px);display:block;margin:0 auto 8px;line-height:0}
 /* ===== cued live avatar (founder prototype, copied verbatim; --size is the only knob) ===== */
 .cued-avatar{
