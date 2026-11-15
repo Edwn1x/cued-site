@@ -184,27 +184,34 @@ nav .btn{height:44px;padding:0 20px;font-size:16px}
 }
 
 /* ===== HERO ===== */
-#hero{padding:clamp(104px,13vh,150px) 0 clamp(64px,8vw,110px);overflow:hidden;min-height:100vh;display:flex;align-items:center}
+#hero{padding:clamp(96px,12vh,140px) 0 clamp(48px,6vw,80px);overflow:hidden;min-height:calc(100svh - 100px);display:flex;align-items:center}   /* 100px short of the viewport so the "say anything." strip peeks under the fold — the scroll cue (founder, 2026-11-14: the full-height hero was "too much vacuum") */
 #hero .wrap{position:relative;z-index:1;width:100%}
 /* two columns: copy left, the mascot loop right (founder reference, 2026-11-14) */
 .hero-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:clamp(24px,3vw,44px);align-items:center;text-align:left}
 .hero-copy{max-width:700px}
-.hero-video{position:relative;aspect-ratio:4/3;border-radius:28px;overflow:hidden;background:var(--cream);box-shadow:inset 0 0 0 1px rgba(11,11,12,.06),0 30px 60px -40px rgba(60,40,20,.35)}
-.hero-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .6s ease}
+/* No frame (founder, 2026-11-14: "a real object rather than a video player"): the
+   clips' cream is the hero's cream, the box is feathered at its edges by a mask on
+   the CONTAINER (so the crop below keeps soft edges), and the clips are scaled up
+   about their character so he fills the box instead of sitting in a thumbnail. */
+.hero-video{position:relative;aspect-ratio:4/3;overflow:hidden;background:transparent;
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 7%,#000 93%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 88%,transparent),radial-gradient(ellipse 80% 80% at 45% 60%,#000 62%,transparent 100%);
+          mask-image:linear-gradient(to right,transparent,#000 7%,#000 93%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 88%,transparent),radial-gradient(ellipse 80% 80% at 45% 60%,#000 62%,transparent 100%);
+  -webkit-mask-composite:source-in;mask-composite:intersect}
+  /* Three masks, intersected. Narrow side feathers (7%): clip 1's ball reaches ~83%
+     of the box and a 15% side feather ate it (founder, 2026-11-14). The ellipse
+     fades the CORNERS only — the clips' backdrop darkens toward the top-right
+     (measured rgb(233,220,208) against the page's 245,234,224) and a rectangle
+     can't reach a corner without eating the ball; the ellipse keeps everything
+     within 62% of its radii solid: the ball (83%,45%), the waving hand (10%,45%),
+     clip 2's speech bubble (50%,15%) and the floor shadow all sit inside that. */
+.hero-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .6s ease;transform:scale(1.25);transform-origin:50% 53%;filter:brightness(1.02)}   /* brightness: the clips' backdrop measures ~rgb(240,230,220) at the edges against the page's rgb(245,234,224) — a 2% lift lands it on the page cream so the box has no visible edge without a wide feather (the stills are already on the page cream and get no filter). The crop: 1.25, not more: clip 1's head top sits ~20% down the frame and clip 2's speech bubble higher still — at 1.4 they land in the feather (measured on the poster, 2026-11-14) */
 .hero-video video.on{opacity:1}
 .hero-still{position:absolute;inset:0;display:none;line-height:0;opacity:0;transition:opacity .8s ease}
 .hero-still.on{opacity:1}
 .hero-still img{width:100%;height:100%;object-fit:cover;display:block}
 .hero-video.still video{display:none}
 .hero-video.still .hero-still{display:block}
-/* stills: no card — the render's cream IS the hero's cream, so drop the
-   rounded frame and inset shadow and feather the edges into the page */
-.hero-video.still{background:transparent;box-shadow:none;border-radius:0;overflow:visible}
-.hero-video.still .hero-still img{
-  -webkit-mask-image:linear-gradient(to right,transparent,#000 7%,#000 93%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
-          mask-image:linear-gradient(to right,transparent,#000 7%,#000 93%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
-  -webkit-mask-composite:source-in;mask-composite:intersect;
-}
+/* stills (autoplay refused): the same feathered box; the 4:3 renders already fill it, no crop */
 .hero-mark{--size:clamp(96px,10vw,140px);display:block;margin:0 auto 8px;line-height:0}
 /* ===== cued live avatar (founder prototype, copied verbatim; --size is the only knob) ===== */
 .cued-avatar{
@@ -277,13 +284,12 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
   #hero{min-height:0;padding:92px 0 56px}
   .hero-h{font-size:clamp(30px,8.4vw,34px);line-height:1.1}
   .hero-sub{font-size:17px;margin-top:20px}
-  .hero-video{border-radius:20px}
   .campanile{display:none}
   .hero-cap{font-size:14px;margin-top:16px}
 }
 
 /* ===== SAY ANYTHING ===== */
-#say{text-align:center;overflow:hidden}
+#say{text-align:center;overflow:hidden;padding-top:clamp(40px,5vw,64px)}   /* short top padding: its headline is what peeks under the hero */
 #say .sub{margin:14px auto 0}
 .mq{overflow:hidden;margin-top:40px;padding:6px 0;
   -webkit-mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent);
@@ -907,6 +913,8 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
    opens on a tap, as many as they like (founder, 2026-11-14). */
 .fo-sec + .fo-sec{margin-top:30px}
 .fo-sec-h{font-family:var(--f-head);font-weight:400;font-size:24px;letter-spacing:-.01em;line-height:1.1;color:var(--co-ink);padding-top:22px;margin-bottom:6px}
+.fo-sec-h small{font-family:var(--f-ui);font-size:13px;color:var(--co-ink-3);margin-left:6px;vertical-align:.18em}
+.fo-sec-note{font-size:14px;line-height:1.45;color:var(--co-ink-2);margin:-2px 0 12px;max-width:34em}
 .fo-field{border-top:1px solid var(--co-line)}
 .fo-field:last-child{border-bottom:1px solid var(--co-line)}
 .fo-q{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:14px 0;background:none;border:none;text-align:left;cursor:pointer;font-size:16px;line-height:1.3;color:var(--co-ink);transition:color .15s}
@@ -923,6 +931,10 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
 .fo-ai{overflow:hidden;min-height:0}
 .fo-body{padding:0 0 18px}
 .fo-tools{display:flex;justify-content:flex-end;margin-bottom:8px}
+/* occupation: the detail field for the kind they picked (school / work) */
+.fo-sub{display:none;margin-top:12px}
+.fo-field.student .fo-sub.school,.fo-field.working .fo-sub.job{display:block}
+.fo-sub-l{display:block;font-size:13px;color:var(--co-ink-2);margin-bottom:6px}
 .fo-foot{display:flex;justify-content:flex-end;margin-top:12px}
 .fo-next{height:36px;padding:0 16px;border-radius:10px;border:1px solid var(--co-line);background:var(--co-field);font-size:14px;color:var(--co-ink);cursor:pointer;transition:border-color .15s,background .15s}
 .fo-next:hover{border-color:var(--co-ink-3)}
@@ -961,8 +973,13 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
 @keyframes co-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 .co-shake{animation:co-shake .28s var(--ease)}
 
-/* SMS consent — the fine print beside a ring that fills blue with a check */
-.fo-consent{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:none;border:none;padding:2px 0 0;cursor:pointer;font-size:13px;line-height:1.5;color:var(--co-ink-2)}
+/* SMS consent — in the footer beside the button (name, number and this are the
+   three things the backend needs; the rows above are optional): the fine print
+   beside a ring that fills blue with a check */
+.fo-consent-row{padding:0 0 2px}
+.fo-consent-row .fo-hint{margin-top:4px}
+.fo-consent-row.bad .fo-consent i{border-color:var(--co-error)}
+.fo-consent{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:none;border:none;padding:0;cursor:pointer;font-size:12.5px;line-height:1.45;color:var(--co-ink-2)}
 .fo-consent i{flex:none;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--co-ink-3);background:var(--co-field);display:inline-flex;align-items:center;justify-content:center;margin-top:0;transition:background .2s,border-color .2s}
 .fo-consent i::after{content:'';width:8px;height:4.5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:translateY(-1px) rotate(-45deg) scale(0);transition:transform .22s var(--ease)}
 .fo-consent.sel i{background:var(--co-blue);border-color:var(--co-blue)}
@@ -974,7 +991,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
 .co-input-area{flex-shrink:0;padding:14px 24px 20px;border-top:1px solid var(--co-line);background:var(--co-sheet);display:flex;flex-direction:column;gap:10px}
 .fo-err{display:none;font-size:14px;line-height:1.4;color:var(--co-error);text-align:center}
 .fo-err.show{display:block}
-.co-bg .co-confirm{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:50px;padding:0 26px;border-radius:14px;border:none;cursor:pointer;background:var(--co-blue);color:#fff;/* class+class so it outranks `.co-bg button{color:inherit}` — otherwise the label inherits the page ink and sits black on blue */font-family:var(--f-ui);font-size:17px;font-weight:400;transition:background .15s,opacity .15s}
+.co-bg .co-confirm{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:10px 22px;line-height:1.2;text-align:center;border-radius:14px;border:none;cursor:pointer;background:var(--co-blue);color:#fff;/* class+class so it outranks `.co-bg button{color:inherit}` — otherwise the label inherits the page ink and sits black on blue */font-family:var(--f-ui);font-size:17px;font-weight:400;transition:background .15s,opacity .15s}
 .co-bg .co-confirm:hover{background:var(--co-blue-deep)}
 .co-bg .co-confirm:disabled{opacity:.6;cursor:default}
 .co-bg .co-confirm:focus-visible{outline:2px solid var(--co-blue);outline-offset:3px}
@@ -1002,12 +1019,15 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   .co-handle{display:block;width:36px;height:4px;border-radius:2px;background:var(--co-line);margin:8px auto 0;flex-shrink:0}
   .co-head{padding:8px 12px 12px 20px}
   .co-msgs{padding:0 20px 20px;min-height:0}
-  .co-input-area{padding:12px 20px calc(16px + env(safe-area-inset-bottom))}
+  .co-input-area{padding:10px 20px calc(14px + env(safe-area-inset-bottom));gap:8px}
+  .co-bg .co-confirm{font-size:16px}
   .co-bg .fo-in{font-size:16px}/* prevent iOS auto-zoom on focus — class+class so it outranks `.co-bg input{font:inherit}`; under 16px iOS zooms on focus, never zooms back, and the sheet runs off the right edge */
   .fo-chip{height:42px;font-size:15px;padding:0 14px}
   .fo-in.fo-num{padding-left:8px;padding-right:8px}/* three fields on a 320px screen at 16px */
 }
 @media (max-width:359.98px){.co-head-sub2{display:none}}   /* the sub-line stays one line on the narrowest phones */
+/* A short viewport (the phone keyboard up: ~390×430) leaves the scroller ~110px tall with the consent in the footer — thin the chrome so the open row's field and its button fit */
+@media (max-height:520px){.co-handle{display:none}.co-head{padding:6px 12px 6px 20px}.co-head-sub{display:none}.co-avatar{width:32px;height:32px}.co-head-name{font-size:20px}.fo-consent{font-size:11.5px;line-height:1.35}.co-input-area{gap:6px}.co-bg .co-confirm{min-height:44px;padding:8px 18px;font-size:15px}}
 @media (prefers-reduced-motion:reduce){
   .co-bg,.co-sheet,.co-progress i,.fo-in,.fo-chip,.fo-consent i,.fo-consent i::after,.fo-a,.fo-chev,.fo-q{transition:none}
   .co-shake{animation:none}
@@ -1056,7 +1076,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
 <section id="hero" class="cream" data-label="meet cued">
   <div class="wrap hero-in hero-grid" id="heroIn">
     <div class="hero-copy">
-      <h1 class="hero-h"><span class="kicker">meet cued</span>the coach that<span class="sr-only"> lives in your texts.</span><span class="rot" id="heroRot" aria-hidden="true"><span class="rot-item on">lives in your texts.</span><span class="rot-item">replaces <span class="rot-icons"><img src="/images/app-icons/hevy.png" alt="Hevy"><img src="/images/app-icons/MyFitnessPal%20Review.jpg" alt="MyFitnessPal"><img src="/images/app-icons/MacroFactor-MacroTracker_icon.png" alt="MacroFactor"><img src="/images/app-icons/notes.png" alt="Notes"><img src="/images/app-icons/reminders_app.webp" alt="Reminders"><img src="/images/app-icons/pen_paper.png" alt="pen and paper"></span></span><span class="rot-item">builds your workouts.</span><span class="rot-item">tracks your food.</span><span class="rot-item">knows the college life.</span><span class="rot-item">knows your schedule.</span></span></h1>
+      <h1 class="hero-h"><span class="kicker">meet cued</span>the fitness coach that<span class="sr-only"> lives in your texts.</span><span class="rot" id="heroRot" aria-hidden="true"><span class="rot-item on">lives in your texts.</span><span class="rot-item">replaces <span class="rot-icons"><img src="/images/app-icons/hevy.png" alt="Hevy"><img src="/images/app-icons/MyFitnessPal%20Review.jpg" alt="MyFitnessPal"><img src="/images/app-icons/MacroFactor-MacroTracker_icon.png" alt="MacroFactor"><img src="/images/app-icons/notes.png" alt="Notes"><img src="/images/app-icons/reminders_app.webp" alt="Reminders"><img src="/images/app-icons/pen_paper.png" alt="pen and paper"></span></span><span class="rot-item">builds your workouts.</span><span class="rot-item">tracks your food.</span><span class="rot-item">knows the college life.</span><span class="rot-item">knows your schedule.</span></span></h1>
       <p class="hero-sub">it knows your classes, replaces your lift and meal apps, and texts first. <span class="b">nothing to download.</span></p>
       <div class="hero-cta"><button type="button" class="btn sq" id="heroCtaTop">text cued</button></div>
     </div>
@@ -1444,6 +1464,34 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
             <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
             </div></div></div>
           </div>
+          <div class="fo-field" data-f="phone">
+            <button type="button" class="fo-q" id="foQ-phone" aria-expanded="false" aria-controls="foA-phone"><span class="fo-qt">your number <small>that's where i'll text you</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-a" id="foA-phone" role="region" aria-labelledby="foQ-phone"><div class="fo-ai"><div class="fo-body">
+            <input class="fo-in" id="foPhone" name="phone" type="tel" placeholder="(510) 555-1234" inputmode="tel" autocomplete="tel" enterkeyhint="next">
+            <div class="fo-hint">that's not a 10-digit US number</div>
+            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
+            </div></div></div>
+          </div>
+          <div class="fo-field" data-f="occupation">
+            <button type="button" class="fo-q" id="foQ-occupation" aria-expanded="false" aria-controls="foA-occupation"><span class="fo-qt">occupation?</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-a" id="foA-occupation" role="region" aria-labelledby="foQ-occupation"><div class="fo-ai"><div class="fo-body">
+            <div class="fo-chips" role="radiogroup" aria-labelledby="foQ-occupation" data-stay="1">
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="student">student</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="working">i work</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="both">both</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="other">something else</button>
+            </div>
+            <div class="fo-sub school"><label class="fo-sub-l" for="foSchool">which school?</label><input class="fo-in" id="foSchool" name="school" type="text" autocomplete="organization" placeholder="e.g. uc berkeley" enterkeyhint="next"></div>
+            <div class="fo-sub job"><label class="fo-sub-l" for="foJob">what kind of work?</label><input class="fo-in" id="foJob" name="job" type="text" autocomplete="organization-title" placeholder="e.g. nurse, software, retail" enterkeyhint="next"></div>
+            <div class="fo-hint">pick one</div>
+            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
+            </div></div></div>
+          </div>
+        </div>
+
+        <div class="fo-sec opt">
+          <h3 class="fo-sec-h">a bit about you <small>optional</small></h3>
+          <p class="fo-sec-note">everything from here is optional. it makes my first texts better — skip anything and i'll just ask over text.</p>
           <div class="fo-field short" data-f="age">
             <button type="button" class="fo-q" id="foQ-age" aria-expanded="false" aria-controls="foA-age"><span class="fo-qt">age</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
             <div class="fo-a" id="foA-age" role="region" aria-labelledby="foQ-age"><div class="fo-ai"><div class="fo-body">
@@ -1485,8 +1533,8 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
             </div></div></div>
           </div>
         </div>
-        <div class="fo-sec">
-          <h3 class="fo-sec-h">your training</h3>
+        <div class="fo-sec opt">
+          <h3 class="fo-sec-h">your training <small>optional</small></h3>
           <div class="fo-field" data-f="goals">
             <button type="button" class="fo-q" id="foQ-goals" aria-expanded="false" aria-controls="foA-goals"><span class="fo-qt">what are you training for? <small>pick all that apply</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
             <div class="fo-a" id="foA-goals" role="region" aria-labelledby="foQ-goals"><div class="fo-ai"><div class="fo-body">
@@ -1603,16 +1651,8 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
             </div></div></div>
           </div>
         </div>
-        <div class="fo-sec">
-          <h3 class="fo-sec-h">where to text you</h3>
-          <div class="fo-field" data-f="phone">
-            <button type="button" class="fo-q" id="foQ-phone" aria-expanded="false" aria-controls="foA-phone"><span class="fo-qt">your number <small>that's where i'll text you</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
-            <div class="fo-a" id="foA-phone" role="region" aria-labelledby="foQ-phone"><div class="fo-ai"><div class="fo-body">
-            <input class="fo-in" id="foPhone" name="phone" type="tel" placeholder="(510) 555-1234" inputmode="tel" autocomplete="tel" enterkeyhint="next">
-            <div class="fo-hint">that's not a 10-digit US number</div>
-            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
-            </div></div></div>
-          </div>
+        <div class="fo-sec opt">
+          <h3 class="fo-sec-h">last things <small>optional</small></h3>
           <div class="fo-field" data-f="email">
             <button type="button" class="fo-q" id="foQ-email" aria-expanded="false" aria-controls="foA-email"><span class="fo-qt">gmail <small>optional — for google calendar or fitbit later</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
             <div class="fo-a" id="foA-email" role="region" aria-labelledby="foQ-email"><div class="fo-ai"><div class="fo-body">
@@ -1628,17 +1668,14 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
             <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
             </div></div></div>
           </div>
-          <div class="fo-field" data-f="consent">
-            <button type="button" class="fo-q" id="foQ-consent" aria-expanded="false" aria-controls="foA-consent"><span class="fo-qt">last thing — the fine print</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
-            <div class="fo-a" id="foA-consent" role="region" aria-labelledby="foQ-consent"><div class="fo-ai"><div class="fo-body">
-            <button type="button" class="fo-consent" role="checkbox" aria-checked="false"><i aria-hidden="true"></i><span>by joining you agree to get recurring automated texts from cued — workouts, meals, check-ins. 5–8 msgs/day, msg &amp; data rates may apply, reply STOP to cancel or HELP for help. <a href="/terms.html" target="_blank" rel="noopener">terms</a> · <a href="/privacy.html" target="_blank" rel="noopener">privacy</a></span></button>
-            <div class="fo-hint">i need a yes here before i can text you</div>
-            </div></div></div>
-          </div>
         </div>
       </form>
     </div>
     <div class="co-input-area" id="coInputArea">
+      <div class="fo-consent-row" data-f="consent">
+        <button type="button" class="fo-consent" role="checkbox" aria-checked="false"><i aria-hidden="true"></i><span>by joining you agree to get recurring automated texts from cued — workouts, meals, check-ins. 5–8 msgs/day, msg &amp; data rates may apply, reply STOP to cancel or HELP for help. <a href="/terms.html" target="_blank" rel="noopener">terms</a> · <a href="/privacy.html" target="_blank" rel="noopener">privacy</a></span></button>
+        <div class="fo-hint">i need a yes here before i can text you</div>
+      </div>
       <div class="fo-err" id="coErr" role="alert"></div>
       <button type="button" class="co-confirm" id="coSubmit">sign up</button>
     </div>
@@ -2355,7 +2392,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   // can be followed into sign-ups, and it fires one `qr-scan {src}` per landing.
   // The label is kept in a variable only (nothing stored in the browser) and
   // never leaves this load. Never put a typed answer in an event.
-  const STEP_NAMES = ['', 'name', 'age', 'gender', 'stats', 'goals', 'obstacle', 'experience', 'equipment', 'days', 'time', 'diet', 'restrictions', 'apps', 'phone', 'consent'];
+  const STEP_NAMES = ['', 'name', 'phone', 'occupation', 'age', 'gender', 'stats', 'goals', 'obstacle', 'experience', 'equipment', 'days', 'time', 'diet', 'restrictions', 'apps', 'consent'];
   const OPTIONAL = new Set(['restrictions']);
   const REQUIRED = STEP_NAMES.slice(1).filter(n => !OPTIONAL.has(n));
   const ref = (() => {
@@ -2381,6 +2418,8 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   const ctaSource = () => overlay.dataset.source || 'unknown';
 
   const fired = new Set();
+  let submitted = {};   // what went up — the SMS fallback needs the phone
+  let busy = false;     // declared up here: setLabel() reads it during init
   function markStep(name){
     const n = STEP_NAMES.indexOf(name);
     if (n < 1 || fired.has(n)) return;
@@ -2389,14 +2428,19 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     track('signup-step', { step: n, name, source: ctaSource() });
   }
   function setProgress(pct){
-    if (pct == null) pct = REQUIRED.filter(n => VALID[n](read(n))).length / REQUIRED.length * 100;
+    if (pct == null) pct = STEP_NAMES.slice(1).filter(answered).length / (STEP_NAMES.length - 1) * 100;   // answered rows of all of them — the hairline is "how complete", not "may I submit"
     if (progress) progress.style.setProperty('--p', Math.min(100, Math.round(pct)) + '%');
   }
 
   // ── reading the form ──
-  const fieldOf = name => form.querySelector(`.fo-field[data-f="${name}"]`);
-  const ORDER = [...form.querySelectorAll('.fo-field')].map(f => f.dataset.f);   // DOM order — validation walks it
+  const fieldOf = name => overlay.querySelector(`[data-f="${name}"]`);   // rows in the form, plus the consent row in the footer
+  const ORDER = [...form.querySelectorAll('.fo-field')].map(f => f.dataset.f);   // the rows, DOM order — the accordion walks it
+  // What the backend needs to create the account and text (app.py /waitlist): a
+  // name, a number, consent. Every other row is optional — the coach's
+  // onboarding asks over text for whatever arrives null (founder, 2026-11-14).
+  const MUST = ['name', 'phone', 'occupation', 'consent'];   // occupation (founder, 2026-11-14): profiles by occupation and school are coming; the backend's User.occupation is free text it reads with startswith("student")
   const stats = fieldOf('stats');
+  const isMetricRow = el => { const row = el.closest('.fo-us, .fo-metric'); return !row || (stats.classList.contains('metric') === row.classList.contains('fo-metric')); };
   const num = el => { const v = parseFloat(String(el.value).replace(',', '.')); return Number.isFinite(v) ? v : NaN; };
   const statIn = k => stats.querySelector(`.fo-in[data-k="${k}"]`);
   // Height + weight resolve to the keys the backend takes for the active unit
@@ -2425,17 +2469,21 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   const validEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
   const one  = v => Array.isArray(v) && v.length === 1;
   const some = v => Array.isArray(v) && v.length > 0;
+  const statsTouched = () => [...stats.querySelectorAll('.fo-in')].filter(isMetricRow).some(i => i.value.trim() !== '');
+  // VALID = "may be posted as is": the three MUST rows need a real answer; an
+  // optional row passes when it's answered OR untouched (a half-typed height &
+  // weight, a 2-digit number or a bad email are still refused — never a wrong fact).
   const VALID = {
     name: v => v.length > 0,
-    age: v => /^\d{1,3}$/.test(v),
-    gender: one, stats: v => !!v,
-    goals: some, obstacle: one, experience: one, equipment: one, days: one, time: some, diet: one,
-    restrictions: () => true,
-    apps: some,
     phone: validPhone,
+    occupation: some,
+    consent: v => v === true,
+    age: v => v === '' || /^\d{1,3}$/.test(v),
+    stats: v => !!v || !statsTouched(),
+    gender: () => true, goals: () => true, obstacle: () => true, experience: () => true, equipment: () => true,
+    days: () => true, time: () => true, diet: () => true, restrictions: () => true, apps: () => true,
     email: v => !v || validEmail(v),
     referral: () => true,
-    consent: v => v === true,
   };
   // ── the accordion ──
   // One row per question. Answering marks the row done (summary at the right),
@@ -2447,31 +2495,50 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   const answered = name => {
     const v = read(name);
     if (name === 'restrictions' || name === 'referral') return v.length > 0;
-    if (name === 'email') return v.length > 0 && VALID.email(v);
-    return VALID[name](v) && (Array.isArray(v) ? v.length > 0 : v !== '' && v !== false && v !== null);
+    if (name === 'email') return v.length > 0 && validEmail(v);
+    if (name === 'age') return /^\d{1,3}$/.test(v);
+    if (name === 'stats') return !!v;
+    if (name === 'consent') return v === true;
+    return Array.isArray(v) ? v.length > 0 : v !== '' && v !== false && v !== null;
   };
   function summary(name){
     const v = read(name);
     if (!answered(name)) return '';
     if (name === 'stats') return v.height_cm != null ? `${v.height_cm} cm, ${v.weight_kg} kg` : `${v.height_ft}'${v.height_in}, ${v.weight_lbs} lbs`;
-    if (name === 'consent') return 'agreed';
     if (name === 'days') return `${v[0]} days`;
+    if (name === 'occupation'){ const o = occupationOf(); return [o.kind === 'other' ? 'something else' : o.kind === 'working' ? 'i work' : o.kind, o.school, o.job].filter(Boolean).join(' · '); }
     if (name === 'referral') return v.toUpperCase();
     if (Array.isArray(v)) return v.map(x => LABELS[name + ':' + x] || x).join(', ');
     return v;
   }
+  // What goes up for occupation: a free-text `occupation` the backend already
+  // reads ("student" first when they study, so its startswith("student") checks
+  // hold), `school` and `job` on their own keys for the profiles to come, and the
+  // picked `occupation_kind`.
+  function occupationOf(){
+    const kind = read('occupation')[0] || null;
+    const field = fieldOf('occupation');
+    const school = (kind === 'student' || kind === 'both') ? field.querySelector('#foSchool').value.trim() : '';
+    const job = (kind === 'working' || kind === 'both') ? field.querySelector('#foJob').value.trim() : '';
+    let occupation = null;
+    if (kind === 'student') occupation = school ? `student at ${school}` : 'student';
+    else if (kind === 'working') occupation = job || 'working';
+    else if (kind === 'both') occupation = `student${school ? ' at ' + school : ''}${job ? ', works as ' + job : ''}`;
+    else if (kind === 'other') occupation = job || 'other';
+    return { kind, school: school || null, job: job || null, occupation };
+  }
   const passed = new Set();   // answered, or skipped on purpose
   function setOpen(name, on){
     const field = fieldOf(name);
+    const q = field.querySelector('.fo-q'); if (!q) return;   // the consent row has no fold
     field.classList.toggle('open', on);
-    field.querySelector('.fo-q').setAttribute('aria-expanded', String(on));
+    q.setAttribute('aria-expanded', String(on));
   }
   function nextAfter(name){
     const i = ORDER.indexOf(name);
     const todo = n => !passed.has(n) && !answered(n);
     return ORDER.slice(i + 1).find(todo) || ORDER.find(todo) || null;
   }
-  const isMetricRow = el => { const row = el.closest('.fo-us, .fo-metric'); return !row || (stats.classList.contains('metric') === row.classList.contains('fo-metric')); };
   function focusIn(name){
     const inp = [...fieldOf(name).querySelectorAll('.fo-in')].find(isMetricRow);
     if (inp) inp.focus({ preventScroll: true });
@@ -2484,6 +2551,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   // above the target still occupies, and the landing matches the settled layout.
   function scrollToRow(name){
     const field = fieldOf(name);
+    if (!body.contains(field)) return;   // the consent row lives in the footer, always on screen
     let top = field.getBoundingClientRect().top - body.getBoundingClientRect().top + body.scrollTop;
     form.querySelectorAll('.fo-field:not(.open)').forEach(f => {
       if (f !== field && (f.compareDocumentPosition(field) & Node.DOCUMENT_POSITION_FOLLOWING)) top -= f.querySelector('.fo-ai').getBoundingClientRect().height;
@@ -2496,11 +2564,10 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     scrollToRow(name);
     focusIn(name);
   }
-  // Leave a row: it has to be answered, or be an optional one (then it's a skip).
+  // Leave a row: a MUST row has to be answered; an optional one is a skip, unless
+  // it's half-typed (VALID refuses it).
   function advance(name){
-    if (!answered(name)){
-      if (!(VALID[name](read(name)) && (name === 'restrictions' || name === 'referral' || name === 'email'))) { flag(name); return; }
-    }
+    if (!VALID[name](read(name)) || (MUST.includes(name) && !answered(name))) { flag(name); return; }
     passed.add(name);
     setOpen(name, false);
     const next = nextAfter(name);
@@ -2510,9 +2577,19 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     const field = fieldOf(name);
     const done = answered(name);
     field.classList.toggle('done', done);
-    field.querySelector('.fo-qv').textContent = summary(name);
+    const qv = field.querySelector('.fo-qv'); if (qv) qv.textContent = summary(name);
     const nxt = field.querySelector('.fo-next');
-    if (nxt) nxt.textContent = (!done && (name === 'restrictions' || name === 'referral' || name === 'email')) ? 'skip' : 'next';
+    if (nxt) nxt.textContent = (!done && !MUST.includes(name)) ? 'skip' : 'next';
+    setLabel();
+  }
+  // The button says what will happen: with name, number and consent in and rows
+  // left blank it's "sign up now, i'll ask the rest over text"; everything
+  // answered (or nothing of the three yet) and it's plain "sign up".
+  function setLabel(){
+    if (busy) return;
+    const minimum = MUST.every(answered);
+    const rest = ORDER.filter(n => !MUST.includes(n) && !['email', 'referral', 'restrictions'].includes(n) && !answered(n)).length;
+    submitBtn.textContent = minimum && rest ? "sign up now, i'll ask the rest over text" : 'sign up';
   }
   // The first time a field has a valid answer its step fires (optional
   // restrictions: when something is typed). Any flag on it clears as they fix it.
@@ -2521,8 +2598,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     field.classList.remove('bad');
     hideErr();
     const v = read(name);
-    const ok = name === 'restrictions' ? v.length > 0 : VALID[name](v) && (Array.isArray(v) ? v.length > 0 : v !== '' && v !== false && v !== null);
-    if (ok && STEP_NAMES.includes(name)) markStep(name);
+    if (answered(name) && STEP_NAMES.includes(name)) markStep(name);
     refresh(name);
     setProgress();
   }
@@ -2558,17 +2634,25 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
         group.querySelectorAll('.fo-chip').forEach(c => { c.classList.remove('sel'); c.setAttribute('aria-checked', 'false'); });
         chip.classList.add('sel'); chip.setAttribute('aria-checked', 'true');
         changed(name);
-        setTimeout(() => advance(name), reduced.matches ? 0 : 240);   // the pick lands, then the row folds
+        if (group.dataset.stay === '1'){
+          // occupation: the pick reveals its detail box (school / work) and stays open for it
+          const f = group.closest('.fo-field'), k = chip.dataset.v;
+          f.classList.toggle('student', k === 'student' || k === 'both');
+          f.classList.toggle('working', k === 'working' || k === 'both');
+          const sub = f.querySelector(k === 'working' ? '#foJob' : (k === 'other' ? null : '#foSchool'));
+          if (sub) sub.focus({ preventScroll: true });
+        } else {
+          setTimeout(() => advance(name), reduced.matches ? 0 : 240);   // the pick lands, then the row folds
+        }
       }
     }));
   });
-  const consentBtn = form.querySelector('.fo-consent');
+  const consentBtn = overlay.querySelector('.fo-consent');
   consentBtn.addEventListener('click', e => {
     if (e.target.closest('a')) return;   // the terms / privacy links open, nothing toggles
     const on = consentBtn.classList.toggle('sel');
     consentBtn.setAttribute('aria-checked', String(on));
     changed('consent');
-    if (on) setTimeout(() => advance('consent'), reduced.matches ? 0 : 240);
   });
   // Units: default by locale (en-US → ft/lb, everyone else → cm/kg); the toggle
   // swaps the row of number fields.
@@ -2589,7 +2673,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
                   : d.length > 3 ? `(${d.slice(0,3)}) ${d.slice(3)}`
                   : d;
   });
-  form.querySelectorAll('.fo-in').forEach(inp => {
+  overlay.querySelectorAll('.fo-in').forEach(inp => {
     const name = inp.closest('.fo-field').dataset.f;
     inp.addEventListener('input', () => changed(name));
     // Enter = next (what enterkeyhint="next" promises). In height & weight it
@@ -2608,6 +2692,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   form.addEventListener('submit', e => { e.preventDefault(); submitProfile(); });
   submitBtn.addEventListener('click', submitProfile);
   ORDER.forEach(refresh);
+  refresh('consent');
   setOpen(ORDER[0], true);
 
   function showErr(text){ if (errLine){ errLine.textContent = text; errLine.classList.add('show'); } }
@@ -2624,8 +2709,6 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   }
 
   // ── submit ──
-  let submitted = {};   // what went up — the SMS fallback needs the phone
-  let busy = false;
   function collect(){
     const full = read('name');
     const times = read('time');
@@ -2641,18 +2724,21 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       active: false,
       status: 'waitlist',
-      age: Number(read('age')),
-      gender: read('gender')[0],
-      goal: read('goals'),
-      biggest_obstacle: read('obstacle')[0],
-      experience: read('experience')[0],
-      equipment: read('equipment')[0],
+      ...(() => { const o = occupationOf(); return { occupation: o.occupation, occupation_kind: o.kind, school: o.school, job: o.job }; })(),
+      // Optional rows post null when blank: the backend fills its defaults and the
+      // coach's onboarding asks over text for what's missing.
+      age: read('age') ? Number(read('age')) : null,
+      gender: read('gender')[0] || null,
+      goal: read('goals').length ? read('goals') : null,
+      biggest_obstacle: read('obstacle')[0] || null,
+      experience: read('experience')[0] || null,
+      equipment: read('equipment')[0] || null,
       // the objective stats (backend #155) — either unit system, backend converts
-      ...read('stats'),
-      workout_days: read('days')[0],
-      workout_time: times[0],
+      ...(read('stats') || {}),
+      workout_days: read('days')[0] || null,
+      workout_time: times[0] || null,
       workout_times: times.length > 1 ? times : null,
-      diet: read('diet')[0],
+      diet: read('diet')[0] || null,
       restrictions: read('restrictions') || null,
       existing_tools: tools.length ? tools : null,
       referral_code: read('referral').toUpperCase() || null,   // a friend's code (backend referrals.py credits them)
@@ -2661,7 +2747,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   }
   async function submitProfile(){
     if (busy) return;
-    const bad = ORDER.find(n => !VALID[n](read(n)));
+    const bad = ORDER.concat('consent').find(n => !VALID[n](read(n)) || (MUST.includes(n) && !answered(n)));
     if (bad){ flag(bad); return; }
     hideErr();
     busy = true;
@@ -2714,6 +2800,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     busy = false;
     submitBtn.disabled = false;
     submitBtn.textContent = label;
+    setLabel();
   }
 
   function successScreen(title, text, link){
