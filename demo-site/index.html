@@ -150,8 +150,13 @@ nav{
   background:transparent;border-bottom:1px solid transparent;
   transition:background .25s,border-color .25s;
 }
-/* transparent all the way down (founder, 2026-11-08); .scrolled is still toggled but styles nothing */
-nav.scrolled{background:transparent;border-bottom-color:transparent}
+/* frosted glass once the page scrolls (founder, 2026-11-14): content can pass
+   under the brand without colliding with it; still see-through on the hero */
+nav.scrolled{
+  background:color-mix(in srgb, var(--cream) 62%, transparent);
+  -webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2);
+  border-bottom-color:color-mix(in srgb, var(--line) 70%, transparent);
+}
 .brand{display:flex;align-items:center;gap:9px;font-family:var(--f-ui);font-weight:400;font-size:22px;color:var(--blue);letter-spacing:-.2px}
 .brand svg{display:block;width:28px;height:28px}
 nav .btn{height:44px;padding:0 20px;font-size:16px}
@@ -171,6 +176,10 @@ nav .btn{height:44px;padding:0 20px;font-size:16px}
 .hero-video{position:relative;aspect-ratio:4/3;border-radius:28px;overflow:hidden;background:var(--cream);box-shadow:inset 0 0 0 1px rgba(11,11,12,.06),0 30px 60px -40px rgba(60,40,20,.35)}
 .hero-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .6s ease}
 .hero-video video.on{opacity:1}
+.hero-still{position:absolute;inset:0;display:none;line-height:0}
+.hero-still img{width:100%;height:100%;object-fit:cover;display:block}
+.hero-video.still video{display:none}
+.hero-video.still .hero-still{display:block}
 .hero-mark{--size:clamp(96px,10vw,140px);display:block;margin:0 auto 8px;line-height:0}
 /* ===== cued live avatar (founder prototype, copied verbatim; --size is the only knob) ===== */
 .cued-avatar{
@@ -914,8 +923,12 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
          no-JS fallback. Not in LFS on purpose — GitHub Pages serves LFS
          pointers, not the file. -->
     <div class="hero-video" id="heroVideo" aria-hidden="true">
-      <video class="on" src="/assets/hero/cued-hero.mp4" poster="/assets/hero/cued-hero-poster.jpg" autoplay muted loop playsinline preload="auto" disablepictureinpicture></video>
-      <video src="/assets/hero/cued-hero-2.mp4" muted playsinline preload="auto" disablepictureinpicture></video>
+      <video class="on" src="/assets/hero/cued-hero.mp4" poster="/assets/hero/cued-hero-poster.jpg" autoplay muted loop playsinline preload="auto" disablepictureinpicture disableremoteplayback></video>
+      <video src="/assets/hero/cued-hero-2.mp4" muted playsinline preload="auto" disablepictureinpicture disableremoteplayback></video>
+      <!-- The still: shown instead of the clips whenever autoplay is refused
+           (iOS Low Power Mode, Reduce Motion, a browser policy) — otherwise iOS
+           paints a paused player with controls over the hero. -->
+      <picture class="hero-still"><source srcset="/assets/hero/cued-hero-still.webp" type="image/webp"><img src="/assets/hero/cued-hero-still.jpg" alt="" width="1200" height="900"></picture>
     </div>
   </div>
 </section>
@@ -1300,7 +1313,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   if (clips.length){
     const XF = 0.6, LEAD = 1.0;   // fade length; start the handoff this far from the end so the outgoing clip never hits 'ended'
     let cur = 0, swapping = false;
-    const play = v => { const p = v.play(); if (p && p.catch) p.catch(() => {}); };
+    const play = v => { const p = v.play(); if (p && p.catch) p.catch(() => { if (!heroVideo.classList.contains('still')) useStill(); }); };
     const swap = () => {
       if (swapping || clips.length < 2) return;
       swapping = true;
@@ -1310,8 +1323,11 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
       cur = (cur + 1) % clips.length;
       setTimeout(() => { a.pause(); a.currentTime = 0; swapping = false; }, XF * 1000 + 80);
     };
+    // Any refusal to autoplay → the still, not a paused player. Reduce Motion
+    // is treated the same way (a paused <video> on iOS shows its controls).
+    const useStill = () => { heroVideo.classList.add('still'); clips.forEach(v => { v.removeAttribute('autoplay'); v.pause(); v.removeAttribute('src'); v.load(); }); };
     if (reduce.matches){
-      clips.forEach(v => { v.removeAttribute('autoplay'); v.pause(); });
+      useStill();
     } else {
       if (clips.length > 1) clips[0].removeAttribute('loop');   // the script hands off instead
       clips.forEach(v => {
@@ -1321,6 +1337,8 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
       new IntersectionObserver(es => es.forEach(e => {
         if (e.isIntersecting) play(clips[cur]); else clips.forEach(v => v.pause());
       }), {threshold: 0}).observe(heroVideo);
+      // some policies pause silently rather than rejecting: no progress 3s in = the still
+      setTimeout(() => { if (!heroVideo.classList.contains('still') && clips[0].paused && clips[0].currentTime < 0.2 && document.visibilityState === 'visible') useStill(); }, 3000);
     }
   }
 
@@ -1337,7 +1355,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   }
   function navState(){
     if (!hero) return;
-    nav.classList.toggle('scrolled', window.scrollY > hero.offsetHeight - 80);
+    nav.classList.toggle('scrolled', window.scrollY > 8);   // frost as soon as anything can slide under the brand
     if (!barRaf) barRaf = requestAnimationFrame(() => { barRaf = 0; barState(); });
   }
   navState();
