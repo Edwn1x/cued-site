@@ -71,6 +71,7 @@ async function walk(w, d, { source = 'hero', referral = '', email = '', times = 
   await until(() => typeof w.openWaitlist === 'function');
   w.openWaitlist(source);
   type(d, 'name', 'Edwin Ruiz');
+  type(d, 'phone', '5105550123');
   type(d, 'age', '20');
   pick(d, 'gender', 'male');
   stats(d);
@@ -82,15 +83,16 @@ async function walk(w, d, { source = 'hero', referral = '', email = '', times = 
   pick(d, 'time', ...times);
   pick(d, 'diet', 'no restrictions');
   pick(d, 'apps', ...apps);
-  type(d, 'phone', '5105550123');
   if (email) type(d, 'email', email);
   if (referral) type(d, 'referral', referral);
   consent(d);
   submit(d);
 }
 
-test('every CTA reads "text cued"; the card is a form, not a chat', () => {
+test('every CTA reads "text cued"; the card is a form, not a chat; name and phone lead', () => {
   const { d } = boot(() => ({}));
+  assert.deepEqual([...d.querySelectorAll('#coForm .fo-field')].slice(0, 2).map(f => f.dataset.f), ['name', 'phone']);
+  assert.match(d.querySelector('#hero h1').textContent, /the fitness coach that/);
   for (const id of CTA_IDS) assert.equal(d.getElementById(id).textContent.trim(), 'text cued', id);
   assert.doesNotMatch(d.body.innerHTML, /Join the waitlist/);
   assert.ok(d.querySelector('#waitlistOverlay form#coForm'));
@@ -198,11 +200,11 @@ test('metric units post height_cm / weight_kg; the toggle defaults from the loca
   await until(() => typeof w.openWaitlist === 'function');
   assert.ok(field(d, 'stats').classList.contains('metric'), 'en-GB → cm/kg');
   w.openWaitlist('hero');
-  type(d, 'name', 'Pat Lee'); type(d, 'age', '22'); pick(d, 'gender', 'female');
+  type(d, 'name', 'Pat Lee'); type(d, 'phone', '5105550124'); type(d, 'age', '22'); pick(d, 'gender', 'female');
   type(d, 'stats', '168', '.fo-in[data-k=cm]'); type(d, 'stats', '63.5', '.fo-in[data-k=kg]');
   pick(d, 'goals', 'build muscle'); pick(d, 'obstacle', 'consistency'); pick(d, 'experience', 'just starting'); pick(d, 'equipment', 'home gym');
   pick(d, 'days', '3'); pick(d, 'time', 'evenings'); pick(d, 'diet', 'vegan'); pick(d, 'apps', 'nothing yet');
-  type(d, 'phone', '5105550124'); consent(d); submit(d);
+  consent(d); submit(d);
   await success(d);
   const p = posted[0].body;
   assert.equal(p.height_cm, 168); assert.equal(p.weight_kg, 63.5);
@@ -220,12 +222,13 @@ test('nothing posts until every required field is answered: the first gap is fla
   type(d, 'name', 'Edwin Ruiz');
   assert.ok(!field(d, 'name').classList.contains('bad'), 'typing clears the flag');
   // phone: a 9-digit number is refused, email: a bad address is refused, consent: required
+  type(d, 'phone', '510555012'); submit(d); await new Promise(r => setTimeout(r, 20));
+  assert.ok(field(d, 'phone').classList.contains('bad'), 'a 9-digit number is refused, and phone is the second row'); assert.equal(posted.length, 0);
+  type(d, 'phone', '5105550123');
   type(d, 'age', '20'); pick(d, 'gender', 'male'); stats(d); pick(d, 'goals', 'endurance'); pick(d, 'obstacle', 'time');
   pick(d, 'experience', '2+ years'); pick(d, 'equipment', 'bodyweight only'); pick(d, 'days', '2'); pick(d, 'time', 'mornings');
   pick(d, 'diet', 'halal'); pick(d, 'apps', 'whoop');
-  type(d, 'phone', '510555012'); submit(d); await new Promise(r => setTimeout(r, 20));
-  assert.ok(field(d, 'phone').classList.contains('bad')); assert.equal(posted.length, 0);
-  type(d, 'phone', '5105550123'); type(d, 'email', 'not-an-email'); submit(d); await new Promise(r => setTimeout(r, 20));
+  type(d, 'email', 'not-an-email'); submit(d); await new Promise(r => setTimeout(r, 20));
   assert.ok(field(d, 'email').classList.contains('bad')); assert.equal(posted.length, 0);
   type(d, 'email', ''); submit(d); await new Promise(r => setTimeout(r, 20));
   assert.ok(field(d, 'consent').classList.contains('bad'), 'consent is required'); assert.equal(posted.length, 0);
@@ -267,9 +270,11 @@ test('accordion: the first row opens; a single pick folds it and opens the next;
   type(d, 'name', 'Edwin Ruiz');
   assert.ok(isOpen(d, 'name'), 'typing alone does not advance');
   d.getElementById('foName').dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
-  assert.ok(!isOpen(d, 'name') && isOpen(d, 'age'), 'Enter folds name and opens age');
+  assert.ok(!isOpen(d, 'name') && isOpen(d, 'phone'), 'Enter folds name and opens phone — name and number are the first two rows');
   assert.equal(summary(d, 'name'), 'Edwin Ruiz');
   assert.ok(field(d, 'name').classList.contains('done'));
+  type(d, 'phone', '5105550123'); field(d, 'phone').querySelector('.fo-next').click();
+  assert.ok(isOpen(d, 'age') && !isOpen(d, 'phone')); assert.equal(summary(d, 'phone'), '(510) 555-0123');
   type(d, 'age', '20'); field(d, 'age').querySelector('.fo-next').click();
   assert.ok(isOpen(d, 'gender') && !isOpen(d, 'age'));
   pick(d, 'gender', 'male');
@@ -321,7 +326,7 @@ test('copy: "estimate is fine", never "ballpark"', () => {
 });
 
 // ── analytics ──
-const STEP_NAMES = ['name', 'age', 'gender', 'stats', 'goals', 'obstacle', 'experience', 'equipment', 'days', 'time', 'diet', 'restrictions', 'apps', 'phone', 'consent'];
+const STEP_NAMES = ['name', 'phone', 'age', 'gender', 'stats', 'goals', 'obstacle', 'experience', 'equipment', 'days', 'time', 'diet', 'restrictions', 'apps', 'consent'];
 
 test('funnel: open → 15 steps in form order (restrictions counted as passed) → submit live → iMessage tap and SMS tap, tagged with the source; no PII', async () => {
   const { w, d, events } = boot((url) => url.endsWith('/signup/channel')
