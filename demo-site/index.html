@@ -447,7 +447,9 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 .stepper button::before{content:'';height:1px;width:16px;background:currentColor;transition:width .25s var(--ease)}
 .stepper button[aria-current="step"]{color:var(--ink)}
 .stepper button[aria-current="step"]::before{width:48px}
-.proof-right{display:flex;align-items:center;justify-content:center;height:100vh}
+.proof-right{display:flex;align-items:center;justify-content:center;height:100vh;position:relative}
+/* the chat column on the lighter cream — a band from the column's left edge to the
+   viewport's right edge (founder, 2026-11-14: differentiate the thread from the page) */
 
 /* ===== PROOF, unframed (founder reference, 2026-11-14) =====
    No phone slab: the thread floats on the hero's cream at reading size,
@@ -474,7 +476,13 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
   opacity:0;transition:opacity .35s ease;
 }
 .proof-mascot img.on{opacity:1}
-#proof .phone-wrap{--ps:1!important;width:min(440px,100%);height:auto;margin:0 auto}
+#proof .phone-wrap{--ps:1!important;width:min(440px,100%);height:auto;margin:0 auto;position:relative}
+/* a faint, faded lighter shade behind the thread — a halo, not a panel (founder, 2026-11-14) */
+#proof .phone-wrap::before{
+  content:'';position:absolute;inset:-96px -140px;z-index:-1;pointer-events:none;border-radius:40%;
+  background:radial-gradient(ellipse 50% 50% at 50% 50%,rgba(255,255,255,.82) 0,rgba(255,255,255,.5) 48%,rgba(255,255,255,0) 76%);
+  filter:blur(26px);
+}
 #proof .phone{position:relative;left:auto;top:auto;transform:none;width:100%;height:auto;background:none;border-radius:0;padding:0;box-shadow:none}
 #proof .phone-screen{--bg:var(--cream);background:none;border-radius:0;height:auto;color:var(--ink);font-family:var(--f-ui)}
 #proof .island,#proof .ph-comp,#proof .ph-home,#proof .ph-head .chev,#proof .ph-head .vid{display:none}
@@ -1691,6 +1699,50 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     list.forEach(el => io.observe(el));
   }
   function startThread(t){ (mqStacked.matches ? playByScroll : playThread)(t); }
+
+  // Pinned desktop: the reader's scroll through a step's band drives the
+  // reveals (bubble k arrives at k/n of the first ~70% of the band), with the
+  // same catch-up stagger and typing beat as phones. If the reader stops with
+  // bubbles still pending, the rest arrive on their own after a beat — the
+  // thread finishes "like texts" instead of sitting half-played. Leaving a step
+  // finishes it, so a revisit shows the whole conversation. ?play=timed keeps
+  // the old autoplay for comparison.
+  function playByProgress(thread){
+    if (thread._prog) return thread._prog;
+    thread.dataset.played = '1';
+    const list = items(thread), n = list.length;
+    const typing = mkTyping(thread);
+    let next = 0, target = 0, busy = false, idle = 0;
+    if (reduce.matches){ revealAll(thread); return (thread._prog = {set(){}, finish(){}}); }
+    layout(thread, 0);
+    function pump(){
+      if (busy || next >= target) return;
+      busy = true;
+      const el = list[next], prev = list[next - 1];
+      const waiting = next === target - 1;
+      typing.className = 'typing ' + sideOf(el);
+      typing.style.top = (prev ? prev.offsetTop + prev.offsetHeight + 6 : 0) + 'px';
+      if (waiting){ typing.classList.add('show'); layout(thread, typing.offsetHeight + 6); }
+      setTimeout(() => {
+        typing.classList.remove('show');
+        el.classList.add('on');
+        layout(thread, 0);
+        choreo(el);
+        next++; busy = false;
+        if (next >= n) typing.remove();
+        pump();
+      }, waiting ? 380 : 90);
+    }
+    function set(q){
+      const want = Math.min(n, Math.floor((q / 0.7) * n) + 1);
+      if (want > target){ target = want; pump(); }
+      clearTimeout(idle);
+      if (target < n) idle = setTimeout(() => { target = n; pump(); }, 1400);
+    }
+    function finish(){ clearTimeout(idle); target = n; pump(); }
+    return (thread._prog = {set, finish});
+  }
+  window.playByProgress = playByProgress;
   window.playThread = playThread;
   window.layoutThread = layout;
 
@@ -1836,9 +1888,10 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     pinned.phoneWrap.style.setProperty('--ps', ps.toFixed(4));
     if (cur >= 0) window.layoutThread && window.layoutThread(pinned.threads[cur], 0);
   }
+  const TIMED = new URLSearchParams(location.search).get('play') === 'timed';
   function setStep(i){
     if (i === cur) return;
-    const first = cur < 0;
+    const first = cur < 0, prev = cur;
     cur = i;
     const {copy, stepper, sticky, threads, status, mascot, dots} = pinned;
     Array.from(copy.children).forEach((c, k) => c.classList.toggle('on', k === i));
@@ -1848,8 +1901,13 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     sticky.className = 'proof-sticky ' + tints[i];
     threads.forEach((t, k) => t.classList.toggle('active', k === i));
     const t = threads[i];
-    if (t.dataset.played){ t.style.transform = ''; }
-    else { window.layoutThread && window.layoutThread(t, 0); setTimeout(() => window.playThread(t), first ? 150 : 350); }
+    if (TIMED){
+      if (t.dataset.played){ t.style.transform = ''; }
+      else { window.layoutThread && window.layoutThread(t, 0); setTimeout(() => window.playThread(t), first ? 150 : 350); }
+    } else {
+      if (prev >= 0 && threads[prev]._prog) threads[prev]._prog.finish();
+      window.playByProgress(t);   // reveals are driven by onScroll's band progress
+    }
     const label = steps[i].dataset.status;
     status.classList.add('swap');
     setTimeout(() => { status.textContent = label; status.classList.remove('swap'); }, 250);
@@ -1865,7 +1923,9 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
       const active = r.top <= 0 && r.bottom >= vh;
       if (active !== window.proofActive){ window.proofActive = active; window.pillState && window.pillState(); }
       if (pinned.rail) pinned.rail.classList.toggle('show', active);
-      setStep(Math.min(4, Math.floor(p * 5)));
+      const idx = Math.min(4, Math.floor(p * 5));
+      setStep(idx);
+      if (!TIMED && pinned.threads[idx]._prog) pinned.threads[idx]._prog.set(Math.min(1, Math.max(0, p * 5 - idx)));
     });
   }
   function fitStacked(){
