@@ -396,8 +396,9 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 /* week */
 .wk-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.4em}
 .wk-day span{display:block;font-size:.62em;color:var(--gray-text);text-align:center;margin-bottom:.35em}
-.wk-col{height:5.2em;border-radius:.55em;background:rgba(11,11,12,.05);padding:.3em;display:flex;flex-direction:column;gap:.3em}
-.chip{font-size:.6em;font-weight:600;padding:.25em .45em;border-radius:.4em;text-align:center;line-height:1.2}
+.wk-col{height:6.6em;border-radius:.55em;background:rgba(11,11,12,.05);padding:.3em;display:flex;flex-direction:column;gap:.25em}
+.chip{font-size:.56em;font-weight:600;padding:.25em .4em;border-radius:.4em;text-align:center;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip.gray{background:rgba(11,11,12,.08);color:var(--gray-text);font-weight:500}
 .chip.blue{background:var(--blue);color:#fff}
 .chip.amber{background:#FCEBD0;color:#B8741A}
 .chip.red{background:#FBDADA;color:#B23B3B}
@@ -1082,14 +1083,14 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
           </div>
           <div class="screen">
             <div class="thread coach-left" data-play>
-              <div class="msg coach card wk" aria-label="this week: push on monday, chem homework wednesday, legs thursday, chem quiz friday">
+              <div class="msg coach card wk" aria-label="this week: classes most days, a lab tuesday, chem homework wednesday, club thursday, chem quiz friday, push monday and legs thursday">
                 <div class="wk-h"><i class="wk-dot"></i>this week</div>
                 <div class="wk-grid">
-                  <div class="wk-day"><span>mon</span><div class="wk-col"><b class="chip blue bot">push</b></div></div>
-                  <div class="wk-day"><span>tue</span><div class="wk-col"></div></div>
-                  <div class="wk-day"><span>wed</span><div class="wk-col"><b class="chip amber">chem</b></div></div>
-                  <div class="wk-day"><span>thu</span><div class="wk-col"><b class="chip blue bot">legs</b></div></div>
-                  <div class="wk-day"><span>fri</span><div class="wk-col"><b class="chip red">chem</b></div></div>
+                  <div class="wk-day"><span>mon</span><div class="wk-col"><b class="chip gray">cs 61c</b><b class="chip gray">data 104</b><b class="chip blue bot">push</b></div></div>
+                  <div class="wk-day"><span>tue</span><div class="wk-col"><b class="chip gray">chem 1a</b><b class="chip gray">lab</b></div></div>
+                  <div class="wk-day"><span>wed</span><div class="wk-col"><b class="chip gray">cs 61c</b><b class="chip amber">chem hw</b><b class="chip gray">discussion</b></div></div>
+                  <div class="wk-day"><span>thu</span><div class="wk-col"><b class="chip gray">chem 1a</b><b class="chip gray">club</b><b class="chip blue bot">legs</b></div></div>
+                  <div class="wk-day"><span>fri</span><div class="wk-col"><b class="chip gray">cs 61c</b><b class="chip red">chem quiz</b></div></div>
                 </div>
               </div>
               <div class="msg coach">chem hw's due wed 4pm, so legs moves to thu. gym closes at 6 today if u want in.</div>
