@@ -8,9 +8,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { JSDOM } from 'jsdom';
 
-// Both pages carry the same sign-up chat: the live root page and the
-// redesign at /demo-site. Every test below runs against each.
-const PAGES = [['index.html', ['floatCta', 'heroCta', 'heroCtaTop', 'closeCta']], ['demo-site/index.html', ['floatCta', 'heroCta', 'heroCtaTop', 'closeCta']]];
+// The root page's conversational sign-up. (demo-site/index.html runs a plain form
+// since 2026-11-14 — see signup_form.test.mjs.)
+const PAGES = [['index.html', ['floatCta', 'heroCta', 'heroCtaTop', 'closeCta']]];
 for (const [PAGE, CTA_IDS] of PAGES) {
 const html = readFileSync(new URL('../' + PAGE, import.meta.url), 'utf8');
 
