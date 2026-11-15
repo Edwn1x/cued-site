@@ -1,6 +1,6 @@
-// The demo-site sign-up FORM (2026-11-14): the conversational chat the root page runs
-// was too slow for readers who just want to fill in the boxes — demo-site/index.html
-// opens the same frosted card with a plain form instead. Same questions, same
+// The root page's sign-up FORM (built 2026-11-14 at /demo-site, promoted to the root
+// 2026-11-15): the previous generation's conversational chat (now at /demo-site) was too
+// slow for readers who just want to fill in the boxes — this page opens a plain form. Same questions, same
 // /waitlist payload, same success states (live + link → iMessage tap / SMS fallback;
 // no link → "just texted you"; exists; an older backend's waitlist copy), same Umami
 // funnel (signup-open / -step / -submit / -imessage / -sms, ?src → qr-scan + ref).
@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { JSDOM } from 'jsdom';
 
-const PAGE = 'demo-site/index.html';
+const PAGE = 'index.html';   // the root since 2026-11-15 (built at /demo-site, promoted)
 const CTA_IDS = ['floatCta', 'heroCta', 'heroCtaTop', 'closeCta'];
 const html = readFileSync(new URL('../' + PAGE, import.meta.url), 'utf8');
 
@@ -21,7 +21,7 @@ async function until(cond, { timeout = 4000, step = 10 } = {}) {
     await new Promise(r => setTimeout(r, step)); }
 }
 
-function boot(respond, { tracker = false, url = 'https://cued.fit/demo-site/', lateTracker = 0, language = 'en-US' } = {}) {
+function boot(respond, { tracker = false, url = 'https://cued.fit/', lateTracker = 0, language = 'en-US' } = {}) {
   const posted = [], events = [];
   const dom = new JSDOM(html, { runScripts: 'dangerously', pretendToBeVisual: true, url,
     beforeParse(w) {
@@ -105,7 +105,7 @@ test('every CTA reads "text cued"; the card is a form, not a chat; name and phon
   assert.deepEqual([...d.querySelectorAll('#coForm .fo-sec-h')].map(h => h.firstChild.textContent.trim()), ['about you', 'a bit about you', 'your training', 'last things']);
   assert.deepEqual([...d.querySelectorAll('#coForm .fo-sec.opt .fo-sec-h small')].map(x => x.textContent), ['optional', 'optional', 'optional']);
   assert.match(fine.textContent, /recurring automated texts/);
-  assert.deepEqual([...fine.querySelectorAll('a')].map(a => a.getAttribute('href')), ['/terms.html', '/privacy.html']);
+  assert.deepEqual([...fine.querySelectorAll('a')].map(a => a.getAttribute('href')), ['terms.html', 'privacy.html']);   // relative: this page is the root
 });
 
 test('live + link: the payload, "you\'re in", the iMessage tap, and no-iPhone sends the first text by SMS now', async () => {
@@ -490,7 +490,7 @@ test('without the tracker the form runs to the success screen untouched', async 
 });
 
 test('?src=flyer: one qr-scan on landing, and ref on every funnel event through to submit', async () => {
-  const { w, d, events } = boot(() => ({ status: 'ok', live: true }), { tracker: true, url: 'https://cued.fit/demo-site/?src=Flyer%20Moffitt' });
+  const { w, d, events } = boot(() => ({ status: 'ok', live: true }), { tracker: true, url: 'https://cued.fit/?src=Flyer%20Moffitt' });
   await until(() => events.some(e => e.name === 'qr-scan'));
   await walk(w, d);
   await success(d);
@@ -502,7 +502,7 @@ test('?src=flyer: one qr-scan on landing, and ref on every funnel event through 
 });
 
 test('?utm_source works too and a late tracker still gets the scan; a plain URL fires nothing extra; the six printed flyer labels arrive as printed', async () => {
-  const late = boot(() => ({}), { url: 'https://cued.fit/demo-site/?utm_source=poster', lateTracker: 600 });
+  const late = boot(() => ({}), { url: 'https://cued.fit/?utm_source=poster', lateTracker: 600 });
   assert.equal(late.events.length, 0);
   await until(() => late.events.length, { timeout: 3000 });
   assert.deepEqual(late.events, [{ name: 'qr-scan', data: { src: 'poster', ref: 'poster' } }]);
@@ -516,7 +516,7 @@ test('?utm_source works too and a late tracker still gets the scan; a plain URL 
 
   for (const name of ['gym', 'partner', 'food', 'school', 'plan', 'weights']) {
     const label = `poster-${name}`;
-    const { events } = boot(() => ({}), { tracker: true, url: `https://cued.fit/demo-site/?src=${label}` });
+    const { events } = boot(() => ({}), { tracker: true, url: `https://cued.fit/?src=${label}` });
     await until(() => events.length);
     assert.deepEqual(events, [{ name: 'qr-scan', data: { src: label, ref: label } }], label);
   }

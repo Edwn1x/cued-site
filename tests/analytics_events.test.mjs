@@ -8,9 +8,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { JSDOM } from 'jsdom';
 
-// The root page's conversational sign-up. (demo-site/index.html runs a plain form
-// since 2026-11-14 — see signup_form.test.mjs.)
-const PAGES = [['index.html', ['floatCta', 'heroCta', 'heroCtaTop', 'closeCta']]];
+// The previous generation's conversational sign-up — demoted to /demo-site on
+// 2026-11-15 when the redesign (a plain form, see signup_form.test.mjs) took the root.
+const PAGES = [['demo-site/index.html', ['floatCta', 'heroCta', 'heroCtaTop', 'closeCta']]];
 for (const [PAGE, CTA_IDS] of PAGES) {
 const html = readFileSync(new URL('../' + PAGE, import.meta.url), 'utf8');
 
