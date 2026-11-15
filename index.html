@@ -1973,6 +1973,10 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   // taking the screen. The pinned screen gets a minimum height so the sheet
   // has room to rise into.
   function sheetUp(thread){
+    // Only the conversation that carries the compact workout card raises a sheet. In
+    // pinned mode all five threads share one .screen, so without this the first
+    // thread to finish grabbed step 2's overlay and raised it (seen 2026-11-15).
+    if (!thread.querySelector('.sheet-card')) return;
     const screen = thread.closest('.screen'); if (!screen) return;
     const ov = thread._overlay || (thread._overlay = screen.querySelector('.sheet-overlay'));
     if (!ov || ov.classList.contains('up')) return;
@@ -2309,7 +2313,12 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
       if (pinned.rail) pinned.rail.classList.toggle('show', active);
       const idx = Math.min(4, Math.floor(p * 5));
       setStep(idx);
-      if (!TIMED && pinned.threads[idx]._prog) pinned.threads[idx]._prog.set(Math.min(1, Math.max(0, p * 5 - idx)));
+      // Drive the reveals only once the track has pinned (its top at or above the
+      // viewport's top). Before that p is clamped to 0, and set(0) still means "the
+      // first bubble" — which starts the 1.4s idle finish, so the first conversation
+      // played itself out while the reader was still on the hero (founder,
+      // 2026-11-15: "already loaded in and played" by the time they scrolled down).
+      if (!TIMED && r.top <= 0 && pinned.threads[idx]._prog) pinned.threads[idx]._prog.set(Math.min(1, Math.max(0, p * 5 - idx)));
     });
   }
   function fitStacked(){
