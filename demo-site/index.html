@@ -847,93 +847,96 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
    keep the waitlist wording). Since 2026-11-14 it is a plain form, not the
    chat the root page still runs: the founder's call — the conversational
    sign-up demoed the product nicely but was slow, and a churn point for a
-   reader who just wants to fill in the boxes and go. Same frosted sheet and
-   mascot header; the hairline under the header fills as required fields
-   complete. Three short groups on one scroll — about you / your training /
-   where to text you — one tap per answer (pill chips, blue when picked), the
-   typed fields are name, age, height & weight, phone and the optional gmail /
-   allergies / referral code, then one submit. Validation happens on submit:
-   the first unanswered field is flagged, shaken and scrolled to. Every colour
-   is a --co-* token mapped from the page's. Bottom sheet under 768px, sized
-   from the visual viewport by JS so an open keyboard shrinks the sheet instead
-   of covering the field in focus; inputs compute to 16px on phones (iOS zoom). */
+   reader who just wants to fill in the boxes and go. Styled in THIS page's
+   system, not the old Messages card's (founder, same day: the frosted glass
+   / system-font / pill version "doesn't align with our new aesthetic"): a
+   solid cream-2 card with warm hairlines, Outfit for every label and field,
+   Hedvig for the title and the three group heads, white fields and chips with
+   the hero button's 14px corners, the submit = the hero's `.btn.sq`. The
+   hairline under the header fills as required fields complete. Three groups
+   on one scroll — about you / your training / where to text you — one tap per
+   answer (chips, blue when picked); typed: name, age, height & weight, phone,
+   optional gmail / allergies / referral code; one submit. Validation on
+   submit: the first unanswered field is flagged, shaken and scrolled to.
+   Bottom sheet under 768px, sized from the visual viewport by JS so an open
+   keyboard shrinks the sheet instead of covering the field in focus; inputs
+   compute to 16px on phones (iOS zoom). */
 .co-bg{
-  --co-blue:var(--blue);--co-blue-deep:var(--blue-deep);--co-blue-soft:var(--blue-soft);--co-blue-ink:var(--blue-ink);
-  --co-card:var(--card);--co-fill:var(--fill);--co-line:var(--line);
-  --co-glass:rgba(255,255,255,.84);--co-glass-edge:rgba(255,255,255,.55);   /* the frosted sheet + its rim */
-  --co-field:rgba(255,255,255,.66);                                       /* inputs and chips sit on the glass */
-  --co-ink:var(--ink);--co-ink-2:var(--ink-2);--co-ink-3:var(--ink-3);--co-error:var(--error);
-  --co-shadow:0 24px 80px rgba(10,22,40,.28);
-  position:fixed;inset:0;z-index:1000;background:var(--overlay);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  --co-blue:var(--blue);--co-blue-deep:var(--blue-hover);--co-blue-soft:var(--blue-soft);--co-blue-ink:#fff;
+  --co-sheet:var(--cream-2);--co-field:var(--card);--co-line:var(--line);--co-fill:var(--fill);
+  --co-ink:var(--ink);--co-ink-2:var(--gray-text);--co-ink-3:var(--ink-3);--co-error:var(--error);
+  --co-overlay:rgba(58,40,24,.38);                 /* a warm dim, not the cool black one */
+  --co-shadow:0 30px 90px rgba(58,40,24,.28),0 0 0 1px rgba(58,40,24,.06);
+  position:fixed;inset:0;z-index:1000;background:var(--co-overlay);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   opacity:0;pointer-events:none;transition:opacity .25s ease;
   display:flex;align-items:center;justify-content:center;padding:24px;
-  font-family:var(--f-msg);font-size:15px;line-height:1.5;color:var(--co-ink);text-align:left;
+  font-family:var(--f-ui);font-size:15px;line-height:1.5;color:var(--co-ink);text-align:left;
 }
 .co-bg *{margin:0;padding:0;box-sizing:border-box}
 .co-bg button,.co-bg input{font:inherit;color:inherit}
 .co-bg.open{opacity:1;pointer-events:all}
 
 /* Card */
-.co-sheet{width:100%;max-width:440px;height:min(700px,100% - 48px);background:var(--co-glass);backdrop-filter:blur(28px) saturate(1.6);-webkit-backdrop-filter:blur(28px) saturate(1.6);border-radius:24px;box-shadow:var(--co-shadow),inset 0 0 0 1px var(--co-glass-edge);display:flex;flex-direction:column;overflow:hidden;transform:translateY(12px);transition:transform .3s var(--ease)}
+.co-sheet{width:100%;max-width:460px;height:min(720px,100% - 48px);background:var(--co-sheet);border-radius:24px;box-shadow:var(--co-shadow);display:flex;flex-direction:column;overflow:hidden;transform:translateY(12px);transition:transform .3s var(--ease)}
 .co-bg.open .co-sheet{transform:translateY(0)}
 .co-handle{display:none}
 
-/* Header — the mascot, "cued", how long this takes */
-.co-head{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 10px 20px;flex-shrink:0}
-.co-head-info{display:flex;align-items:center;gap:11px}
-.co-avatar{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:block;overflow:hidden}
-.co-avatar img{display:block;width:100%;height:100%}
-.co-head-name{font-size:15px;font-weight:500;color:var(--co-ink);line-height:1.2}
-.co-head-sub{font-size:12px;color:var(--co-ink-3);margin-top:2px}
-.co-close{width:32px;height:32px;border-radius:50%;background:transparent;border:none;cursor:pointer;font-size:18px;color:var(--co-ink-3);display:inline-flex;align-items:center;justify-content:center;transition:color .15s,background .15s}
+/* Header — the mascot, a serif "sign up", how long it takes */
+.co-head{display:flex;align-items:center;justify-content:space-between;padding:18px 16px 14px 24px;flex-shrink:0}
+.co-head-info{display:flex;align-items:center;gap:12px}
+.co-avatar{width:44px;height:44px;border-radius:50%;flex-shrink:0;display:block;overflow:hidden}
+.co-avatar img{display:block;width:100%;height:100%;object-fit:cover}
+.co-head-name{font-family:var(--f-head);font-weight:400;font-size:24px;letter-spacing:-.01em;color:var(--co-ink);line-height:1.1}
+.co-head-sub{font-size:13px;color:var(--co-ink-2);margin-top:3px}
+.co-close{width:34px;height:34px;border-radius:50%;background:transparent;border:none;cursor:pointer;font-size:18px;color:var(--co-ink-3);display:inline-flex;align-items:center;justify-content:center;transition:color .15s,background .15s}
 .co-close:hover{color:var(--co-ink);background:var(--co-fill)}
 /* Progress hairline — fills as the required fields complete */
 .co-progress{height:2px;background:var(--co-line);flex-shrink:0;overflow:hidden}
 .co-progress i{display:block;height:100%;width:var(--p,0%);background:var(--co-blue);transition:width .45s var(--ease)}
 
 /* Body — the form scrolls here; the success screen replaces it */
-.co-msgs{flex:1;overflow-y:auto;padding:4px 20px 22px;display:flex;flex-direction:column;scrollbar-width:none;overscroll-behavior:contain;
+.co-msgs{flex:1;overflow-y:auto;padding:0 24px 26px;display:flex;flex-direction:column;scrollbar-width:none;overscroll-behavior:contain;
   -webkit-mask-image:linear-gradient(to bottom,transparent,#000 14px);mask-image:linear-gradient(to bottom,transparent,#000 14px)}  /* fields fade out under the header instead of clipping */
 .co-msgs::-webkit-scrollbar{display:none}
 .co-msgs > *{flex-shrink:0}
 
-/* Groups */
-.fo-sec{padding-top:16px}
-.fo-sec + .fo-sec{margin-top:18px;padding-top:20px;border-top:1px solid var(--co-line)}
-.fo-sec-h{font-family:var(--f-header);font-weight:400;font-size:20px;letter-spacing:-.2px;line-height:1.1;color:var(--co-ink);margin-bottom:14px}
-.fo-field{margin-top:16px}
+/* Groups — serif heads over warm hairlines, like the FAQ and the apps rows */
+.fo-sec{padding-top:20px}
+.fo-sec + .fo-sec{margin-top:26px;padding-top:24px;border-top:1px solid var(--co-line)}
+.fo-sec-h{font-family:var(--f-head);font-weight:400;font-size:24px;letter-spacing:-.01em;line-height:1.1;color:var(--co-ink);margin-bottom:16px}
+.fo-field{margin-top:18px}
 .fo-sec-h + .fo-field{margin-top:0}
-.fo-label{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:13.5px;font-weight:500;color:var(--co-ink-2);margin-bottom:7px;line-height:1.3}
-.fo-label small{font-size:12px;font-weight:400;color:var(--co-ink-3);white-space:nowrap}
+.fo-label{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:15px;font-weight:400;color:var(--co-ink);margin-bottom:8px;line-height:1.3}
+.fo-label small{font-size:13px;font-weight:400;color:var(--co-ink-2);white-space:nowrap}
 .fo-row{display:flex;gap:8px}
 .fo-row > *{flex:1;min-width:0}
 
-/* Typed fields */
-.co-bg .fo-in{width:100%;display:block;padding:11px 14px;border:1px solid var(--co-line);border-radius:12px;font-size:15px;line-height:1.3;color:var(--co-ink);background:var(--co-field);outline:none;-webkit-appearance:none;appearance:none;transition:border-color .15s,box-shadow .15s}
+/* Typed fields — white on the cream, the hero button's corners */
+.co-bg .fo-in{width:100%;display:block;height:48px;padding:0 16px;border:1px solid var(--co-line);border-radius:14px;font-size:16px;line-height:1.3;color:var(--co-ink);background:var(--co-field);outline:none;-webkit-appearance:none;appearance:none;transition:border-color .15s,box-shadow .15s}
 .fo-in:focus{border-color:var(--co-blue);box-shadow:0 0 0 3px var(--co-blue-soft)}
 .fo-in::placeholder{color:var(--co-ink-3)}
 .fo-in.fo-num{text-align:center;padding-left:10px;padding-right:10px}
 .fo-in.fo-num::placeholder{text-align:center}
 .fo-field.short .fo-in{max-width:120px}
 
-/* Chips — one tap per answer; multi-select fields toggle */
-.fo-chips{display:flex;flex-wrap:wrap;gap:7px}
-.fo-chip{display:inline-flex;align-items:center;justify-content:center;padding:8px 13px;border-radius:999px;border:1px solid var(--co-line);background:var(--co-field);font-size:14px;line-height:1.2;color:var(--co-ink);cursor:pointer;user-select:none;-webkit-user-select:none;transition:background .15s,border-color .15s,color .15s}
+/* Chips — one tap per answer; white tiles that fill blue when picked */
+.fo-chips{display:flex;flex-wrap:wrap;gap:8px}
+.fo-chip{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 15px;border-radius:12px;border:1px solid var(--co-line);background:var(--co-field);font-size:15px;line-height:1;color:var(--co-ink);cursor:pointer;user-select:none;-webkit-user-select:none;transition:background .15s,border-color .15s,color .15s}
 .fo-chip:hover{border-color:var(--co-ink-3)}
 .fo-chip.sel{background:var(--co-blue);border-color:var(--co-blue);color:var(--co-blue-ink)}
-.fo-chips.even .fo-chip{flex:1 1 0}
+.fo-chips.even .fo-chip{flex:1 1 0;padding:0 8px}
 
 /* Height + weight: a unit toggle at the label's right, then one row of
    short number fields for the active system (the backend takes either). */
-.co-units{display:inline-flex;gap:5px}
-.co-unit{background:none;border:1px solid var(--co-line);border-radius:999px;padding:3px 9px;font:inherit;font-size:12px;font-weight:500;color:var(--co-ink-3);cursor:pointer;transition:color .15s,border-color .15s,background .15s}
-.co-unit.sel{color:var(--co-blue);border-color:var(--co-blue);background:var(--co-blue-soft)}
+.co-units{display:inline-flex;gap:4px;padding:2px;border-radius:9px;background:var(--co-fill)}
+.co-unit{background:none;border:none;border-radius:7px;padding:3px 9px;font:inherit;font-size:12.5px;color:var(--co-ink-2);cursor:pointer;transition:color .15s,background .15s}
+.co-unit.sel{color:var(--co-ink);background:var(--co-field)}
 .fo-field[data-f="stats"] .fo-metric{display:none}
 .fo-field[data-f="stats"].metric .fo-metric{display:flex}
 .fo-field[data-f="stats"].metric .fo-us{display:none}
 
 /* Validation — flagged on submit: label and hint turn, the field shakes */
-.fo-hint{display:none;font-size:12.5px;line-height:1.35;color:var(--co-error);margin-top:6px}
+.fo-hint{display:none;font-size:13px;line-height:1.35;color:var(--co-error);margin-top:7px}
 .fo-field.bad .fo-hint{display:block}
 .fo-field.bad .fo-label{color:var(--co-error)}
 .fo-field.bad .fo-in{border-color:var(--co-error)}
@@ -941,33 +944,33 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
 .co-shake{animation:co-shake .28s var(--ease)}
 
 /* SMS consent — the fine print beside a ring that fills blue with a check */
-.fo-consent{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:none;border:none;padding:2px 0 0;cursor:pointer;font-size:12.5px;line-height:1.45;color:var(--co-ink-2)}
-.fo-consent i{flex:none;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--co-ink-3);display:inline-flex;align-items:center;justify-content:center;margin-top:1px;transition:background .2s,border-color .2s}
-.fo-consent i::after{content:'';width:7px;height:4px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:translateY(-1px) rotate(-45deg) scale(0);transition:transform .22s var(--ease)}
+.fo-consent{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:none;border:none;padding:4px 0 0;cursor:pointer;font-size:13px;line-height:1.5;color:var(--co-ink-2)}
+.fo-consent i{flex:none;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--co-ink-3);background:var(--co-field);display:inline-flex;align-items:center;justify-content:center;margin-top:0;transition:background .2s,border-color .2s}
+.fo-consent i::after{content:'';width:8px;height:4.5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:translateY(-1px) rotate(-45deg) scale(0);transition:transform .22s var(--ease)}
 .fo-consent.sel i{background:var(--co-blue);border-color:var(--co-blue)}
 .fo-consent.sel i::after{transform:translateY(-1px) rotate(-45deg) scale(1)}
 .fo-consent a{color:var(--co-blue);text-decoration:none}
 .fo-consent a:hover{text-decoration:underline}
 
-/* Footer — the one submit, with the server's word when something's wrong */
-.co-input-area{flex-shrink:0;padding:12px 20px 16px;border-top:1px solid var(--co-line);display:flex;flex-direction:column;gap:8px}
-.fo-err{display:none;font-size:13px;line-height:1.4;color:var(--co-error);text-align:center}
+/* Footer — the one submit (the hero's button), with the server's word when something's wrong */
+.co-input-area{flex-shrink:0;padding:14px 24px 20px;border-top:1px solid var(--co-line);background:var(--co-sheet);display:flex;flex-direction:column;gap:10px}
+.fo-err{display:none;font-size:14px;line-height:1.4;color:var(--co-error);text-align:center}
 .fo-err.show{display:block}
-.co-confirm{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 22px;border-radius:999px;border:none;cursor:pointer;background:var(--co-blue);color:#fff;font-size:15px;font-weight:500;transition:background .15s,opacity .15s}
+.co-confirm{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:50px;padding:0 26px;border-radius:14px;border:none;cursor:pointer;background:var(--co-blue);color:#fff;font-family:var(--f-ui);font-size:17px;font-weight:400;transition:background .15s,opacity .15s}
 .co-confirm:hover{background:var(--co-blue-deep)}
 .co-confirm:disabled{opacity:.6;cursor:default}
 
 /* Success */
-.co-success{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 20px;gap:10px}
+.co-success{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 20px;gap:12px}
 .co-success-icon{font-size:38px;margin-bottom:2px}
-.co-success h3{font-family:var(--f-header);font-weight:400;font-size:clamp(1.5rem,2.2vw,1.9rem);letter-spacing:-.4px;line-height:1.1;color:var(--co-ink)}
-.co-success p{font-size:15px;color:var(--co-ink-2);line-height:1.55;max-width:300px}
+.co-success h3{font-family:var(--f-head);font-weight:400;font-size:clamp(1.7rem,2.4vw,2.1rem);letter-spacing:-.01em;line-height:1.1;color:var(--co-ink)}
+.co-success p{font-size:16px;color:var(--co-ink-2);line-height:1.55;max-width:320px}
 /* iMessage-first choice (shown only when the backend returned a link) */
 .co-success .co-imsg{width:auto;min-width:240px;margin-top:8px;text-decoration:none}
 .co-success .co-alt{background:none;border:none;cursor:pointer;padding:8px 12px;font-size:14px;color:var(--co-ink-3);text-decoration:underline;text-underline-offset:3px}
 .co-success .co-alt:hover{color:var(--co-ink-2)}
 .co-success .co-alt:disabled{cursor:default;text-decoration:none}
-.co-success .co-imsg-note{font-size:13px;color:var(--co-ink-3);max-width:300px}
+.co-success .co-imsg-note{font-size:14px;color:var(--co-ink-3);max-width:320px}
 
 /* Phones: a bottom sheet. The overlay's height/top are set from
    window.visualViewport by the script while the sheet is open, so an open
@@ -978,11 +981,11 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   .co-sheet{max-width:none;height:calc(100% - 40px);max-height:none;border-radius:24px 24px 0 0;transform:translateY(100%)}
   .co-bg.open .co-sheet{transform:translateY(0)}
   .co-handle{display:block;width:36px;height:4px;border-radius:2px;background:var(--co-line);margin:8px auto 0;flex-shrink:0}
-  .co-head{padding-top:6px}
-  .co-msgs{padding:2px 16px 18px;min-height:0}
-  .co-input-area{padding:10px 16px calc(14px + env(safe-area-inset-bottom))}
-  .co-bg .fo-in{font-size:16px}/* prevent iOS auto-zoom on focus — class+class so it outranks `.co-bg input{font:inherit}`; at 15px iOS zooms 16/15 on focus, never zooms back, and the sheet runs off the right edge */
-  .fo-chip{font-size:15px;padding:9px 14px}
+  .co-head{padding:8px 12px 12px 20px}
+  .co-msgs{padding:0 20px 20px;min-height:0}
+  .co-input-area{padding:12px 20px calc(16px + env(safe-area-inset-bottom))}
+  .co-bg .fo-in{font-size:16px}/* prevent iOS auto-zoom on focus — class+class so it outranks `.co-bg input{font:inherit}`; under 16px iOS zooms on focus, never zooms back, and the sheet runs off the right edge */
+  .fo-chip{height:42px;font-size:15px;padding:0 14px}
   .fo-in.fo-num{padding-left:8px;padding-right:8px}/* three fields on a 320px screen at 16px */
 }
 @media (prefers-reduced-motion:reduce){
@@ -1400,10 +1403,10 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     <div class="co-handle"></div>
     <div class="co-head">
       <div class="co-head-info">
-        <div class="co-avatar" aria-hidden="true"><picture><source srcset="/assets/mascot/v2/cued-face-256.webp" type="image/webp"><img src="/assets/mascot/v2/cued-face-256.png" alt="" width="36" height="36"></picture></div>
+        <div class="co-avatar" aria-hidden="true"><picture><source srcset="/assets/mascot/v2/cued-face-256.webp" type="image/webp"><img src="/assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture></div>
         <div>
-          <div class="co-head-name">cued</div>
-          <div class="co-head-sub">sign up · about a minute</div>
+          <div class="co-head-name">sign up</div>
+          <div class="co-head-sub">about a minute. nothing to download.</div>
         </div>
       </div>
       <button type="button" class="co-close" id="waitlistClose" aria-label="Close">✕</button>
