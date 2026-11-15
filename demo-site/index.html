@@ -1007,6 +1007,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   .fo-chip{height:42px;font-size:15px;padding:0 14px}
   .fo-in.fo-num{padding-left:8px;padding-right:8px}/* three fields on a 320px screen at 16px */
 }
+@media (max-width:359.98px){.co-head-sub2{display:none}}   /* the sub-line stays one line on the narrowest phones */
 @media (prefers-reduced-motion:reduce){
   .co-bg,.co-sheet,.co-progress i,.fo-in,.fo-chip,.fo-consent i,.fo-consent i::after,.fo-a,.fo-chev,.fo-q{transition:none}
   .co-shake{animation:none}
@@ -1425,7 +1426,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
         <div class="co-avatar" aria-hidden="true"><picture><source srcset="/assets/mascot/v2/cued-face-256.webp" type="image/webp"><img src="/assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture></div>
         <div>
           <div class="co-head-name">sign up</div>
-          <div class="co-head-sub">about a minute. nothing to download.</div>
+          <div class="co-head-sub">about a minute.<span class="co-head-sub2"> nothing to download.</span></div>
         </div>
       </div>
       <button type="button" class="co-close" id="waitlistClose" aria-label="Close">✕</button>
@@ -2529,9 +2530,15 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   // ── wiring ──
   form.querySelectorAll('.fo-q').forEach(q => q.addEventListener('click', () => {
     const name = q.closest('.fo-field').dataset.f;
-    const on = !fieldOf(name).classList.contains('open');
+    const field = fieldOf(name);
+    const on = !field.classList.contains('open');
     setOpen(name, on);
-    if (on) focusIn(name);
+    if (!on) return;
+    // If the unfolded row would run past the bottom of the scroller, bring it to the top.
+    const top = field.getBoundingClientRect().top - body.getBoundingClientRect().top;
+    const settled = q.getBoundingClientRect().height + field.querySelector('.fo-body').getBoundingClientRect().height;
+    if (top + settled > body.clientHeight) scrollToRow(name);
+    focusIn(name);
   }));
   form.querySelectorAll('.fo-next').forEach(b => b.addEventListener('click', () => advance(b.closest('.fo-field').dataset.f)));
   form.querySelectorAll('.fo-chips').forEach(group => {
@@ -2770,6 +2777,9 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     // the visible part instead of letting its right side run off the edge.
     overlay.style.width = Math.round(vv.width) + 'px';
     overlay.style.left = Math.round(vv.offsetLeft) + 'px';
+    // The keyboard just took half the screen: keep the field they're typing in on it.
+    const el = document.activeElement;
+    if (el && el.classList && el.classList.contains('fo-in') && form.contains(el)) scrollToRow(el.closest('.fo-field').dataset.f);
   }
   let lastFocus = null;
   let opened = false;
