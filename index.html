@@ -543,7 +543,7 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 .step .phone-wrap{--ph:720px}
 .step .ph-comp{display:none}
 /* pinned layout (built by JS at ≥1024px, motion OK) */
-.proof-track{position:relative;height:500vh}
+.proof-track{position:relative;height:560vh}   /* five bands, unequal: step 2 (the set sheet) gets 30% — see BANDS in the script */
 .proof-sticky{position:sticky;top:0;height:100vh;overflow:hidden;transition:background .3s;background:var(--bg)}
 .proof-sticky.tint-1{background:var(--tint-1);--bg:var(--tint-1)}
 .proof-sticky.tint-2{background:var(--tint-2);--bg:var(--tint-2)}
@@ -2095,6 +2095,12 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     const list = items(thread), n = list.length;
     const typing = mkTyping(thread);
     let next = 0, target = 0, busy = false, idle = 0;
+    // Step 2 ends on the set sheet. Its bubbles land across the first 45% of the band
+    // (70% for the others) and the sheet rises at 62% — by scroll distance, with no
+    // 2.6s wait — so a reader moving at any pace sees the takeover before the band
+    // ends; stop early and the idle finish + the 2.6s beat still apply (2026-11-15).
+    const hasSheet = !!thread.querySelector('.sheet-card'), SPAN = hasSheet ? 0.45 : 0.7, SHEET_AT = 0.62;
+    let rush = false;
     if (reduce.matches){ revealAll(thread); return (thread._prog = {set(){}, finish(){}}); }
     layout(thread, 0);
     function pump(){
@@ -2111,13 +2117,17 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
         layout(thread, 0);
         choreo(el);
         next++; busy = false;
-        if (next >= n){ typing.remove(); setTimeout(() => sheetUp(thread), 2600); }
+        if (next >= n){ typing.remove(); setTimeout(() => sheetUp(thread), rush ? 0 : 2600); }
         pump();
       }, waiting ? 380 : 90);
     }
     function set(q){
-      const want = Math.min(n, Math.floor((q / 0.7) * n) + 1);
+      const want = Math.min(n, Math.floor((q / SPAN) * n) + 1);
       if (want > target){ target = want; pump(); }
+      if (hasSheet && q >= SHEET_AT && !rush){
+        rush = true;                       // the scroll distance was the beat
+        if (next >= n) sheetUp(thread); else { target = n; pump(); }
+      }
       clearTimeout(idle);
       if (target < n) idle = setTimeout(() => { target = n; pump(); }, 1400);
     }
@@ -2178,6 +2188,14 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   const tints = ['', '', '', '', ''];   // the proof stays on the hero's cream (was tint-2 / white / tint-1 / white / tint-2)
   let pinned = null, cur = -1, raf = 0;
 
+  // The five bands of the pinned track, as shares of its scroll span. Unequal since
+  // 2026-11-15: step 2 ends on the set sheet rising, and at a normal pace the
+  // reader left its band before the sheet's timer fired (founder: "i keep scrolling
+  // past before the workout card pops up"). It gets 30% of the track (~168vh of a
+  // 560vh track); the rest ~90–100vh each, what they had at five equal fifths of 500vh.
+  const BANDS = [0, .16, .46, .64, .82, 1];
+  const bandOf = p => { let i = 0; while (i < 4 && p >= BANDS[i + 1]) i++; return i; };
+  const bandStartY = (track, i) => { const r = track.getBoundingClientRect(); return r.top + window.scrollY + BANDS[i] * Math.max(1, r.height - window.innerHeight) + 2; };
   function pinProof(){
     if (pinned) return;
     const track = document.createElement('div'); track.className = 'proof-track';
@@ -2202,7 +2220,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
       const b = document.createElement('button'); b.type = 'button';
       b.textContent = c.querySelector('h2').textContent;
       b.addEventListener('click', () => {
-        const top = track.getBoundingClientRect().top + window.scrollY + i * window.innerHeight + 2;
+        const top = bandStartY(track, i);
         window.scrollTo({top, behavior: 'smooth'});
       });
       li.appendChild(b); stepper.appendChild(li);
@@ -2234,7 +2252,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
         b.setAttribute('aria-label', copy.children[i].querySelector('h2').textContent);   // the step copy already moved into `copy`
         b.innerHTML = '<span class="dot"></span>';
         b.addEventListener('click', () => {
-          const top = track.getBoundingClientRect().top + window.scrollY + i * window.innerHeight + 2;
+          const top = bandStartY(track, i);
           window.scrollTo({top, behavior: reduce.matches ? 'auto' : 'smooth'});
         });
         rail.appendChild(b); dots.push(b);
@@ -2311,14 +2329,14 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
       const active = r.top <= 0 && r.bottom >= vh;
       if (active !== window.proofActive){ window.proofActive = active; window.pillState && window.pillState(); }
       if (pinned.rail) pinned.rail.classList.toggle('show', active);
-      const idx = Math.min(4, Math.floor(p * 5));
+      const idx = bandOf(p);
       setStep(idx);
       // Drive the reveals only once the track has pinned (its top at or above the
       // viewport's top). Before that p is clamped to 0, and set(0) still means "the
       // first bubble" — which starts the 1.4s idle finish, so the first conversation
       // played itself out while the reader was still on the hero (founder,
       // 2026-11-15: "already loaded in and played" by the time they scrolled down).
-      if (!TIMED && r.top <= 0 && pinned.threads[idx]._prog) pinned.threads[idx]._prog.set(Math.min(1, Math.max(0, p * 5 - idx)));
+      if (!TIMED && r.top <= 0 && pinned.threads[idx]._prog) pinned.threads[idx]._prog.set(Math.min(1, Math.max(0, (p - BANDS[idx]) / (BANDS[idx + 1] - BANDS[idx]))));
     });
   }
   function fitStacked(){
