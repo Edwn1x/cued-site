@@ -2474,10 +2474,24 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     const inp = [...fieldOf(name).querySelectorAll('.fo-in')].find(isMetricRow);
     if (inp) inp.focus({ preventScroll: true });
   }
+  // Scroll the body so the row sits at the top. Computed by hand, not with
+  // scrollIntoView: a row that was just folded is still at full height when
+  // the scroll starts (its 300ms fold is in flight), so a target read from the
+  // live layout overshoots by that height and the opened row lands above the
+  // view (founder's screenshot, 2026-11-14). Subtract what every closed row
+  // above the target still occupies, and the landing matches the settled layout.
+  function scrollToRow(name){
+    const field = fieldOf(name);
+    let top = field.getBoundingClientRect().top - body.getBoundingClientRect().top + body.scrollTop;
+    form.querySelectorAll('.fo-field:not(.open)').forEach(f => {
+      if (f !== field && (f.compareDocumentPosition(field) & Node.DOCUMENT_POSITION_FOLLOWING)) top -= f.querySelector('.fo-ai').getBoundingClientRect().height;
+    });
+    top = Math.max(0, Math.round(top));
+    if (body.scrollTo) body.scrollTo({ top, behavior: reduced.matches ? 'auto' : 'smooth' }); else body.scrollTop = top;
+  }
   function goTo(name){
     setOpen(name, true);
-    const field = fieldOf(name);
-    if (field.scrollIntoView) field.scrollIntoView({ block: 'start', behavior: reduced.matches ? 'auto' : 'smooth' });
+    scrollToRow(name);
     focusIn(name);
   }
   // Leave a row: it has to be answered, or be an optional one (then it's a skip).
@@ -2596,7 +2610,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     field.classList.add('bad');
     field.classList.remove('co-shake');
     requestAnimationFrame(() => field.classList.add('co-shake'));
-    if (field.scrollIntoView) field.scrollIntoView({ block: 'center', behavior: reduced.matches ? 'auto' : 'smooth' });
+    scrollToRow(name);
     const inp = [...field.querySelectorAll('.fo-in')].find(x => !x.value.trim() && isMetricRow(x));
     if (inp) inp.focus({ preventScroll: true });
   }
