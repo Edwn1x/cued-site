@@ -253,21 +253,71 @@ test('rejected and offline: the server\'s word shows above the button, the form 
   assert.match(e2.textContent, /connection error/);
 });
 
-test('Enter moves to the next typed field; from the last one it submits', async () => {
-  const { w, d, posted } = boot(() => ({ status: 'ok', live: true }));
-  await walk(w, d);
-  await success(d);
-  assert.equal(posted.length, 1);
-  const r = boot(() => ({ status: 'ok', live: true }));
-  await until(() => typeof r.w.openWaitlist === 'function');
-  r.w.openWaitlist('hero');
-  const name = r.d.getElementById('foName'); name.focus();
-  name.dispatchEvent(new r.w.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
-  assert.equal(r.d.activeElement, r.d.getElementById('foAge'));
-  const ref = r.d.getElementById('foRef');
-  ref.dispatchEvent(new r.w.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
-  await new Promise(x => setTimeout(x, 20));
-  assert.equal(r.posted.length, 0, 'an empty form does not post'); assert.ok(field(r.d, 'name').classList.contains('bad'));
+// The accordion (founder 2026-11-14): one row per question; answering folds the row to a
+// one-line summary and opens the next unanswered one; typed / multi-pick rows wait for Enter
+// or "next" ("skip" on an empty optional); any row opens on a tap; a flagged row opens.
+const isOpen = (d, name) => field(d, name).classList.contains('open');
+const summary = (d, name) => field(d, name).querySelector('.fo-qv').textContent;
+test('accordion: the first row opens; a single pick folds it and opens the next; typed and multi rows advance on Enter / next', async () => {
+  const { w, d } = boot(() => ({ status: 'ok', live: true }));
+  await until(() => typeof w.openWaitlist === 'function');
+  w.openWaitlist('hero');
+  assert.ok(isOpen(d, 'name')); assert.ok(!isOpen(d, 'age'));
+  assert.equal(field(d, 'name').querySelector('.fo-q').getAttribute('aria-expanded'), 'true');
+  type(d, 'name', 'Edwin Ruiz');
+  assert.ok(isOpen(d, 'name'), 'typing alone does not advance');
+  d.getElementById('foName').dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+  assert.ok(!isOpen(d, 'name') && isOpen(d, 'age'), 'Enter folds name and opens age');
+  assert.equal(summary(d, 'name'), 'Edwin Ruiz');
+  assert.ok(field(d, 'name').classList.contains('done'));
+  type(d, 'age', '20'); field(d, 'age').querySelector('.fo-next').click();
+  assert.ok(isOpen(d, 'gender') && !isOpen(d, 'age'));
+  pick(d, 'gender', 'male');
+  await until(() => isOpen(d, 'stats'));
+  assert.ok(!isOpen(d, 'gender')); assert.equal(summary(d, 'gender'), 'male');
+  stats(d);
+  // Enter in height & weight walks the empty boxes first, then advances
+  const kg = field(d, 'stats').querySelector('.fo-in[data-k=lbs]');
+  kg.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+  assert.ok(isOpen(d, 'goals') && !isOpen(d, 'stats'));
+  assert.equal(summary(d, 'stats'), "5'6, 139 lbs");
+  pick(d, 'goals', 'lose fat', 'build muscle');
+  assert.ok(isOpen(d, 'goals'), 'multi-pick waits for next');
+  field(d, 'goals').querySelector('.fo-next').click();
+  assert.ok(isOpen(d, 'obstacle')); assert.equal(summary(d, 'goals'), 'lose fat, build muscle');
+  // next on an unanswered required row flags it instead of moving on
+  field(d, 'goals').querySelector('.fo-q').click(); assert.ok(isOpen(d, 'goals'), 'any row re-opens on a tap');
+  pick(d, 'goals', 'lose fat', 'build muscle');   // un-pick both
+  field(d, 'goals').querySelector('.fo-next').click();
+  assert.ok(field(d, 'goals').classList.contains('bad') && isOpen(d, 'goals'));
+});
+
+test('accordion: optional rows skip on next, their button reads "skip" until typed; consent folds to "agreed"; a flagged row opens', async () => {
+  const { w, d } = boot(() => ({ status: 'ok', live: true }));
+  await until(() => typeof w.openWaitlist === 'function');
+  w.openWaitlist('hero');
+  assert.equal(field(d, 'restrictions').querySelector('.fo-next').textContent, 'skip');
+  field(d, 'restrictions').querySelector('.fo-q').click();
+  field(d, 'restrictions').querySelector('.fo-next').click();
+  assert.ok(!isOpen(d, 'restrictions') && isOpen(d, 'apps'), 'skipped, next opens');
+  type(d, 'email', 'edwin@gmail.com');
+  assert.equal(field(d, 'email').querySelector('.fo-next').textContent, 'next');
+  type(d, 'email', 'nope'); field(d, 'email').querySelector('.fo-q').click();
+  field(d, 'email').querySelector('.fo-next').click();
+  assert.ok(field(d, 'email').classList.contains('bad') && isOpen(d, 'email'), 'a bad email cannot be skipped past');
+  consent(d);
+  await until(() => !isOpen(d, 'consent'));
+  assert.equal(summary(d, 'consent'), 'agreed');
+  // submit with gaps: the first gap (name) opens and is flagged
+  field(d, 'name').querySelector('.fo-q').click(); assert.ok(!isOpen(d, 'name'));
+  submit(d); await new Promise(r => setTimeout(r, 20));
+  assert.ok(isOpen(d, 'name') && field(d, 'name').classList.contains('bad'));
+});
+
+test('copy: "estimate is fine", never "ballpark"', () => {
+  const { d } = boot(() => ({}));
+  assert.doesNotMatch(d.body.innerHTML, /ballpark/);
+  assert.match(field(d, 'stats').textContent, /estimate is fine/);
 });
 
 // ── analytics ──

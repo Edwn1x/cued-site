@@ -900,14 +900,32 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
 .co-msgs::-webkit-scrollbar{display:none}
 .co-msgs > *{flex-shrink:0}
 
-/* Groups — serif heads over warm hairlines, like the FAQ and the apps rows */
-.fo-sec{padding-top:20px}
-.fo-sec + .fo-sec{margin-top:26px;padding-top:24px;border-top:1px solid var(--co-line)}
-.fo-sec-h{font-family:var(--f-head);font-weight:400;font-size:24px;letter-spacing:-.01em;line-height:1.1;color:var(--co-ink);margin-bottom:16px}
-.fo-field{margin-top:18px}
-.fo-sec-h + .fo-field{margin-top:0}
-.fo-label{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:15px;font-weight:400;color:var(--co-ink);margin-bottom:8px;line-height:1.3}
-.fo-label small{font-size:13px;font-weight:400;color:var(--co-ink-2);white-space:nowrap}
+/* Groups — serif heads, then one hairline row per question (the FAQ's
+   rows). A row is a button: the question, the answer as a one-line summary
+   once answered, a chevron. Open rows unfold their body (grid-rows 0fr→1fr).
+   Answering collapses the row and opens the next unanswered one; any row
+   opens on a tap, as many as they like (founder, 2026-11-14). */
+.fo-sec + .fo-sec{margin-top:30px}
+.fo-sec-h{font-family:var(--f-head);font-weight:400;font-size:24px;letter-spacing:-.01em;line-height:1.1;color:var(--co-ink);padding-top:22px;margin-bottom:6px}
+.fo-field{border-top:1px solid var(--co-line)}
+.fo-field:last-child{border-bottom:1px solid var(--co-line)}
+.fo-q{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:14px 0;background:none;border:none;text-align:left;cursor:pointer;font-size:16px;line-height:1.3;color:var(--co-ink);transition:color .15s}
+.fo-qt{flex:1;min-width:0}
+.fo-qt small{display:block;font-size:13px;color:var(--co-ink-2);margin-top:2px}
+.fo-field.done:not(.open) .fo-qt small{display:none}
+.fo-qv{flex:0 1 auto;max-width:48%;font-size:15px;color:var(--co-ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
+.fo-field.open .fo-qv{display:none}
+.fo-field.open .fo-q{color:var(--co-blue)}
+.fo-chev{flex:none;width:8px;height:8px;margin:0 4px 0 2px;border-right:1.5px solid var(--co-ink-3);border-bottom:1.5px solid var(--co-ink-3);transform:translateY(-2px) rotate(45deg);transition:transform .22s var(--ease),border-color .15s}
+.fo-field.open .fo-chev{transform:translateY(2px) rotate(225deg);border-color:var(--co-blue)}
+.fo-a{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s var(--ease)}
+.fo-field.open .fo-a{grid-template-rows:1fr}
+.fo-ai{overflow:hidden;min-height:0}
+.fo-body{padding:0 0 18px}
+.fo-tools{display:flex;justify-content:flex-end;margin-bottom:8px}
+.fo-foot{display:flex;justify-content:flex-end;margin-top:12px}
+.fo-next{height:36px;padding:0 16px;border-radius:10px;border:1px solid var(--co-line);background:var(--co-field);font-size:14px;color:var(--co-ink);cursor:pointer;transition:border-color .15s,background .15s}
+.fo-next:hover{border-color:var(--co-ink-3)}
 .fo-row{display:flex;gap:8px}
 .fo-row > *{flex:1;min-width:0}
 
@@ -938,13 +956,13 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
 /* Validation — flagged on submit: label and hint turn, the field shakes */
 .fo-hint{display:none;font-size:13px;line-height:1.35;color:var(--co-error);margin-top:7px}
 .fo-field.bad .fo-hint{display:block}
-.fo-field.bad .fo-label{color:var(--co-error)}
+.fo-field.bad .fo-q{color:var(--co-error)}
 .fo-field.bad .fo-in{border-color:var(--co-error)}
 @keyframes co-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 .co-shake{animation:co-shake .28s var(--ease)}
 
 /* SMS consent — the fine print beside a ring that fills blue with a check */
-.fo-consent{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:none;border:none;padding:4px 0 0;cursor:pointer;font-size:13px;line-height:1.5;color:var(--co-ink-2)}
+.fo-consent{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:none;border:none;padding:2px 0 0;cursor:pointer;font-size:13px;line-height:1.5;color:var(--co-ink-2)}
 .fo-consent i{flex:none;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--co-ink-3);background:var(--co-field);display:inline-flex;align-items:center;justify-content:center;margin-top:0;transition:background .2s,border-color .2s}
 .fo-consent i::after{content:'';width:8px;height:4.5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:translateY(-1px) rotate(-45deg) scale(0);transition:transform .22s var(--ease)}
 .fo-consent.sel i{background:var(--co-blue);border-color:var(--co-blue)}
@@ -989,7 +1007,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   .fo-in.fo-num{padding-left:8px;padding-right:8px}/* three fields on a 320px screen at 16px */
 }
 @media (prefers-reduced-motion:reduce){
-  .co-bg,.co-sheet,.co-progress i,.fo-in,.fo-chip,.fo-consent i,.fo-consent i::after{transition:none}
+  .co-bg,.co-sheet,.co-progress i,.fo-in,.fo-chip,.fo-consent i,.fo-consent i::after,.fo-a,.fo-chev,.fo-q{transition:none}
   .co-shake{animation:none}
 }
 
@@ -1417,32 +1435,40 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
         <div class="fo-sec">
           <h3 class="fo-sec-h">about you</h3>
           <div class="fo-field" data-f="name">
-            <label class="fo-label" for="foName">full name</label>
-            <input class="fo-in" id="foName" name="name" type="text" autocomplete="name" placeholder="first and last" enterkeyhint="next">
+            <button type="button" class="fo-q" id="foQ-name" aria-expanded="false" aria-controls="foA-name"><span class="fo-qt">full name</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-a" id="foA-name" role="region" aria-labelledby="foQ-name"><div class="fo-ai"><div class="fo-body">
+            <input class="fo-in" id="foName" name="name" type="text" placeholder="first and last" autocomplete="name" enterkeyhint="next">
             <div class="fo-hint">what should i call you?</div>
+            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
+            </div></div></div>
           </div>
           <div class="fo-field short" data-f="age">
-            <label class="fo-label" for="foAge">age</label>
-            <input class="fo-in fo-num" id="foAge" name="age" type="text" inputmode="numeric" autocomplete="off" maxlength="3" placeholder="20" enterkeyhint="next">
+            <button type="button" class="fo-q" id="foQ-age" aria-expanded="false" aria-controls="foA-age"><span class="fo-qt">age</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-a" id="foA-age" role="region" aria-labelledby="foQ-age"><div class="fo-ai"><div class="fo-body">
+            <input class="fo-in fo-num" id="foAge" name="age" type="text" placeholder="20" inputmode="numeric" autocomplete="off" maxlength="3" enterkeyhint="next">
             <div class="fo-hint">just the number</div>
+            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
+            </div></div></div>
           </div>
           <div class="fo-field" data-f="gender">
-            <div class="fo-label" id="foGenderL">gender</div>
-            <div class="fo-chips" role="radiogroup" aria-labelledby="foGenderL">
+            <button type="button" class="fo-q" id="foQ-gender" aria-expanded="false" aria-controls="foA-gender"><span class="fo-qt">gender</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-a" id="foA-gender" role="region" aria-labelledby="foQ-gender"><div class="fo-ai"><div class="fo-body">
+            <div class="fo-chips" role="radiogroup">
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="male">male</button>
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="female">female</button>
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="non_binary">non-binary</button>
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="prefer_not_to_say">rather not say</button>
             </div>
             <div class="fo-hint">pick one</div>
+            </div></div></div>
           </div>
           <div class="fo-field" data-f="stats">
-            <div class="fo-label"><span>height &amp; weight <small>ballpark is fine</small></span>
-              <span class="co-units" role="radiogroup" aria-label="units">
+            <button type="button" class="fo-q" id="foQ-stats" aria-expanded="false" aria-controls="foA-stats"><span class="fo-qt">height &amp; weight <small>estimate is fine</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-a" id="foA-stats" role="region" aria-labelledby="foQ-stats"><div class="fo-ai"><div class="fo-body">
+            <div class="fo-tools"><span class="co-units" role="radiogroup" aria-label="units">
                 <button type="button" class="co-unit sel" role="radio" aria-checked="true" data-metric="0">ft / lb</button>
                 <button type="button" class="co-unit" role="radio" aria-checked="false" data-metric="1">cm / kg</button>
-              </span>
-            </div>
+              </span></div>
             <div class="fo-row fo-us">
               <input class="fo-in fo-num" data-k="ft" type="text" inputmode="decimal" autocomplete="off" maxlength="1" placeholder="ft" aria-label="height, feet" enterkeyhint="next">
               <input class="fo-in fo-num" data-k="in" type="text" inputmode="decimal" autocomplete="off" maxlength="2" placeholder="in" aria-label="height, inches" enterkeyhint="next">
@@ -1452,15 +1478,17 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
               <input class="fo-in fo-num" data-k="cm" type="text" inputmode="decimal" autocomplete="off" maxlength="3" placeholder="height (cm)" aria-label="height, centimetres" enterkeyhint="next">
               <input class="fo-in fo-num" data-k="kg" type="text" inputmode="decimal" autocomplete="off" maxlength="5" placeholder="weight (kg)" aria-label="weight, kilograms" enterkeyhint="next">
             </div>
-            <div class="fo-hint">a height and a weight — ballpark is fine</div>
+            <div class="fo-hint">a height and a weight — estimate is fine</div>
+            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
+            </div></div></div>
           </div>
         </div>
-
         <div class="fo-sec">
           <h3 class="fo-sec-h">your training</h3>
           <div class="fo-field" data-f="goals">
-            <div class="fo-label" id="foGoalsL">what are you training for? <small>pick all that apply</small></div>
-            <div class="fo-chips" role="group" aria-labelledby="foGoalsL" data-multi="1">
+            <button type="button" class="fo-q" id="foQ-goals" aria-expanded="false" aria-controls="foA-goals"><span class="fo-qt">what are you training for? <small>pick all that apply</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-a" id="foA-goals" role="region" aria-labelledby="foQ-goals"><div class="fo-ai"><div class="fo-body">
+            <div class="fo-chips" role="group" data-multi="1">
               <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="fat_loss">lose fat</button>
               <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="muscle_building">build muscle</button>
               <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="strength">get stronger</button>
@@ -1468,10 +1496,13 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
               <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="endurance">endurance</button>
             </div>
             <div class="fo-hint">pick at least one</div>
+            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
+            </div></div></div>
           </div>
           <div class="fo-field" data-f="obstacle">
-            <div class="fo-label" id="foObsL">what gets in the way most?</div>
-            <div class="fo-chips" role="radiogroup" aria-labelledby="foObsL">
+            <button type="button" class="fo-q" id="foQ-obstacle" aria-expanded="false" aria-controls="foA-obstacle"><span class="fo-qt">what gets in the way most?</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-a" id="foA-obstacle" role="region" aria-labelledby="foQ-obstacle"><div class="fo-ai"><div class="fo-body">
+            <div class="fo-chips" role="radiogroup">
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="consistency">consistency</button>
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="nutrition">nutrition</button>
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="knowledge">knowing what to do</button>
@@ -1480,30 +1511,36 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="injuries">injuries</button>
             </div>
             <div class="fo-hint">pick one</div>
+            </div></div></div>
           </div>
           <div class="fo-field" data-f="experience">
-            <div class="fo-label" id="foExpL">how long have you been training?</div>
-            <div class="fo-chips" role="radiogroup" aria-labelledby="foExpL">
+            <button type="button" class="fo-q" id="foQ-experience" aria-expanded="false" aria-controls="foA-experience"><span class="fo-qt">how long have you been training?</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-a" id="foA-experience" role="region" aria-labelledby="foQ-experience"><div class="fo-ai"><div class="fo-body">
+            <div class="fo-chips" role="radiogroup">
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="none">just starting</button>
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="beginner">under 6 months</button>
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="intermediate">6 months – 2 years</button>
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="advanced">2+ years</button>
             </div>
             <div class="fo-hint">pick one</div>
+            </div></div></div>
           </div>
           <div class="fo-field" data-f="equipment">
-            <div class="fo-label" id="foEqL">what do you have access to?</div>
-            <div class="fo-chips" role="radiogroup" aria-labelledby="foEqL">
+            <button type="button" class="fo-q" id="foQ-equipment" aria-expanded="false" aria-controls="foA-equipment"><span class="fo-qt">what do you have access to?</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-a" id="foA-equipment" role="region" aria-labelledby="foQ-equipment"><div class="fo-ai"><div class="fo-body">
+            <div class="fo-chips" role="radiogroup">
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="full_gym">full gym</button>
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="limited_gym">limited gym</button>
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="home_gym">home gym</button>
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="bodyweight">bodyweight only</button>
             </div>
             <div class="fo-hint">pick one</div>
+            </div></div></div>
           </div>
           <div class="fo-field" data-f="days">
-            <div class="fo-label" id="foDaysL">days a week you can realistically train</div>
-            <div class="fo-chips even" role="radiogroup" aria-labelledby="foDaysL">
+            <button type="button" class="fo-q" id="foQ-days" aria-expanded="false" aria-controls="foA-days"><span class="fo-qt">days a week you can realistically train</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-a" id="foA-days" role="region" aria-labelledby="foQ-days"><div class="fo-ai"><div class="fo-body">
+            <div class="fo-chips even" role="radiogroup">
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="2">2</button>
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="3">3</button>
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="4">4</button>
@@ -1511,19 +1548,24 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="6">6</button>
             </div>
             <div class="fo-hint">pick one</div>
+            </div></div></div>
           </div>
           <div class="fo-field" data-f="time">
-            <div class="fo-label" id="foTimeL">when do you usually get to it? <small>pick all that apply</small></div>
-            <div class="fo-chips even" role="group" aria-labelledby="foTimeL" data-multi="1">
+            <button type="button" class="fo-q" id="foQ-time" aria-expanded="false" aria-controls="foA-time"><span class="fo-qt">when do you usually get to it? <small>pick all that apply</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-a" id="foA-time" role="region" aria-labelledby="foQ-time"><div class="fo-ai"><div class="fo-body">
+            <div class="fo-chips even" role="group" data-multi="1">
               <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="morning">mornings</button>
               <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="afternoon">afternoons</button>
               <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="evening">evenings</button>
             </div>
             <div class="fo-hint">pick at least one</div>
+            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
+            </div></div></div>
           </div>
           <div class="fo-field" data-f="diet">
-            <div class="fo-label" id="foDietL">how do you eat?</div>
-            <div class="fo-chips" role="radiogroup" aria-labelledby="foDietL">
+            <button type="button" class="fo-q" id="foQ-diet" aria-expanded="false" aria-controls="foA-diet"><span class="fo-qt">how do you eat?</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-a" id="foA-diet" role="region" aria-labelledby="foQ-diet"><div class="fo-ai"><div class="fo-body">
+            <div class="fo-chips" role="radiogroup">
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="omnivore">no restrictions</button>
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="vegetarian">vegetarian</button>
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="vegan">vegan</button>
@@ -1532,14 +1574,19 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="kosher">kosher</button>
             </div>
             <div class="fo-hint">pick one</div>
+            </div></div></div>
           </div>
           <div class="fo-field" data-f="restrictions">
-            <label class="fo-label" for="foRestr">allergies, or foods you just won't eat <small>optional</small></label>
-            <input class="fo-in" id="foRestr" name="restrictions" type="text" autocomplete="off" placeholder="e.g. peanuts, mushrooms" enterkeyhint="next">
+            <button type="button" class="fo-q" id="foQ-restrictions" aria-expanded="false" aria-controls="foA-restrictions"><span class="fo-qt">allergies, or foods you just won't eat <small>optional</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-a" id="foA-restrictions" role="region" aria-labelledby="foQ-restrictions"><div class="fo-ai"><div class="fo-body">
+            <input class="fo-in" id="foRestr" name="restrictions" type="text" placeholder="e.g. peanuts, mushrooms" autocomplete="off" enterkeyhint="next">
+            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
+            </div></div></div>
           </div>
           <div class="fo-field" data-f="apps">
-            <div class="fo-label" id="foAppsL">track anything already? <small>pick all that apply</small></div>
-            <div class="fo-chips" role="group" aria-labelledby="foAppsL" data-multi="1">
+            <button type="button" class="fo-q" id="foQ-apps" aria-expanded="false" aria-controls="foA-apps"><span class="fo-qt">track anything already? <small>pick all that apply</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-a" id="foA-apps" role="region" aria-labelledby="foQ-apps"><div class="fo-ai"><div class="fo-body">
+            <div class="fo-chips" role="group" data-multi="1">
               <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="none">nothing yet</button>
               <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="apple_watch">apple watch</button>
               <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="fitbit">fitbit / google</button>
@@ -1550,28 +1597,41 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
               <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="myfitnesspal">myfitnesspal</button>
             </div>
             <div class="fo-hint">pick at least one — "nothing yet" counts</div>
+            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
+            </div></div></div>
           </div>
         </div>
-
         <div class="fo-sec">
           <h3 class="fo-sec-h">where to text you</h3>
           <div class="fo-field" data-f="phone">
-            <label class="fo-label" for="foPhone">your number <small>that's where i'll text you</small></label>
-            <input class="fo-in" id="foPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(510) 555-1234" enterkeyhint="next">
+            <button type="button" class="fo-q" id="foQ-phone" aria-expanded="false" aria-controls="foA-phone"><span class="fo-qt">your number <small>that's where i'll text you</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-a" id="foA-phone" role="region" aria-labelledby="foQ-phone"><div class="fo-ai"><div class="fo-body">
+            <input class="fo-in" id="foPhone" name="phone" type="tel" placeholder="(510) 555-1234" inputmode="tel" autocomplete="tel" enterkeyhint="next">
             <div class="fo-hint">that's not a 10-digit US number</div>
+            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
+            </div></div></div>
           </div>
           <div class="fo-field" data-f="email">
-            <label class="fo-label" for="foEmail">gmail <small>optional — for google calendar or fitbit later</small></label>
-            <input class="fo-in" id="foEmail" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@gmail.com" enterkeyhint="next">
+            <button type="button" class="fo-q" id="foQ-email" aria-expanded="false" aria-controls="foA-email"><span class="fo-qt">gmail <small>optional — for google calendar or fitbit later</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-a" id="foA-email" role="region" aria-labelledby="foQ-email"><div class="fo-ai"><div class="fo-body">
+            <input class="fo-in" id="foEmail" name="email" type="email" placeholder="you@gmail.com" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" enterkeyhint="next">
             <div class="fo-hint">that email doesn't look right — fix it or leave it blank</div>
+            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
+            </div></div></div>
           </div>
           <div class="fo-field" data-f="referral">
-            <label class="fo-label" for="foRef">a friend's referral code <small>optional — they get the credit</small></label>
-            <input class="fo-in" id="foRef" name="referral_code" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Alex1234" enterkeyhint="done">
+            <button type="button" class="fo-q" id="foQ-referral" aria-expanded="false" aria-controls="foA-referral"><span class="fo-qt">a friend's referral code <small>optional — they get the credit</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-a" id="foA-referral" role="region" aria-labelledby="foQ-referral"><div class="fo-ai"><div class="fo-body">
+            <input class="fo-in" id="foRef" name="referral_code" type="text" placeholder="Alex1234" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="done">
+            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
+            </div></div></div>
           </div>
           <div class="fo-field" data-f="consent">
+            <button type="button" class="fo-q" id="foQ-consent" aria-expanded="false" aria-controls="foA-consent"><span class="fo-qt">last thing — the fine print</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-a" id="foA-consent" role="region" aria-labelledby="foQ-consent"><div class="fo-ai"><div class="fo-body">
             <button type="button" class="fo-consent" role="checkbox" aria-checked="false"><i aria-hidden="true"></i><span>by joining you agree to get recurring automated texts from cued — workouts, meals, check-ins. 5–8 msgs/day, msg &amp; data rates may apply, reply STOP to cancel or HELP for help. <a href="/terms.html" target="_blank" rel="noopener">terms</a> · <a href="/privacy.html" target="_blank" rel="noopener">privacy</a></span></button>
             <div class="fo-hint">i need a yes here before i can text you</div>
+            </div></div></div>
           </div>
         </div>
       </form>
@@ -2375,6 +2435,69 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     referral: () => true,
     consent: v => v === true,
   };
+  // ── the accordion ──
+  // One row per question. Answering marks the row done (summary at the right),
+  // collapses it and opens the next unanswered row; typed and multi-pick rows
+  // wait for Enter / "next" (an empty optional reads "skip"). Any row opens on
+  // a tap, as many as they like. Flagging a row on submit opens it.
+  const LABELS = {};
+  form.querySelectorAll('.fo-chip').forEach(c => { LABELS[c.closest('.fo-field').dataset.f + ':' + c.dataset.v] = c.textContent.trim(); });
+  const answered = name => {
+    const v = read(name);
+    if (name === 'restrictions' || name === 'referral') return v.length > 0;
+    if (name === 'email') return v.length > 0 && VALID.email(v);
+    return VALID[name](v) && (Array.isArray(v) ? v.length > 0 : v !== '' && v !== false && v !== null);
+  };
+  function summary(name){
+    const v = read(name);
+    if (!answered(name)) return '';
+    if (name === 'stats') return v.height_cm != null ? `${v.height_cm} cm, ${v.weight_kg} kg` : `${v.height_ft}'${v.height_in}, ${v.weight_lbs} lbs`;
+    if (name === 'consent') return 'agreed';
+    if (name === 'days') return `${v[0]} days`;
+    if (name === 'referral') return v.toUpperCase();
+    if (Array.isArray(v)) return v.map(x => LABELS[name + ':' + x] || x).join(', ');
+    return v;
+  }
+  const passed = new Set();   // answered, or skipped on purpose
+  function setOpen(name, on){
+    const field = fieldOf(name);
+    field.classList.toggle('open', on);
+    field.querySelector('.fo-q').setAttribute('aria-expanded', String(on));
+  }
+  function nextAfter(name){
+    const i = ORDER.indexOf(name);
+    const todo = n => !passed.has(n) && !answered(n);
+    return ORDER.slice(i + 1).find(todo) || ORDER.find(todo) || null;
+  }
+  const isMetricRow = el => { const row = el.closest('.fo-us, .fo-metric'); return !row || (stats.classList.contains('metric') === row.classList.contains('fo-metric')); };
+  function focusIn(name){
+    const inp = [...fieldOf(name).querySelectorAll('.fo-in')].find(isMetricRow);
+    if (inp) inp.focus({ preventScroll: true });
+  }
+  function goTo(name){
+    setOpen(name, true);
+    const field = fieldOf(name);
+    if (field.scrollIntoView) field.scrollIntoView({ block: 'start', behavior: reduced.matches ? 'auto' : 'smooth' });
+    focusIn(name);
+  }
+  // Leave a row: it has to be answered, or be an optional one (then it's a skip).
+  function advance(name){
+    if (!answered(name)){
+      if (!(VALID[name](read(name)) && (name === 'restrictions' || name === 'referral' || name === 'email'))) { flag(name); return; }
+    }
+    passed.add(name);
+    setOpen(name, false);
+    const next = nextAfter(name);
+    if (next) goTo(next); else submitBtn.focus({ preventScroll: true });
+  }
+  function refresh(name){
+    const field = fieldOf(name);
+    const done = answered(name);
+    field.classList.toggle('done', done);
+    field.querySelector('.fo-qv').textContent = summary(name);
+    const nxt = field.querySelector('.fo-next');
+    if (nxt) nxt.textContent = (!done && (name === 'restrictions' || name === 'referral' || name === 'email')) ? 'skip' : 'next';
+  }
   // The first time a field has a valid answer its step fires (optional
   // restrictions: when something is typed). Any flag on it clears as they fix it.
   function changed(name){
@@ -2382,12 +2505,20 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     field.classList.remove('bad');
     hideErr();
     const v = read(name);
-    const answered = name === 'restrictions' ? v.length > 0 : VALID[name](v) && (Array.isArray(v) ? v.length > 0 : v !== '' && v !== false && v !== null);
-    if (answered && STEP_NAMES.includes(name)) markStep(name);
+    const ok = name === 'restrictions' ? v.length > 0 : VALID[name](v) && (Array.isArray(v) ? v.length > 0 : v !== '' && v !== false && v !== null);
+    if (ok && STEP_NAMES.includes(name)) markStep(name);
+    refresh(name);
     setProgress();
   }
 
   // ── wiring ──
+  form.querySelectorAll('.fo-q').forEach(q => q.addEventListener('click', () => {
+    const name = q.closest('.fo-field').dataset.f;
+    const on = !fieldOf(name).classList.contains('open');
+    setOpen(name, on);
+    if (on) focusIn(name);
+  }));
+  form.querySelectorAll('.fo-next').forEach(b => b.addEventListener('click', () => advance(b.closest('.fo-field').dataset.f)));
   form.querySelectorAll('.fo-chips').forEach(group => {
     const multi = group.dataset.multi === '1';
     const name = group.closest('.fo-field').dataset.f;
@@ -2400,11 +2531,13 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
           const none = chip.dataset.v === 'none';
           group.querySelectorAll('.fo-chip.sel').forEach(c => { if (c !== chip && (none || c.dataset.v === 'none')) { c.classList.remove('sel'); c.setAttribute('aria-checked', 'false'); } });
         }
+        changed(name);
       } else {
         group.querySelectorAll('.fo-chip').forEach(c => { c.classList.remove('sel'); c.setAttribute('aria-checked', 'false'); });
         chip.classList.add('sel'); chip.setAttribute('aria-checked', 'true');
+        changed(name);
+        setTimeout(() => advance(name), reduced.matches ? 0 : 240);   // the pick lands, then the row folds
       }
-      changed(name);
     }));
   });
   const consentBtn = form.querySelector('.fo-consent');
@@ -2413,6 +2546,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     const on = consentBtn.classList.toggle('sel');
     consentBtn.setAttribute('aria-checked', String(on));
     changed('consent');
+    if (on) setTimeout(() => advance('consent'), reduced.matches ? 0 : 240);
   });
   // Units: default by locale (en-US → ft/lb, everyone else → cm/kg); the toggle
   // swaps the row of number fields.
@@ -2420,7 +2554,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   stats.querySelectorAll('.co-unit').forEach(u => {
     const sync = () => { const on = (u.dataset.metric === '1') === stats.classList.contains('metric'); u.classList.toggle('sel', on); u.setAttribute('aria-checked', String(on)); };
     sync();
-    u.addEventListener('click', () => { stats.classList.toggle('metric', u.dataset.metric === '1'); stats.querySelectorAll('.co-unit').forEach(x => x.dispatchEvent(new Event('sync'))); changed('stats'); });
+    u.addEventListener('click', () => { stats.classList.toggle('metric', u.dataset.metric === '1'); stats.querySelectorAll('.co-unit').forEach(x => x.dispatchEvent(new Event('sync'))); changed('stats'); focusIn('stats'); });
     u.addEventListener('sync', sync);
   });
   const phoneIn = form.querySelector('#foPhone');
@@ -2433,30 +2567,37 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
                   : d.length > 3 ? `(${d.slice(0,3)}) ${d.slice(3)}`
                   : d;
   });
-  const typed = [...form.querySelectorAll('.fo-in')];
-  typed.forEach((inp, i) => {
-    inp.addEventListener('input', () => changed(inp.closest('.fo-field').dataset.f));
-    // Enter moves to the next typed field (what enterkeyhint="next" promises);
-    // from the last one it submits.
+  form.querySelectorAll('.fo-in').forEach(inp => {
+    const name = inp.closest('.fo-field').dataset.f;
+    inp.addEventListener('input', () => changed(name));
+    // Enter = next (what enterkeyhint="next" promises). In height & weight it
+    // first walks the row's empty boxes.
     inp.addEventListener('keydown', e => {
       if (e.key !== 'Enter') return;
       e.preventDefault();
-      const visible = typed.slice(i + 1).find(x => { const row = x.closest('.fo-us, .fo-metric'); return !row || (stats.classList.contains('metric') ? row.classList.contains('fo-metric') : row.classList.contains('fo-us')); });
-      if (visible) visible.focus(); else submitProfile();
+      if (name === 'stats'){
+        const boxes = [...stats.querySelectorAll('.fo-in')].filter(isMetricRow);
+        const after = boxes.slice(boxes.indexOf(inp) + 1).find(x => !x.value.trim());
+        if (after){ after.focus(); return; }
+      }
+      advance(name);
     });
   });
   form.addEventListener('submit', e => { e.preventDefault(); submitProfile(); });
   submitBtn.addEventListener('click', submitProfile);
+  ORDER.forEach(refresh);
+  setOpen(ORDER[0], true);
 
   function showErr(text){ if (errLine){ errLine.textContent = text; errLine.classList.add('show'); } }
   function hideErr(){ if (errLine){ errLine.textContent = ''; errLine.classList.remove('show'); } }
   function flag(name){
     const field = fieldOf(name);
+    setOpen(name, true);
     field.classList.add('bad');
     field.classList.remove('co-shake');
     requestAnimationFrame(() => field.classList.add('co-shake'));
     if (field.scrollIntoView) field.scrollIntoView({ block: 'center', behavior: reduced.matches ? 'auto' : 'smooth' });
-    const inp = [...field.querySelectorAll('.fo-in')].find(x => !x.value.trim() && (!x.closest('.fo-us, .fo-metric') || (stats.classList.contains('metric') === x.closest('.fo-us, .fo-metric').classList.contains('fo-metric'))));
+    const inp = [...field.querySelectorAll('.fo-in')].find(x => !x.value.trim() && isMetricRow(x));
     if (inp) inp.focus({ preventScroll: true });
   }
 
