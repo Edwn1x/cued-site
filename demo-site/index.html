@@ -381,6 +381,113 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 .msg.card .wc-pr{font-weight:700;opacity:1}
 .msg.card .wc-foot{font-size:.68em;font-weight:600;margin-top:.5em;padding-top:.5em;border-top:1px solid color-mix(in srgb,currentColor 30%,transparent)}
 
+/* ===== PRODUCT CARDS (the coach's rich messages, drawn in the page palette) =====
+   Modelled on the real iMessage extension cards (founder screenshots,
+   2026-11-14): a header row with the rainbow-ball app glyph, big numbers,
+   thin progress bars; the week grid; the set sheet; the link card; the
+   water-break sticker. Everything em-sized so it rides the thread scale. */
+.msg.card{width:min(100%,20em);max-width:88%;padding:.8em .95em .9em}
+.wk-h{display:flex;align-items:center;gap:.45em;font-size:.72em;color:var(--gray-text);margin-bottom:.6em}
+.wk-dot{width:1.35em;height:1.35em;border-radius:50%;background:conic-gradient(from 90deg,#ff7a59,#ffd166,#7ad7a0,#5aa9ff,#c58cff,#ff7a59);flex:none}
+.gy-as{margin-left:auto;font-size:.95em}
+.bar{height:.5em;border-radius:.25em;background:rgba(11,11,12,.08);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:.25em;background:var(--blue)}
+.bar.amber i{background:#F0A64B}
+/* week */
+.wk-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.4em}
+.wk-day span{display:block;font-size:.62em;color:var(--gray-text);text-align:center;margin-bottom:.35em}
+.wk-col{height:6.6em;border-radius:.55em;background:rgba(11,11,12,.05);padding:.3em;display:flex;flex-direction:column;gap:.25em}
+.chip{font-size:.56em;font-weight:600;padding:.25em .4em;border-radius:.4em;text-align:center;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip.gray{background:rgba(11,11,12,.08);color:var(--gray-text);font-weight:500}
+.chip.blue{background:var(--blue);color:#fff}
+.chip.amber{background:#FCEBD0;color:#B8741A}
+.chip.red{background:#FBDADA;color:#B23B3B}
+.chip.bot{margin-top:auto}
+/* today */
+.td-grid{display:grid;grid-template-columns:1fr 1fr;gap:1em}
+.td-k{font-size:.7em;color:var(--gray-text)}
+.td-v{font-size:1.35em;font-weight:600;letter-spacing:-.02em;margin:.1em 0 .35em;color:var(--ink)}
+.td-v small{font-size:.5em;font-weight:400;color:var(--gray-text);margin-left:.3em}
+/* gym */
+.gy-v{font-size:1.5em;font-weight:600;letter-spacing:-.02em;color:var(--ink);margin:0 0 .4em}
+.gy-v small{font-size:.5em;font-weight:400;color:var(--gray-text);margin-left:.3em}
+/* set sheet (the extension's "tap to start" sheet, inline) */
+/* the compact "tap to start" card the extension sends */
+.msg.card.sheet-card{width:auto;max-width:76%;cursor:pointer}
+#proof .msg.card.sheet-card{max-width:76%}
+.sh-compact{display:flex;align-items:center;gap:.6em}
+.sh-compact .wk-dot{width:1.9em;height:1.9em}
+.sh-ct{font-size:.95em;font-weight:600;color:var(--ink)}
+.sh-cs{font-size:.7em;color:var(--gray-text);margin-top:.1em}
+/* the set sheet as an overlay: slides up from the bottom of the chat and
+   holds as the thread's final frame (founder, 2026-11-14) */
+.screen{position:relative}
+.sheet-overlay{
+  position:absolute;left:0;right:0;bottom:0;z-index:3;
+  background:var(--card);border-radius:1.4em 1.4em 0 0;padding:.6em 1em 1em;
+  box-shadow:0 -12px 40px rgba(60,40,20,.14);
+  font-size:16px;
+  transform:translateY(104%);transition:transform .55s cubic-bezier(.22,1,.36,1);
+}
+.sheet-overlay.up{transform:none}
+.sheet-grab{width:2.4em;height:.3em;border-radius:.15em;background:rgba(11,11,12,.18);margin:0 auto .8em}
+.sheet-overlay .sh-top{margin-top:.2em}
+.sheet-overlay .sh-title{font-size:1.5em}
+.sheet-overlay .sh-row{font-size:1em}
+.sheet-overlay .sh-stepper.open{display:grid}
+@media(max-width:1023.98px){
+  #proof .phone-wrap::before{display:none}   /* the desktop halo's -140px inset overflowed the phone viewport */
+  /* stacked: same takeover — the sheet rises over the step's chat column; the
+     column is given room (min-height on .screen, set by JS) so it isn't clipped */
+  #proof .screen{overflow:hidden;border-radius:1.4em;max-height:none}   /* no cap: stacked chats show every bubble */
+  .sheet-overlay{font-size:15px;padding:.5em .9em .9em;border-radius:1.4em 1.4em 0 0}
+  .sheet-overlay .sh-title{font-size:1.35em}
+  .sheet-overlay .sh-sub{text-align:left}
+}
+.sh-top{display:flex;align-items:baseline;justify-content:space-between}
+.sh-title{font-family:var(--f-head);font-size:1.3em;color:var(--ink)}
+.sh-count{font-size:.68em;color:var(--gray-text)}
+.sh-count b{color:var(--ink);font-weight:600}
+.sh-sub{font-size:.66em;color:var(--gray-text);line-height:1.4;margin:.3em 0 .7em}
+.sh-ex{display:flex;justify-content:space-between;font-size:.7em;color:var(--gray-text);padding-bottom:.45em;border-bottom:1px solid rgba(11,11,12,.1)}
+.sh-row{display:flex;align-items:center;justify-content:space-between;width:100%;padding:.55em 0;border:none;border-bottom:1px solid rgba(11,11,12,.08);background:none;font:inherit;font-size:.9em;color:var(--ink);cursor:pointer;text-align:left}
+.sh-row i{width:1.45em;height:1.45em;border-radius:50%;border:2px solid rgba(11,11,12,.25);flex:none;transition:background .25s,border-color .25s}
+.sh-row.done i{background:var(--blue);border-color:var(--blue)}
+.sh-row.sh-edit{border-bottom:none;padding-bottom:.3em}
+.sh-stepper{display:none;grid-template-columns:auto 1fr;gap:.45em .8em;align-items:center;padding:.3em 0 .7em;border-bottom:1px solid rgba(11,11,12,.08)}
+.sh-stepper.open{display:grid}
+.sh-k{font-size:.66em;color:var(--gray-text)}
+.sh-v{display:flex;justify-content:flex-end;gap:.35em}
+.sh-v b,.sh-v span{display:inline-flex;align-items:center;justify-content:center;height:1.9em;min-width:2.1em;padding:0 .5em;border-radius:.5em;background:rgba(11,11,12,.06);font-size:.8em;font-weight:500;color:var(--ink)}
+.sh-v span{min-width:3.4em;font-weight:600}
+.sh-v span.bump{color:var(--blue)}
+.sh-btns{grid-column:1/-1;display:flex;align-items:center;gap:.6em;font-size:.7em;padding-top:.2em}
+.sh-rm{color:#D45B5B;margin-right:auto}
+.sh-cancel,.sh-done{padding:.5em 1em;border-radius:999px;background:rgba(11,11,12,.06);color:var(--ink);font-weight:500}
+.sh-done{background:var(--blue);color:#fff}
+.sh-foot{display:flex;align-items:center;justify-content:space-between;padding-top:.7em;font-size:.72em;color:var(--gray-text)}
+.sh-foot b{color:var(--ink);font-weight:600;font-size:1.15em}
+.sh-save{padding:.55em 1.1em;border-radius:999px;background:var(--blue);color:#fff;font-weight:500}
+/* link card (profile / memory) */
+#proof .msg.card.link,.thread-card .msg.card.link{position:relative;width:auto;max-width:76%;padding:.7em 3.2em .7em .95em}   /* id-qualified: `#proof .msg{padding}` would otherwise win and the icon overlaps the subtitle */
+.lk-t{font-size:.95em;font-weight:600;color:var(--ink)}
+.lk-s{font-size:.7em;color:var(--gray-text);margin-top:.15em}
+.lk-i{position:absolute;right:.85em;top:50%;width:1.6em;height:1.6em;transform:translateY(-50%);color:var(--gray-text)}
+/* water-break sticker: no bubble */
+.msg.sticker{background:none!important;padding:.2em 0 .4em .4em;color:var(--blue);text-align:center;width:auto;max-width:none;line-height:1}
+.msg.sticker svg{width:3.6em;height:3.6em;display:block;margin:0 auto .5em}
+.msg.sticker span{font-size:.78em;font-weight:500}
+.msg.sticker::before,.msg.sticker::after{content:none!important}
+/* timestamp divider inside a thread (Messages' "Sunday 9:14 PM") */
+.tsd{align-self:center;font-size:.72em;color:var(--ink-3);margin:.9em 0 .3em;letter-spacing:.01em}
+/* tapback on a reader bubble (the pseudo-element must out-rank the
+   `#proof .msg.t::after{content:none}` tail-stripper, hence the id) */
+.msg.tap{position:relative;overflow:visible}
+#proof .msg.tap::after,.thread-card .msg.tap::after{content:'👍'!important;   /* the later `#proof .msg.t::after{content:none}` ties on specificity */position:absolute;left:-.6em;top:-.9em;right:auto;bottom:auto;width:auto;height:auto;font-size:.8em;line-height:1;background:var(--card);border-radius:999px;padding:.3em .4em;box-shadow:0 1px 0 var(--line);border-radius:999px}
+/* poll "add choice" row */
+.poll-add{font-size:.85em;font-weight:500;color:var(--poll-ink);padding:.2em 1.35em 0}
+@media(max-width:1023.98px){.msg.card{max-width:92%}}
+
 /* ===== PHONE ===== */
 .phone-wrap{--ps:1;--ph:844px;width:calc(390px * var(--ps));height:calc(var(--ph) * var(--ps));position:relative;margin:0 auto}
 .phone{
@@ -459,6 +566,8 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
    thread engine are unchanged; these rules just take the frame off. */
 #proof,#proof .step,#proof .proof-sticky{background:var(--cream)!important;--bg:var(--cream)}
 #proof .step-copy .sub{display:none}
+/* a long step headline: a notch smaller, balanced to three lines, lifted so it clears the corner mascot (pinned only) */
+#proof .proof-copy h2.h2-long{font-size:clamp(28px,3.3vw,44px);text-wrap:balance;margin-top:-8vh}
 #proof .proof-grid{grid-template-columns:1fr 1fr;gap:clamp(32px,5vw,80px)}
 #proof .proof-left{height:100vh;display:flex;flex-direction:column;justify-content:center;padding:calc(72px + 16vh) 0 clamp(220px,38vh,360px)}   /* extra top padding drops the headline ~8vh toward the mascot */   /* bottom padding reserves the mascot's corner so the stepper never sits under it */
 #proof .proof-copy{min-height:0}
@@ -490,7 +599,9 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 #proof .ph-avatar{width:48px;height:48px}
 #proof .ph-name{font-family:var(--f-ui);font-size:14px;font-weight:500;margin-top:8px;color:var(--ink)}
 #proof .ph-status{margin-top:6px;height:26px;padding:0 12px;border-radius:13px;font-family:var(--f-ui);font-size:12.5px;background:var(--card);color:var(--gray-text)}
-#proof .screen{flex:none;height:auto;max-height:min(560px,calc(100vh - 240px));padding:0 0 8px}   /* sized to the active thread (capped) so the header sits right above the first bubble; flex:none — the base .screen is flex:1 */
+#proof .screen{flex:none;height:auto;max-height:min(560px,calc(100vh - 240px));padding:0 0 8px}
+/* short laptop viewports: a slightly smaller thread so the longest step (i remember) fits the box */
+@media(min-width:1024px) and (max-height:780px){#proof .thread{font-size:15px}#proof .screen{max-height:calc(100vh - 220px)}}   /* sized to the active thread (capped) so the header sits right above the first bubble; flex:none — the base .screen is flex:1 */
 #proof .thread{font-family:var(--f-ui);font-size:clamp(15px,1.15vw,16.5px)}
 #proof .msg{max-width:86%;padding:.7em .95em;border-radius:1.1em;line-height:1.38;text-align:left}
 #proof .msg.turn{margin-top:.6em}
@@ -1001,44 +1112,45 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
           <h2>i know your week</h2>
           <p class="sub">calendar, canvas, class times, the gym line. i plan around all of it.</p>
         </div>
-        <div class="phone-wrap">
-          <div class="phone" aria-hidden="false">
-            <div class="phone-screen">
-              <div class="island" aria-hidden="true"></div>
-              <div class="ph-head">
-                <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <picture><source srcset="/assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="/assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
-                <div class="ph-name">cued</div>
-                <div class="ph-status">reading your calendar…</div>
-                <svg class="vid" viewBox="0 0 26 18" aria-hidden="true"><rect x="1" y="2" width="16" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M17 7l7-3v10l-7-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
-              </div>
-              <div class="screen">
-                <div class="thread coach-left" data-play>
-                  <div class="msg coach">gym's dead right now and you're out of class till 3. quick upper push? in and out before the rush.</div>
-                  <div class="msg coach">also saw the chem midterm on your calendar tues. moving leg day to wednesday.</div>
-                  <div class="msg coach t">you've got class 2–5 wednesday. when do you want it?</div>
-                  <div class="poll" aria-label="poll: pick a workout time">
-                    <button type="button" class="poll-row pick" data-t="5:30" aria-pressed="true"><span>5:30pm – 7pm</span><i aria-hidden="true"></i></button>
-                    <button type="button" class="poll-row" data-t="12:30" aria-pressed="false"><span>12:30pm – 1:30pm</span><i aria-hidden="true"></i></button>
-                    <button type="button" class="poll-row" data-t="9am" aria-pressed="false"><span>9am – 11am</span><i aria-hidden="true"></i></button>
-                  </div>
-                  <div class="msg coach t poll-lock">locked. 5:30 it is.</div>
+        <div class="phone-wrap"><div class="phone"><div class="phone-screen">
+          <div class="ph-head">
+            <picture><source srcset="/assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="/assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
+            <div class="ph-name">cued</div>
+            <div class="ph-status">reading your calendar…</div>
+          </div>
+          <div class="screen">
+            <div class="thread coach-left" data-play>
+              <div class="msg coach card wk" aria-label="this week: classes most days, a lab tuesday, chem homework wednesday, club thursday, chem quiz friday, push monday and legs thursday">
+                <div class="wk-h"><i class="wk-dot"></i>this week</div>
+                <div class="wk-grid">
+                  <div class="wk-day"><span>mon</span><div class="wk-col"><b class="chip gray">cs 61c</b><b class="chip gray">data 104</b><b class="chip blue bot">push</b></div></div>
+                  <div class="wk-day"><span>tue</span><div class="wk-col"><b class="chip gray">chem 1a</b><b class="chip gray">lab</b></div></div>
+                  <div class="wk-day"><span>wed</span><div class="wk-col"><b class="chip gray">cs 61c</b><b class="chip amber">chem hw</b><b class="chip gray">discussion</b></div></div>
+                  <div class="wk-day"><span>thu</span><div class="wk-col"><b class="chip gray">chem 1a</b><b class="chip gray">club</b><b class="chip blue bot">legs</b></div></div>
+                  <div class="wk-day"><span>fri</span><div class="wk-col"><b class="chip gray">cs 61c</b><b class="chip red">chem quiz</b></div></div>
                 </div>
               </div>
-              <div class="ph-comp" aria-hidden="true"><div class="plus">+</div><div class="field">iMessage</div><svg class="mic" viewBox="0 0 16 22"><rect x="5" y="1" width="6" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M2 10a6 6 0 0 0 12 0M8 16v4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
-              <div class="ph-home" aria-hidden="true"></div>
+              <div class="msg coach">chem hw's due wed 4pm, so legs moves to thu. gym closes at 6 today if u want in.</div>
+              <div class="msg coach t">gym time tomorrow?</div>
+              <div class="poll" aria-label="poll: gym time tomorrow?">
+                <button type="button" class="poll-row" data-t="morning" aria-pressed="false"><span>morning</span><i aria-hidden="true"></i></button>
+                <button type="button" class="poll-row" data-t="afternoon" aria-pressed="false"><span>afternoon</span><i aria-hidden="true"></i></button>
+                <button type="button" class="poll-row pick" data-t="evening" aria-pressed="true"><span>evening</span><i aria-hidden="true"></i></button>
+                <button type="button" class="poll-row" data-t="rest day" aria-pressed="false"><span>rest day</span><i aria-hidden="true"></i></button>
+                <span class="poll-add">add choice</span>
+              </div>
+              <div class="msg coach t poll-lock">alr, evening it is. i'll ping u when the line's short.</div>
             </div>
           </div>
-        </div>
+        </div></div></div>
       </div>
     </article>
-
     <article class="step" data-status="logging your sets…">
       <div class="wrap">
         <div class="step-copy">
-          <picture class="step-mascot"><source srcset="/assets/mascot/v2/cued-sets-light.webp" type="image/webp"><img src="/assets/mascot/v2/cued-sets-light.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
-          <h2>i log your sets</h2>
-          <p class="sub">tap a set to log it. text me when it goes different.</p>
+          <picture class="step-mascot"><source srcset="/assets/mascot/v2/cued-sets.webp" type="image/webp"><img src="/assets/mascot/v2/cued-sets.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
+          <h2 class="h2-long">i log your sets and create your personalized workouts</h2>
+          <p class="sub">tap a set when you did it. tap the numbers if it went different.</p>
         </div>
         <div class="phone-wrap"><div class="phone"><div class="phone-screen">
           <div class="ph-head">
@@ -1048,88 +1160,101 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
           </div>
           <div class="screen">
             <div class="thread coach-left" data-play>
-              <div class="msg coach t">push day. 3 sets bench, then the usual. tap as you go — text me if a set goes different.</div>
-              <div class="checklist" aria-label="today's sets — tap a set when it's done">
-                <button type="button" class="poll-row" aria-pressed="false"><span>bench 185 × 6</span><i aria-hidden="true"></i></button>
-                <button type="button" class="poll-row" aria-pressed="false"><span>bench 185 × 6</span><i aria-hidden="true"></i></button>
-                <button type="button" class="poll-row" aria-pressed="false"><span>bench 185 × 6</span><i aria-hidden="true"></i></button>
+              <div class="msg coach t">push day. bench 110 for 4×5, if it all moves easy we jump next time.</div>
+              <div class="msg coach card sheet-card" role="button" tabindex="0" aria-expanded="false" aria-label="workout card: push, saturday — tap to open the set sheet">
+                <div class="sh-compact"><i class="wk-dot"></i><div><div class="sh-ct">push · sat</div><div class="sh-cs">bench press — tap to start</div></div></div>
               </div>
-              <div class="msg user t turn">190 x5</div>
-              <div class="msg coach turn cl-swap">swapped it in. 190 × 5 is a PR 🎉 last time was 190 × 3.</div>
-              <div class="msg coach t card">
-                <div class="wc-head">push · wed · 48 min</div>
-                <div class="wc-row">bench press — 185×6 · 185×6 · <b class="wc-pr">190×5</b></div>
-                <div class="wc-row">incline db press — 65×10 · 65×9 · 65×8</div>
-                <div class="wc-row">cable fly — 30×12 · 30×12 · 30×11</div>
-                <div class="wc-row">tricep pushdown — 50×12 · 50×12 · 50×10</div>
-                <div class="wc-foot">7,675 lb total · 1 PR</div>
+              <div class="msg user t turn">felt easy</div>
+              <div class="msg coach t turn cl-swap">noted. 115 next time 🎉</div>
+            </div>
+            <!-- The set sheet: the extension taking the screen. Slides up over the
+                 thread as the conversation's final frame and holds with set 3's
+                 stepper open. Opened by the thread finishing, or a tap on the card. -->
+            <div class="sheet-overlay" aria-hidden="true">
+              <div class="sheet-grab"></div>
+              <div class="sh-top"><span class="sh-title">push · sat</span><span class="sh-count"><b>2</b> / 13 sets</span></div>
+              <div class="sh-sub">tap a set when you did it as planned. tap the numbers if it went different — or just text me.</div>
+              <div class="sh-ex"><span>bench press</span><span class="sh-act">swap &nbsp; remove</span></div>
+              <button type="button" class="sh-row done" aria-pressed="true"><span>110 × 5</span><i></i></button>
+              <button type="button" class="sh-row done" aria-pressed="true"><span>110 × 5</span><i></i></button>
+              <button type="button" class="sh-row sh-edit" aria-pressed="false"><span>110 × 5</span><i></i></button>
+              <div class="sh-stepper open" aria-hidden="true">
+                <div class="sh-k">lb</div><div class="sh-v"><b>−</b><span class="sh-lb">110</span><b>+</b></div>
+                <div class="sh-k">reps</div><div class="sh-v"><b>−</b><span>5</span><b>+</b></div>
+                <div class="sh-btns"><span class="sh-rm">remove set</span><span class="sh-cancel">cancel</span><span class="sh-done">done</span></div>
               </div>
+              <button type="button" class="sh-row" aria-pressed="false"><span>110 × 5</span><i></i></button>
+              <div class="sh-foot"><span><b class="sh-total">1,100 lb</b> so far</span><span class="sh-save">save</span></div>
             </div>
           </div>
         </div></div></div>
       </div>
     </article>
-
-    <article class="step tint-1" data-status="checking the dining hall menu…">
+    <article class="step tint-1" data-status="logging your plate…">
       <div class="wrap">
         <div class="step-copy">
           <picture class="step-mascot"><source srcset="/assets/mascot/v2/cued-dinner.webp" type="image/webp"><img src="/assets/mascot/v2/cued-dinner.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
           <h2>i know what's for dinner</h2>
-          <p class="sub">dining hall menus, receipts, photos. no logging.</p>
+          <p class="sub">send a photo. i log it, you fix my guesses.</p>
         </div>
         <div class="phone-wrap"><div class="phone"><div class="phone-screen">
           <div class="ph-head">
             <picture><source srcset="/assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="/assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
             <div class="ph-name">cued</div>
-            <div class="ph-status">checking the dining hall menu…</div>
+            <div class="ph-status">logging your plate…</div>
           </div>
           <div class="screen">
             <div class="thread coach-left" data-play>
-              <div class="msg user t">what's good at the dining hall rn</div>
-              <div class="msg coach t turn">chimichurri tri-tip tonight. grab the roasted sweet potatoes, pile on the veg — that's ~45g protein, you're at 80 for the day.</div>
-              <div class="msg user photo turn"><img src="/images/dinner-plate.jpg" width="1000" height="855" loading="lazy" alt="photo of a dinner plate: sliced tri-tip with chimichurri, roasted sweet potatoes, broccoli and cauliflower"></div>
-              <div class="msg coach t turn">logged. you went heavy on the steak — closer to 55. nice.</div>
+              <div class="msg user photo"><img src="/images/dinner-plate.jpg" width="1000" height="855" loading="lazy" alt="photo of a dinner plate: sliced tri-tip with chimichurri, roasted sweet potatoes, broccoli and cauliflower"></div>
+              <div class="msg user t">ate this from the dining hall</div>
+              <div class="msg coach turn">i logged your plate at 740 cal. portions are my guesses: about 5oz of beef with the veg, 1 medium sweet potato. fix any of those.</div>
+              <div class="msg user t turn">how many cals do i have left</div>
+              <div class="msg coach turn">plenty of room for a real dinner tonight</div>
+              <div class="msg coach card today" aria-label="today: 1,300 of 2,500 calories, 59 of 142 grams protein">
+                <div class="wk-h"><i class="wk-dot"></i>today</div>
+                <div class="td-grid">
+                  <div><div class="td-k">calories</div><div class="td-v">1,300<small>/ 2,500</small></div><div class="bar"><i style="width:52%"></i></div></div>
+                  <div><div class="td-k">protein</div><div class="td-v">59g<small>/ 142g</small></div><div class="bar"><i style="width:42%"></i></div></div>
+                </div>
+              </div>
             </div>
           </div>
         </div></div></div>
       </div>
     </article>
-
-    <article class="step" data-status="pulling up your week…">
+    <article class="step" data-status="picking up where we left off…">
       <div class="wrap">
         <div class="step-copy">
-          <picture class="step-mascot"><source srcset="/assets/mascot/v2/cued-remember-light.webp" type="image/webp"><img src="/assets/mascot/v2/cued-remember-light.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
+          <picture class="step-mascot"><source srcset="/assets/mascot/v2/cued-remember.webp" type="image/webp"><img src="/assets/mascot/v2/cued-remember.jpg" alt="" width="1100" height="869" loading="lazy"></picture>
           <h2>i remember</h2>
-          <p class="sub">the midterm, the week, the lift we moved. i don't start over every text.</p>
+          <p class="sub">the weekend away, the birthday, the lift you'd rather hit. i pick up where we left off.</p>
         </div>
         <div class="phone-wrap"><div class="phone"><div class="phone-screen">
           <div class="ph-head">
             <picture><source srcset="/assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="/assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
             <div class="ph-name">cued</div>
-            <div class="ph-status">pulling up your week…</div>
+            <div class="ph-status">picking up where we left off…</div>
           </div>
           <div class="screen">
             <div class="thread coach-left" data-play>
-              <div class="msg coach t">how'd the chem midterm go</div>
-              <div class="msg user turn">brutal but done</div>
-              <div class="msg user t">how'd my week go</div>
-              <div class="msg coach chart turn">
-                <svg viewBox="0 0 900 265" role="img" aria-label="chart: workout volume by day, monday to sunday — low on monday and tuesday around the midterm, peaking wednesday">
-                  <g fill="currentColor" opacity=".9">
-                    <rect x="24" y="145" width="80" height="60" rx="20"/><rect x="153" y="157" width="80" height="48" rx="20"/><rect x="281" y="0" width="80" height="205" rx="20"/><rect x="410" y="20" width="80" height="185" rx="20"/><rect x="539" y="77" width="80" height="128" rx="20"/><rect x="667" y="55" width="80" height="150" rx="20"/><rect x="796" y="110" width="80" height="95" rx="20"/>
-                  </g>
-                  <g class="lbl" font-size="42" font-weight="500" text-anchor="middle">
-                    <text x="64" y="258">M</text><text x="193" y="258">T</text><text x="321" y="258">W</text><text x="450" y="258">T</text><text x="579" y="258">F</text><text x="707" y="258">S</text><text x="836" y="258">S</text>
-                  </g>
-                </svg>
+              <div class="msg user t">heading home for the weekend, back sunday night</div>
+              <div class="msg coach turn">got it, i'll hold the gym pings till you're back. legs is next whenever you are</div>
+              <div class="msg user t turn tap">my mom's bday is tmrw btw</div>
+              <div class="msg coach t turn">tell her happy bday from me</div>
+              <div class="tsd" aria-label="sunday 9:14 pm">sunday 9:14 pm</div>
+              <div class="msg coach">welcome back. legs tomorrow after class, or back like last time?</div>
+              <div class="msg user t turn">back. and too much cake lol</div>
+              <div class="msg coach turn">worth it. back monday then. it's all here if u ever want to check:</div>
+              <div class="msg coach card link" aria-label="what i remember, your profile on cued.fit">
+                <div class="lk-t">what i remember</div>
+                <div class="lk-s">who you are · 3 notes · cued.fit</div>
+                <svg class="lk-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 8.5l-2 5-5 2 2-5z" fill="currentColor"/></svg>
               </div>
-              <div class="msg coach t">solid week considering. you're back on normal sched now — pull day tonight, the one we pushed.</div>
             </div>
           </div>
         </div></div></div>
       </div>
     </article>
-
     <article class="step tint-2" data-status="reading last night's sleep…">
       <div class="wrap">
         <div class="step-copy">
@@ -1145,9 +1270,19 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
           </div>
           <div class="screen">
             <div class="thread coach-left" data-play>
-              <div class="msg coach t">your watch says you slept 4 hours. not the day for heavy squats. moved leg day to thursday — tonight: walk, protein, early bed.</div>
+              <div class="msg coach sticker" aria-label="water break reminder">
+                <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="32" cy="32" r="22" fill="currentColor"/><circle cx="39" cy="26" r="4.5" fill="#fff"/></svg>
+                <span>water break</span>
+              </div>
+              <div class="msg coach t turn">your watch says you slept 4 hours. not the day for heavy squats, moved legs to thu. tonight: walk, protein, early bed.</div>
+              <div class="msg user t turn">how full is the gym rn</div>
+              <div class="msg coach card gym" aria-label="gym right now: 68 percent full, filling up, as of 6:11pm">
+                <div class="wk-h"><i class="wk-dot"></i>gym right now<span class="gy-as">as of 6:11pm</span></div>
+                <div class="gy-v">68% full <small>filling up.</small></div>
+                <div class="bar amber"><i style="width:68%"></i></div>
+              </div>
               <div class="msg user t turn">i don't have a watch lol</div>
-              <div class="msg coach t turn">then text me "slept like garbage" and i'll do the same thing. apple watch, whoop, oura, garmin — great if you have one, never required.</div>
+              <div class="msg coach t turn">then text me "slept like garbage" and i'll do the same thing.</div>
             </div>
           </div>
         </div></div></div>
@@ -1204,9 +1339,14 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
         <div class="ph-status">keeping this between us…</div>
       </div>
       <div class="thread coach-left" data-play>
-        <div class="msg user t">wait who else sees all this</div>
-        <div class="msg coach turn">nobody. it's used to coach you, that's it. no ads, nothing sold.</div>
-        <div class="msg coach t">and if you ever want out, text "delete me" and it's gone within 30 days.</div>
+        <div class="msg user t">where can i see everything you have on me</div>
+        <div class="msg coach turn">that page has everything i have saved on u:</div>
+        <div class="msg coach card link" aria-label="your profile on cued.fit">
+          <div class="lk-t">your profile</div>
+          <div class="lk-s">cued.fit</div>
+          <svg class="lk-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 8.5l-2 5-5 2 2-5z" fill="currentColor"/></svg>
+        </div>
+        <div class="msg coach t">it's only used to coach you. no ads, nothing sold. text "delete me" and it's all gone within 30 days.</div>
         <div class="msg user t turn">ok good</div>
       </div>
     </div>
@@ -1591,40 +1731,42 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     if (el.classList.contains('user')) return 'user';
     return 'coach';   // polls and checklists come from the coach
   }
-  function clCheck(row, delay){
-    if (!row || row.classList.contains('done')) return;
-    setTimeout(() => { row.classList.add('done'); row.setAttribute('aria-pressed', 'true'); }, delay);
+  // The set sheet is the thread's final frame: once the conversation has
+  // played (or on a tap of the compact card), the overlay slides up from the
+  // bottom of the chat and holds with set 3's stepper open — the extension
+  // taking the screen. The pinned screen gets a minimum height so the sheet
+  // has room to rise into.
+  function sheetUp(thread){
+    const screen = thread.closest('.screen'); if (!screen) return;
+    const ov = thread._overlay || (thread._overlay = screen.querySelector('.sheet-overlay'));
+    if (!ov || ov.classList.contains('up')) return;
+    const card = thread.querySelector('.sheet-card'); if (card) card.setAttribute('aria-expanded', 'true');
+    ov.setAttribute('aria-hidden', 'false');
+    screen.style.minHeight = Math.max(screen.offsetHeight, ov.scrollHeight + 28) + 'px';   // room for the sheet to rise into, no more
+    setTimeout(() => ov.classList.add('up'), 30);   // a tick after display/min-height land so the slide actually transitions
   }
+  document.querySelectorAll('.step .screen').forEach(sc => { const t = sc.querySelector('.thread[data-play]'), o = sc.querySelector('.sheet-overlay'); if (t) t._overlay = o || null; });
+  window.sheetUp = sheetUp;
+  document.querySelectorAll('.msg.card.sheet-card').forEach(card => {
+    const th = card.closest('.thread');
+    card.addEventListener('click', () => sheetUp(th));
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); sheetUp(th); } });
+  });
   function choreo(el){
     if (el.classList.contains('poll')){
       setTimeout(() => { if (!el.classList.contains('chosen')) el.classList.add('chosen'); }, 800);
     }
-    if (el.classList.contains('checklist')){
-      const rows = el.querySelectorAll('.poll-row');
-      clCheck(rows[0], 600); clCheck(rows[1], 1200);
-    }
-    if (el.classList.contains('cl-swap')){
-      const list = el.parentElement.querySelector('.checklist');
-      if (list){
-        const rows = list.querySelectorAll('.poll-row');
-        const sp = rows[2] && rows[2].querySelector('span');
-        if (sp) sp.textContent = 'bench 190 × 5';
-        clCheck(rows[2], 150);
-      }
-    }
+    // Set sheet: the third set opens its stepper, the weight bumps to 115,
+    // "done" closes it and the set logs — the reader's "felt easy" explains it.
   }
   function revealAll(thread){
     items(thread).forEach(el => {
       el.classList.add('on');
       if (el.classList.contains('poll')) el.classList.add('chosen');
-      if (el.classList.contains('checklist')){
-        const sp = el.querySelectorAll('.poll-row span')[2];
-        if (sp) sp.textContent = 'bench 190 × 5';
-        el.querySelectorAll('.poll-row').forEach(r => { r.classList.add('done'); r.setAttribute('aria-pressed', 'true'); });
-      }
-    });
+      });
     thread.style.transform = '';
     thread.dataset.played = '1';
+    sheetUp(thread);
   }
   function playThread(thread){
     if (thread.dataset.played) return;
@@ -1635,7 +1777,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     let i = 0;
     layout(thread, 0);
     function step(){
-      if (i >= list.length){ typing.remove(); return; }
+      if (i >= list.length){ typing.remove(); setTimeout(() => sheetUp(thread), 2600); return; }
       const el = list[i];
       // typing beat on the incoming side, parked just under the last bubble
       const prev = list[i - 1];
@@ -1684,7 +1826,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
         el.classList.add('on');
         choreo(el);
         next++; busy = false;
-        if (next >= list.length) typing.remove();
+        if (next >= list.length){ typing.remove(); setTimeout(() => sheetUp(thread), 2600); }
         pump();
       }, lead);
     }
@@ -1729,7 +1871,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
         layout(thread, 0);
         choreo(el);
         next++; busy = false;
-        if (next >= n) typing.remove();
+        if (next >= n){ typing.remove(); setTimeout(() => sheetUp(thread), 2600); }
         pump();
       }, waiting ? 380 : 90);
     }
@@ -1753,11 +1895,11 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     rows.forEach(row => row.addEventListener('click', () => {
       rows.forEach(r => { r.classList.toggle('pick', r === row); r.setAttribute('aria-pressed', r === row ? 'true' : 'false'); });
       poll.classList.add('chosen');
-      if (lock) lock.textContent = 'locked. ' + row.dataset.t + ' it is.';
+      if (lock) lock.textContent = row.dataset.t === 'rest day' ? 'alr, rest day it is. i\'ll leave u alone tomorrow.' : 'alr, ' + row.dataset.t + ' it is. i\'ll ping u when the line\'s short.';
     }));
   });
-  // Checklist rows: tapping logs a set; the story skips rows already tapped.
-  document.querySelectorAll('.checklist .poll-row').forEach(row => {
+  // Sheet rows: tapping logs a set (the story skips rows already tapped).
+  document.querySelectorAll('.sh-row').forEach(row => {
     row.addEventListener('click', () => { row.classList.add('done'); row.setAttribute('aria-pressed', 'true'); });
   });
 
@@ -1811,7 +1953,8 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     const screen = phoneWrap.querySelector('.screen');
     screen.innerHTML = '';
     const threads = steps.map(s => s.querySelector('.thread[data-play]'));
-    threads.forEach(t => { t.classList.remove('active'); screen.appendChild(t); });
+    const overlays = steps.map(s => s.querySelector('.sheet-overlay'));   // step 2's set sheet rides along with its thread
+    threads.forEach((t, i) => { t.classList.remove('active'); screen.appendChild(t); if (overlays[i]) screen.appendChild(overlays[i]); });
     steps.forEach((s, i) => {
       const c = s.querySelector('.step-copy');
       copy.appendChild(c);
@@ -1857,7 +2000,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
         rail.appendChild(b); dots.push(b);
       });
     }
-    pinned = {track, sticky, copy, stepper, phoneWrap, screen, threads, mascot, rail, dots,
+    pinned = {track, sticky, copy, stepper, phoneWrap, screen, threads, overlays, mascot, rail, dots,
               status: phoneWrap.querySelector('.ph-status')};
     cur = -1;
     fitPhone();
@@ -1869,7 +2012,9 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     window.removeEventListener('scroll', onScroll);
     pinned.threads.forEach((t, i) => {
       t.classList.add('active');
-      steps[i].querySelector('.screen').appendChild(t);
+      const sc = steps[i].querySelector('.screen');
+      sc.appendChild(t);
+      if (pinned.overlays[i]) sc.appendChild(pinned.overlays[i]);
       t.style.transform = '';
     });
     Array.from(pinned.copy.children).forEach((c, i) => steps[i].querySelector('.wrap').prepend(c));
@@ -1900,6 +2045,9 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     Array.from(stepper.querySelectorAll('button')).forEach((b, k) => k === i ? b.setAttribute('aria-current', 'step') : b.removeAttribute('aria-current'));
     sticky.className = 'proof-sticky ' + tints[i];
     threads.forEach((t, k) => t.classList.toggle('active', k === i));
+    pinned.overlays.forEach((o, k) => { if (o) o.style.display = (k === i) ? '' : 'none'; });
+    pinned.screen.style.minHeight = '';
+    if (pinned.overlays[i] && pinned.overlays[i].classList.contains('up')) pinned.screen.style.minHeight = '520px';
     const t = threads[i];
     if (TIMED){
       if (t.dataset.played){ t.style.transform = ''; }
