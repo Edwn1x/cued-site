@@ -1773,8 +1773,29 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   // Hero: fade the block in on load (400ms).
   const heroIn = document.getElementById('heroIn');
   requestAnimationFrame(() => requestAnimationFrame(() => heroIn && heroIn.classList.add('in')));
+  // The Messages banners over the clip: a cycle, not a sticker (founder, 2026-11-15:
+  // "why does it just stay there? and it's only one?"). Each drops in, holds, slides
+  // back up, and the next follows — one text per thing the coach does. Pauses while
+  // the hero is off screen; reduced motion shows the first one at rest.
   const heroNotif = document.querySelector('.hero-notif');
-  if (heroNotif) setTimeout(() => heroNotif.classList.add('in'), 1500);   // the Messages banner, a beat after the hero has faded in
+  if (heroNotif){
+    const texts = ['gym time tomorrow?', "chem hw's due wed, so legs moves to thu.", 'logged your plate at 740 cal. room for a real dinner.',
+                   'slept 4 hours? not the day for heavy squats.', "gym's 68% full and filling up. go now if u want a rack.", 'water break.'];
+    const line = heroNotif.querySelector('.hn-text');
+    const rm = matchMedia('(prefers-reduced-motion: reduce)');
+    if (rm.matches){ heroNotif.classList.add('in'); }
+    else {
+      let i = 0, visible = true, timer = 0;
+      const HOLD = 3800, GAP = 650, FIRST = 1500;
+      function show(){ line.textContent = texts[i % texts.length]; heroNotif.classList.add('in'); timer = setTimeout(hide, HOLD); }
+      function hide(){ heroNotif.classList.remove('in'); i++; timer = setTimeout(next, GAP); }
+      function next(){ if (visible) show(); else timer = 0; }   // off screen: wait for the observer
+      if ('IntersectionObserver' in window){
+        new IntersectionObserver(es => es.forEach(e => { visible = e.isIntersecting; if (visible && !timer) timer = setTimeout(show, GAP); }), {threshold: 0.2}).observe(heroNotif);
+      }
+      timer = setTimeout(show, FIRST);
+    }
+  }
   requestAnimationFrame(() => document.body.classList.add('anim'));
 
   // Headline rotation: one phrase at a time after "the coach that". The slot
