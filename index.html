@@ -184,7 +184,7 @@ nav .btn{height:44px;padding:0 20px;font-size:16px}
 }
 
 /* ===== HERO ===== */
-#hero{padding:clamp(96px,12vh,140px) 0 clamp(48px,6vw,80px);overflow:hidden;min-height:calc(100svh - 100px);display:flex;align-items:center}   /* 100px short of the viewport so the "say anything." strip peeks under the fold — the scroll cue (founder, 2026-11-14: the full-height hero was "too much vacuum") */
+#hero{padding:clamp(96px,12vh,140px) 0 clamp(48px,6vw,80px);overflow:hidden;min-height:min(calc(100svh - 100px),860px);display:flex;align-items:center}   /* capped at 860px (2026-11-15: on a 1329px-tall screen the centred block floated in ~500px of cream — "too much white space"); otherwise 100px short of the viewport so the "say anything." strip peeks under the fold — the scroll cue (founder, 2026-11-14: the full-height hero was "too much vacuum") */
 #hero .wrap{position:relative;z-index:1;width:100%}
 /* two columns: copy left, the mascot loop right (founder reference, 2026-11-14) */
 .hero-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:clamp(24px,3vw,44px);align-items:center;text-align:left}
@@ -273,10 +273,29 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 .hero-cta{margin-top:28px}
 .js .hero-in{opacity:0;transition:opacity .4s ease}
 .js .hero-in.in{opacity:1}
+/* the Messages notification over the clip (2026-11-15): an iOS banner — rounded icon,
+   sender + "now", one line of text — on a frosted white card at the box's top-right,
+   — centred over the box (left:50% + `translate`, so the slide's `transform` stays
+   free) and mostly ABOVE it (top:-13%), overlapping only its feathered top edge: at
+   top:3% right-aligned it covered the ball in clip 1 (founder's screenshots, 2026-11-15). Slides down 1.5s
+   after load; shown at rest under reduced motion. */
+.hero-visual{position:relative}
+.hero-notif{position:absolute;left:50%;translate:-50% 0;top:-13%;z-index:2;display:flex;gap:11px;align-items:center;width:min(300px,78%);padding:11px 13px;border-radius:18px;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 16px 40px -16px rgba(60,40,20,.38),inset 0 0 0 1px rgba(255,255,255,.65);
+  font-family:var(--f-phone);color:var(--ink);text-align:left;opacity:0;transform:translateY(-16px);transition:opacity .5s var(--ease),transform .65s var(--ease)}
+.hero-notif.in{opacity:1;transform:none}
+.hero-notif img{width:38px;height:38px;border-radius:10px;display:block;object-fit:cover}
+.hn-body{min-width:0;flex:1}
+.hn-row{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;line-height:1.2}
+.hn-row b{font-weight:600}
+.hn-row span{font-size:12px;color:var(--ink-3)}
+.hn-text{font-size:14px;line-height:1.3;margin-top:2px}
 @media(max-width:1023.98px){
   .hero-grid{grid-template-columns:1fr;gap:24px}
   .hero-copy{max-width:640px}
+  .hero-visual{max-width:640px}
   .hero-video{aspect-ratio:16/11;max-width:640px}
+  .hero-notif{top:-30px;width:min(280px,82%)}
 }
 .campanile{position:absolute;left:-6%;bottom:-4%;width:min(64vw,920px);opacity:.4;pointer-events:none;user-select:none;z-index:0}
 .campanile img{display:block;width:100%;height:auto}
@@ -605,13 +624,37 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 #proof .ph-avatar{width:48px;height:48px}
 #proof .ph-name{font-family:var(--f-ui);font-size:14px;font-weight:500;margin-top:8px;color:var(--ink)}
 #proof .ph-status{margin-top:6px;height:26px;padding:0 12px;border-radius:13px;font-family:var(--f-ui);font-size:12.5px;background:var(--card);color:var(--gray-text)}
-#proof .screen{flex:none;height:auto;max-height:min(560px,calc(100vh - 240px));padding:0 0 8px}
+#proof .screen{flex:none;height:auto;max-height:min(560px,calc(100vh - 292px));padding:0 0 8px}   /* 292: the header plus the composer row under the screen */
 /* short laptop viewports: a slightly smaller thread so the longest step (i remember) fits the box */
 @media(min-width:1024px) and (max-height:780px){#proof .thread{font-size:15px}#proof .screen{max-height:calc(100vh - 220px)}}   /* sized to the active thread (capped) so the header sits right above the first bubble; flex:none — the base .screen is flex:1 */
 #proof .thread{font-family:var(--f-ui);font-size:clamp(15px,1.15vw,16.5px)}
 #proof .msg{max-width:86%;padding:.7em .95em;border-radius:1.1em;line-height:1.38;text-align:left}
 #proof .msg.turn{margin-top:.6em}
-#proof .msg.t::before,#proof .msg.t::after{content:none}   /* plain rounded bubbles, no tails */
+/* iMessage cues (2026-11-15 — a reader: "make the iMessage conversation more
+   prominent, to highlight that it lives in your iMessage"; the unframed restyle had
+   left generic chat panels). Tails are back as ONE colour extension per bubble shaped
+   by a mask — the page's two-pseudo carve would notch the white halo behind the chat
+   with a cream wedge. Cards, photos, stickers and the chart stay tail-less. */
+#proof .msg.t::after,.thread-card .msg.t::after{content:none}
+#proof .msg.user.t::before,.thread-card .msg.user.t::before{right:-.35em;width:1em;background:var(--bubble-user);border-bottom-left-radius:.8em .7em;
+  -webkit-mask:linear-gradient(#000,#000) 0 0/.65em 100% no-repeat,radial-gradient(circle .5em at .5em 0,transparent 97%,#000 100%) .65em .5em/.35em .5em no-repeat;
+          mask:linear-gradient(#000,#000) 0 0/.65em 100% no-repeat,radial-gradient(circle .5em at .5em 0,transparent 97%,#000 100%) .65em .5em/.35em .5em no-repeat}
+#proof .msg.coach.t::before,.thread-card .msg.coach.t::before{left:-.35em;width:1em;background:var(--bubble-coach);border-bottom-right-radius:.8em .7em;
+  -webkit-mask:linear-gradient(#000,#000) .35em 0/.65em 100% no-repeat,radial-gradient(circle .5em at -.15em 0,transparent 97%,#000 100%) 0 .5em/.35em .5em no-repeat;
+          mask:linear-gradient(#000,#000) .35em 0/.65em 100% no-repeat,radial-gradient(circle .5em at -.15em 0,transparent 97%,#000 100%) 0 .5em/.35em .5em no-repeat}
+#proof .msg.t:is(.card,.photo,.chart,.sticker)::before,.thread-card .msg.t:is(.card,.photo,.chart,.sticker)::before{content:none}
+/* the caption real threads open with, "Delivered" under the reader's latest bubble, and the composer */
+.ts-cap{align-self:center;text-align:center;font-size:.68em;line-height:1.4;color:var(--ink-3);margin:0 0 .8em;letter-spacing:.01em}
+.ts-cap b{display:block;font-weight:600}
+.dlv{align-self:flex-end;font-size:.66em;font-weight:500;color:var(--ink-3);margin:.15em .35em 0 0;line-height:1.2;opacity:0;transition:opacity .25s ease}
+.msg.on + .dlv,html:not(.js) .dlv,.thread:not([data-play]) .dlv{opacity:1}
+.ph-compose{display:flex;align-items:center;gap:10px;padding:10px 0 0;margin-top:2px;font-family:var(--f-ui)}
+.pc-plus{flex:none;width:32px;height:32px;border-radius:50%;background:var(--fill);position:relative}
+.pc-plus::before,.pc-plus::after{content:'';position:absolute;left:50%;top:50%;width:12px;height:1.8px;background:var(--ink-3);transform:translate(-50%,-50%)}
+.pc-plus::after{transform:translate(-50%,-50%) rotate(90deg)}
+.pc-field{flex:1;display:flex;align-items:center;justify-content:space-between;height:36px;padding:0 6px 0 14px;border-radius:18px;background:var(--card);border:1px solid var(--line);color:var(--ink-3);font-size:15px}
+.pc-mic{width:26px;height:26px;color:var(--ink-3)}
+.pc-mic svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 #proof .poll,#proof .checklist{width:88%;font-size:.7em}
 #proof .msg.photo{max-width:46%}
 #proof .msg.chart svg{width:12em}
@@ -689,7 +732,6 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 .thread-card .thread{font-family:var(--f-ui);font-size:clamp(15px,1.15vw,16.5px)}
 .thread-card .msg{max-width:86%;padding:.7em .95em;border-radius:1.1em;line-height:1.38;text-align:left}
 .thread-card .msg.turn{margin-top:.6em}
-.thread-card .msg.t::before,.thread-card .msg.t::after{content:none}
 @media(max-width:1023.98px){
   .two{grid-template-columns:1fr;gap:40px}
 }
@@ -844,8 +886,9 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   .thread[data-play]{transition:none!important;transform:none!important}
   .poll-row,.poll-row i,.poll-row i::after{transition:none!important;animation:none!important}
   .ph-status::before{animation:none}
-  .float-cta,.hero-in,.rot-item,.rail,.rail .dot,.rail button::after,.m-cta,.m-cta .btn{transition:none}
+  .float-cta,.hero-in,.rot-item,.rail,.rail .dot,.rail button::after,.m-cta,.m-cta .btn,.hero-notif{transition:none}
   .js .hero-in{opacity:1}
+  .hero-notif{opacity:1;transform:none}
 }
 
 /* ===== SIGN-UP — the form =====
@@ -1103,7 +1146,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   <div class="wrap hero-in hero-grid" id="heroIn">
     <div class="hero-copy">
       <h1 class="hero-h"><span class="kicker">meet cued</span>the fitness coach that<span class="sr-only"> lives in your texts.</span><span class="rot" id="heroRot" aria-hidden="true"><span class="rot-item on">lives in your texts.</span><span class="rot-item">replaces <span class="rot-icons"><img src="images/app-icons/hevy.png" alt="Hevy"><img src="images/app-icons/MyFitnessPal%20Review.jpg" alt="MyFitnessPal"><img src="images/app-icons/MacroFactor-MacroTracker_icon.png" alt="MacroFactor"><img src="images/app-icons/notes.png" alt="Notes"><img src="images/app-icons/reminders_app.webp" alt="Reminders"><img src="images/app-icons/pen_paper.png" alt="pen and paper"></span></span><span class="rot-item">builds your workouts.</span><span class="rot-item">tracks your food.</span><span class="rot-item">knows the college life.</span><span class="rot-item">knows your schedule.</span></span></h1>
-      <p class="hero-sub">it knows your classes, replaces your lift and meal apps, and texts first. <span class="b">nothing to download.</span></p>
+      <p class="hero-sub">knows your class schedule, your lifts and your food. <span class="b">all over text.</span></p>
       <div class="hero-cta"><button type="button" class="btn sq" id="heroCtaTop">text cued</button></div>
     </div>
     <!-- The mascot: two locked-off render clips (founder, 2026-11-14) played
@@ -1113,6 +1156,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
          under reduced motion. The first clip keeps autoplay+loop as the
          no-JS fallback. Not in LFS on purpose — GitHub Pages serves LFS
          pointers, not the file. -->
+    <div class="hero-visual">
     <div class="hero-video" id="heroVideo" aria-hidden="true">
       <video class="on" src="assets/hero/cued-hero.mp4" poster="assets/hero/cued-hero-poster.jpg" autoplay muted loop playsinline preload="auto" disablepictureinpicture disableremoteplayback></video>
       <video src="assets/hero/cued-hero-2.mp4" muted playsinline preload="auto" disablepictureinpicture disableremoteplayback></video>
@@ -1121,6 +1165,14 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
            paints a paused player with controls over the hero. -->
       <picture class="hero-still on"><source srcset="assets/hero/cued-hero-still.webp" type="image/webp"><img src="assets/hero/cued-hero-still.jpg" alt="" width="1200" height="900"></picture>
       <picture class="hero-still"><source srcset="assets/hero/cued-hero-still-2.webp" type="image/webp"><img src="assets/hero/cued-hero-still-2.jpg" alt="" width="1200" height="900" loading="lazy"></picture>
+    </div>
+    <!-- A Messages notification drops in over the clip a beat after load: the one
+         place the hero shows the medium itself (a reader, 2026-11-15: "highlight
+         that it lives in your iMessage"). Decorative; the headline says texts. -->
+    <div class="hero-notif" aria-hidden="true">
+      <img src="images/imessage-icon.png" alt="" width="38" height="38">
+      <div class="hn-body"><div class="hn-row"><b>cued</b><span>now</span></div><div class="hn-text">gym time tomorrow?</div></div>
+    </div>
     </div>
   </div>
 </section>
@@ -1159,7 +1211,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
             <div class="ph-status">reading your calendar…</div>
           </div>
           <div class="screen">
-            <div class="thread coach-left" data-play>
+            <div class="thread coach-left" data-play data-cap="today · 8:02 am">
               <div class="msg coach card wk" aria-label="this week: classes most days, a lab tuesday, chem homework wednesday, club thursday, chem quiz friday, push monday and legs thursday">
                 <div class="wk-h"><i class="wk-dot"></i>this week</div>
                 <div class="wk-grid">
@@ -1199,7 +1251,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
             <div class="ph-status">logging your sets…</div>
           </div>
           <div class="screen">
-            <div class="thread coach-left" data-play>
+            <div class="thread coach-left" data-play data-cap="sat · 5:48 pm">
               <div class="msg coach t">push day. bench 110 for 4×5, if it all moves easy we jump next time.</div>
               <div class="msg coach card sheet-card" role="button" tabindex="0" aria-expanded="false" aria-label="workout card: push, saturday — tap to open the set sheet">
                 <div class="sh-compact"><i class="wk-dot"></i><div><div class="sh-ct">push · sat</div><div class="sh-cs">bench press — tap to start</div></div></div>
@@ -1244,7 +1296,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
             <div class="ph-status">logging your plate…</div>
           </div>
           <div class="screen">
-            <div class="thread coach-left" data-play>
+            <div class="thread coach-left" data-play data-cap="today · 1:12 pm">
               <div class="msg user photo"><img src="images/dinner-plate.jpg" width="1000" height="855" loading="lazy" alt="photo of a dinner plate: sliced tri-tip with chimichurri, roasted sweet potatoes, broccoli and cauliflower"></div>
               <div class="msg user t">ate this from the dining hall</div>
               <div class="msg coach turn">i logged your plate at 740 cal. portions are my guesses: about 5oz of beef with the veg, 1 medium sweet potato. fix any of those.</div>
@@ -1276,7 +1328,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
             <div class="ph-status">picking up where we left off…</div>
           </div>
           <div class="screen">
-            <div class="thread coach-left" data-play>
+            <div class="thread coach-left" data-play data-cap="fri · 4:21 pm">
               <div class="msg user t">heading home for the weekend, back sunday night</div>
               <div class="msg coach turn">got it, i'll hold the gym pings till you're back. legs is next whenever you are</div>
               <div class="msg user t turn tap">my mom's bday is tmrw btw</div>
@@ -1309,7 +1361,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
             <div class="ph-status">reading last night's sleep…</div>
           </div>
           <div class="screen">
-            <div class="thread coach-left" data-play>
+            <div class="thread coach-left" data-play data-cap="today · 6:11 pm">
               <div class="msg coach sticker" aria-label="water break reminder">
                 <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="32" cy="32" r="22" fill="currentColor"/><circle cx="39" cy="26" r="4.5" fill="#fff"/></svg>
                 <span>water break</span>
@@ -1378,7 +1430,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
         <div class="ph-name">cued</div>
         <div class="ph-status">keeping this between us…</div>
       </div>
-      <div class="thread coach-left" data-play>
+      <div class="thread coach-left" data-play data-cap="today · 9:30 pm">
         <div class="msg user t">where can i see everything you have on me</div>
         <div class="msg coach turn">that page has everything i have saved on u:</div>
         <div class="msg coach card link" aria-label="your profile on cued.fit">
@@ -1723,6 +1775,29 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   // Hero: fade the block in on load (400ms).
   const heroIn = document.getElementById('heroIn');
   requestAnimationFrame(() => requestAnimationFrame(() => heroIn && heroIn.classList.add('in')));
+  // The Messages banners over the clip: a cycle, not a sticker (founder, 2026-11-15:
+  // "why does it just stay there? and it's only one?"). Each drops in, holds, slides
+  // back up, and the next follows — one text per thing the coach does. Pauses while
+  // the hero is off screen; reduced motion shows the first one at rest.
+  const heroNotif = document.querySelector('.hero-notif');
+  if (heroNotif){
+    const texts = ['gym time tomorrow?', "chem hw's due wed, so legs moves to thu.", 'logged your plate at 740 cal. room for a real dinner.',
+                   'slept 4 hours? not the day for heavy squats.', "gym's 68% full and filling up. go now if u want a rack.", 'water break.'];
+    const line = heroNotif.querySelector('.hn-text');
+    const rm = matchMedia('(prefers-reduced-motion: reduce)');
+    if (rm.matches){ heroNotif.classList.add('in'); }
+    else {
+      let i = 0, visible = true, timer = 0;
+      const HOLD = 3800, GAP = 650, FIRST = 1500;
+      function show(){ line.textContent = texts[i % texts.length]; heroNotif.classList.add('in'); timer = setTimeout(hide, HOLD); }
+      function hide(){ heroNotif.classList.remove('in'); i++; timer = setTimeout(next, GAP); }
+      function next(){ if (visible) show(); else timer = 0; }   // off screen: wait for the observer
+      if ('IntersectionObserver' in window){
+        new IntersectionObserver(es => es.forEach(e => { visible = e.isIntersecting; if (visible && !timer) timer = setTimeout(show, GAP); }), {threshold: 0.2}).observe(heroNotif);
+      }
+      timer = setTimeout(show, FIRST);
+    }
+  }
   requestAnimationFrame(() => document.body.classList.add('anim'));
 
   // Headline rotation: one phrase at a time after "the coach that". The slot
@@ -1971,6 +2046,24 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
 // motion: everything revealed at once, poll picked, sets logged.
 (function(){
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  // iMessage cues (2026-11-15): before any player runs — and before pinProof clones
+  // step 1's phone — every thread gets the caption real threads open with (from
+  // data-cap) and "Delivered" under the reader's latest bubble; every phone screen
+  // and the privacy card get a composer row. The caption and "Delivered" are NOT
+  // items (items() skips them): the caption just rides above the first bubble, and
+  // "Delivered" fades in with the bubble before it (`.msg.on + .dlv`).
+  document.querySelectorAll('.thread[data-cap]').forEach(t => {
+    const cap = document.createElement('div'); cap.className = 'ts-cap'; cap.setAttribute('aria-hidden', 'true');
+    cap.innerHTML = '<b>iMessage</b>'; cap.appendChild(document.createTextNode(t.dataset.cap));
+    t.prepend(cap);
+    const users = t.querySelectorAll(':scope > .msg.user'); const lastUser = users[users.length - 1];
+    if (lastUser){ const d = document.createElement('div'); d.className = 'dlv'; d.setAttribute('aria-hidden', 'true'); d.textContent = 'Delivered'; lastUser.after(d); }
+  });
+  document.querySelectorAll('.phone-screen, .thread-card').forEach(host => {
+    const c = document.createElement('div'); c.className = 'ph-compose'; c.setAttribute('aria-hidden', 'true');
+    c.innerHTML = '<i class="pc-plus"></i><div class="pc-field"><span>iMessage</span><i class="pc-mic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></i></div>';
+    host.appendChild(c);
+  });
   const TYPE_LEAD = 520, GAP = 560;
 
   function mkTyping(thread){
@@ -1981,14 +2074,16 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     return t;
   }
   function items(thread){
-    return Array.from(thread.children).filter(el => !el.classList.contains('typing'));
+    return Array.from(thread.children).filter(el => !el.classList.contains('typing') && !el.classList.contains('ts-cap') && !el.classList.contains('dlv'));
   }
   // Bottom-anchor math: translate the thread down by the unrevealed height
   // (plus the typing pill's room while it shows).
   function layout(thread, lift){
     const list = items(thread);
     const last = list.filter(el => el.classList.contains('on')).pop();
-    const revealedBottom = last ? last.offsetTop + last.offsetHeight : 0;
+    // a "Delivered" line under the last revealed bubble is revealed with it
+    const tail = last && last.nextElementSibling && last.nextElementSibling.classList.contains('dlv') ? last.nextElementSibling : last;
+    const revealedBottom = tail ? tail.offsetTop + tail.offsetHeight : 0;
     const shift = Math.max(0, thread.offsetHeight - revealedBottom) - (lift || 0);
     thread.style.transform = 'translateY(' + Math.round(shift) + 'px)';
   }
