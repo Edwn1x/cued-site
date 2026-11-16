@@ -293,9 +293,11 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 @media(max-width:1023.98px){
   .hero-grid{grid-template-columns:1fr;gap:24px}
   .hero-copy{max-width:640px}
-  .hero-visual{max-width:640px}
-  .hero-video{aspect-ratio:16/11;max-width:640px}
-  .hero-notif{top:-30px;width:min(280px,82%)}
+  /* stacked: the banner gets its own band between the sub-line and the picture — floated
+     above the box it sat on the sub-line (founder's phone, 2026-11-15) */
+  .hero-visual{max-width:640px;display:flex;flex-direction:column;align-items:center}
+  .hero-video{aspect-ratio:16/11;max-width:640px;width:100%}
+  .hero-notif{position:relative;order:-1;left:auto;top:auto;translate:none;width:min(300px,100%);margin:0 0 10px}
 }
 .campanile{position:absolute;left:-6%;bottom:-4%;width:min(64vw,920px);opacity:.4;pointer-events:none;user-select:none;z-index:0}
 .campanile img{display:block;width:100%;height:auto}
