@@ -1569,9 +1569,9 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
           </div>
         </div>
 
-        <div class="fo-sec opt">
-          <h3 class="fo-sec-h">a bit about you <small>optional</small></h3>
-          <p class="fo-sec-note">everything from here is optional. it makes my first texts better — skip anything and i'll just ask over text.</p>
+        <div class="fo-sec">
+          <h3 class="fo-sec-h">a bit about you</h3>
+          <p class="fo-sec-note">this is what your targets and first workout are built from.</p>
           <div class="fo-field short" data-f="age">
             <button type="button" class="fo-q" id="foQ-age" aria-expanded="false" aria-controls="foA-age"><span class="fo-qt">age</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
             <div class="fo-a" id="foA-age" role="region" aria-labelledby="foQ-age"><div class="fo-ai"><div class="fo-body">
@@ -1613,8 +1613,8 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
             </div></div></div>
           </div>
         </div>
-        <div class="fo-sec opt">
-          <h3 class="fo-sec-h">your training <small>optional</small></h3>
+        <div class="fo-sec">
+          <h3 class="fo-sec-h">your training</h3>
           <div class="fo-field" data-f="goals">
             <button type="button" class="fo-q" id="foQ-goals" aria-expanded="false" aria-controls="foA-goals"><span class="fo-qt">what are you training for? <small>pick all that apply</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
             <div class="fo-a" id="foA-goals" role="region" aria-labelledby="foQ-goals"><div class="fo-ai"><div class="fo-body">
@@ -2585,10 +2585,17 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   // ── reading the form ──
   const fieldOf = name => overlay.querySelector(`[data-f="${name}"]`);   // rows in the form, plus the consent row in the footer
   const ORDER = [...form.querySelectorAll('.fo-field')].map(f => f.dataset.f);   // the rows, DOM order — the accordion walks it
-  // What the backend needs to create the account and text (app.py /waitlist): a
-  // name, a number, consent. Every other row is optional — the coach's
-  // onboarding asks over text for whatever arrives null (founder, 2026-11-14).
-  const MUST = ['name', 'phone', 'occupation', 'consent'];   // occupation (founder, 2026-11-14): profiles by occupation and school are coming; the backend's User.occupation is free text it reads with startswith("student")
+  // Every question row is required (founder, 2026-11-20 — reverting the 11-14
+  // "only name, number and consent" middle ground: of the first four sign-ups on
+  // it, three skipped everything, and the coach then had to collect the whole
+  // profile over text at ~25s a turn — "This is so slow" (user 96), a nine-question
+  // catch-up bundle, two who never answered the kickoff — the exact slow path
+  // the form was built to replace). Only allergies, gmail and a friend's code may
+  // stay blank; they post null. occupation (founder, 2026-11-14): profiles by
+  // occupation and school are coming; the backend's User.occupation is free text
+  // it reads with startswith("student").
+  const SKIPPABLE = ['restrictions', 'email', 'referral'];
+  const MUST = ORDER.filter(n => !SKIPPABLE.includes(n)).concat('consent');
   const stats = fieldOf('stats');
   const isMetricRow = el => { const row = el.closest('.fo-us, .fo-metric'); return !row || (stats.classList.contains('metric') === row.classList.contains('fo-metric')); };
   const num = el => { const v = parseFloat(String(el.value).replace(',', '.')); return Number.isFinite(v) ? v : NaN; };
@@ -2620,9 +2627,9 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   const one  = v => Array.isArray(v) && v.length === 1;
   const some = v => Array.isArray(v) && v.length > 0;
   const statsTouched = () => [...stats.querySelectorAll('.fo-in')].filter(isMetricRow).some(i => i.value.trim() !== '');
-  // VALID = "may be posted as is": the three MUST rows need a real answer; an
-  // optional row passes when it's answered OR untouched (a half-typed height &
-  // weight, a 2-digit number or a bad email are still refused — never a wrong fact).
+  // VALID = "may be posted as is" (never a wrong fact: a half-typed height &
+  // weight, a 4-digit age or a bad email are refused). Whether a blank row may be
+  // LEFT blank is MUST's call, checked beside VALID in advance() and on submit.
   const VALID = {
     name: v => v.length > 0,
     phone: validPhone,
@@ -2714,9 +2721,10 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     scrollToRow(name);
     focusIn(name);
   }
-  // Leave a row: a MUST row has to be answered; an optional one is a skip, unless
-  // it's half-typed (VALID refuses it).
+  // Leave a row: a MUST row has to be answered; a skippable one (allergies, gmail,
+  // referral code) is a skip, unless it's half-typed (VALID refuses it).
   function advance(name){
+    if (!fieldOf(name)) return;   // the 240ms fold timer after a pick can fire once the success screen has replaced the form
     if (!VALID[name](read(name)) || (MUST.includes(name) && !answered(name))) { flag(name); return; }
     passed.add(name);
     setOpen(name, false);
@@ -2732,14 +2740,12 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     if (nxt) nxt.textContent = (!done && !MUST.includes(name)) ? 'skip' : 'next';
     setLabel();
   }
-  // The button says what will happen: with name, number and consent in and rows
-  // left blank it's "sign up now, i'll ask the rest over text"; everything
-  // answered (or nothing of the three yet) and it's plain "sign up".
+  // The button reads "sign up" throughout. (2026-11-14 → 11-20 it switched to
+  // "sign up now, i'll ask the rest over text" once the three required rows were
+  // in — the rows are all required again, so there is no "rest".)
   function setLabel(){
     if (busy) return;
-    const minimum = MUST.every(answered);
-    const rest = ORDER.filter(n => !MUST.includes(n) && !['email', 'referral', 'restrictions'].includes(n) && !answered(n)).length;
-    submitBtn.textContent = minimum && rest ? "sign up now, i'll ask the rest over text" : 'sign up';
+    submitBtn.textContent = 'sign up';
   }
   // The first time a field has a valid answer its step fires (optional
   // restrictions: when something is typed). Any flag on it clears as they fix it.
@@ -2875,8 +2881,8 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
       active: false,
       status: 'waitlist',
       ...(() => { const o = occupationOf(); return { occupation: o.occupation, occupation_kind: o.kind, school: o.school, job: o.job }; })(),
-      // Optional rows post null when blank: the backend fills its defaults and the
-      // coach's onboarding asks over text for what's missing.
+      // Every question row is required, so these all arrive; only allergies, gmail
+      // and the referral code may be blank, and post null.
       age: read('age') ? Number(read('age')) : null,
       gender: read('gender')[0] || null,
       goal: read('goals').length ? read('goals') : null,
