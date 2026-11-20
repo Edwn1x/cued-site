@@ -103,7 +103,10 @@ test('every CTA reads "text cued"; the card is a form, not a chat; name and phon
   const fine = d.querySelector('#coInputArea .fo-consent');
   assert.ok(fine);
   assert.deepEqual([...d.querySelectorAll('#coForm .fo-sec-h')].map(h => h.firstChild.textContent.trim()), ['about you', 'a bit about you', 'your training', 'last things']);
-  assert.deepEqual([...d.querySelectorAll('#coForm .fo-sec.opt .fo-sec-h small')].map(x => x.textContent), ['optional', 'optional', 'optional']);
+  // only "last things" (gmail, referral code) is marked optional — every question row is required again (founder, 2026-11-20)
+  assert.deepEqual([...d.querySelectorAll('#coForm .fo-sec.opt .fo-sec-h')].map(h => h.firstChild.textContent.trim()), ['last things']);
+  assert.deepEqual([...d.querySelectorAll('#coForm .fo-sec-h small')].map(x => x.textContent), ['optional']);
+  assert.doesNotMatch(d.querySelector('#coForm').textContent, /everything from here is optional/);
   assert.match(fine.textContent, /recurring automated texts/);
   assert.deepEqual([...fine.querySelectorAll('a')].map(a => a.getAttribute('href')), ['terms.html', 'privacy.html']);   // relative: this page is the root
 });
@@ -233,15 +236,22 @@ test('nothing posts until name, number and consent are in: the first gap is flag
   submit(d); await new Promise(r => setTimeout(r, 20));
   assert.ok(field(d, 'occupation').classList.contains('bad') && isOpen(d, 'occupation'), 'occupation is required, the third row'); assert.equal(posted.length, 0);
   pick(d, 'occupation', 'something else');
-  // a half-typed height & weight is refused (never a wrong fact), an empty one is fine
+  // age is required and comes before height & weight: a blank age is the next flag
+  submit(d); await new Promise(r => setTimeout(r, 20));
+  assert.ok(field(d, 'age').classList.contains('bad') && isOpen(d, 'age'), 'age is required'); assert.equal(posted.length, 0);
+  type(d, 'age', '2'); pick(d, 'gender', 'male');
+  // a half-typed height & weight is refused (never a wrong fact); a blank one is a required gap
   type(d, 'stats', '5', '.fo-in[data-k=ft]'); submit(d); await new Promise(r => setTimeout(r, 20));
   assert.ok(field(d, 'stats').classList.contains('bad') && isOpen(d, 'stats')); assert.equal(posted.length, 0);
-  type(d, 'stats', '', '.fo-in[data-k=ft]');
-  type(d, 'age', '2'); submit(d); await new Promise(r => setTimeout(r, 20));
-  assert.ok(!field(d, 'age').classList.contains('bad'), 'a 1-digit age is a valid age'); 
-  type(d, 'age', '20'); pick(d, 'gender', 'male'); stats(d); pick(d, 'goals', 'endurance'); pick(d, 'obstacle', 'time');
+  type(d, 'stats', '', '.fo-in[data-k=ft]'); submit(d); await new Promise(r => setTimeout(r, 20));
+  assert.ok(field(d, 'stats').classList.contains('bad') && isOpen(d, 'stats'), 'blank height & weight is flagged, not skipped'); assert.equal(posted.length, 0);
+  assert.ok(!field(d, 'age').classList.contains('bad'), 'a 1-digit age is a valid age');
+  type(d, 'age', '20'); stats(d); pick(d, 'goals', 'endurance'); pick(d, 'obstacle', 'time');
   pick(d, 'experience', '2+ years'); pick(d, 'equipment', 'bodyweight only'); pick(d, 'days', '2'); pick(d, 'time', 'mornings');
-  pick(d, 'diet', 'halal'); pick(d, 'apps', 'whoop');
+  pick(d, 'diet', 'halal');
+  submit(d); await new Promise(r => setTimeout(r, 20));
+  assert.ok(field(d, 'apps').classList.contains('bad') && isOpen(d, 'apps'), '"track anything?" is required too'); assert.equal(posted.length, 0);
+  pick(d, 'apps', 'whoop');
   type(d, 'email', 'not-an-email'); submit(d); await new Promise(r => setTimeout(r, 20));
   assert.ok(field(d, 'email').classList.contains('bad')); assert.equal(posted.length, 0);
   type(d, 'email', ''); submit(d); await new Promise(r => setTimeout(r, 20));
@@ -272,7 +282,8 @@ test('rejected and offline: the server\'s word shows above the button, the form 
 
 // The accordion (founder 2026-11-14): one row per question; answering folds the row to a
 // one-line summary and opens the next unanswered one; typed / multi-pick rows wait for Enter
-// or "next" ("skip" on an empty optional); any row opens on a tap; a flagged row opens.
+// or "next" ("skip" on an empty skippable row — allergies, gmail, referral code); any row
+// opens on a tap; a flagged row opens.
 const isOpen = (d, name) => field(d, name).classList.contains('open');
 const summary = (d, name) => field(d, name).querySelector('.fo-qv').textContent;
 test('accordion: the first row opens; a single pick folds it and opens the next; typed and multi rows advance on Enter / next', async () => {
@@ -311,18 +322,19 @@ test('accordion: the first row opens; a single pick folds it and opens the next;
   assert.ok(isOpen(d, 'goals'), 'multi-pick waits for next');
   field(d, 'goals').querySelector('.fo-next').click();
   assert.ok(isOpen(d, 'obstacle')); assert.equal(summary(d, 'goals'), 'lose fat, build muscle');
-  // an optional row left blank skips on next; a MUST row left blank is flagged instead of moving on
+  // a question row left blank is flagged instead of moving on (required again, founder 2026-11-20)
   field(d, 'goals').querySelector('.fo-q').click(); assert.ok(isOpen(d, 'goals'), 'any row re-opens on a tap');
   pick(d, 'goals', 'lose fat', 'build muscle');   // un-pick both
-  assert.equal(field(d, 'goals').querySelector('.fo-next').textContent, 'skip');
+  assert.equal(field(d, 'goals').querySelector('.fo-next').textContent, 'next', 'no "skip" on a required row');
   field(d, 'goals').querySelector('.fo-next').click();
-  assert.ok(!isOpen(d, 'goals') && !field(d, 'goals').classList.contains('bad'), 'blank optional row skips');
+  assert.ok(isOpen(d, 'goals') && field(d, 'goals').classList.contains('bad'), 'a blank goals row cannot be skipped');
+  pick(d, 'goals', 'lose fat');
   field(d, 'phone').querySelector('.fo-q').click(); type(d, 'phone', '');
   field(d, 'phone').querySelector('.fo-next').click();
   assert.ok(field(d, 'phone').classList.contains('bad') && isOpen(d, 'phone'), 'a blank number cannot be skipped');
 });
 
-test('accordion: optional rows skip on next, their button reads "skip" until typed; consent folds to "agreed"; a flagged row opens', async () => {
+test('accordion: the skippable rows (allergies, gmail, referral) skip on next, their button reads "skip" until typed; a flagged row opens', async () => {
   const { w, d } = boot(() => ({ status: 'ok', live: true }));
   await until(() => typeof w.openWaitlist === 'function');
   w.openWaitlist('hero');
@@ -347,46 +359,44 @@ test('copy: "estimate is fine", never "ballpark"', () => {
   assert.match(field(d, 'stats').textContent, /estimate is fine/);
 });
 
-// The middle ground (founder 2026-11-14): name, number and consent are all the backend needs
-// (app.py /waitlist); every other row is optional and the coach asks over text for what's null.
-test('minimal sign-up: name + number + consent posts with the rest null; the button says so; "skip" on every optional row', async () => {
+// Every question row is required (founder 2026-11-20, reverting the 11-14 middle ground):
+// the backend creates the account from name, number and consent, but the coach needs the
+// profile to build targets and the first card — three of the first four readers on the
+// optional form skipped it all and spent the first five minutes answering it over text.
+test('required form: name + number + occupation + consent alone are refused at the first blank question; "skip" only on allergies, gmail and the referral code; the button always reads "sign up"', async () => {
   const { w, d, posted } = boot(() => ({ status: 'ok', live: true, imessage_link: null }));
   await until(() => typeof w.openWaitlist === 'function');
   w.openWaitlist('hero');
   assert.equal(d.getElementById('coSubmit').textContent, 'sign up');
-  type(d, 'name', 'Edwin Ruiz'); type(d, 'phone', '5105550123');
+  type(d, 'name', 'Edwin Ruiz'); type(d, 'phone', '5105550123'); pick(d, 'occupation', 'i work');
   consent(d);
-  assert.equal(d.getElementById('coSubmit').textContent, 'sign up', 'not until occupation');
-  pick(d, 'occupation', 'i work');
-  assert.equal(d.getElementById('coSubmit').textContent, "sign up now, i'll ask the rest over text");
-  for (const n of ['age', 'stats', 'goals', 'time', 'restrictions', 'apps', 'email', 'referral']) assert.equal(field(d, n).querySelector('.fo-next').textContent, 'skip', n);
-  assert.equal(field(d, 'name').querySelector('.fo-next').textContent, 'next');
+  assert.equal(d.getElementById('coSubmit').textContent, 'sign up', 'no "ask the rest over text" offer');
+  for (const n of ['age', 'stats', 'goals', 'obstacle', 'experience', 'equipment', 'days', 'time', 'diet', 'apps']) assert.equal(field(d, n).querySelector('.fo-next')?.textContent ?? 'next', 'next', n);
+  for (const n of ['restrictions', 'email', 'referral']) assert.equal(field(d, n).querySelector('.fo-next').textContent, 'skip', n);
+  submit(d); await new Promise(r => setTimeout(r, 20));
+  assert.equal(posted.length, 0, 'nothing posts');
+  assert.ok(field(d, 'age').classList.contains('bad') && isOpen(d, 'age'), 'the first blank question (age) is flagged and opened');
+  type(d, 'age', '20'); pick(d, 'gender', 'female'); stats(d); pick(d, 'goals', 'build muscle'); pick(d, 'obstacle', 'time');
+  pick(d, 'experience', '2+ years'); pick(d, 'equipment', 'full gym'); pick(d, 'days', '3'); pick(d, 'time', 'evenings'); pick(d, 'diet', 'vegan');
+  pick(d, 'apps', 'nothing yet');
+  assert.equal(d.getElementById('coSubmit').textContent, 'sign up');
   submit(d);
   const s = await success(d);
   assert.equal(s.querySelector('h3').textContent, "you're in, Edwin.");
   const p = posted[0].body;
-  assert.equal(p.name, 'Edwin'); assert.equal(p.phone, '(510) 555-0123'); assert.equal(p.sms_consent, true);
-  assert.equal(p.occupation, 'working'); assert.equal(p.occupation_kind, 'working'); assert.equal(p.school, null); assert.equal(p.job, null);
-  for (const k of ['age', 'gender', 'goal', 'biggest_obstacle', 'experience', 'equipment', 'workout_days', 'workout_time', 'workout_times', 'diet', 'restrictions', 'existing_tools', 'email', 'referral_code']) assert.equal(p[k], null, k);
-  for (const k of ['height_ft', 'height_in', 'weight_lbs', 'height_cm', 'weight_kg']) assert.ok(!(k in p), k);
+  assert.equal(p.occupation, 'working'); assert.equal(p.age, 20); assert.equal(p.gender, 'female');
+  assert.equal(p.height_ft, 5); assert.equal(p.weight_lbs, 139); assert.deepEqual(p.goal, ['muscle_building']);
+  assert.equal(p.biggest_obstacle, 'time'); assert.equal(p.experience, 'advanced'); assert.equal(p.equipment, 'full_gym');
+  assert.equal(p.workout_days, '3'); assert.equal(p.workout_time, 'evening'); assert.equal(p.diet, 'vegan'); assert.deepEqual(p.existing_tools, ['none']);
+  // the three skippable rows post null when blank
+  assert.equal(p.restrictions, null); assert.equal(p.email, null); assert.equal(p.referral_code, null);
 });
 
-test('the button goes back to "sign up" once every question is answered', async () => {
-  const { w, d } = boot(() => ({ status: 'ok', live: true }));
-  await walk(w, d);   // walk answers everything and submits
-  // re-check the label just before the post: boot a fresh one and stop short of submit
-  const r = boot(() => ({ status: 'ok', live: true }));
-  await until(() => typeof r.w.openWaitlist === 'function');
-  r.w.openWaitlist('hero');
-  type(r.d, 'name', 'Edwin Ruiz'); type(r.d, 'phone', '5105550123'); pick(r.d, 'occupation', 'student'); consent(r.d);
-  assert.match(r.d.getElementById('coSubmit').textContent, /ask the rest/);
-  type(r.d, 'age', '20'); pick(r.d, 'gender', 'male'); stats(r.d); pick(r.d, 'goals', 'lose fat'); pick(r.d, 'obstacle', 'time');
-  pick(r.d, 'experience', '2+ years'); pick(r.d, 'equipment', 'full gym'); pick(r.d, 'days', '3'); pick(r.d, 'time', 'evenings'); pick(r.d, 'diet', 'vegan');
-  assert.match(r.d.getElementById('coSubmit').textContent, /ask the rest/, 'apps still blank');
-  pick(r.d, 'apps', 'nothing yet');
-  assert.equal(r.d.getElementById('coSubmit').textContent, 'sign up', 'gmail / referral / allergies do not count');
-});
-
+// The question rows after occupation, answered so a submit goes through (all required since 2026-11-20).
+function fillRest(d){
+  type(d, 'age', '20'); pick(d, 'gender', 'male'); stats(d); pick(d, 'goals', 'lose fat'); pick(d, 'obstacle', 'time');
+  pick(d, 'experience', '2+ years'); pick(d, 'equipment', 'full gym'); pick(d, 'days', '3'); pick(d, 'time', 'evenings'); pick(d, 'diet', 'no restrictions'); pick(d, 'apps', 'nothing yet');
+}
 test('occupation: what goes up for each kind — the free text starts with "student" when they study, school and job ride on their own keys', async () => {
   const cases = [
     [['student'], 'uc berkeley', '', { occupation: 'student at uc berkeley', occupation_kind: 'student', school: 'uc berkeley', job: null }],
@@ -402,6 +412,7 @@ test('occupation: what goes up for each kind — the free text starts with "stud
     type(d, 'name', 'Edwin Ruiz'); type(d, 'phone', '5105550123'); pick(d, 'occupation', ...kind);
     if (school) type(d, 'occupation', school, '#foSchool');
     if (job) type(d, 'occupation', job, '#foJob');
+    fillRest(d);   // every question row is required
     consent(d); submit(d);
     await success(d);
     for (const k of Object.keys(want)) assert.equal(posted[0].body[k], want[k], `${kind}: ${k}`);
@@ -415,7 +426,7 @@ test('occupation: what goes up for each kind — the free text starts with "stud
   assert.ok(field(d, 'occupation').classList.contains('student') && !field(d, 'occupation').classList.contains('working'));
   pick(d, 'occupation', 'i work');
   assert.ok(!field(d, 'occupation').classList.contains('student') && field(d, 'occupation').classList.contains('working'));
-  consent(d); submit(d); await success(d);
+  fillRest(d); consent(d); submit(d); await success(d);
   assert.equal(posted[0].body.school, null); assert.equal(posted[0].body.occupation, 'working');
 });
 
