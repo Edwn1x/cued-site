@@ -204,7 +204,7 @@ nav .btn{height:44px;padding:0 20px;font-size:16px}
      can't reach a corner without eating the ball; the ellipse keeps everything
      within 62% of its radii solid: the ball (83%,45%), the waving hand (10%,45%),
      clip 2's speech bubble (50%,15%) and the floor shadow all sit inside that. */
-.hero-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .6s ease;transform:scale(1);transform-origin:50% 53%;filter:brightness(1.02)}   /* no crop since 2026-11-26: the one 10s clip's action (ball, dumbbell, headband) spans ~22–82% of its frame, wider than the old pair's — at 1.25 the ball and the dumbbell landed in the side feathers. brightness: the clips' backdrop measures ~rgb(240,230,220) at the edges against the page's rgb(245,234,224) — a 2% lift lands it on the page cream so the box has no visible edge without a wide feather (the stills are already on the page cream and get no filter). The crop: 1.25, not more: clip 1's head top sits ~20% down the frame and clip 2's speech bubble higher still — at 1.4 they land in the feather (measured on the poster, 2026-11-14) */
+.hero-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .6s ease;transform:scale(1);transform-origin:50% 53%;filter:brightness(1.02)}   /* no crop since 2026-11-26: clip 1's action (ball, dumbbell, headband) spans ~22–82% of its frame — at the old 1.25 the ball and the dumbbell landed in the side feathers; clip 2 (the phone) spans 27–76% / 7–73% and sits at the same 1.0 so the character doesn't change size across the crossfade. brightness: the clips' backdrop measures ~rgb(240,230,220) at the edges against the page's rgb(245,234,224) — a 2% lift lands it on the page cream so the box has no visible edge without a wide feather (the stills are already on the page cream and get no filter). The crop: 1.25, not more: clip 1's head top sits ~20% down the frame and clip 2's speech bubble higher still — at 1.4 they land in the feather (measured on the poster, 2026-11-14) */
 .hero-video video.on{opacity:1}
 .hero-still{position:absolute;inset:0;display:none;line-height:0;opacity:0;transition:opacity .8s ease}
 .hero-still.on{opacity:1}
@@ -1161,6 +1161,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     <div class="hero-visual">
     <div class="hero-video" id="heroVideo" aria-hidden="true">
       <video class="on" src="assets/hero/cued-hero.mp4" poster="assets/hero/cued-hero-poster.jpg" autoplay muted loop playsinline preload="auto" disablepictureinpicture disableremoteplayback></video>
+      <video src="assets/hero/cued-hero-2.mp4" muted playsinline preload="auto" disablepictureinpicture disableremoteplayback></video>
       <!-- The still: shown instead of the clips whenever autoplay is refused
            (iOS Low Power Mode, Reduce Motion, a browser policy) — otherwise iOS
            paints a paused player with controls over the hero. -->
