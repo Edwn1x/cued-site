@@ -967,19 +967,20 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   .foot-ball{width:70vw;right:-18%;bottom:-24%}
 }
 
-/* ===== FLOATING PILL ===== */
+/* ===== THE NAV'S "text cued" (was the floating pill) =====
+   Top-right corner of the nav bar since 2026-11-27 (founder: "move it to the top right corner of the nav bar").
+   It used to float bottom-centre, and stepped aside to the left while the proof was pinned because the phone's
+   composer overhangs that spot — which read as a mistake. In the nav it collides with nothing, at any width.
+   Still the same element (#floatCta, source "floating"), fixed over the nav rather than inside it, and still
+   shown only mid-page: hidden while the hero, the close or the FAQ is in view (see pillState). */
 .float-cta{
-  position:fixed;left:50%;bottom:24px;z-index:45;transform:translate(-50%,0);
+  position:fixed;top:14px;right:var(--pad);z-index:51;   /* 14px = (the nav's 72px - 44px) / 2; above the nav (50), under the sign-up card */
   height:44px;padding:0 22px;border:none;border-radius:999px;
   background:var(--blue);color:#fff;font-family:var(--f-ui);font-size:15px;
-  box-shadow:0 0 0 2px var(--cream-2),0 8px 24px rgba(60,40,20,.18);
-  transition:opacity .25s,transform .25s var(--ease),background .15s,left .4s var(--ease);
+  transition:opacity .25s,transform .25s var(--ease),background .15s;
 }
 .float-cta:hover{background:var(--blue-hover)}
-.float-cta.hide{opacity:0;transform:translate(-50%,8px);pointer-events:none}
-/* while the proof is pinned the pill steps aside to the copy column's left edge: bottom-centre is where the phone's composer overhangs (2026-11-26) */
-.float-cta.aside{left:calc(max(0px,(100vw - var(--wrap)) / 2) + var(--pad));transform:none}
-.float-cta.aside.hide{transform:translateY(8px)}
+.float-cta.hide{opacity:0;transform:translateY(-6px);pointer-events:none}
 /* ===== PHONE CTA BAR ===== */
 .m-cta{display:none}
 @media(max-width:767.98px){
@@ -2230,14 +2231,12 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   }, {threshold: 0.2});
   document.querySelectorAll('[data-io]').forEach(el => reduce.matches ? el.classList.add('on') : io.observe(el));
 
-  // Floating pill: hidden while the hero or the close is in view (both carry
-  // their own CTA); under 480px also hidden while the pinned proof is active.
+  // The nav's "text cued" (#floatCta, top-right): shown mid-page only — hidden while the hero or the close
+  // is in view (both carry their own button) and over the FAQ / footer (nothing left to sell).
   const vis = {hero: true, close: false, faq: false, proof: false};
   window.proofActive = false;
   function pillState(){
-    const narrow = window.innerWidth < 1024;   // stacked layouts: the chat sits in the main column, so no pill over it
-    pill.classList.toggle('hide', vis.hero || vis.close || vis.faq || (narrow && (window.proofActive || vis.proof)));
-    pill.classList.toggle('aside', !narrow && !!window.proofActive);   // the pinned phone's composer overhangs bottom-centre
+    pill.classList.toggle('hide', vis.hero || vis.close || vis.faq);
     if (mCta) mCta.classList.toggle('hide', vis.close || vis.faq);   // the close has the same button; nothing to sell past it
   }
   window.pillState = pillState;
@@ -2248,7 +2247,6 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   hero && ioPill.observe(hero);
   close && ioPill.observe(close);
   faq && ioPill.observe(faq);   // past the close there's nothing left to sell — no pill over the FAQ/footer
-  proofSec && ioPill.observe(proofSec);   // narrow screens: no pill over the stacked chat either
 })();
 
 // === The film: plays while it's on screen, silently ===
