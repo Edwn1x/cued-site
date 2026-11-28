@@ -8,7 +8,7 @@
 
   cued.fit v2 (Nov 2026 rework) — single-file vanilla HTML/CSS/JS, GitHub Pages.
 
-  One hero (the inline-icon headline), a "say anything." strip, five proof
+  One hero (the inline-icon headline), the "your cue" film, five proof
   steps beside ONE pinned phone whose thread swaps per step (#proof), the
   plugs-into / replaces rows (#apps), privacy facts beside a thread card
   (#privacy), the founder block (#berkeley), the close with the full-body
@@ -184,7 +184,7 @@ nav .btn{height:44px;padding:0 20px;font-size:16px}
 }
 
 /* ===== HERO ===== */
-#hero{padding:clamp(96px,12vh,140px) 0 clamp(48px,6vw,80px);overflow:hidden;min-height:min(calc(100svh - 100px),860px);display:flex;align-items:center}   /* capped at 860px (2026-11-15: on a 1329px-tall screen the centred block floated in ~500px of cream — "too much white space"); otherwise 100px short of the viewport so the "say anything." strip peeks under the fold — the scroll cue (founder, 2026-11-14: the full-height hero was "too much vacuum") */
+#hero{padding:clamp(96px,12vh,140px) 0 clamp(48px,6vw,80px);overflow:hidden;min-height:min(calc(100svh - 100px),860px);display:flex;align-items:center}   /* capped at 860px (2026-11-15: on a 1329px-tall screen the centred block floated in ~500px of cream — "too much white space"); otherwise 100px short of the viewport so the next section (the film's headline since 2026-11-26; the "say anything." strip before it was removed 2026-11-27) peeks under the fold — the scroll cue (founder, 2026-11-14: the full-height hero was "too much vacuum") */
 #hero .wrap{position:relative;z-index:1;width:100%}
 /* two columns: copy left, the mascot loop right (founder reference, 2026-11-14) */
 .hero-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:clamp(24px,3vw,44px);align-items:center;text-align:left}
@@ -309,22 +309,37 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
   .hero-cap{font-size:14px;margin-top:16px}
 }
 
-/* ===== SAY ANYTHING ===== */
-#say{text-align:center;overflow:hidden;padding-top:clamp(40px,5vw,64px)}   /* short top padding: its headline is what peeks under the hero */
-#say .sub{margin:14px auto 0}
-.mq{overflow:hidden;margin-top:40px;padding:6px 0;
-  -webkit-mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent);
-          mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent)}
-.mq + .mq{margin-top:18px}
-.mq .mq-track{display:flex;flex-direction:row;align-items:center;gap:16px;width:max-content;animation:mq 40s linear infinite;will-change:transform}
-.mq.rev .mq-track{animation-direction:reverse}
-.mq:hover .mq-track{animation-play-state:paused}
-@keyframes mq{to{transform:translateX(-50%)}}
-.mq .msg{flex:none;max-width:none;margin:0 0 0 .4em;font-size:20px;font-family:var(--f-phone)}
-@media(max-width:767.98px){.mq .msg{font-size:16px}.mq{margin-top:28px}}
-@media(prefers-reduced-motion:reduce){.mq-track{animation:none}}
+/* ===== FILM — the 1:38 "your cue" film, right under the hero (founder, 2026-11-26; the slot muse.ai gives its
+   statement video) =====
+   A centred heading and one line, then one large rounded card, 16:9. The film's own backdrops run cream → pale
+   blue, so the card needs an edge of its own on the cream: a warm hairline and a soft drop. It is a SILENT film:
+   the files carry no audio track and there is no sound control (founder, 2026-11-27: "no sound at all"). It plays
+   when half of it is on screen and pauses when it leaves (preload="none": nothing is fetched until then — the
+   files are 9.3 MB at 1080p and 5.4 MB at 720p for phones); a click on the card pauses / plays, the hairline along
+   the bottom is the progress. No native controls and no autoplay attribute: if a play() is refused (iOS Low Power
+   Mode) or the reader prefers reduced motion, the card sits on its poster with a play button. */
+#film{text-align:center;padding:calc(100px - clamp(34px,4.2vw,56px) * .67) 0 clamp(64px,8vw,120px)}   /* the top padding sets THE PEEK: the hero stops 100px short of the window, so the headline starts (100px - this) above the fold — about two thirds of its line, at every headline size (founder, 2026-11-27: "not getting enough of the following headline peeking through"; it was 86px at 1440, which left 14px = the tips of the ascenders) */
+#film .sub{margin-left:auto;margin-right:auto}
+.film{position:relative;width:min(980px,100%);aspect-ratio:16/9;margin:clamp(30px,4vw,52px) auto 0;border-radius:clamp(20px,3vw,40px);overflow:hidden;
+  background:var(--fill);box-shadow:0 0 0 1px var(--line),0 30px 80px rgba(58,40,24,.13);cursor:pointer;isolation:isolate;
+  transform:scale(var(--film-s,1));transform-origin:50% 35%;will-change:transform}   /* --film-s: the scroll-driven grow, written by the film script (small as it enters from below, full size by mid-screen) */
+.film video{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover;background:var(--fill)}
+.film-play{position:absolute;left:50%;top:50%;width:84px;height:84px;margin:-42px 0 0 -42px;border:none;border-radius:50%;
+  background:rgba(255,255,255,.82);-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.8),0 10px 30px rgba(58,40,24,.18);color:var(--blue);
+  display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(.9);pointer-events:none;transition:opacity .2s ease,transform .25s var(--ease)}
+.film-play svg{width:30px;height:30px;margin-left:4px;fill:currentColor}
+.film.paused .film-play{opacity:1;transform:none;pointer-events:auto}
+.film-bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(11,11,12,.08);pointer-events:none}
+.film-bar i{display:block;height:100%;width:0;background:var(--blue)}
+@media(max-width:767.98px){
+  #film{padding:40px 0 64px}
+  .film-play{width:64px;height:64px;margin:-32px 0 0 -32px}
+  .film-play svg{width:24px;height:24px}
+}
+@media(prefers-reduced-motion:reduce){.film-play{transition:none}}
 
-/* ===== BUBBLES (phone + thread cards + strip) ===== */
+/* ===== BUBBLES (phone + thread cards) ===== */
 .thread{display:flex;flex-direction:column;font-family:var(--f-phone);font-size:16px;position:relative}
 .msg{
   position:relative;max-width:78%;
@@ -463,7 +478,6 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 .sheet-overlay .sh-row{font-size:1em}
 .sheet-overlay .sh-stepper.open{display:grid}
 @media(max-width:1023.98px){
-  #proof .phone-wrap::before{display:none}   /* the desktop halo's -140px inset overflowed the phone viewport */
   /* stacked: same takeover — the sheet rises over the step's chat column; the
      column is given room (min-height on .screen, set by JS) so it isn't clipped */
   #proof .screen{overflow:hidden;border-radius:1.4em;max-height:none}   /* no cap: stacked chats show every bubble */
@@ -613,12 +627,6 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
 }
 .proof-mascot img.on{opacity:1}
 #proof .phone-wrap{--ps:1!important;width:min(440px,100%);height:auto;margin:0 auto;position:relative}
-/* a faint, faded lighter shade behind the thread — a halo, not a panel (founder, 2026-11-14) */
-#proof .phone-wrap::before{
-  content:'';position:absolute;inset:-96px -140px;z-index:-1;pointer-events:none;border-radius:40%;
-  background:radial-gradient(ellipse 50% 50% at 50% 50%,rgba(255,255,255,.82) 0,rgba(255,255,255,.5) 48%,rgba(255,255,255,0) 76%);
-  filter:blur(26px);
-}
 #proof .phone{position:relative;left:auto;top:auto;transform:none;width:100%;height:auto;background:none;border-radius:0;padding:0;box-shadow:none}
 #proof .phone-screen{--bg:var(--cream);background:none;border-radius:0;height:auto;color:var(--ink);font-family:var(--f-ui)}
 #proof .island,#proof .ph-comp,#proof .ph-home,#proof .ph-head .chev,#proof .ph-head .vid{display:none}
@@ -638,12 +646,6 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
    by a mask — the page's two-pseudo carve would notch the white halo behind the chat
    with a cream wedge. Cards, photos, stickers and the chart stay tail-less. */
 #proof .msg.t::after,.thread-card .msg.t::after{content:none}
-#proof .msg.user.t::before,.thread-card .msg.user.t::before{right:-.35em;width:1em;background:var(--bubble-user);border-bottom-left-radius:.8em .7em;
-  -webkit-mask:linear-gradient(#000,#000) 0 0/.65em 100% no-repeat,radial-gradient(circle .5em at .5em 0,transparent 97%,#000 100%) .65em .5em/.35em .5em no-repeat;
-          mask:linear-gradient(#000,#000) 0 0/.65em 100% no-repeat,radial-gradient(circle .5em at .5em 0,transparent 97%,#000 100%) .65em .5em/.35em .5em no-repeat}
-#proof .msg.coach.t::before,.thread-card .msg.coach.t::before{left:-.35em;width:1em;background:var(--bubble-coach);border-bottom-right-radius:.8em .7em;
-  -webkit-mask:linear-gradient(#000,#000) .35em 0/.65em 100% no-repeat,radial-gradient(circle .5em at -.15em 0,transparent 97%,#000 100%) 0 .5em/.35em .5em no-repeat;
-          mask:linear-gradient(#000,#000) .35em 0/.65em 100% no-repeat,radial-gradient(circle .5em at -.15em 0,transparent 97%,#000 100%) 0 .5em/.35em .5em no-repeat}
 #proof .msg.t:is(.card,.photo,.chart,.sticker)::before,.thread-card .msg.t:is(.card,.photo,.chart,.sticker)::before{content:none}
 /* the caption real threads open with, "Delivered" under the reader's latest bubble, and the composer */
 .ts-cap{align-self:center;text-align:center;font-size:.68em;line-height:1.4;color:var(--ink-3);margin:0 0 .8em;letter-spacing:.01em}
@@ -690,6 +692,142 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
   #proof .poll,#proof .checklist{width:92%}
 }
 
+/* ===== PROOF, the ghost phone (founder, 2026-11-26 — after Meta's muse.ai rows) =====
+   The chat gets a phone back, but only a silhouette of one: a rounded slab one
+   step warmer than the page (no bezel, no island, no buttons). The conversation
+   sits INSIDE it — except the one or two moments of each thread that matter
+   most (the rich cards, the line that shows what the coach knows), which carry
+   `.pop` and hang out past the slab's left edge with a deeper lift. Breaking
+   the frame is the highlight, so it is rationed (founder, same day: "not every
+   text has to be outside of the frame, we only use this to exemplify and
+   exaggerate the important ones"). The composer is wider than the phone on
+   both sides. The avatar sits half above the slab's top edge with the name and
+   the live status in one pill under it. Bubbles lose their tails and the
+   coach's turn white with a soft lift (the warm gray was too close to the slab);
+   the reader's stay brand blue, flat.
+   Geometry: .phone-wrap / .thread-card IS the slab's footprint (its ::before),
+   padded --in so the thread sits inside; a .pop runs --pop past the left edge,
+   the composer --comp past both. The wrap isolates: a z-index:-1 pseudo would
+   otherwise paint under the stacked steps' own backgrounds.
+   The "iMessage" caption, "Delivered" and the iMessage composer stay — they
+   are what says the thread lives in Messages (2026-11-15). Replaces the white
+   halo (2026-11-14) and the mask tails (2026-11-15). */
+#proof,.thread-card{--bubble-coach:#FFFFFF;--slab-1:#E6D6C5;--slab-2:#EDE1D4;
+  /* flat, like the reference: tone does the layering. A hairline keeps a white bubble's edge where it overhangs the cream; only a .pop casts a (soft) shadow */
+  --lift:0 0 0 1px rgba(58,40,24,.05);
+  --lift-pop:0 0 0 1px rgba(58,40,24,.05),0 10px 26px rgba(58,40,24,.13);
+  --glass:rgba(255,255,255,.66);--glass-rim:inset 0 0 0 1px rgba(255,255,255,.75),0 0 0 1px rgba(58,40,24,.06)}
+#proof .phone-wrap,.thread-card{--in:14px;--pop:58px;--comp:58px;--slab-top:30px;
+  position:relative;isolation:isolate;padding:0 var(--in) 44px}
+#proof .phone-wrap{width:min(392px,100%)}   /* tall and narrow — the reference's phone is ~0.46 wide for its height */
+#proof .phone-wrap::before,.thread-card::before{
+  content:'';position:absolute;z-index:-1;pointer-events:none;
+  top:var(--slab-top);bottom:0;left:0;right:0;
+  border-radius:66px;background:linear-gradient(180deg,var(--slab-1),var(--slab-2) 38%)}
+#proof .phone-screen{overflow:visible}
+/* header: the avatar breaks the slab's top edge; name + status in one pill */
+#proof .ph-head,.thread-card .ph-head{padding:0 0 20px;position:relative}
+#proof .ph-head picture,.thread-card .ph-head picture{position:relative;z-index:1;line-height:0}
+#proof .ph-avatar,.thread-card .ph-avatar{width:60px;height:60px;box-shadow:0 0 0 1px rgba(58,40,24,.06)}
+.ph-id{display:flex;flex-direction:column;align-items:center}
+#proof .ph-id,.thread-card .ph-id{margin-top:-10px;min-width:184px;padding:16px 20px 11px;border-radius:22px;background:var(--glass);-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);box-shadow:var(--glass-rim)}
+#proof .ph-name,.thread-card .ph-name{margin:0;font-size:17px;font-weight:600;line-height:1.2;letter-spacing:-.01em}
+#proof .ph-name::after,.thread-card .ph-name::after{content:none}
+#proof .ph-status,.thread-card .ph-status{margin-top:3px;height:auto;padding:0;border-radius:0;background:none;font-size:14px;line-height:1.3;white-space:nowrap}
+/* bubbles: no tails, rounder, the coach's lifted off the slab */
+#proof .msg,.thread-card .msg{border-radius:1.5em;padding:.72em 1.05em;margin-top:.4em;max-width:88%}
+#proof .msg.turn,.thread-card .msg.turn{margin-top:1em}
+#proof .msg.user,.thread-card .msg.user{max-width:82%}
+#proof .msg.photo{max-width:46%}
+#proof .msg.t::before,.thread-card .msg.t::before{content:none}
+#proof .msg.coach:not(.sticker),.thread-card .msg.coach:not(.sticker),#proof .typing.coach,.thread-card .typing.coach{box-shadow:var(--lift)}
+#proof .msg.card,.thread-card .msg.card{border-radius:1.5em;padding:.9em 1em 1em}
+/* .pop — the highlighted moments: out past the slab's left edge, lifted higher; the big cards grow by the overhang */
+#proof .msg.pop,.thread-card .msg.pop{margin-left:calc(var(--pop) * -1);box-shadow:var(--lift-pop)}
+#proof .msg.pop:not(.card),.thread-card .msg.pop:not(.card){max-width:calc(88% + var(--pop))}
+#proof .msg.card.pop:is(.wk,.today,.gym){width:min(100% + var(--pop),20em + var(--pop));max-width:none}
+/* the poll's PICKED row is a highlight too (founder, 2026-11-26: "the poll that gets picked can also be amplified"):
+   when the pick lands (.chosen, 800ms after the poll arrives, or on a click) that row breaks the frame like a .pop —
+   out past the slab's left edge, a size up, a deeper orange, the pop's shadow. It grows upward (the thread is
+   bottom-anchored), so nothing under it jumps; clicking another row moves the highlight with it. */
+#proof .poll-row{transition:background .25s ease,margin-left .45s var(--ease),width .45s var(--ease),font-size .45s var(--ease),padding .45s var(--ease),box-shadow .45s var(--ease)}
+#proof .poll.chosen .poll-row.pick{margin-left:calc(var(--pop) * -1);width:calc(100% + var(--pop));font-size:1.16em;padding-top:.82em;padding-bottom:.82em;background:#F9D6A2;box-shadow:var(--lift-pop)}
+@media(prefers-reduced-motion:reduce){#proof .poll-row{transition:none}}
+/* the screen clips the push-up; side room for the overhang and the lifts, a fade at the top instead of a hard edge */
+#proof .screen{margin:0 -16px 0 calc((var(--pop) + 28px) * -1);padding:0 16px 14px calc(var(--pop) + 28px);
+  -webkit-mask-image:linear-gradient(to bottom,transparent,#000 22px);mask-image:linear-gradient(to bottom,transparent,#000 22px)}
+/* the set sheet is step 2's highlight: a card of its own (all four corners) that overhangs like a .pop, a breath above the composer (its foot sits LOWER than the thread's last bubble, or a sliver of that bubble shows under it) */
+#proof .sheet-overlay{left:28px;right:16px;bottom:6px;border-radius:1.5em;box-shadow:0 0 0 1px rgba(58,40,24,.05),0 3px 10px rgba(58,40,24,.12);transform:translateY(calc(100% + 60px))}   /* the lift has to fit the screen's side room — a wider one is cut by the clip and shows as an edge */
+#proof .sheet-overlay.up{transform:none}
+/* pinned: the phone is ONE size for all five conversations (bubbles rise from the
+   composer, like Messages). The budget is the viewport minus the nav (72px), the
+   header, the composer and the slab's foot (~234px) and 16px of air each side;
+   the thread's type follows the viewport's height so the longest conversation
+   (i know your week, ~37em) fits the screen it gets. */
+#proof .proof-right{padding-top:72px}
+#proof .proof-sticky .screen{height:min(620px,calc(100vh - 340px));max-height:none}
+#proof .proof-sticky .thread{font-size:clamp(13.5px,1.6vh,17px)}
+@media(min-width:1800px){
+  #proof .proof-sticky .screen{height:min(760px,calc(100vh - 340px))}
+  #proof .proof-sticky .thread{font-size:clamp(15px,1.6vh,20px)}
+}
+@media(min-width:1024px) and (max-height:780px){
+  /* a 13" laptop's window: smaller header, composer and foot, and the "iMessage · time" caption gives its three lines to the bubbles */
+  #proof .proof-sticky .screen{height:calc(100vh - 268px)}
+  #proof .proof-sticky .ts-cap{display:none}
+  #proof .phone-wrap{--slab-top:24px;padding-bottom:20px}
+  #proof .ph-head{padding-bottom:12px}
+  #proof .ph-avatar{width:48px;height:48px}
+  #proof .ph-id{padding:13px 16px 8px}
+  #proof .ph-compose{height:48px;margin-top:10px}
+}
+/* composer: one pill, wider than the phone on both sides */
+#proof .ph-compose,.thread-card .ph-compose{height:56px;margin:12px calc((var(--in) + var(--comp)) * -1) 0;padding:0 16px 0 20px;gap:14px;border-radius:28px;background:var(--glass);-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);box-shadow:var(--glass-rim)}
+#proof .pc-plus,.thread-card .pc-plus{width:20px;height:20px;background:none}
+#proof .pc-plus::before,#proof .pc-plus::after,.thread-card .pc-plus::before,.thread-card .pc-plus::after{width:17px;height:1.8px;background:var(--ink)}
+#proof .pc-field,.thread-card .pc-field{height:auto;padding:0;border:none;background:none;font-size:17px}
+@media(max-width:1023.98px){
+  #proof .screen{border-radius:0;-webkit-mask-image:none;mask-image:none}   /* stacked: natural height (nothing to fade — nothing is clipped), the slab grows with the conversation */
+  #proof .screen{margin:0 -16px 0 calc((var(--pop) + 28px) * -1);padding:0 16px 14px calc(var(--pop) + 28px)}
+}
+@media(max-width:767.98px){
+  /* phones: the slab is the column, so the overhang is what the page's side padding allows */
+  #proof .phone-wrap{--in:12px;--pop:14px;--comp:0px;--slab-top:26px;padding-bottom:28px}
+  #proof .phone-wrap::before{border-radius:40px}
+  #proof .ph-avatar{width:52px;height:52px}
+  #proof .ph-head{padding-bottom:16px}
+  #proof .screen{margin:0 -10px 0 -24px;padding:0 10px 12px 24px}
+  #proof .sheet-overlay{left:10px;right:10px}
+  #proof .ph-compose{height:48px}
+}
+
+/* ===== PROPS — the things that fly out of a conversation (founder, 2026-11-26, after the popcorn on muse.ai) =====
+   Each step has a small scatter of its own objects beside the phone: the calendar, the dumbbell and
+   PR stars, the bowl, the signal arcs, the watch. They are CUT OUT OF THE MASCOT RENDERS
+   (assets/props/*.webp, made by .context/tools/cutprops.py — same clay, same brand blue), so no new art.
+   One hero object low beside the highlighted card, the rest smaller and higher, a few out of focus
+   (blur = depth). They burst out once, when the thread's first .pop lands (the engine calls
+   window.burstProps), and then hold still — the page has no drifting elements. The box hangs off the
+   slab's right edge; every position and size is a share of the box, so the scatter scales with it.
+   Pinned: five groups in the one phone, only the current step's shown (.cur). Decorative: aria-hidden. */
+.props{position:absolute;z-index:3;pointer-events:none;top:5%;bottom:9%;left:calc(100% - 28px);width:clamp(112px,12vw,190px)}   /* starts just inside the slab's right edge: the hero overlaps the edge, never the reader's bubbles */
+.proof-sticky .props{display:none}
+.proof-sticky .props.cur{display:block}
+.props img{position:absolute;left:var(--x);top:var(--y);width:var(--s);height:auto;translate:-50% -50%;rotate:var(--r,0deg);filter:blur(var(--b,0px));
+  opacity:0;transform:translate(-90px,60px) scale(.15);
+  transition:opacity .3s ease var(--d,0s),transform .75s cubic-bezier(.3,1.45,.5,1) var(--d,0s)}
+.props.on img{opacity:var(--o,1);transform:none}
+html:not(.js) .props{display:none}
+@media(max-width:767.98px){
+  /* phones: no room beside the slab — three of them sit in the empty corners beside the name pill */
+  .props{top:0;bottom:auto;left:0;width:100%;height:160px}
+  .props img{display:none}
+  .props img:nth-child(1){display:block;left:auto;right:-6px;top:44px;width:76px;translate:0 0;rotate:8deg}
+  .props img:nth-child(2){display:block;left:10px;top:84px;width:36px;translate:0 0;rotate:-12deg}
+  .props img:nth-child(4){display:block;left:auto;right:76px;top:24px;width:22px;translate:0 0;filter:blur(1px)}
+}
+@media(prefers-reduced-motion:reduce){.props img{transition:none}}
+
 /* ===== APPS ===== */
 .apps-row{display:grid;grid-template-columns:1fr 2fr;gap:40px;align-items:center;padding:36px 0;border-top:1px solid var(--line)}
 .apps-row:last-of-type{border-bottom:1px solid var(--line)}
@@ -726,13 +864,12 @@ picture.ic img{display:block;width:100%;height:100%;object-fit:cover;border-radi
           mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);
   -webkit-mask-composite:source-in;mask-composite:intersect;
 }
-.thread-card{width:min(440px,100%);margin:0 auto}   /* unframed — the same chat aesthetic as the proof steps (founder, 2026-11-14) */
-.thread-card .ph-head{padding:0 0 16px;border:none;background:none;position:static}
-.thread-card .ph-avatar{width:48px;height:48px}
-.thread-card .ph-name{font-family:var(--f-ui);font-size:14px;font-weight:500;margin-top:8px;color:var(--ink)}
-.thread-card .ph-status{margin-top:6px;height:26px;padding:0 12px;border-radius:13px;font-family:var(--f-ui);font-size:12.5px;background:var(--card);color:var(--gray-text)}
+.thread-card{width:min(392px,100%);margin:0 auto}   /* unframed — the same chat aesthetic as the proof steps (founder, 2026-11-14) */
+.thread-card .ph-head{border:none;background:none}   /* its geometry, the avatar and the name/status pill are the ghost phone's (see PROOF, the ghost phone) */
+.thread-card .ph-name{font-family:var(--f-ui);color:var(--ink)}
+.thread-card .ph-status{font-family:var(--f-ui);color:var(--gray-text)}
 .thread-card .thread{font-family:var(--f-ui);font-size:clamp(15px,1.15vw,16.5px)}
-.thread-card .msg{max-width:86%;padding:.7em .95em;border-radius:1.1em;line-height:1.38;text-align:left}
+.thread-card .msg{max-width:86%;padding:.7em .95em;line-height:1.38;text-align:left}
 .thread-card .msg.turn{margin-top:.6em}
 @media(max-width:1023.98px){
   .two{grid-template-columns:1fr;gap:40px}
@@ -836,10 +973,13 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   height:44px;padding:0 22px;border:none;border-radius:999px;
   background:var(--blue);color:#fff;font-family:var(--f-ui);font-size:15px;
   box-shadow:0 0 0 2px var(--cream-2),0 8px 24px rgba(60,40,20,.18);
-  transition:opacity .25s,transform .25s var(--ease),background .15s;
+  transition:opacity .25s,transform .25s var(--ease),background .15s,left .4s var(--ease);
 }
 .float-cta:hover{background:var(--blue-hover)}
 .float-cta.hide{opacity:0;transform:translate(-50%,8px);pointer-events:none}
+/* while the proof is pinned the pill steps aside to the copy column's left edge: bottom-centre is where the phone's composer overhangs (2026-11-26) */
+.float-cta.aside{left:calc(max(0px,(100vw - var(--wrap)) / 2) + var(--pad));transform:none}
+.float-cta.aside.hide{transform:translateY(8px)}
 /* ===== PHONE CTA BAR ===== */
 .m-cta{display:none}
 @media(max-width:767.98px){
@@ -937,6 +1077,12 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
 .co-head-info{display:flex;align-items:center;gap:12px}
 .co-avatar{width:44px;height:44px;border-radius:50%;flex-shrink:0;display:block;overflow:hidden}
 .co-avatar img{display:block;width:100%;height:100%;object-fit:cover}
+/* the mascot's pose per screen: stacked renders, the current one faded in (each is a square crop of a wider render, zoomed on the character) */
+.pose{position:relative}
+.pose img{position:absolute;inset:0;opacity:0;transition:opacity .3s ease,transform .45s cubic-bezier(.3,1.5,.5,1);transform:scale(.86)}
+.pose img.on{opacity:1;transform:none}
+.pose img:not([data-pose="face"]){object-position:50% 50%;scale:1.14}   /* barely zoomed: the pose's props (dumbbell, calendar, lock) have to stay in the disc */
+.co-peek{display:none}
 .co-head-name{font-family:var(--f-head);font-weight:400;font-size:24px;letter-spacing:-.01em;color:var(--co-ink);line-height:1.1}
 .co-head-sub{font-size:13px;color:var(--co-ink-2);margin-top:3px}
 .co-close{width:34px;height:34px;border-radius:50%;background:transparent;border:none;cursor:pointer;font-size:18px;color:var(--co-ink-3);display:inline-flex;align-items:center;justify-content:center;transition:color .15s,background .15s}
@@ -951,38 +1097,34 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
 .co-msgs::-webkit-scrollbar{display:none}
 .co-msgs > *{flex-shrink:0}
 
-/* Groups — serif heads, then one hairline row per question (the FAQ's
-   rows). A row is a button: the question, the answer as a one-line summary
-   once answered, a chevron. Open rows unfold their body (grid-rows 0fr→1fr).
-   Answering collapses the row and opens the next unanswered one; any row
-   opens on a tap, as many as they like (founder, 2026-11-14). */
-.fo-sec + .fo-sec{margin-top:30px}
-.fo-sec-h{font-family:var(--f-head);font-weight:400;font-size:24px;letter-spacing:-.01em;line-height:1.1;color:var(--co-ink);padding-top:22px;margin-bottom:6px}
+/* Screens (founder, 2026-11-27: "easier to digest and funner to complete"). The form is FIVE short screens
+   (.fo-page: about you · a bit about you · your training · your week · last things), one shown at a time,
+   and every question on the current screen is OPEN — answers visible, nothing to unfold, nothing to
+   scroll for on a laptop. It replaced the accordion of 17 look-alike rows (2026-11-14 → 11-27). A question
+   that has an answer gets a small blue tick beside it. back / next live in the footer; the last screen
+   swaps next for the consent line + "sign up". */
+.fo-page[hidden]{display:none}
+.fo-page.cur{animation:fo-page .32s var(--ease) both}
+@keyframes fo-page{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+.fo-page.cur.rev{animation-name:fo-page-rev}
+@keyframes fo-page-rev{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+.fo-sec-h{font-family:var(--f-head);font-weight:400;font-size:28px;letter-spacing:-.01em;line-height:1.1;color:var(--co-ink);padding-top:22px;margin-bottom:4px}
 .fo-sec-h small{font-family:var(--f-ui);font-size:13px;color:var(--co-ink-3);margin-left:6px;vertical-align:.18em}
-.fo-sec-note{font-size:14px;line-height:1.45;color:var(--co-ink-2);margin:-2px 0 12px;max-width:34em}
-.fo-field{border-top:1px solid var(--co-line)}
-.fo-field:last-child{border-bottom:1px solid var(--co-line)}
-.fo-q{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:14px 0;background:none;border:none;text-align:left;cursor:pointer;font-size:16px;line-height:1.3;color:var(--co-ink);transition:color .15s}
-.fo-qt{flex:1;min-width:0}
-.fo-qt small{display:block;font-size:13px;color:var(--co-ink-2);margin-top:2px}
-.fo-field.done:not(.open) .fo-qt small{display:none}
-.fo-qv{flex:0 1 auto;max-width:48%;font-size:15px;color:var(--co-ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
-.fo-field.open .fo-qv{display:none}
-.fo-field.open .fo-q{color:var(--co-blue)}
-.fo-chev{flex:none;width:8px;height:8px;margin:0 4px 0 2px;border-right:1.5px solid var(--co-ink-3);border-bottom:1.5px solid var(--co-ink-3);transform:translateY(-2px) rotate(45deg);transition:transform .22s var(--ease),border-color .15s}
-.fo-field.open .fo-chev{transform:translateY(2px) rotate(225deg);border-color:var(--co-blue)}
-.fo-a{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s var(--ease)}
-.fo-field.open .fo-a{grid-template-rows:1fr}
-.fo-ai{overflow:hidden;min-height:0}
-.fo-body{padding:0 0 18px}
-.fo-tools{display:flex;justify-content:flex-end;margin-bottom:8px}
+.fo-sec-note{font-size:14px;line-height:1.45;color:var(--co-ink-2);margin:0 0 2px;max-width:34em}
+.fo-field{padding:16px 0 2px}
+.fo-q{display:flex;align-items:center;gap:8px;font-size:16px;line-height:1.3;color:var(--co-ink);margin-bottom:10px;transition:color .15s}
+.fo-qt small{font-size:13px;color:var(--co-ink-2);margin-left:6px}
+/* the tick: appears when the question has an answer */
+.fo-q::after{content:'';flex:none;width:18px;height:18px;border-radius:50%;background:var(--co-blue) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M5 9.4l2.6 2.6L13 6.6' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat;transform:scale(0);opacity:0;transition:transform .28s cubic-bezier(.3,1.6,.5,1),opacity .15s}
+.fo-field.done .fo-q::after{transform:none;opacity:1}
+.fo-tools{display:flex;justify-content:flex-start;margin-bottom:8px}
 /* occupation: the detail field for the kind they picked (school / work) */
 .fo-sub{display:none;margin-top:12px}
 .fo-field.student .fo-sub.school,.fo-field.working .fo-sub.job{display:block}
 .fo-sub-l{display:block;font-size:13px;color:var(--co-ink-2);margin-bottom:6px}
-.fo-foot{display:flex;justify-content:flex-end;margin-top:12px}
-.fo-next{height:36px;padding:0 16px;border-radius:10px;border:1px solid var(--co-line);background:var(--co-field);font-size:14px;color:var(--co-ink);cursor:pointer;transition:border-color .15s,background .15s}
-.fo-next:hover{border-color:var(--co-ink-3)}
+.fo-sub-l span{color:var(--co-ink-3)}
+.fo-sub-l2{margin-top:12px}
+.fo-field.noted .fo-sub.note{display:block}                     /* injuries: the note box, once something other than "none" is picked */
 .fo-row{display:flex;gap:8px}
 .fo-row > *{flex:1;min-width:0}
 
@@ -1034,6 +1176,17 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
 
 /* Footer — the one submit (the hero's button), with the server's word when something's wrong */
 .co-input-area{flex-shrink:0;padding:14px 24px 20px;border-top:1px solid var(--co-line);background:var(--co-sheet);display:flex;flex-direction:column;gap:10px}
+/* back · step dots · next (or, on the last screen, the consent line above and "sign up") */
+.fo-nav{display:flex;align-items:center;gap:14px}
+.co-bg .fo-back{flex:none;height:50px;padding:0 16px;border:none;border-radius:14px;background:none;font-size:16px;color:var(--co-ink-2);cursor:pointer;transition:color .15s,background .15s}
+.co-bg .fo-back:hover{color:var(--co-ink);background:var(--co-fill)}
+.co-bg.first .fo-back{visibility:hidden}
+.fo-steps{flex:1;display:flex;align-items:center;justify-content:center;gap:7px}
+.co-bg .fo-steps button{width:8px;height:8px;padding:0;border:none;border-radius:4px;background:var(--co-line);cursor:default;transition:width .3s var(--ease),background .2s}
+.co-bg .fo-steps button.seen{background:color-mix(in srgb,var(--co-blue) 38%,var(--co-line));cursor:pointer}
+.co-bg .fo-steps button.cur{width:26px;background:var(--co-blue)}
+.co-bg .fo-nav .co-confirm{width:auto;min-width:150px;flex:none}
+.co-bg:not(.last) #coSubmit,.co-bg:not(.last) .fo-consent-row,.co-bg.last #coNext{display:none}
 .fo-err{display:none;font-size:14px;line-height:1.4;color:var(--co-error);text-align:center}
 .fo-err.show{display:block}
 .co-bg .co-confirm{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:10px 22px;line-height:1.2;text-align:center;border-radius:14px;border:none;cursor:pointer;background:var(--co-blue);color:#fff;/* class+class so it outranks `.co-bg button{color:inherit}` — otherwise the label inherits the page ink and sits black on blue */font-family:var(--f-ui);font-size:17px;font-weight:400;transition:background .15s,opacity .15s}
@@ -1043,7 +1196,12 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
 
 /* Success */
 .co-success{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 20px;gap:12px}
-.co-success-icon{font-size:38px;margin-bottom:2px}
+.co-success-icon{font-size:38px;margin-bottom:2px;position:relative}
+/* the finish: the PR stars and the dumbbell (the proof's cut-outs) burst out around the 🎉 once, then hold */
+.co-burst{--k:1}
+@media (max-width:767.98px){.co-burst{--k:.7}}   /* phones: the same burst pulled in, or the outer pieces are cut by the sheet's edges */
+.co-burst img{position:absolute;left:50%;top:50%;width:var(--w);height:auto;margin:calc(var(--w) / -2) 0 0 calc(var(--w) / -2);transform:translate(calc(var(--x) * var(--k)),calc(var(--y) * var(--k))) rotate(var(--r));animation:co-burst .75s cubic-bezier(.3,1.45,.5,1) var(--d) both}
+@keyframes co-burst{from{opacity:0;transform:translate(0,0) scale(.1) rotate(0deg)}}
 .co-success h3{font-family:var(--f-head);font-weight:400;font-size:clamp(1.7rem,2.4vw,2.1rem);letter-spacing:-.01em;line-height:1.1;color:var(--co-ink)}
 .co-success p{font-size:16px;color:var(--co-ink-2);line-height:1.55;max-width:320px}
 /* iMessage-first choice (shown only when the backend returned a link) */
@@ -1052,6 +1210,71 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
 .co-success .co-alt:hover{color:var(--co-ink-2)}
 .co-success .co-alt:disabled{cursor:default;text-decoration:none}
 .co-success .co-imsg-note{font-size:14px;color:var(--co-ink-3);max-width:320px}
+
+/* The card's two parts. .co-main is the form (header, hairline, the current screen, footer). .co-preview is
+   the live preview — desktop only: the conversations' phone, filling in with what cued would text back as the
+   reader answers (their name, the days they train lit on a week card, their goal). It is the fun half: you
+   watch your coach take shape instead of filling in a form. Everything in it is built from the fields by the
+   form script, with textContent — nothing is sent anywhere, and no answer goes into an analytics event. */
+.co-main{flex:1;min-height:0;min-width:0;display:flex;flex-direction:column}
+.co-preview{display:none}
+@media (min-width:1024px){
+  .co-sheet{max-width:1080px;height:min(830px,100% - 40px);flex-direction:row;transition:transform .3s var(--ease),max-width .35s var(--ease),height .35s var(--ease)}
+  .co-bg.sent .co-sheet{max-width:520px;height:min(560px,100% - 48px)}
+  .co-bg.sent .co-preview{display:none}
+  .co-head{padding:22px 24px 16px 40px}
+  .co-avatar{width:56px;height:56px}
+  .co-head-name{font-size:28px}
+  .co-head-sub{font-size:14px}
+  .co-msgs{padding:0 40px 18px}
+  .co-input-area{padding:12px 40px 18px}
+  /* the two five-question screens have to fit a 900px-tall window without a scroll: tighter rhythm here */
+  .fo-sec-h{padding-top:16px}
+  .fo-field{padding-top:12px}
+  .fo-q{margin-bottom:8px}
+  .fo-chip{height:38px}
+  .co-input-area .fo-consent{font-size:13px}
+  .co-preview{flex:none;width:384px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:34px 0 24px;background:var(--cream);border-left:1px solid var(--co-line);overflow:hidden}
+}
+/* the preview phone: the proof's ghost phone at card scale (own rules — the overlay's reset zeroes single-class paddings) */
+.co-preview .pv-phone{position:relative;isolation:isolate;width:270px;padding:0 12px 30px}
+.co-preview .pv-phone::before{content:'';position:absolute;z-index:-1;inset:28px 0 0 0;border-radius:46px;background:linear-gradient(180deg,#E6D6C5,#EDE1D4 38%)}
+.co-preview .pv-head{display:flex;flex-direction:column;align-items:center;padding-bottom:14px}
+.co-preview .pv-ava{width:56px;height:56px;border-radius:50%;overflow:hidden;z-index:1;box-shadow:0 0 0 1px rgba(58,40,24,.06)}
+.co-preview .pv-ava img{width:100%;height:100%;object-fit:cover;display:block}
+.co-preview .pv-id{margin-top:-9px;min-width:160px;padding:14px 16px 9px;border-radius:18px;display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,.66);-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);box-shadow:inset 0 0 0 1px rgba(255,255,255,.75),0 0 0 1px rgba(58,40,24,.06)}
+.co-preview .pv-id b{font-size:15px;font-weight:600;line-height:1.2;letter-spacing:-.01em}
+.co-preview .pv-id span{font-size:12.5px;line-height:1.3;color:var(--co-ink-2);margin-top:2px;white-space:nowrap}
+.co-preview .pv-screen{height:min(400px,calc(100vh - 430px));display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;margin:0 -44px 0 -56px;padding:0 44px 6px 56px;
+  -webkit-mask-image:linear-gradient(to bottom,transparent,#000 26px);mask-image:linear-gradient(to bottom,transparent,#000 26px)}
+.co-preview .pv-thread{display:flex;flex-direction:column;align-items:flex-start;gap:7px;font-size:14px;line-height:1.36}
+.co-preview .pv-msg{max-width:92%;padding:.7em 1em;border-radius:1.4em;background:#fff;color:var(--co-ink);box-shadow:0 0 0 1px rgba(58,40,24,.05);overflow-wrap:anywhere;
+  opacity:0;transform:translateY(10px) scale(.96);transform-origin:0 100%;transition:opacity .3s var(--ease),transform .4s cubic-bezier(.3,1.4,.5,1)}
+.co-preview .pv-msg.in{opacity:1;transform:none}
+/* the week card is the preview's highlight: it breaks the phone's left edge like a .pop */
+.co-preview .pv-card{max-width:none;width:calc(100% + 44px);margin-left:-44px;padding:.8em .9em .85em;box-shadow:0 0 0 1px rgba(58,40,24,.05),0 10px 26px rgba(58,40,24,.13)}
+.co-preview .pv-wk-h{display:flex;justify-content:space-between;font-size:.8em;color:var(--co-ink-2);margin-bottom:.6em}
+.co-preview .pv-wk{display:grid;grid-template-columns:repeat(7,1fr);gap:.3em}
+.co-preview .pv-wk div{display:flex;flex-direction:column;align-items:center;gap:.35em;font-size:.72em;color:var(--co-ink-2)}
+.co-preview .pv-wk i{display:block;width:100%;height:2.9em;border-radius:.5em;background:rgba(11,11,12,.05);transition:background .3s ease,transform .35s cubic-bezier(.3,1.6,.5,1)}
+.co-preview .pv-wk i.on{background:var(--co-blue);transform:scaleY(1.06)}
+.co-preview .pv-dots{display:flex;gap:.3em;align-items:center;padding:.85em .95em}
+.co-preview .pv-dots i{width:.45em;height:.45em;border-radius:50%;background:var(--co-ink-3);animation:typeDot 1.1s ease-in-out infinite}
+.co-preview .pv-dots i:nth-child(2){animation-delay:.15s}
+.co-preview .pv-dots i:nth-child(3){animation-delay:.3s}
+.co-preview .pv-compose{display:flex;align-items:center;gap:10px;height:44px;margin:10px -34px 0;padding:0 16px;border-radius:22px;font-size:14px;color:var(--co-ink-3);background:rgba(255,255,255,.66);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.75),0 0 0 1px rgba(58,40,24,.06)}
+.co-preview .pv-compose i{position:relative;width:14px;height:14px}
+.co-preview .pv-compose i::before,.co-preview .pv-compose i::after{content:'';position:absolute;left:0;top:6px;width:14px;height:1.8px;background:var(--co-ink)}
+.co-preview .pv-compose i::after{transform:rotate(90deg)}
+.co-preview .pv-note{font-size:12.5px;line-height:1.4;color:var(--co-ink-3);text-align:center;max-width:250px}
+/* under 1024px there is no room for the phone: the preview's latest line rides under the header as one coach bubble */
+@media (max-width:1023.98px){
+  .co-peek{display:flex;flex:none;padding:10px 20px 0}
+  .co-peek span{max-width:100%;padding:.55em .95em;border-radius:1.3em;background:#fff;box-shadow:0 0 0 1px rgba(58,40,24,.06);font-size:14px;line-height:1.3;color:var(--co-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .co-peek span:empty{display:none}
+}
+@media (max-height:520px){.co-peek{display:none}}
+.co-bg.sent .co-peek{display:none}   /* the success screen has its own words */
 
 /* Phones: a bottom sheet. The overlay's height/top are set from
    window.visualViewport by the script while the sheet is open, so an open
@@ -1064,6 +1287,8 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   .co-handle{display:block;width:36px;height:4px;border-radius:2px;background:var(--co-line);margin:8px auto 0;flex-shrink:0}
   .co-head{padding:8px 12px 12px 20px}
   .co-msgs{padding:0 20px 20px;min-height:0}
+  .fo-sec-h{font-size:24px;padding-top:16px}
+  .co-bg .fo-nav .co-confirm{min-width:132px}
   .co-input-area{padding:10px 20px calc(14px + env(safe-area-inset-bottom));gap:8px}
   .co-bg .co-confirm{font-size:16px}
   .co-bg .fo-in{font-size:16px}/* prevent iOS auto-zoom on focus — class+class so it outranks `.co-bg input{font:inherit}`; under 16px iOS zooms on focus, never zooms back, and the sheet runs off the right edge */
@@ -1071,10 +1296,12 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   .fo-in.fo-num{padding-left:8px;padding-right:8px}/* three fields on a 320px screen at 16px */
 }
 @media (max-width:359.98px){.co-head-sub2{display:none}}   /* the sub-line stays one line on the narrowest phones */
+@media (max-width:359.98px){.fo-nav{gap:8px}.co-bg .fo-back{padding:0 10px}.co-bg .fo-nav .co-confirm{min-width:104px}.fo-steps{gap:5px}.co-bg .fo-steps button{width:6px;height:6px}.co-bg .fo-steps button.cur{width:18px}}   /* 320px: back · six dots · next have to fit 280px — at the regular sizes the button ran off the right edge */
 /* A short viewport (the phone keyboard up: ~390×430) leaves the scroller ~110px tall with the consent in the footer — thin the chrome so the open row's field and its button fit */
 @media (max-height:520px){.co-handle{display:none}.co-head{padding:6px 12px 6px 20px}.co-head-sub{display:none}.co-avatar{width:32px;height:32px}.co-head-name{font-size:20px}.fo-consent{font-size:11.5px;line-height:1.35}.co-input-area{gap:6px}.co-bg .co-confirm{min-height:44px;padding:8px 18px;font-size:15px}}
 @media (prefers-reduced-motion:reduce){
-  .co-bg,.co-sheet,.co-progress i,.fo-in,.fo-chip,.fo-consent i,.fo-consent i::after,.fo-a,.fo-chev,.fo-q{transition:none}
+  .co-bg,.co-sheet,.co-progress i,.fo-in,.fo-chip,.fo-consent i,.fo-consent i::after,.fo-q,.fo-q::after,.pose img,.co-preview .pv-msg,.co-preview .pv-wk i,.co-bg .fo-steps button{transition:none}
+  .fo-page.cur,.co-burst img{animation:none}
   .co-shake{animation:none}
 }
 
@@ -1090,11 +1317,12 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   .hero-h{font-size:clamp(60px,3.9vw,72px)}
   .hero-copy{max-width:900px}
   .hero-sub{font-size:22px;margin-top:32px}
+  .film{width:min(1240px,100%)}
+  #film{padding-top:calc(100px - clamp(56px,3.5vw,70px) * .67)}   /* the same two-thirds peek at this tier's headline size */
   .btn.sq{height:58px;padding:0 32px;font-size:19px}
   h2{font-size:clamp(56px,3.5vw,70px)}
-  .mq .msg{font-size:24px}
   #proof .proof-copy h2.h2-long{font-size:50px}   /* three lines in the ~620px column; 54 wraps to four */
-  #proof .phone-wrap{width:min(540px,100%)}
+  #proof .phone-wrap{width:min(480px,100%)}
   #proof .thread{font-size:19px}
   .proof-mascot{width:clamp(360px,44vh,640px)}
   .apps-row h3{font-size:40px}
@@ -1179,18 +1407,21 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   </div>
 </section>
 
-<!-- ===== SAY ANYTHING ===== -->
-<section id="say" class="blend blend-to" style="--from:var(--cream);--to:var(--cream)" data-label="say anything">
+<!-- ===== FILM — the "your cue" film (founder's cut, 1:38), where muse.ai has its statement video. Muted
+     autoplay in view, no sound at all (the files have no audio); see the FILM block in the sheet and the film script. ===== -->
+<section id="film" class="cream" data-label="the film">
   <div class="wrap">
-    <h2 data-io>say anything.</h2>
-    <p class="sub" data-io>it's a text thread. so text it like one.</p>
+    <h2 data-io>see a week with cued.</h2>
+    <p class="sub" data-io>classes, lifts, meals and sleep, all handled in one text thread.</p>
+    <div class="film paused" id="filmCard">
+      <video id="filmVideo" muted loop playsinline preload="none" poster="assets/film/cued-your-cue-poster.jpg" disablepictureinpicture disableremoteplayback aria-label="the cued film: your cue to lock in">
+        <source src="assets/film/cued-your-cue-720.mp4" type="video/mp4" media="(max-width: 767px)">
+        <source src="assets/film/cued-your-cue.mp4" type="video/mp4">
+      </video>
+      <button type="button" class="film-play" id="filmPlay" aria-label="play the film"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5v17a1 1 0 0 0 1.5.86l14-8.5a1 1 0 0 0 0-1.72l-14-8.5A1 1 0 0 0 6 3.5z"/></svg></button>
+      <div class="film-bar" aria-hidden="true"><i id="filmBar"></i></div>
+    </div>
   </div>
-  <div class="mq" aria-hidden="true"><div class="mq-track thread" id="mq1"></div></div>
-  <div class="mq rev" aria-hidden="true"><div class="mq-track thread" id="mq2"></div></div>
-  <ul class="sr-only" id="mqList">
-    <li>gym line rn?</li><li>190 x4</li><li>slept like garbage</li><li>what's good at the dining hall</li><li>move leg day to thurs</li><li>im sore af</li><li>how much protein am i at</li><li>book me a library room</li><li>pull or push today</li>
-    <li>how'd my week go</li><li>new pr 225</li><li>skipping today ngl</li><li>what's due this week</li><li>remind me to meal prep sunday</li><li>is the gym packed</li><li>what should i eat before class</li><li>logged my trader joe's run</li><li>when's my next lift</li>
-  </ul>
 </section>
 
 <!-- ===== PROOF — five steps, one phone. The markup is the stacked (mobile /
@@ -1209,12 +1440,11 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
         <div class="phone-wrap"><div class="phone"><div class="phone-screen">
           <div class="ph-head">
             <picture><source srcset="assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
-            <div class="ph-name">cued</div>
-            <div class="ph-status">reading your calendar…</div>
+            <div class="ph-id"><div class="ph-name">cued</div><div class="ph-status">reading your calendar…</div></div>
           </div>
           <div class="screen">
             <div class="thread coach-left" data-play data-cap="today · 8:02 am">
-              <div class="msg coach card wk" aria-label="this week: classes most days, a lab tuesday, chem homework wednesday, club thursday, chem quiz friday, push monday and legs thursday">
+              <div class="msg coach card wk pop" aria-label="this week: classes most days, a lab tuesday, chem homework wednesday, club thursday, chem quiz friday, push monday and legs thursday">
                 <div class="wk-h"><i class="wk-dot"></i>this week</div>
                 <div class="wk-grid">
                   <div class="wk-day"><span>mon</span><div class="wk-col"><b class="chip gray">cs 61c</b><b class="chip gray">data 104</b><b class="chip blue bot">push</b></div></div>
@@ -1249,13 +1479,12 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
         <div class="phone-wrap"><div class="phone"><div class="phone-screen">
           <div class="ph-head">
             <picture><source srcset="assets/mascot/v2/cued-face-256-light.webp" type="image/webp"><img class="ph-avatar" src="assets/mascot/v2/cued-face-256-light.png" alt="" width="44" height="44"></picture>
-            <div class="ph-name">cued</div>
-            <div class="ph-status">logging your sets…</div>
+            <div class="ph-id"><div class="ph-name">cued</div><div class="ph-status">logging your sets…</div></div>
           </div>
           <div class="screen">
             <div class="thread coach-left" data-play data-cap="sat · 5:48 pm">
               <div class="msg coach t">push day. bench 110 for 4×5, if it all moves easy we jump next time.</div>
-              <div class="msg coach card sheet-card" role="button" tabindex="0" aria-expanded="false" aria-label="workout card: push, saturday — tap to open the set sheet">
+              <div class="msg coach card sheet-card pop" role="button" tabindex="0" aria-expanded="false" aria-label="workout card: push, saturday — tap to open the set sheet">
                 <div class="sh-compact"><i class="wk-dot"></i><div><div class="sh-ct">push · sat</div><div class="sh-cs">bench press — tap to start</div></div></div>
               </div>
               <div class="msg user t turn">felt easy</div>
@@ -1294,17 +1523,16 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
         <div class="phone-wrap"><div class="phone"><div class="phone-screen">
           <div class="ph-head">
             <picture><source srcset="assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
-            <div class="ph-name">cued</div>
-            <div class="ph-status">logging your plate…</div>
+            <div class="ph-id"><div class="ph-name">cued</div><div class="ph-status">logging your plate…</div></div>
           </div>
           <div class="screen">
             <div class="thread coach-left" data-play data-cap="today · 1:12 pm">
               <div class="msg user photo"><img src="images/dinner-plate.jpg" width="1000" height="855" loading="lazy" alt="photo of a dinner plate: sliced tri-tip with chimichurri, roasted sweet potatoes, broccoli and cauliflower"></div>
               <div class="msg user t">ate this from the dining hall</div>
-              <div class="msg coach turn">i logged your plate at 740 cal. portions are my guesses: about 5oz of beef with the veg, 1 medium sweet potato. fix any of those.</div>
+              <div class="msg coach turn pop">i logged your plate at 740 cal. portions are my guesses: about 5oz of beef with the veg, 1 medium sweet potato. fix any of those.</div>
               <div class="msg user t turn">how many cals do i have left</div>
               <div class="msg coach turn">plenty of room for a real dinner tonight</div>
-              <div class="msg coach card today" aria-label="today: 1,300 of 2,500 calories, 59 of 142 grams protein">
+              <div class="msg coach card today pop" aria-label="today: 1,300 of 2,500 calories, 59 of 142 grams protein">
                 <div class="wk-h"><i class="wk-dot"></i>today</div>
                 <div class="td-grid">
                   <div><div class="td-k">calories</div><div class="td-v">1,300<small>/ 2,500</small></div><div class="bar"><i style="width:52%"></i></div></div>
@@ -1326,8 +1554,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
         <div class="phone-wrap"><div class="phone"><div class="phone-screen">
           <div class="ph-head">
             <picture><source srcset="assets/mascot/v2/cued-face-256-light.webp" type="image/webp"><img class="ph-avatar" src="assets/mascot/v2/cued-face-256-light.png" alt="" width="44" height="44"></picture>
-            <div class="ph-name">cued</div>
-            <div class="ph-status">picking up where we left off…</div>
+            <div class="ph-id"><div class="ph-name">cued</div><div class="ph-status">picking up where we left off…</div></div>
           </div>
           <div class="screen">
             <div class="thread coach-left" data-play data-cap="fri · 4:21 pm">
@@ -1336,10 +1563,10 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
               <div class="msg user t turn tap">my mom's bday is tmrw btw</div>
               <div class="msg coach t turn">tell her happy bday from me</div>
               <div class="tsd" aria-label="sunday 9:14 pm">sunday 9:14 pm</div>
-              <div class="msg coach">welcome back. legs tomorrow after class, or back like last time?</div>
+              <div class="msg coach pop">welcome back. legs tomorrow after class, or back like last time?</div>
               <div class="msg user t turn">back. and too much cake lol</div>
               <div class="msg coach turn">worth it. back monday then. it's all here if u ever want to check:</div>
-              <div class="msg coach card link" aria-label="what i remember, your profile on cued.fit">
+              <div class="msg coach card link pop" aria-label="what i remember, your profile on cued.fit">
                 <div class="lk-t">what i remember</div>
                 <div class="lk-s">who you are · 3 notes · cued.fit</div>
                 <svg class="lk-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 8.5l-2 5-5 2 2-5z" fill="currentColor"/></svg>
@@ -1359,8 +1586,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
         <div class="phone-wrap"><div class="phone"><div class="phone-screen">
           <div class="ph-head">
             <picture><source srcset="assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
-            <div class="ph-name">cued</div>
-            <div class="ph-status">reading last night's sleep…</div>
+            <div class="ph-id"><div class="ph-name">cued</div><div class="ph-status">reading last night's sleep…</div></div>
           </div>
           <div class="screen">
             <div class="thread coach-left" data-play data-cap="today · 6:11 pm">
@@ -1368,9 +1594,9 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
                 <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="32" cy="32" r="22" fill="currentColor"/><circle cx="39" cy="26" r="4.5" fill="#fff"/></svg>
                 <span>water break</span>
               </div>
-              <div class="msg coach t turn">your watch says you slept 4 hours. not the day for heavy squats, moved legs to thu. tonight: walk, protein, early bed.</div>
+              <div class="msg coach t turn pop">your watch says you slept 4 hours. not the day for heavy squats, moved legs to thu. tonight: walk, protein, early bed.</div>
               <div class="msg user t turn">how full is the gym rn</div>
-              <div class="msg coach card gym" aria-label="gym right now: 68 percent full, filling up, as of 6:11pm">
+              <div class="msg coach card gym pop" aria-label="gym right now: 68 percent full, filling up, as of 6:11pm">
                 <div class="wk-h"><i class="wk-dot"></i>gym right now<span class="gy-as">as of 6:11pm</span></div>
                 <div class="gy-v">68% full <small>filling up.</small></div>
                 <div class="bar amber"><i style="width:68%"></i></div>
@@ -1429,13 +1655,12 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     <div class="thread-card" data-io>
       <div class="ph-head">
         <picture><source srcset="assets/mascot/v2/cued-face-256.webp" type="image/webp"><img class="ph-avatar" src="assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture>
-        <div class="ph-name">cued</div>
-        <div class="ph-status">keeping this between us…</div>
+        <div class="ph-id"><div class="ph-name">cued</div><div class="ph-status">keeping this between us…</div></div>
       </div>
       <div class="thread coach-left" data-play data-cap="today · 9:30 pm">
         <div class="msg user t">where can i see everything you have on me</div>
         <div class="msg coach turn">that page has everything i have saved on u:</div>
-        <div class="msg coach card link" aria-label="your profile on cued.fit">
+        <div class="msg coach card link pop" aria-label="your profile on cued.fit">
           <div class="lk-t">your profile</div>
           <div class="lk-s">cued.fit</div>
           <svg class="lk-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15.5 8.5l-2 5-5 2 2-5z" fill="currentColor"/></svg>
@@ -1520,10 +1745,12 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
 <!-- ===== SIGN-UP — the form (script at the bottom of the page) ===== -->
 <div class="co-bg" id="waitlistOverlay" role="dialog" aria-modal="true" aria-label="Sign up for cued" aria-hidden="true">
   <div class="co-sheet" role="document">
+   <div class="co-main">
     <div class="co-handle"></div>
     <div class="co-head">
       <div class="co-head-info">
-        <div class="co-avatar" aria-hidden="true"><picture><source srcset="assets/mascot/v2/cued-face-256.webp" type="image/webp"><img src="assets/mascot/v2/cued-face-256.png" alt="" width="44" height="44"></picture></div>
+        <!-- the mascot strikes a pose per screen (data-pose on each .fo-page); the later ones load when the card first opens -->
+        <div class="co-avatar pose" aria-hidden="true"><img class="on" data-pose="face" src="assets/mascot/v2/cued-face-256.webp" alt="" width="56" height="56"><img data-pose="ball" data-src="assets/mascot/v2/cued-ball.webp" alt=""><img data-pose="sets" data-src="assets/mascot/v2/cued-sets.webp" alt=""><img data-pose="week" data-src="assets/mascot/v2/cued-week.webp" alt=""><img data-pose="dinner" data-src="assets/mascot/v2/cued-dinner.webp" alt=""><img data-pose="lock" data-src="assets/mascot/v2/cued-lock.webp" alt=""></div>
         <div>
           <div class="co-head-name">sign up</div>
           <div class="co-head-sub">about a minute.<span class="co-head-sub2"> nothing to download.</span></div>
@@ -1532,28 +1759,32 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
       <button type="button" class="co-close" id="waitlistClose" aria-label="Close">✕</button>
     </div>
     <div class="co-progress" aria-hidden="true"><i id="coProgress"></i></div>
+    <!-- phones: the preview's latest line as one small coach bubble (the full preview phone is desktop's) -->
+    <div class="co-peek" id="coPeek" aria-hidden="true"><span></span></div>
     <div class="co-msgs" id="coMsgs">
       <form class="fo" id="coForm" novalidate>
-        <div class="fo-sec">
+        <!-- Six short screens (.fo-page), one shown at a time; every question on the current screen is open.
+             2026-11-27 (the founder's table): injuries, current routine, food
+             situation, wake + sleep and activity joined the form so the coach stops asking them over text,
+             and "how many days" became WHICH days. Steps and current intake stay a text conversation. -->
+        <div class="fo-sec fo-page" data-pose="face" data-status="getting to know you…">
           <h3 class="fo-sec-h">about you</h3>
           <div class="fo-field" data-f="name">
-            <button type="button" class="fo-q" id="foQ-name" aria-expanded="false" aria-controls="foA-name"><span class="fo-qt">full name</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-q" id="foQ-name"><span class="fo-qt">full name</span></div>
             <div class="fo-a" id="foA-name" role="region" aria-labelledby="foQ-name"><div class="fo-ai"><div class="fo-body">
             <input class="fo-in" id="foName" name="name" type="text" placeholder="first and last" autocomplete="name" enterkeyhint="next">
             <div class="fo-hint">what should i call you?</div>
-            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
             </div></div></div>
           </div>
           <div class="fo-field" data-f="phone">
-            <button type="button" class="fo-q" id="foQ-phone" aria-expanded="false" aria-controls="foA-phone"><span class="fo-qt">your number <small>that's where i'll text you</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-q" id="foQ-phone"><span class="fo-qt">your number <small>that's where i'll text you</small></span></div>
             <div class="fo-a" id="foA-phone" role="region" aria-labelledby="foQ-phone"><div class="fo-ai"><div class="fo-body">
             <input class="fo-in" id="foPhone" name="phone" type="tel" placeholder="(510) 555-1234" inputmode="tel" autocomplete="tel" enterkeyhint="next">
             <div class="fo-hint">that's not a 10-digit US number</div>
-            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
             </div></div></div>
           </div>
           <div class="fo-field" data-f="occupation">
-            <button type="button" class="fo-q" id="foQ-occupation" aria-expanded="false" aria-controls="foA-occupation"><span class="fo-qt">occupation?</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-q" id="foQ-occupation"><span class="fo-qt">occupation?</span></div>
             <div class="fo-a" id="foA-occupation" role="region" aria-labelledby="foQ-occupation"><div class="fo-ai"><div class="fo-body">
             <div class="fo-chips" role="radiogroup" aria-labelledby="foQ-occupation" data-stay="1">
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="student">student</button>
@@ -1564,24 +1795,21 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
             <div class="fo-sub school"><label class="fo-sub-l" for="foSchool">which school?</label><input class="fo-in" id="foSchool" name="school" type="text" autocomplete="organization" placeholder="e.g. uc berkeley" enterkeyhint="next"></div>
             <div class="fo-sub job"><label class="fo-sub-l" for="foJob">what kind of work?</label><input class="fo-in" id="foJob" name="job" type="text" autocomplete="organization-title" placeholder="e.g. nurse, software, retail" enterkeyhint="next"></div>
             <div class="fo-hint">pick one</div>
-            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
             </div></div></div>
           </div>
         </div>
-
-        <div class="fo-sec">
+        <div class="fo-sec fo-page" data-pose="ball" data-status="doing the math…" hidden>
           <h3 class="fo-sec-h">a bit about you</h3>
           <p class="fo-sec-note">this is what your targets and first workout are built from.</p>
           <div class="fo-field short" data-f="age">
-            <button type="button" class="fo-q" id="foQ-age" aria-expanded="false" aria-controls="foA-age"><span class="fo-qt">age</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-q" id="foQ-age"><span class="fo-qt">age</span></div>
             <div class="fo-a" id="foA-age" role="region" aria-labelledby="foQ-age"><div class="fo-ai"><div class="fo-body">
             <input class="fo-in fo-num" id="foAge" name="age" type="text" placeholder="20" inputmode="numeric" autocomplete="off" maxlength="3" enterkeyhint="next">
             <div class="fo-hint">just the number</div>
-            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
             </div></div></div>
           </div>
           <div class="fo-field" data-f="gender">
-            <button type="button" class="fo-q" id="foQ-gender" aria-expanded="false" aria-controls="foA-gender"><span class="fo-qt">gender</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-q" id="foQ-gender"><span class="fo-qt">gender</span></div>
             <div class="fo-a" id="foA-gender" role="region" aria-labelledby="foQ-gender"><div class="fo-ai"><div class="fo-body">
             <div class="fo-chips" role="radiogroup">
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="male">male</button>
@@ -1593,7 +1821,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
             </div></div></div>
           </div>
           <div class="fo-field" data-f="stats">
-            <button type="button" class="fo-q" id="foQ-stats" aria-expanded="false" aria-controls="foA-stats"><span class="fo-qt">height &amp; weight <small>estimate is fine</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-q" id="foQ-stats"><span class="fo-qt">height &amp; weight <small>estimate is fine</small></span></div>
             <div class="fo-a" id="foA-stats" role="region" aria-labelledby="foQ-stats"><div class="fo-ai"><div class="fo-body">
             <div class="fo-tools"><span class="co-units" role="radiogroup" aria-label="units">
                 <button type="button" class="co-unit sel" role="radio" aria-checked="true" data-metric="0">ft / lb</button>
@@ -1609,28 +1837,22 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
               <input class="fo-in fo-num" data-k="kg" type="text" inputmode="decimal" autocomplete="off" maxlength="5" placeholder="weight (kg)" aria-label="weight, kilograms" enterkeyhint="next">
             </div>
             <div class="fo-hint">a height and a weight — estimate is fine</div>
-            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
             </div></div></div>
           </div>
-        </div>
-        <div class="fo-sec">
-          <h3 class="fo-sec-h">your training</h3>
-          <div class="fo-field" data-f="goals">
-            <button type="button" class="fo-q" id="foQ-goals" aria-expanded="false" aria-controls="foA-goals"><span class="fo-qt">what are you training for? <small>pick all that apply</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
-            <div class="fo-a" id="foA-goals" role="region" aria-labelledby="foQ-goals"><div class="fo-ai"><div class="fo-body">
-            <div class="fo-chips" role="group" data-multi="1">
-              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="fat_loss">lose fat</button>
-              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="muscle_building">build muscle</button>
-              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="strength">get stronger</button>
-              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="general_fitness">general fitness</button>
-              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="endurance">endurance</button>
+          <div class="fo-field" data-f="activity">
+            <div class="fo-q" id="foQ-activity"><span class="fo-qt">how active is your day outside the gym?</span></div>
+            <div class="fo-a" id="foA-activity" role="region" aria-labelledby="foQ-activity"><div class="fo-ai"><div class="fo-body">
+            <div class="fo-chips" role="radiogroup" aria-labelledby="foQ-activity">
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="sitting">mostly sitting</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="walking">some walking</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="feet">on my feet</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="physical">physical job or sport</button>
             </div>
-            <div class="fo-hint">pick at least one</div>
-            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
+            <div class="fo-hint">pick one</div>
             </div></div></div>
           </div>
           <div class="fo-field" data-f="obstacle">
-            <button type="button" class="fo-q" id="foQ-obstacle" aria-expanded="false" aria-controls="foA-obstacle"><span class="fo-qt">what gets in the way most?</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-q" id="foQ-obstacle"><span class="fo-qt">what gets in the way most?</span></div>
             <div class="fo-a" id="foA-obstacle" role="region" aria-labelledby="foQ-obstacle"><div class="fo-ai"><div class="fo-body">
             <div class="fo-chips" role="radiogroup">
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="consistency">consistency</button>
@@ -1643,8 +1865,24 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
             <div class="fo-hint">pick one</div>
             </div></div></div>
           </div>
+        </div>
+        <div class="fo-sec fo-page" data-pose="sets" data-status="building your plan…" hidden>
+          <h3 class="fo-sec-h">your training</h3>
+          <div class="fo-field" data-f="goals">
+            <div class="fo-q" id="foQ-goals"><span class="fo-qt">what are you training for? <small>pick all that apply</small></span></div>
+            <div class="fo-a" id="foA-goals" role="region" aria-labelledby="foQ-goals"><div class="fo-ai"><div class="fo-body">
+            <div class="fo-chips" role="group" data-multi="1">
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="fat_loss">lose fat</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="muscle_building">build muscle</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="strength">get stronger</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="general_fitness">general fitness</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="endurance">endurance</button>
+            </div>
+            <div class="fo-hint">pick at least one</div>
+            </div></div></div>
+          </div>
           <div class="fo-field" data-f="experience">
-            <button type="button" class="fo-q" id="foQ-experience" aria-expanded="false" aria-controls="foA-experience"><span class="fo-qt">how long have you been training?</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-q" id="foQ-experience"><span class="fo-qt">how long have you been training?</span></div>
             <div class="fo-a" id="foA-experience" role="region" aria-labelledby="foQ-experience"><div class="fo-ai"><div class="fo-body">
             <div class="fo-chips" role="radiogroup">
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="none">just starting</button>
@@ -1655,8 +1893,22 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
             <div class="fo-hint">pick one</div>
             </div></div></div>
           </div>
+          <div class="fo-field" data-f="routine">
+            <div class="fo-q" id="foQ-routine"><span class="fo-qt">do you follow a routine already?</span></div>
+            <div class="fo-a" id="foA-routine" role="region" aria-labelledby="foQ-routine"><div class="fo-ai"><div class="fo-body">
+            <div class="fo-chips" role="radiogroup" aria-labelledby="foQ-routine">
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="ppl">push / pull / legs</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="upper_lower">upper / lower</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="full_body">full body</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="bro_split">one body part a day</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="custom">my own thing</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="none">no, build me one</button>
+            </div>
+            <div class="fo-hint">pick one</div>
+            </div></div></div>
+          </div>
           <div class="fo-field" data-f="equipment">
-            <button type="button" class="fo-q" id="foQ-equipment" aria-expanded="false" aria-controls="foA-equipment"><span class="fo-qt">what do you have access to?</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-q" id="foQ-equipment"><span class="fo-qt">what do you have access to?</span></div>
             <div class="fo-a" id="foA-equipment" role="region" aria-labelledby="foQ-equipment"><div class="fo-ai"><div class="fo-body">
             <div class="fo-chips" role="radiogroup">
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="full_gym">full gym</button>
@@ -1667,21 +1919,43 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
             <div class="fo-hint">pick one</div>
             </div></div></div>
           </div>
-          <div class="fo-field" data-f="days">
-            <button type="button" class="fo-q" id="foQ-days" aria-expanded="false" aria-controls="foA-days"><span class="fo-qt">days a week you can realistically train</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
-            <div class="fo-a" id="foA-days" role="region" aria-labelledby="foQ-days"><div class="fo-ai"><div class="fo-body">
-            <div class="fo-chips even" role="radiogroup">
-              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="2">2</button>
-              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="3">3</button>
-              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="4">4</button>
-              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="5">5</button>
-              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="6">6</button>
+          <div class="fo-field" data-f="injuries">
+            <div class="fo-q" id="foQ-injuries"><span class="fo-qt">any injuries or limits? <small>pick all that apply</small></span></div>
+            <div class="fo-a" id="foA-injuries" role="region" aria-labelledby="foQ-injuries"><div class="fo-ai"><div class="fo-body">
+            <div class="fo-chips" role="group" data-multi="1" aria-labelledby="foQ-injuries">
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="none">none</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="shoulder">shoulder</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="back">lower back</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="knee">knee</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="wrist">wrist or elbow</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="hip">hip</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="ankle">ankle</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="other">something else</button>
             </div>
-            <div class="fo-hint">pick one</div>
+            <div class="fo-sub note"><label class="fo-sub-l" for="foInjNote">anything i should know? <span>(optional)</span></label><input class="fo-in" id="foInjNote" name="injuries_note" type="text" autocomplete="off" placeholder="e.g. left knee, no deep squats" enterkeyhint="next"></div>
+            <div class="fo-hint">pick one — "none" counts. for "something else", say what</div>
+            </div></div></div>
+          </div>
+        </div>
+        <div class="fo-sec fo-page" data-pose="week" data-status="planning your week…" hidden>
+          <h3 class="fo-sec-h">your week</h3>
+          <div class="fo-field" data-f="days">
+            <div class="fo-q" id="foQ-days"><span class="fo-qt">which days can you realistically train? <small>pick all that apply</small></span></div>
+            <div class="fo-a" id="foA-days" role="region" aria-labelledby="foQ-days"><div class="fo-ai"><div class="fo-body">
+            <div class="fo-chips even" role="group" data-multi="1" aria-labelledby="foQ-days">
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="mon">mon</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="tue">tue</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="wed">wed</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="thu">thu</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="fri">fri</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="sat">sat</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="sun">sun</button>
+            </div>
+            <div class="fo-hint">pick at least one</div>
             </div></div></div>
           </div>
           <div class="fo-field" data-f="time">
-            <button type="button" class="fo-q" id="foQ-time" aria-expanded="false" aria-controls="foA-time"><span class="fo-qt">when do you usually get to it? <small>pick all that apply</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-q" id="foQ-time"><span class="fo-qt">when do you usually get to it? <small>pick all that apply</small></span></div>
             <div class="fo-a" id="foA-time" role="region" aria-labelledby="foQ-time"><div class="fo-ai"><div class="fo-body">
             <div class="fo-chips even" role="group" data-multi="1">
               <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="morning">mornings</button>
@@ -1689,11 +1963,61 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
               <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="evening">evenings</button>
             </div>
             <div class="fo-hint">pick at least one</div>
-            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
+            </div></div></div>
+          </div>
+          <div class="fo-field" data-f="sleep">
+            <div class="fo-q" id="foQ-sleep"><span class="fo-qt">when are you up, and when do you crash? <small>roughly</small></span></div>
+            <div class="fo-a" id="foA-sleep" role="region" aria-labelledby="foQ-sleep"><div class="fo-ai"><div class="fo-body">
+            <span class="fo-sub-l" id="foWakeL">up around</span>
+            <div class="fo-chips even" role="radiogroup" aria-labelledby="foWakeL" data-g="wake">
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="06:00">before 7</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="08:00">7 – 9</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="10:00">9 – 11</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="12:00">after 11</button>
+            </div>
+            <span class="fo-sub-l fo-sub-l2" id="foSleepL">asleep around</span>
+            <div class="fo-chips even" role="radiogroup" aria-labelledby="foSleepL" data-g="sleep">
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="21:30">before 10</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="23:00">10 – 12</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="01:00">12 – 2</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="03:00">after 2</button>
+            </div>
+            <div class="fo-hint">pick one of each</div>
+            </div></div></div>
+          </div>
+          <div class="fo-field" data-f="apps">
+            <div class="fo-q" id="foQ-apps"><span class="fo-qt">track anything already? <small>pick all that apply</small></span></div>
+            <div class="fo-a" id="foA-apps" role="region" aria-labelledby="foQ-apps"><div class="fo-ai"><div class="fo-body">
+            <div class="fo-chips" role="group" data-multi="1">
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="none">nothing yet</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="apple_watch">apple watch</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="fitbit">fitbit / google</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="garmin">garmin</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="whoop">whoop</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="oura">oura</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="strava">strava</button>
+              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="myfitnesspal">myfitnesspal</button>
+            </div>
+            <div class="fo-hint">pick at least one — "nothing yet" counts</div>
+            </div></div></div>
+          </div>
+        </div>
+        <div class="fo-sec fo-page" data-pose="dinner" data-status="planning your plate…" hidden>
+          <h3 class="fo-sec-h">your food</h3>
+          <div class="fo-field" data-f="cooking">
+            <div class="fo-q" id="foQ-cooking"><span class="fo-qt">where does most of your food come from?</span></div>
+            <div class="fo-a" id="foA-cooking" role="region" aria-labelledby="foQ-cooking"><div class="fo-ai"><div class="fo-body">
+            <div class="fo-chips" role="radiogroup" aria-labelledby="foQ-cooking">
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="cook_myself">i cook</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="dining_hall">dining hall</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="mostly_eat_out">eating out</button>
+              <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="mix">a mix</button>
+            </div>
+            <div class="fo-hint">pick one</div>
             </div></div></div>
           </div>
           <div class="fo-field" data-f="diet">
-            <button type="button" class="fo-q" id="foQ-diet" aria-expanded="false" aria-controls="foA-diet"><span class="fo-qt">how do you eat?</span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-q" id="foQ-diet"><span class="fo-qt">how do you eat?</span></div>
             <div class="fo-a" id="foA-diet" role="region" aria-labelledby="foQ-diet"><div class="fo-ai"><div class="fo-body">
             <div class="fo-chips" role="radiogroup">
               <button type="button" class="fo-chip" role="radio" aria-checked="false" data-v="omnivore">no restrictions</button>
@@ -1707,45 +2031,25 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
             </div></div></div>
           </div>
           <div class="fo-field" data-f="restrictions">
-            <button type="button" class="fo-q" id="foQ-restrictions" aria-expanded="false" aria-controls="foA-restrictions"><span class="fo-qt">allergies, or foods you just won't eat <small>optional</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-q" id="foQ-restrictions"><span class="fo-qt">allergies, or foods you just won't eat <small>optional</small></span></div>
             <div class="fo-a" id="foA-restrictions" role="region" aria-labelledby="foQ-restrictions"><div class="fo-ai"><div class="fo-body">
             <input class="fo-in" id="foRestr" name="restrictions" type="text" placeholder="e.g. peanuts, mushrooms" autocomplete="off" enterkeyhint="next">
-            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
-            </div></div></div>
-          </div>
-          <div class="fo-field" data-f="apps">
-            <button type="button" class="fo-q" id="foQ-apps" aria-expanded="false" aria-controls="foA-apps"><span class="fo-qt">track anything already? <small>pick all that apply</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
-            <div class="fo-a" id="foA-apps" role="region" aria-labelledby="foQ-apps"><div class="fo-ai"><div class="fo-body">
-            <div class="fo-chips" role="group" data-multi="1">
-              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="none">nothing yet</button>
-              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="apple_watch">apple watch</button>
-              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="fitbit">fitbit / google</button>
-              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="garmin">garmin</button>
-              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="whoop">whoop</button>
-              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="oura">oura</button>
-              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="strava">strava</button>
-              <button type="button" class="fo-chip" role="checkbox" aria-checked="false" data-v="myfitnesspal">myfitnesspal</button>
-            </div>
-            <div class="fo-hint">pick at least one — "nothing yet" counts</div>
-            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
             </div></div></div>
           </div>
         </div>
-        <div class="fo-sec opt">
+        <div class="fo-sec fo-page opt" data-pose="lock" data-status="ready when you are…" hidden>
           <h3 class="fo-sec-h">last things <small>optional</small></h3>
           <div class="fo-field" data-f="email">
-            <button type="button" class="fo-q" id="foQ-email" aria-expanded="false" aria-controls="foA-email"><span class="fo-qt">gmail <small>optional — for google calendar or fitbit later</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-q" id="foQ-email"><span class="fo-qt">gmail <small>optional — for google calendar or fitbit later</small></span></div>
             <div class="fo-a" id="foA-email" role="region" aria-labelledby="foQ-email"><div class="fo-ai"><div class="fo-body">
             <input class="fo-in" id="foEmail" name="email" type="email" placeholder="you@gmail.com" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" enterkeyhint="next">
             <div class="fo-hint">that email doesn't look right — fix it or leave it blank</div>
-            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
             </div></div></div>
           </div>
           <div class="fo-field" data-f="referral">
-            <button type="button" class="fo-q" id="foQ-referral" aria-expanded="false" aria-controls="foA-referral"><span class="fo-qt">a friend's referral code <small>optional — they get the credit</small></span><span class="fo-qv" aria-hidden="true"></span><i class="fo-chev" aria-hidden="true"></i></button>
+            <div class="fo-q" id="foQ-referral"><span class="fo-qt">a friend's referral code <small>optional — they get the credit</small></span></div>
             <div class="fo-a" id="foA-referral" role="region" aria-labelledby="foQ-referral"><div class="fo-ai"><div class="fo-body">
             <input class="fo-in" id="foRef" name="referral_code" type="text" placeholder="Alex1234" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="done">
-            <div class="fo-foot"><button type="button" class="fo-next">next</button></div>
             </div></div></div>
           </div>
         </div>
@@ -1757,8 +2061,27 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
         <div class="fo-hint">i need a yes here before i can text you</div>
       </div>
       <div class="fo-err" id="coErr" role="alert"></div>
-      <button type="button" class="co-confirm" id="coSubmit">sign up</button>
+      <div class="fo-nav">
+        <button type="button" class="fo-back" id="coBack">back</button>
+        <div class="fo-steps" id="coSteps" role="group" aria-label="steps"></div>
+        <button type="button" class="co-confirm" id="coNext">next</button>
+        <button type="button" class="co-confirm" id="coSubmit">sign up</button>
+      </div>
     </div>
+   </div>
+   <!-- The live preview (desktop): the conversations' phone, filling in from the answers as they are given —
+        what cued will say back. Built by the form script from the fields; nothing here is sent anywhere. -->
+   <aside class="co-preview" id="coPreview" aria-hidden="true">
+     <div class="pv-phone">
+       <div class="pv-head">
+         <div class="pv-ava pose"><img class="on" data-pose="face" src="assets/mascot/v2/cued-face-256.webp" alt="" width="60" height="60"><img data-pose="ball" data-src="assets/mascot/v2/cued-ball.webp" alt=""><img data-pose="sets" data-src="assets/mascot/v2/cued-sets.webp" alt=""><img data-pose="week" data-src="assets/mascot/v2/cued-week.webp" alt=""><img data-pose="dinner" data-src="assets/mascot/v2/cued-dinner.webp" alt=""><img data-pose="lock" data-src="assets/mascot/v2/cued-lock.webp" alt=""></div>
+         <div class="pv-id"><b>cued</b><span id="pvStatus">getting to know you…</span></div>
+       </div>
+       <div class="pv-screen"><div class="pv-thread" id="pvThread"></div></div>
+       <div class="pv-compose"><i></i><span>iMessage</span></div>
+     </div>
+     <p class="pv-note">your first texts from cued. they fill in as you answer.</p>
+   </aside>
   </div>
 </div>
 
@@ -1914,6 +2237,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   function pillState(){
     const narrow = window.innerWidth < 1024;   // stacked layouts: the chat sits in the main column, so no pill over it
     pill.classList.toggle('hide', vis.hero || vis.close || vis.faq || (narrow && (window.proofActive || vis.proof)));
+    pill.classList.toggle('aside', !narrow && !!window.proofActive);   // the pinned phone's composer overhangs bottom-centre
     if (mCta) mCta.classList.toggle('hide', vis.close || vis.faq);   // the close has the same button; nothing to sell past it
   }
   window.pillState = pillState;
@@ -1925,6 +2249,65 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   close && ioPill.observe(close);
   faq && ioPill.observe(faq);   // past the close there's nothing left to sell — no pill over the FAQ/footer
   proofSec && ioPill.observe(proofSec);   // narrow screens: no pill over the stacked chat either
+})();
+
+// === The film: plays while it's on screen, silently ===
+// Plays when half the card is in view and pauses when it leaves; nothing is fetched before that
+// (preload="none"). A click on the card pauses / plays. There is no sound: the files have no audio track and
+// the element stays muted (founder, 2026-11-27: "no sound at all"). If play() is refused (iOS Low Power Mode,
+// a browser policy) or the reader prefers reduced motion, the card stays on its poster with the play button.
+// It also pauses under the sign-up card — no point playing behind the form.
+(function(){
+  const card = document.getElementById('filmCard'), v = document.getElementById('filmVideo');
+  if (!card || !v) return;
+  const bar = document.getElementById('filmBar');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  let inView = false, userPaused = false, covered = false;
+  function play(){
+    let p; try { v.muted = true; p = v.play(); } catch (e) { p = null; }
+    if (p && p.catch) p.catch(() => card.classList.add('paused'));
+  }
+  function pause(){ try { v.pause(); } catch (e) {} }
+  v.addEventListener('play', () => card.classList.remove('paused'));
+  v.addEventListener('pause', () => card.classList.add('paused'));
+  v.addEventListener('timeupdate', () => { if (bar && v.duration) bar.style.width = (v.currentTime / v.duration * 100).toFixed(2) + '%'; });
+  const sync = () => { if (inView && !userPaused && !covered && !reduce.matches) play(); else if (!inView || covered) pause(); };
+  if ('IntersectionObserver' in window){
+    new IntersectionObserver(es => es.forEach(e => { inView = e.isIntersecting; sync(); }), {threshold: 0.5}).observe(card);
+  }
+  card.addEventListener('click', () => {
+    if (v.paused){ userPaused = false; play(); }
+    else { userPaused = true; pause(); }
+  });
+  const overlay = document.getElementById('waitlistOverlay');
+  if (overlay && 'MutationObserver' in window){
+    new MutationObserver(() => { covered = overlay.classList.contains('open'); sync(); }).observe(overlay, {attributes: true, attributeFilter: ['class']});
+  }
+
+  // The grow (founder, 2026-11-27: "small when not in frame, then grows as we scroll onto it"): the card
+  // enters from below at MIN scale and reaches full size when it is centred (or its top is under the nav,
+  // whichever comes first), eased out so most of the growth happens early; past that it stays full, and
+  // scrolling back up shrinks it again. Driven by scroll position, one write per frame, transform only.
+  // Measured from the section + offsetTop, never the card's own rect — that one already carries the scale.
+  // Off under reduced motion.
+  const section = document.getElementById('film');
+  const raf = window.requestAnimationFrame || (f => setTimeout(f, 16));
+  let queued = false;
+  function grow(){
+    queued = false;
+    if (reduce.matches){ card.style.removeProperty('--film-s'); return; }
+    const vh = window.innerHeight, h = card.offsetHeight;
+    const top = section.getBoundingClientRect().top + card.offsetTop;
+    const full = Math.max(88, (vh - h) / 2);                       // where the card's top sits when it is full size
+    const t = Math.min(1, Math.max(0, (vh - top) / Math.max(1, vh - full)));
+    const MIN = window.innerWidth < 768 ? .86 : .72;
+    card.style.setProperty('--film-s', (MIN + (1 - MIN) * (1 - (1 - t) * (1 - t))).toFixed(4));
+  }
+  const onScroll = () => { if (!queued){ queued = true; raf(grow); } };
+  window.addEventListener('scroll', onScroll, {passive: true});
+  window.addEventListener('resize', onScroll);
+  if (reduce.addEventListener) reduce.addEventListener('change', onScroll);
+  grow();
 })();
 
 // === cued live avatar (founder prototype, 2026-11-08) ===
@@ -2028,18 +2411,6 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   }), {threshold: 0}).observe(root);
 })();
 
-// === "say anything." strip — two rows, opposite directions, duplicated for a seamless loop ===
-(function(){
-  const items = Array.from(document.querySelectorAll('#mqList li')).map(li => li.textContent);
-  const rows = [items.slice(0, 9), items.slice(9)];
-  ['mq1', 'mq2'].forEach((id, i) => {
-    const track = document.getElementById(id);
-    if (!track) return;
-    const html = rows[i].map(t => '<div class="msg user t">' + t.replace(/</g, '&lt;') + '</div>').join('');
-    track.innerHTML = html + html;   // duplicated: translateX(-50%) lands on the copy
-  });
-})();
-
 // === Thread engine ===
 // playThread(thread): reveals the bubbles in order with a typing lead-in on
 // the incoming side, pushing the thread up like real Messages (the thread is
@@ -2109,16 +2480,26 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     const card = thread.querySelector('.sheet-card'); if (card) card.setAttribute('aria-expanded', 'true');
     ov.setAttribute('aria-hidden', 'false');
     screen.style.minHeight = Math.max(screen.offsetHeight, ov.scrollHeight + 28) + 'px';   // room for the sheet to rise into, no more
-    setTimeout(() => ov.classList.add('up'), 30);   // a tick after display/min-height land so the slide actually transitions
+    thread._sheetWant = true;
+    setTimeout(() => { if (thread._sheetWant) ov.classList.add('up'); }, 30);   // a tick after display/min-height land so the slide actually transitions
+  }
+  // The scroll-driven player lowers it again when the reader scrolls back above the point where it rose.
+  function sheetDown(thread){
+    thread._sheetWant = false;
+    const ov = thread._overlay; if (!ov || !ov.classList.contains('up')) return;
+    ov.classList.remove('up'); ov.setAttribute('aria-hidden', 'true');
+    const card = thread.querySelector('.sheet-card'); if (card) card.setAttribute('aria-expanded', 'false');
+    const screen = thread.closest('.screen'); if (screen) screen.style.minHeight = '';
   }
   document.querySelectorAll('.step .screen').forEach(sc => { const t = sc.querySelector('.thread[data-play]'), o = sc.querySelector('.sheet-overlay'); if (t) t._overlay = o || null; });
   window.sheetUp = sheetUp;
   document.querySelectorAll('.msg.card.sheet-card').forEach(card => {
     const th = card.closest('.thread');
-    card.addEventListener('click', () => sheetUp(th));
-    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); sheetUp(th); } });
+    card.addEventListener('click', () => { th._sheetManual = true; sheetUp(th); });   // opened by hand: scroll no longer lowers it
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); th._sheetManual = true; sheetUp(th); } });
   });
   function choreo(el){
+    if (el.classList.contains('pop') && window.burstProps) window.burstProps(el.parentElement);   // the step's objects fly out with its first highlight
     if (el.classList.contains('poll')){
       setTimeout(() => { if (!el.classList.contains('chosen')) el.classList.add('chosen'); }, 800);
     }
@@ -2132,6 +2513,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
       });
     thread.style.transform = '';
     thread.dataset.played = '1';
+    if (window.burstProps) window.burstProps(thread);
     sheetUp(thread);
   }
   function playThread(thread){
@@ -2208,57 +2590,49 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   }
   function startThread(t){ (mqStacked.matches ? playByScroll : playThread)(t); }
 
-  // Pinned desktop: the reader's scroll through a step's band drives the
-  // reveals (bubble k arrives at k/n of the first ~70% of the band), with the
-  // same catch-up stagger and typing beat as phones. If the reader stops with
-  // bubbles still pending, the rest arrive on their own after a beat — the
-  // thread finishes "like texts" instead of sitting half-played. Leaving a step
-  // finishes it, so a revisit shows the whole conversation. ?play=timed keeps
-  // the old autoplay for comparison.
+  // Pinned desktop: the conversation is a PURE FUNCTION OF SCROLL (founder, 2026-11-27: "make the convos
+  // purely scroll activated"). Nothing here runs on a timer: where the reader is in a step's band decides
+  // how many bubbles are in, whether the three dots show, whether the poll is picked, whether the set sheet
+  // is up and whether the step's objects have flown out. Stop scrolling and it holds exactly there; scroll
+  // back and it un-plays. (Before this the scroll only set a target and timers did the rest — a typing
+  // beat, a catch-up stagger, an idle finish after 1.4s, an 800ms poll pick, a 2.6s sheet.)
+  // q = progress through the band (0–1), or -1 before the track has pinned (nothing shown).
+  // In "bubbles": x = q / SPAN * n, bubble k is in from x >= k; the dots for the next bubble show over the
+  // last 45% of the stretch before it; the poll picks halfway to the bubble after it. The sheet thread
+  // lands its bubbles over the first 45% of its band and raises the sheet at 62%.
+  // ?play=timed keeps the old autoplay for comparison.
   function playByProgress(thread){
     if (thread._prog) return thread._prog;
     thread.dataset.played = '1';
+    if (reduce.matches){ revealAll(thread); return (thread._prog = {set(){}, finish(){}}); }
     const list = items(thread), n = list.length;
     const typing = mkTyping(thread);
-    let next = 0, target = 0, busy = false, idle = 0;
-    // Step 2 ends on the set sheet. Its bubbles land across the first 45% of the band
-    // (70% for the others) and the sheet rises at 62% — by scroll distance, with no
-    // 2.6s wait — so a reader moving at any pace sees the takeover before the band
-    // ends; stop early and the idle finish + the 2.6s beat still apply (2026-11-15).
-    const hasSheet = !!thread.querySelector('.sheet-card'), SPAN = hasSheet ? 0.45 : 0.7, SHEET_AT = 0.62;
-    let rush = false;
-    if (reduce.matches){ revealAll(thread); return (thread._prog = {set(){}, finish(){}}); }
-    layout(thread, 0);
-    function pump(){
-      if (busy || next >= target) return;
-      busy = true;
-      const el = list[next], prev = list[next - 1];
-      const waiting = next === target - 1;
-      typing.className = 'typing ' + sideOf(el);
-      typing.style.top = (prev ? prev.offsetTop + prev.offsetHeight + 6 : 0) + 'px';
-      if (waiting){ typing.classList.add('show'); layout(thread, typing.offsetHeight + 6); }
-      setTimeout(() => {
-        typing.classList.remove('show');
-        el.classList.add('on');
-        layout(thread, 0);
-        choreo(el);
-        next++; busy = false;
-        if (next >= n){ typing.remove(); setTimeout(() => sheetUp(thread), rush ? 0 : 2600); }
-        pump();
-      }, waiting ? 380 : 90);
-    }
+    const hasSheet = !!thread.querySelector('.sheet-card'), SPAN = hasSheet ? 0.45 : 0.7, SHEET_AT = 0.62, DOTS_FROM = 0.55;
+    const firstPop = list.findIndex(el => el.classList.contains('pop'));
+    const polls = list.map((el, k) => el.classList.contains('poll') ? k : -1).filter(k => k >= 0);
+    let key = '';
     function set(q){
-      const want = Math.min(n, Math.floor((q / SPAN) * n) + 1);
-      if (want > target){ target = want; pump(); }
-      if (hasSheet && q >= SHEET_AT && !rush){
-        rush = true;                       // the scroll distance was the beat
-        if (next >= n) sheetUp(thread); else { target = n; pump(); }
-      }
-      clearTimeout(idle);
-      if (target < n) idle = setTimeout(() => { target = n; pump(); }, 1400);
+      const x = q < 0 ? -1 : (q / SPAN) * n;
+      const count = q < 0 ? 0 : Math.min(n, Math.floor(x) + 1);
+      const dots = count > 0 && count < n && (x - Math.floor(x)) >= DOTS_FROM;
+      const picked = polls.map(k => x >= k + 0.5 ? 1 : 0).join('');
+      const sheet = hasSheet && (q >= SHEET_AT || !!thread._sheetManual);
+      const k2 = count + '|' + (dots ? 1 : 0) + '|' + picked + '|' + (sheet ? 1 : 0);
+      if (k2 === key) return;                    // same state as the last frame: nothing to write
+      key = k2;
+      list.forEach((el, k) => el.classList.toggle('on', k < count));
+      polls.forEach((k, m) => { if (!list[k].dataset.user) list[k].classList.toggle('chosen', picked[m] === '1'); });
+      if (dots){
+        const nxt = list[count], prev = list[count - 1];
+        typing.className = 'typing ' + sideOf(nxt);
+        typing.style.top = (prev.offsetTop + prev.offsetHeight + 6) + 'px';
+        typing.classList.add('show');
+      } else typing.classList.remove('show');
+      layout(thread, dots ? typing.offsetHeight + 6 : 0);
+      if (window.burstProps) window.burstProps(thread, firstPop >= 0 && firstPop < count);
+      if (hasSheet){ if (sheet) sheetUp(thread); else sheetDown(thread); }
     }
-    function finish(){ clearTimeout(idle); target = n; pump(); }
-    return (thread._prog = {set, finish});
+    return (thread._prog = {set, finish(){}});
   }
   window.playByProgress = playByProgress;
   window.playThread = playThread;
@@ -2270,7 +2644,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     const lock = poll.parentElement.querySelector('.poll-lock');
     rows.forEach(row => row.addEventListener('click', () => {
       rows.forEach(r => { r.classList.toggle('pick', r === row); r.setAttribute('aria-pressed', r === row ? 'true' : 'false'); });
-      poll.classList.add('chosen');
+      poll.classList.add('chosen'); poll.dataset.user = '1';   // the reader's own pick: the scroll-driven player leaves it alone
       if (lock) lock.textContent = row.dataset.t === 'rest day' ? 'alr, rest day it is. i\'ll leave u alone tomorrow.' : 'alr, ' + row.dataset.t + ' it is. i\'ll ping u when the line\'s short.';
     }));
   });
@@ -2314,6 +2688,35 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   const tints = ['', '', '', '', ''];   // the proof stays on the hero's cream (was tint-2 / white / tint-1 / white / tint-2)
   let pinned = null, cur = -1, raf = 0;
 
+  // Props: each step's objects, scattered beside its phone (see the PROPS block in the sheet).
+  // SLOTS = where the eight sit in the box: x%, y%, width as % of the box, rotation, blur px —
+  // slot 0 is the hero, low beside the highlighted card; the rest climb and shrink. SETS = which
+  // cut-out fills each slot, per step (the same object repeats at other sizes, like the reference's popcorn).
+  const SLOTS = [[44, 80, 66, -8, 0], [76, 59, 31, 12, 0], [27, 51, 21, -16, 1.4], [66, 40, 25, 9, 0], [91, 48, 15, 0, 2.2], [44, 30, 16, 22, .8], [82, 24, 20, -12, 0], [36, 14, 12, 10, 2.6]];
+  const SETS = [
+    ['calendar', 'dot', 'calendar', 'star', 'dot', 'dot', 'calendar', 'dot'],
+    ['dumbbell', 'star-pr', 'star', 'star-pr-2', 'star-2', 'star', 'star-2', 'star'],
+    ['bowl', 'cutlery', 'dot', 'cutlery', 'dot', 'dot', 'bowl', 'dot'],
+    ['signal', 'chart', 'dot', 'signal', 'dot', 'dot', 'chart', 'dot'],
+    ['watch', 'dot', 'dot', 'watch', 'dot', 'dot', 'dot', 'dot']];
+  const allThreads = steps.map(s => s.querySelector('.thread[data-play]'));
+  const propGroups = steps.map((s, i) => {
+    const g = document.createElement('div'); g.className = 'props'; g.setAttribute('aria-hidden', 'true');
+    SETS[i].forEach((name, k) => {
+      const [x, y, w, r, b] = SLOTS[k], im = new Image();
+      im.alt = ''; im.decoding = 'async'; im.dataset.src = 'assets/props/' + name + '.webp';
+      im.style.cssText = `--x:${x}%;--y:${y}%;--s:${name === 'dot' ? Math.round(w * .55) : w}%;--r:${r}deg;--b:${b}px;--o:${b > 2 ? .8 : 1};--d:${(k * .055).toFixed(2)}s`;
+      g.appendChild(im);
+    });
+    return g;
+  });
+  function mountProps(host){ propGroups.forEach((g, i) => (host || steps[i].querySelector('.phone-wrap')).appendChild(g)); }
+  mountProps(null);
+  // ~70 KB in all, fetched when the proof is a screen or so away — not with the hero
+  const loadProps = () => propGroups.forEach(g => g.querySelectorAll('img[data-src]').forEach(im => { im.src = im.dataset.src; im.removeAttribute('data-src'); }));
+  if ('IntersectionObserver' in window){ const pio = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)){ loadProps(); pio.disconnect(); } }, {rootMargin: '1400px 0px'}); pio.observe(section); } else loadProps();
+  window.burstProps = (thread, on) => { const i = allThreads.indexOf(thread); if (i >= 0) propGroups[i].classList.toggle('on', on !== false); };   // the scroll-driven player passes false to take them back
+
   // The five bands of the pinned track, as shares of its scroll span. Unequal since
   // 2026-11-15: step 2 ends on the set sheet rising, and at a normal pace the
   // reader left its band before the sheet's timer fired (founder: "i keep scrolling
@@ -2334,6 +2737,8 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     // one phone: step 1's chrome, every thread moved into its screen
     const phoneWrap = steps[0].querySelector('.phone-wrap').cloneNode(true);
     phoneWrap.style.removeProperty('--ph');
+    phoneWrap.querySelectorAll('.props').forEach(n => n.remove());   // the clone carried step 1's copy
+    mountProps(phoneWrap);
     const screen = phoneWrap.querySelector('.screen');
     screen.innerHTML = '';
     const threads = steps.map(s => s.querySelector('.thread[data-play]'));
@@ -2402,6 +2807,8 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
       t.style.transform = '';
     });
     Array.from(pinned.copy.children).forEach((c, i) => steps[i].querySelector('.wrap').prepend(c));
+    propGroups.forEach(g => g.classList.remove('cur'));
+    mountProps(null);
     pinned.track.remove();
     if (pinned.rail){ pinned.rail.classList.remove('show'); pinned.rail.innerHTML = ''; }
     stepsWrap.style.display = '';
@@ -2426,6 +2833,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     Array.from(copy.children).forEach((c, k) => c.classList.toggle('on', k === i));
     dots.forEach((d, k) => k === i ? d.setAttribute('aria-current', 'true') : d.removeAttribute('aria-current'));
     Array.from(mascot.children).forEach((m, k) => m.classList.toggle('on', k === i));
+    propGroups.forEach((g, k) => g.classList.toggle('cur', k === i));
     Array.from(stepper.querySelectorAll('button')).forEach((b, k) => k === i ? b.setAttribute('aria-current', 'step') : b.removeAttribute('aria-current'));
     sticky.className = 'proof-sticky ' + tints[i];
     threads.forEach((t, k) => t.classList.toggle('active', k === i));
@@ -2457,12 +2865,11 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
       if (pinned.rail) pinned.rail.classList.toggle('show', active);
       const idx = bandOf(p);
       setStep(idx);
-      // Drive the reveals only once the track has pinned (its top at or above the
-      // viewport's top). Before that p is clamped to 0, and set(0) still means "the
-      // first bubble" — which starts the 1.4s idle finish, so the first conversation
-      // played itself out while the reader was still on the hero (founder,
-      // 2026-11-15: "already loaded in and played" by the time they scrolled down).
-      if (!TIMED && r.top <= 0 && pinned.threads[idx]._prog) pinned.threads[idx]._prog.set(Math.min(1, Math.max(0, (p - BANDS[idx]) / (BANDS[idx + 1] - BANDS[idx]))));
+      // The conversation is a function of this progress. Before the track has pinned (its top still below
+      // the viewport's top) p is clamped to 0, which would already mean "the first bubble" — so that case
+      // is fed as -1: nothing shown until the phone is actually in place (2026-11-15: the first
+      // conversation used to play itself out while the reader was still on the hero).
+      if (!TIMED && pinned.threads[idx]._prog) pinned.threads[idx]._prog.set(r.top > 0 ? -1 : Math.min(1, Math.max(0, (p - BANDS[idx]) / (BANDS[idx + 1] - BANDS[idx]))));   // -1 = not pinned yet: nothing shown
     });
   }
   function fitStacked(){
@@ -2542,8 +2949,8 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   // can be followed into sign-ups, and it fires one `qr-scan {src}` per landing.
   // The label is kept in a variable only (nothing stored in the browser) and
   // never leaves this load. Never put a typed answer in an event.
-  const STEP_NAMES = ['', 'name', 'phone', 'occupation', 'age', 'gender', 'stats', 'goals', 'obstacle', 'experience', 'equipment', 'days', 'time', 'diet', 'restrictions', 'apps', 'consent'];
-  const OPTIONAL = new Set(['restrictions']);
+  const STEP_NAMES = ['', 'name', 'phone', 'occupation', 'age', 'gender', 'stats', 'activity', 'obstacle', 'goals', 'experience', 'routine', 'equipment', 'injuries', 'days', 'time', 'sleep', 'apps', 'cooking', 'diet', 'restrictions', 'consent'];
+  const OPTIONAL = new Set(['restrictions']);   // allergies may be blank
   const REQUIRED = STEP_NAMES.slice(1).filter(n => !OPTIONAL.has(n));
   const ref = (() => {
     try {
@@ -2584,7 +2991,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
 
   // ── reading the form ──
   const fieldOf = name => overlay.querySelector(`[data-f="${name}"]`);   // rows in the form, plus the consent row in the footer
-  const ORDER = [...form.querySelectorAll('.fo-field')].map(f => f.dataset.f);   // the rows, DOM order — the accordion walks it
+  const ORDER = [...form.querySelectorAll('.fo-field')].map(f => f.dataset.f);   // the questions, DOM order — the screens walk it
   // Every question row is required (founder, 2026-11-20 — reverting the 11-14
   // "only name, number and consent" middle ground: of the first four sign-ups on
   // it, three skipped everything, and the coach then had to collect the whole
@@ -2596,6 +3003,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   // it reads with startswith("student").
   const SKIPPABLE = ['restrictions', 'email', 'referral'];
   const MUST = ORDER.filter(n => !SKIPPABLE.includes(n)).concat('consent');
+  const needs = n => MUST.includes(n);   // every question except the three skippable ones (the routine question is asked of everyone — founder, 2026-11-27; it was hidden for "just starting" for an hour)
   const stats = fieldOf('stats');
   const isMetricRow = el => { const row = el.closest('.fo-us, .fo-metric'); return !row || (stats.classList.contains('metric') === row.classList.contains('fo-metric')); };
   const num = el => { const v = parseFloat(String(el.value).replace(',', '.')); return Number.isFinite(v) ? v : NaN; };
@@ -2617,6 +3025,10 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     if (!field) return '';
     if (name === 'stats') return readStats();
     if (name === 'consent') return field.querySelector('.fo-consent').classList.contains('sel');
+    if (name === 'sleep'){   // two rows of picks: when they're up, when they're asleep
+      const g = k => { const c = field.querySelector(`.fo-chips[data-g="${k}"] .fo-chip.sel`); return c ? c.dataset.v : null; };
+      return { wake: g('wake'), sleep: g('sleep') };
+    }
     const chips = field.querySelector('.fo-chips');
     if (chips) return [...chips.querySelectorAll('.fo-chip.sel')].map(c => c.dataset.v);
     const inp = field.querySelector('.fo-in');
@@ -2629,7 +3041,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   const statsTouched = () => [...stats.querySelectorAll('.fo-in')].filter(isMetricRow).some(i => i.value.trim() !== '');
   // VALID = "may be posted as is" (never a wrong fact: a half-typed height &
   // weight, a 4-digit age or a bad email are refused). Whether a blank row may be
-  // LEFT blank is MUST's call, checked beside VALID in advance() and on submit.
+  // LEFT blank is MUST's call, checked beside VALID on "next" and on submit.
   const VALID = {
     name: v => v.length > 0,
     phone: validPhone,
@@ -2639,14 +3051,12 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     stats: v => !!v || !statsTouched(),
     gender: () => true, goals: () => true, obstacle: () => true, experience: () => true, equipment: () => true,
     days: () => true, time: () => true, diet: () => true, restrictions: () => true, apps: () => true,
+    activity: () => true, routine: () => true, sleep: () => true, cooking: () => true,
+    injuries: v => !(v.length === 1 && v[0] === 'other' && !injNote()),   // "something else" alone has to say what
     email: v => !v || validEmail(v),
     referral: () => true,
   };
-  // ── the accordion ──
-  // One row per question. Answering marks the row done (summary at the right),
-  // collapses it and opens the next unanswered row; typed and multi-pick rows
-  // wait for Enter / "next" (an empty optional reads "skip"). Any row opens on
-  // a tap, as many as they like. Flagging a row on submit opens it.
+  // ── answers ──
   const LABELS = {};
   form.querySelectorAll('.fo-chip').forEach(c => { LABELS[c.closest('.fo-field').dataset.f + ':' + c.dataset.v] = c.textContent.trim(); });
   const answered = name => {
@@ -2656,17 +3066,28 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     if (name === 'age') return /^\d{1,3}$/.test(v);
     if (name === 'stats') return !!v;
     if (name === 'consent') return v === true;
+    if (name === 'sleep') return !!(v.wake && v.sleep);
+    if (name === 'injuries') return v.length > 0 && VALID.injuries(v);
     return Array.isArray(v) ? v.length > 0 : v !== '' && v !== false && v !== null;
   };
   function summary(name){
     const v = read(name);
     if (!answered(name)) return '';
     if (name === 'stats') return v.height_cm != null ? `${v.height_cm} cm, ${v.weight_kg} kg` : `${v.height_ft}'${v.height_in}, ${v.weight_lbs} lbs`;
-    if (name === 'days') return `${v[0]} days`;
     if (name === 'occupation'){ const o = occupationOf(); return [o.kind === 'other' ? 'something else' : o.kind === 'working' ? 'i work' : o.kind, o.school, o.job].filter(Boolean).join(' · '); }
     if (name === 'referral') return v.toUpperCase();
     if (Array.isArray(v)) return v.map(x => LABELS[name + ':' + x] || x).join(', ');
     return v;
+  }
+  // Injuries as the backend takes them: free text, "none" when there are none (signup_stats.py).
+  const injNote = () => (form.querySelector('#foInjNote') || { value: '' }).value.trim();
+  function injuriesText(){
+    const v = read('injuries');
+    if (!v.length) return null;
+    if (v.includes('none')) return 'none';
+    const parts = v.filter(x => x !== 'other').map(x => LABELS['injuries:' + x] || x).join(', ');
+    const note = injNote();
+    return note ? (parts ? `${parts} — ${note}` : note) : (parts || null);
   }
   // What goes up for occupation: a free-text `occupation` the backend already
   // reads ("student" first when they study, so its startswith("student") checks
@@ -2684,60 +3105,65 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     else if (kind === 'other') occupation = job || 'other';
     return { kind, school: school || null, job: job || null, occupation };
   }
-  const passed = new Set();   // answered, or skipped on purpose
-  function setOpen(name, on){
-    const field = fieldOf(name);
-    const q = field.querySelector('.fo-q'); if (!q) return;   // the consent row has no fold
-    field.classList.toggle('open', on);
-    q.setAttribute('aria-expanded', String(on));
+  // ── the screens ──
+  // Five short screens (.fo-page), one shown at a time; every question on the current one is open
+  // (.open — which is also what "is this question on screen" means to the tests). "next" checks only
+  // the current screen: the first question that is blank-but-required or half-typed is flagged and the
+  // reader stays; otherwise the next screen slides in. "back" never checks anything. Enter in a typed
+  // field walks to the screen's next typed field, and from the last one acts as "next". A step dot
+  // jumps back to any screen already seen. Submit checks everything and goes to the first gap's screen.
+  const PAGES = [...form.querySelectorAll('.fo-page')], LAST = PAGES.length - 1;
+  const nextBtn = document.getElementById('coNext'), backBtn = document.getElementById('coBack'), stepsEl = document.getElementById('coSteps');
+  const namesOn = i => [...PAGES[i].querySelectorAll('.fo-field')].map(f => f.dataset.f);
+  const pageOf = name => name === 'consent' ? LAST : PAGES.findIndex(pg => pg.contains(fieldOf(name)));
+  const gap = names => names.find(n => !VALID[n](read(n)) || (needs(n) && !answered(n)));
+  let page = 0, seen = 0;
+  const dots = PAGES.map((pg, i) => {
+    const b = document.createElement('button'); b.type = 'button';
+    b.setAttribute('aria-label', `step ${i + 1} of ${PAGES.length}: ${pg.querySelector('.fo-sec-h').firstChild.textContent.trim()}`);
+    b.addEventListener('click', () => { if (i <= seen && i !== page) showPage(i, true); });
+    if (stepsEl) stepsEl.appendChild(b);
+    return b;
+  });
+  // typed fields a reader can actually reach on a screen (the active unit row; the occupation detail for the picked kind)
+  const reachable = inp => {
+    const f = inp.closest('.fo-field'), sub = inp.closest('.fo-sub');
+    if (sub) return f.classList.contains(sub.classList.contains('school') ? 'student' : sub.classList.contains('note') ? 'noted' : 'working');
+    return isMetricRow(inp);
+  };
+  function focusFirst(){
+    if (!window.matchMedia('(min-width: 768px)').matches) return;   // phones: focusing opens the keyboard over the sheet
+    const ins = [...PAGES[page].querySelectorAll('.fo-in')].filter(reachable);
+    const el = ins.find(x => !x.value.trim()) || null;
+    if (el) el.focus({ preventScroll: true });
   }
-  function nextAfter(name){
-    const i = ORDER.indexOf(name);
-    const todo = n => !passed.has(n) && !answered(n);
-    return ORDER.slice(i + 1).find(todo) || ORDER.find(todo) || null;
-  }
-  function focusIn(name){
-    const inp = [...fieldOf(name).querySelectorAll('.fo-in')].find(isMetricRow);
-    if (inp) inp.focus({ preventScroll: true });
-  }
-  // Scroll the body so the row sits at the top. Computed by hand, not with
-  // scrollIntoView: a row that was just folded is still at full height when
-  // the scroll starts (its 300ms fold is in flight), so a target read from the
-  // live layout overshoots by that height and the opened row lands above the
-  // view (founder's screenshot, 2026-11-14). Subtract what every closed row
-  // above the target still occupies, and the landing matches the settled layout.
-  function scrollToRow(name){
-    const field = fieldOf(name);
-    if (!body.contains(field)) return;   // the consent row lives in the footer, always on screen
-    let top = field.getBoundingClientRect().top - body.getBoundingClientRect().top + body.scrollTop;
-    form.querySelectorAll('.fo-field:not(.open)').forEach(f => {
-      if (f !== field && (f.compareDocumentPosition(field) & Node.DOCUMENT_POSITION_FOLLOWING)) top -= f.querySelector('.fo-ai').getBoundingClientRect().height;
+  function showPage(i, focus){
+    const from = page;
+    page = Math.max(0, Math.min(LAST, i)); seen = Math.max(seen, page);
+    PAGES.forEach((pg, k) => {
+      const on = k === page;
+      pg.hidden = !on; pg.classList.toggle('cur', on); pg.classList.toggle('rev', on && page < from);
+      pg.querySelectorAll('.fo-field').forEach(f => f.classList.toggle('open', on));
     });
-    top = Math.max(0, Math.round(top));
-    if (body.scrollTo) body.scrollTo({ top, behavior: reduced.matches ? 'auto' : 'smooth' }); else body.scrollTop = top;
+    overlay.classList.toggle('first', page === 0);
+    overlay.classList.toggle('last', page === LAST);
+    dots.forEach((b, k) => { b.classList.toggle('cur', k === page); b.classList.toggle('seen', k <= seen && k !== page); if (k === page) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+    // the mascot's pose and the preview's status line follow the screen
+    const pose = PAGES[page].dataset.pose;
+    overlay.querySelectorAll('.pose img').forEach(im => im.classList.toggle('on', im.dataset.pose === pose));
+    const st = document.getElementById('pvStatus'); if (st) st.textContent = PAGES[page].dataset.status || '';
+    body.scrollTop = 0;
+    hideErr();
+    preview();
+    if (focus) focusFirst();
   }
-  function goTo(name){
-    setOpen(name, true);
-    scrollToRow(name);
-    focusIn(name);
-  }
-  // Leave a row: a MUST row has to be answered; a skippable one (allergies, gmail,
-  // referral code) is a skip, unless it's half-typed (VALID refuses it).
-  function advance(name){
-    if (!fieldOf(name)) return;   // the 240ms fold timer after a pick can fire once the success screen has replaced the form
-    if (!VALID[name](read(name)) || (MUST.includes(name) && !answered(name))) { flag(name); return; }
-    passed.add(name);
-    setOpen(name, false);
-    const next = nextAfter(name);
-    if (next) goTo(next); else submitBtn.focus({ preventScroll: true });
+  function next(){
+    const bad = gap(namesOn(page));
+    if (bad){ flag(bad); return; }
+    if (page < LAST) showPage(page + 1, true); else submitProfile();
   }
   function refresh(name){
-    const field = fieldOf(name);
-    const done = answered(name);
-    field.classList.toggle('done', done);
-    const qv = field.querySelector('.fo-qv'); if (qv) qv.textContent = summary(name);
-    const nxt = field.querySelector('.fo-next');
-    if (nxt) nxt.textContent = (!done && !MUST.includes(name)) ? 'skip' : 'next';
+    fieldOf(name).classList.toggle('done', answered(name));
     setLabel();
   }
   // The button reads "sign up" throughout. (2026-11-14 → 11-20 it switched to
@@ -2753,26 +3179,93 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     const field = fieldOf(name);
     field.classList.remove('bad');
     hideErr();
-    const v = read(name);
+    if (name === 'injuries'){ const v = read('injuries'), was = field.classList.contains('noted'); field.classList.toggle('noted', v.length > 0 && !v.includes('none')); if (!was && field.classList.contains('noted')) showRow('injuries'); }   // the note box (scrolled into view when it appears)
     if (answered(name) && STEP_NAMES.includes(name)) markStep(name);
     refresh(name);
     setProgress();
+    preview();
+  }
+
+  // ── the live preview ──
+  // What cued would text back, assembled from the answers so far: a hello by first name, a line about
+  // classes or work, the stats line, the goal, their routine, injuries, a week card with the days they picked lit,
+  // wake and sleep, the tracker, food,
+  // and a last line on the final screen. Desktop shows it as a phone beside the form; under 1024px its
+  // latest line shows as one bubble under the header. Typed text only ever goes in through textContent,
+  // and none of it leaves the page or enters an analytics event.
+  const pv = document.getElementById('pvThread'), peek = overlay.querySelector('#coPeek span');
+  const lbl = (n, v) => LABELS[n + ':' + v] || v;
+  const EQUIP = { full_gym: 'at a full gym', limited_gym: 'at a limited gym', home_gym: 'with a home gym', bodyweight: 'bodyweight only' };
+  const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+  const ACTIVITY = { sitting: 'sedentary — mostly sitting', walking: 'lightly active — some walking', feet: 'active — on my feet most of the day', physical: 'very active — physical job or sport' };   // phrases, as the backend's activity_level column holds them
+  const COOK = { cook_myself: 'you cook', dining_hall: 'dining hall', mostly_eat_out: 'mostly eating out', mix: 'a mix of cooking and eating out' };
+  const UP = { '06:00': 'before 7', '08:00': 'around 8', '10:00': 'around 10', '12:00': 'around noon' };
+  const DOWN = { '21:30': 'before 10', '23:00': 'around 11', '01:00': 'around 1', '03:00': 'after 2' };
+  function previewItems(){
+    const out = [];
+    const first = read('name').split(/\s+/)[0].toLowerCase();
+    out.push(['hi', first ? `hey ${first}.` : null]);                      // null = three dots, waiting for a name
+    const o = occupationOf();
+    if (o.kind === 'student') out.push(['who', `a student${o.school ? ' at ' + o.school.toLowerCase() : ''}. i'll work around your classes.`]);
+    else if (o.kind === 'working') out.push(['who', `${o.job ? o.job.toLowerCase() + '. ' : ''}i'll work around your job.`]);
+    else if (o.kind === 'both') out.push(['who', "classes and a job. i'll fit training around both."]);
+    if (read('stats')) out.push(['stats', `${summary('stats')}. i'll set your calories and protein from that.`]);
+    const goals = read('goals');
+    if (goals.length){ const eq = read('equipment')[0]; out.push(['goal', `${goals.map(g => lbl('goals', g)).join(' + ')}${eq ? ', ' + EQUIP[eq] : ''}. i'll build your first workout around that.`]); }
+    const split = read('routine')[0];
+    if (split) out.push(['split', split === 'none' ? "no routine yet. i'll build you one." : `${lbl('routine', split)}. i'll build on that.`]);
+    const inj = read('injuries');
+    if (inj.length && !inj.includes('none') && VALID.injuries(inj)){
+      const parts = inj.filter(x => x !== 'other').map(x => lbl('injuries', x));
+      out.push(['inj', parts.length ? `i'll work around your ${parts.join(' and ')}.` : "noted. i'll work around that."]);
+    }
+    const days = read('days');
+    if (days.length) out.push(['week', { days, times: read('time').map(t => lbl('time', t)) }]);
+    const sl = read('sleep');
+    if (sl.wake && sl.sleep) out.push(['sleep', `up ${UP[sl.wake]}, asleep ${DOWN[sl.sleep]}. i'll keep my texts inside that.`]);
+    const tools = read('apps');
+    if (tools.length) out.push(['apps', tools.includes('none') ? 'no tracker? just text me how it went.' : `i'll read your ${tools.map(a => lbl('apps', a)).join(' + ')}.`]);
+    const cook = read('cooking')[0], diet = read('diet')[0];
+    if (cook || diet){
+      const r = read('restrictions').toLowerCase();
+      const bits = [cook ? COOK[cook] : null, diet ? (diet === 'omnivore' ? 'no restrictions' : lbl('diet', diet)) : null, r ? 'minus ' + r : null].filter(Boolean);
+      out.push(['food', `${bits.join(', ')}. i'll plan meals around that.`]);
+    }
+    if (page === LAST) out.push(['go', "that's everything. sign up and i'll text you."]);
+    return out;
+  }
+  function weekCard(el, v){
+    if (!el.firstChild){
+      el.innerHTML = '<div class="pv-wk-h"><span>your week</span><span class="pv-wk-c"></span></div><div class="pv-wk">' + ['m', 't', 'w', 't', 'f', 's', 's'].map(d => `<div><i></i>${d}</div>`).join('') + '</div>';
+    }
+    el.querySelector('.pv-wk-c').textContent = `${v.days.length} day${v.days.length === 1 ? '' : 's'}${v.times.length ? ' · ' + v.times.join(' + ') : ''}`;
+    el.querySelectorAll('.pv-wk i').forEach((c, k) => c.classList.toggle('on', v.days.includes(DAY_KEYS[k])));   // the days they actually picked
+  }
+  function preview(){
+    const items = previewItems();
+    if (pv){
+      const keep = new Set(items.map(it => it[0]));
+      [...pv.children].forEach(el => { if (!keep.has(el.dataset.k)) el.remove(); });
+      items.forEach(([key, val]) => {
+        let el = pv.querySelector(`[data-k="${key}"]`);
+        if (!el){
+          el = document.createElement('div'); el.dataset.k = key; el.className = 'pv-msg' + (key === 'week' ? ' pv-card' : '');
+          requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('in')));
+        }
+        pv.appendChild(el);   // (re)appending keeps the thread in the items' order
+        if (key === 'week') weekCard(el, val);
+        else if (val === null){ if (!el.classList.contains('pv-dots')){ el.classList.add('pv-dots'); el.innerHTML = '<i></i><i></i><i></i>'; } }
+        else { el.classList.remove('pv-dots'); if (el.textContent !== val) el.textContent = val; }
+      });
+    }
+    if (peek){
+      const last = items.filter(it => it[1] !== null).pop();
+      peek.textContent = !last ? '' : last[0] === 'week' ? `${last[1].days.join(', ')}${last[1].times.length ? ' · ' + last[1].times.join(' + ') : ''}. got it.` : last[1];
+    }
   }
 
   // ── wiring ──
-  form.querySelectorAll('.fo-q').forEach(q => q.addEventListener('click', () => {
-    const name = q.closest('.fo-field').dataset.f;
-    const field = fieldOf(name);
-    const on = !field.classList.contains('open');
-    setOpen(name, on);
-    if (!on) return;
-    // If the unfolded row would run past the bottom of the scroller, bring it to the top.
-    const top = field.getBoundingClientRect().top - body.getBoundingClientRect().top;
-    const settled = q.getBoundingClientRect().height + field.querySelector('.fo-body').getBoundingClientRect().height;
-    if (top + settled > body.clientHeight) scrollToRow(name);
-    focusIn(name);
-  }));
-  form.querySelectorAll('.fo-next').forEach(b => b.addEventListener('click', () => advance(b.closest('.fo-field').dataset.f)));
+  form.querySelectorAll('.fo-field').forEach(f => { const q = f.querySelector('.fo-q'); f.querySelectorAll('.fo-in:not([aria-label]):not([id="foSchool"]):not([id="foJob"])').forEach(inp => q && inp.setAttribute('aria-labelledby', q.id)); });
   form.querySelectorAll('.fo-chips').forEach(group => {
     const multi = group.dataset.multi === '1';
     const name = group.closest('.fo-field').dataset.f;
@@ -2780,8 +3273,8 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
       if (multi){
         const on = chip.classList.toggle('sel');
         chip.setAttribute('aria-checked', String(on));
-        // "nothing yet" is exclusive: picking it clears the rest, picking a tool clears it.
-        if (name === 'apps' && on){
+        // "nothing yet" / "none" is exclusive: picking it clears the rest, picking anything else clears it.
+        if ((name === 'apps' || name === 'injuries') && on){
           const none = chip.dataset.v === 'none';
           group.querySelectorAll('.fo-chip.sel').forEach(c => { if (c !== chip && (none || c.dataset.v === 'none')) { c.classList.remove('sel'); c.setAttribute('aria-checked', 'false'); } });
         }
@@ -2789,17 +3282,15 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
       } else {
         group.querySelectorAll('.fo-chip').forEach(c => { c.classList.remove('sel'); c.setAttribute('aria-checked', 'false'); });
         chip.classList.add('sel'); chip.setAttribute('aria-checked', 'true');
-        changed(name);
         if (group.dataset.stay === '1'){
-          // occupation: the pick reveals its detail box (school / work) and stays open for it
+          // occupation: the pick reveals its detail box (school / work)
           const f = group.closest('.fo-field'), k = chip.dataset.v;
           f.classList.toggle('student', k === 'student' || k === 'both');
           f.classList.toggle('working', k === 'working' || k === 'both');
+          changed(name);
           const sub = f.querySelector(k === 'working' ? '#foJob' : (k === 'other' ? null : '#foSchool'));
-          if (sub) sub.focus({ preventScroll: true });
-        } else {
-          setTimeout(() => advance(name), reduced.matches ? 0 : 240);   // the pick lands, then the row folds
-        }
+          if (sub && f.classList.contains('open')) sub.focus({ preventScroll: true });
+        } else changed(name);
       }
     }));
   });
@@ -2816,7 +3307,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   stats.querySelectorAll('.co-unit').forEach(u => {
     const sync = () => { const on = (u.dataset.metric === '1') === stats.classList.contains('metric'); u.classList.toggle('sel', on); u.setAttribute('aria-checked', String(on)); };
     sync();
-    u.addEventListener('click', () => { stats.classList.toggle('metric', u.dataset.metric === '1'); stats.querySelectorAll('.co-unit').forEach(x => x.dispatchEvent(new Event('sync'))); changed('stats'); focusIn('stats'); });
+    u.addEventListener('click', () => { stats.classList.toggle('metric', u.dataset.metric === '1'); stats.querySelectorAll('.co-unit').forEach(x => x.dispatchEvent(new Event('sync'))); changed('stats'); const el = [...stats.querySelectorAll('.fo-in')].find(isMetricRow); if (el) el.focus({ preventScroll: true }); });
     u.addEventListener('sync', sync);
   });
   const phoneIn = form.querySelector('#foPhone');
@@ -2832,8 +3323,8 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   overlay.querySelectorAll('.fo-in').forEach(inp => {
     const name = inp.closest('.fo-field').dataset.f;
     inp.addEventListener('input', () => changed(name));
-    // Enter = next (what enterkeyhint="next" promises). In height & weight it
-    // first walks the row's empty boxes.
+    // Enter walks the screen's typed fields (what enterkeyhint="next" promises): in height & weight the
+    // row's empty boxes first, then the next reachable field on this screen; from the last one it is "next".
     inp.addEventListener('keydown', e => {
       if (e.key !== 'Enter') return;
       e.preventDefault();
@@ -2842,26 +3333,41 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
         const after = boxes.slice(boxes.indexOf(inp) + 1).find(x => !x.value.trim());
         if (after){ after.focus(); return; }
       }
-      advance(name);
+      const ins = [...PAGES[page].querySelectorAll('.fo-in')].filter(reachable);
+      const after = ins[ins.indexOf(inp) + 1];
+      if (after) after.focus(); else next();
     });
   });
   form.addEventListener('submit', e => { e.preventDefault(); submitProfile(); });
   submitBtn.addEventListener('click', submitProfile);
+  if (nextBtn) nextBtn.addEventListener('click', next);
+  if (backBtn) backBtn.addEventListener('click', () => { if (page > 0) showPage(page - 1, true); });
   ORDER.forEach(refresh);
   refresh('consent');
-  setOpen(ORDER[0], true);
+  showPage(0);
 
   function showErr(text){ if (errLine){ errLine.textContent = text; errLine.classList.add('show'); } }
   function hideErr(){ if (errLine){ errLine.textContent = ''; errLine.classList.remove('show'); } }
   function flag(name){
     const field = fieldOf(name);
-    setOpen(name, true);
+    if (pageOf(name) !== page) showPage(pageOf(name));
     field.classList.add('bad');
     field.classList.remove('co-shake');
     requestAnimationFrame(() => field.classList.add('co-shake'));
-    scrollToRow(name);
-    const inp = [...field.querySelectorAll('.fo-in')].find(x => !x.value.trim() && isMetricRow(x));
+    showRow(name);
+    const inp = [...field.querySelectorAll('.fo-in')].find(x => !x.value.trim() && reachable(x));
     if (inp) inp.focus({ preventScroll: true });
+  }
+  // Scroll the screen only as far as it takes to show a question (a flagged one, or the field the phone
+  // keyboard just covered).
+  function showRow(name){
+    const field = fieldOf(name);
+    if (!body.contains(field)) return;   // the consent line lives in the footer, always on screen
+    const top = field.getBoundingClientRect().top - body.getBoundingClientRect().top + body.scrollTop, h = field.offsetHeight, PAD = 16;
+    let to = body.scrollTop;
+    if (top - PAD < to) to = top - PAD; else if (top + h + PAD > to + body.clientHeight) to = Math.min(top - PAD, top + h + PAD - body.clientHeight); else return;
+    to = Math.max(0, Math.round(to));
+    if (body.scrollTo) body.scrollTo({ top: to, behavior: reduced.matches ? 'auto' : 'smooth' }); else body.scrollTop = to;
   }
 
   // ── submit ──
@@ -2891,7 +3397,13 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
       equipment: read('equipment')[0] || null,
       // the objective stats (backend #155) — either unit system, backend converts
       ...(read('stats') || {}),
-      workout_days: read('days')[0] || null,
+      workout_days: read('days').length ? read('days') : null,   // WHICH days since 2026-11-27 (["mon","wed","fri"], week order) — the backend took a count or day names all along
+      // new on the form 2026-11-27 so the coach stops asking them over text:
+      injuries: injuriesText(),                                           // "none" | "shoulder, knee — left knee, no deep squats"
+      current_split: read('routine')[0] || null,                          // ppl | upper_lower | full_body | bro_split | custom | none — asked of everyone, beginners included
+      activity_level: ACTIVITY[read('activity')[0]] || null,
+      cooking_situation: read('cooking')[0] || null,                      // cook_myself | dining_hall | mostly_eat_out | mix
+      wake_time: read('sleep').wake, sleep_time: read('sleep').sleep,     // HH:MM, the middle of the range they picked
       workout_time: times[0] || null,
       workout_times: times.length > 1 ? times : null,
       diet: read('diet')[0] || null,
@@ -2903,7 +3415,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   }
   async function submitProfile(){
     if (busy) return;
-    const bad = ORDER.concat('consent').find(n => !VALID[n](read(n)) || (MUST.includes(n) && !answered(n)));
+    const bad = gap(ORDER.concat('consent'));
     if (bad){ flag(bad); return; }
     hideErr();
     busy = true;
@@ -2962,11 +3474,17 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
   function successScreen(title, text, link){
     body.innerHTML = '';
     footer.style.display = 'none';
+    overlay.classList.add('sent');   // desktop: the wide card shrinks back around the success screen
     const s = document.createElement('div');
     s.className = 'co-success';
     s.innerHTML = '<div class="co-success-icon">🎉</div><h3></h3><p></p>';
     s.querySelector('h3').textContent = title;
     s.querySelector('p').textContent = text;
+    // the finish: the PR stars and the dumbbell burst out to either side of the 🎉 (x, y, width, tilt) — nothing above it, the header is right there
+    const burst = document.createElement('span'); burst.className = 'co-burst'; burst.setAttribute('aria-hidden', 'true');
+    [['star-pr', -116, -30, 46, -14], ['star', -76, 32, 24, 12], ['dumbbell', -178, 26, 62, -10], ['star-pr-2', 112, -36, 42, 14], ['star', 84, 30, 24, -10], ['star-2', 150, 6, 22, 20], ['star-2', 190, 44, 16, -16]]
+      .forEach(([n, x, y, w, r], k) => { const im = new Image(); im.alt = ''; im.src = 'assets/props/' + n + '.webp'; im.style.cssText = `--x:${x}px;--y:${y}px;--w:${w}px;--r:${r}deg;--d:${(k * .05).toFixed(2)}s`; burst.appendChild(im); });
+    s.querySelector('.co-success-icon').appendChild(burst);
     if (link){
       // iMessage-first (Photon shared pool): Cued can't text a new number in
       // blue until that number texts Cued's line once. The link opens Messages
@@ -3022,7 +3540,7 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     overlay.style.left = Math.round(vv.offsetLeft) + 'px';
     // The keyboard just took half the screen: keep the field they're typing in on it.
     const el = document.activeElement;
-    if (el && el.classList && el.classList.contains('fo-in') && form.contains(el)) scrollToRow(el.closest('.fo-field').dataset.f);
+    if (el && el.classList && el.classList.contains('fo-in') && form.contains(el)) showRow(el.closest('.fo-field').dataset.f);
   }
   let lastFocus = null;
   let opened = false;
@@ -3034,8 +3552,9 @@ footer{position:relative;overflow:hidden;isolation:isolate;background:var(--crea
     document.body.style.overflow = 'hidden';
     if (vv){ vv.addEventListener('resize', fitViewport); vv.addEventListener('scroll', fitViewport); fitViewport(); }
     if (!opened){ opened = true; track('signup-open', { source: ctaSource() }); }   // re-opening keeps what they've filled in
-    // Desktop: the cursor lands in the first field. Phones: no — focusing opens the keyboard over the sheet.
-    if (window.matchMedia('(min-width: 768px)').matches){ const first = form.querySelector('.fo-in'); first && first.focus({ preventScroll: true }); }
+    // the later poses are fetched the first time the card opens, not with the page
+    overlay.querySelectorAll('.pose img[data-src]').forEach(im => { im.src = im.dataset.src; im.removeAttribute('data-src'); });
+    focusFirst();   // desktop: the cursor lands in the screen's first empty field. Phones: no — focusing opens the keyboard over the sheet.
   }
   window.openWaitlist = open;
 
